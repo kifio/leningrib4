@@ -2,15 +2,20 @@ package kifio.leningrib.view;
 
 import kifio.leningrib.LGCGame;
 import kifio.leningrib.model.*;
+import kifio.leningrib.controller.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class WorldRenderer {
     
 	private LGCGame game;
-	private World world;
+	private WorldController worldController;
+	private Stage stage;
+	private ScreenViewport viewport;
     private Texture overworld;
     private TextureRegion grass;
 
@@ -18,18 +23,18 @@ public class WorldRenderer {
 	private int cameraWidth;
 	private int cameraHeight;
 	private int tileSize;
-	private float elapsedTime = 0;
 
-	public WorldRenderer(LGCGame game, World world) {
+	public WorldRenderer(LGCGame game, WorldController worldController) {
 		this.game = game;
-		this.world = world;
+		this.worldController = worldController;
 		loadTextures();
 		initCamera();
+		initStage();
 	}
 
 	private void loadTextures() {
-		this.overworld = game.getTexture("overworld.png");
-		this.grass = new TextureRegion(overworld, 0, 0, 16, 16);
+		overworld = game.getTexture("overworld.png");
+		grass = new TextureRegion(overworld, 0, 0, 16, 16);
 	}
 
 	private void initCamera() {
@@ -43,27 +48,26 @@ public class WorldRenderer {
 		// create the camera and the game.batch
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, width, height);
-		
-		Gdx.app.log("kifio", String.format("cameraWidth: %d; cameraHeight: %d", cameraWidth, cameraHeight));
+	}
+
+	private void initStage() {
+		viewport = new ScreenViewport(camera);
+		stage = new Stage(viewport, game.batch);
+		stage.addActor(worldController.player);
 	}
 
 	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		elapsedTime += Gdx.graphics.getDeltaTime();
 		
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 		
 		game.batch.begin();
 		drawGrass();
-		drawPlayer();
 		game.batch.end();
-	}
-
-	private void drawPlayer() {
-		TextureRegion playerTexture = world.player.getTextureRegion(elapsedTime);
-		game.batch.draw(playerTexture, world.player.x, world.player.y, playerTexture.getRegionWidth() * 4, playerTexture.getRegionHeight() * 4);
+		stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
 	}
 
 	private void drawGrass() {
@@ -71,6 +75,13 @@ public class WorldRenderer {
 			for (int j = 0; j < cameraHeight; j++) {
 				game.batch.draw(grass, tileSize * i, tileSize * j, tileSize, tileSize);
 			}
+		}
+	}
+
+	public void dispose() {
+		if (stage != null) {
+			stage.dispose();
+			stage = null;
 		}
 	}
 }

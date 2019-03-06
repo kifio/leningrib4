@@ -3,20 +3,24 @@ package kifio.leningrib.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import kifio.leningrib.LGCGame;
-import kifio.leningrib.model.World;
+import com.badlogic.gdx.graphics.*;
+import kifio.leningrib.controller.*;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import kifio.leningrib.view.WorldRenderer;
 import com.badlogic.gdx.graphics.GL20;
 
-public class GameScreen implements Screen {
+public class GameScreen extends InputAdapter implements Screen {
     
 	private LGCGame game;
-	private World world;
 	private WorldRenderer worldRenderer;
+	private WorldController worldController;
 
 	public GameScreen(LGCGame game) {
+		Gdx.input.setInputProcessor(this);
 		this.game = game;
-		this.world = new World();
-		this.worldRenderer = new WorldRenderer(game, world);
+		this.worldController = new WorldController();
+		this.worldRenderer = new WorldRenderer(game, worldController);
 	}
 
 	@Override
@@ -26,7 +30,10 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		worldRenderer = null;
+		if (worldRenderer != null) {
+			worldRenderer.dispose();
+			worldRenderer = null;
+		}
 		game = null;
 	}
 	
@@ -49,5 +56,16 @@ public class GameScreen implements Screen {
 	@Override
 	public void resume() {
 	}
+
+	@Override 
+	public boolean touchDown(int x, int y, int pointer, int button) {
+        return super.touchDown(x, y, pointer, button);
+    }
+
+    @Override 
+    public boolean touchUp(int x, int y, int pointer, int button) {
+        worldController.movePlayerTo((float) x, (float) (Gdx.graphics.getHeight() - y));
+        return true;
+    }
 
 }
