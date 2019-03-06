@@ -19,12 +19,13 @@ public class GameScreen extends InputAdapter implements Screen {
 	public GameScreen(LGCGame game) {
 		Gdx.input.setInputProcessor(this);
 		this.game = game;
-		this.worldController = new WorldController();
+		this.worldController = new WorldController(game);
 		this.worldRenderer = new WorldRenderer(game, worldController);
 	}
 
 	@Override
 	public void render(float delta) {
+		worldController.update();
 		worldRenderer.render();
 	}
 

@@ -5,6 +5,7 @@ import kifio.leningrib.model.*;
 import kifio.leningrib.controller.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,7 +17,6 @@ public class WorldRenderer {
 	private WorldController worldController;
 	private Stage stage;
 	private ScreenViewport viewport;
-    private Texture overworld;
     private TextureRegion grass;
 
 	private OrthographicCamera camera;
@@ -33,8 +33,7 @@ public class WorldRenderer {
 	}
 
 	private void loadTextures() {
-		overworld = game.getTexture("overworld.png");
-		grass = new TextureRegion(overworld, 0, 0, 16, 16);
+		grass = new TextureRegion(game.getTexture("overworld.png"), 0, 0, 16, 16);
 	}
 
 	private void initCamera() {
@@ -54,6 +53,10 @@ public class WorldRenderer {
 		viewport = new ScreenViewport(camera);
 		stage = new Stage(viewport, game.batch);
 		stage.addActor(worldController.player);
+		
+		for (Group tree : worldController.trees) {
+			stage.addActor(tree);
+		}
 	}
 
 	public void render() {
