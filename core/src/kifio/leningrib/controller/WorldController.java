@@ -58,4 +58,9 @@ public class WorldController {
 			}
 		}
     }
+
+    // Если игрок пересекся с деревом, возвращаем его назад, чтобы не блокировать движение
+    private void moveBack() {
+
+    }
 }
