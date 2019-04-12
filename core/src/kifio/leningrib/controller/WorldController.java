@@ -1,66 +1,105 @@
 package kifio.leningrib.controller;
 
 import kifio.leningrib.model.*;
+
 import java.util.*;
-import com.badlogic.gdx.Gdx;
+
 import kifio.leningrib.LGCGame;
+
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 public class WorldController {
 
-	// Параметр должен зависеть от разрешения экрана
-	private static final int SCALE = 4;
+    // Параметр должен зависеть от разрешения экрана
+//	private static final int scale = 8;
 
-	private LGCGame game;
+    private LGCGame game;
 
-	public Player player = new Player(SCALE);
-	public Set<Group> trees = new HashSet<>();
-	public Set<Rectangle> treesBounds = new HashSet<>();
+    public MovableActor player;
+    public Set<Group> trees = new HashSet<>();
 
-	private TextureRegion[] tree = new TextureRegion[4];
+    // Множестов зон, в которые нельзя попасть
+    public Set<Rectangle> unreachableBounds = new HashSet<>();
 
-	public WorldController(LGCGame game) {
-		this.game = game;
-		initTrees();
-	}
+    public WorldController(LGCGame game) {
+        this.game = game;
+        this.player = new MovableActor(game.width / game.tileSize, game.tileSize, "player.txt");
+        initTrees();
+        initMushrooms();
+    }
 
-	private void initTrees() {
-		Texture overworld = game.getTexture("overworld.png");
-		tree[0] = new TextureRegion(overworld, 80, 256, 16, 16);
-		tree[1] = new TextureRegion(overworld, 80, 272, 16, 16);
-		tree[2] = new TextureRegion(overworld, 96, 272, 16, 16);
-		tree[3] = new TextureRegion(overworld, 96, 256, 16, 16);
+    private void initMushrooms() {
+        Group group = new Group();
+        group.addActor(new MovableActor(game.tileSize * 3, game.tileSize * 3, -1,
+                game.tileSize, "power_mushroom.txt"));
+        trees.add(group);
+    }
 
-		addTree(200, 200);
-	}
+    private void initTrees() {
+        // TODO: Разные группы будут отвечать за разные эффекты деревьев
+        Group group = new Group();
+        addTree(group, game.tileSize, 3 * game.tileSize);
+        addTree(group, game.tileSize * 3, 5 * game.tileSize);
+        addTree(group, game.tileSize * 4, 2 * game.tileSize);
 
-	private void addTree(int x, int y) {
-		Group group = new Group();
-		group.addActor(new TreePart(tree[0], x, y, SCALE));
-		group.addActor(new TreePart(tree[1], x, y  - 16 * SCALE, SCALE));
-		group.addActor(new TreePart(tree[2], x  + 16 * SCALE, y  - 16 * SCALE, SCALE));
-		group.addActor(new TreePart(tree[3], x  + 16 * SCALE, y, SCALE));
-		treesBounds.add(new Rectangle(x, y  - 16 * SCALE, 2 * 16 * SCALE, 2 * 16 * SCALE));
-		trees.add(group);
-	}
+        addTopLeftSegment(group, game.tileSize, 0);
+        addTopRightSegment(group, 2 * game.tileSize, 0);
 
-	public void movePlayerTo(float x, float y) {
-		player.moveTo(x, y);
+        addBottomRightSegment(group, 0, 4 * game.tileSize);
+        addTopRightSegment(group, 0, 5 * game.tileSize);
+
+        trees.add(group);
+    }
+
+    // TODO: Выыделить методы для добавления сегментов дерева
+    private void addTree(Group group, int x, int y) {
+        addTopLeftSegment(group, x, y);
+        addBottomLeftSegment(group, x, y - game.tileSize);
+        addTopRightSegment(group, x + game.tileSize, y);
+        addBottomRightSegment(group, x + game.tileSize, y - game.tileSize);
+    }
+
+    private void addTopLeftSegment(Group group, int x, int y) {
+        group.addActor(new TreePart(TextureManager.get("tree_0"), x, y, game.tileSize, game.tileSize));
+    }
+
+    private void addTopRightSegment(Group group, int x, int y) {
+        group.addActor(new TreePart( TextureManager.get("tree_3"), x, y, game.tileSize, game.tileSize));
+    }
+
+    private void addBottomLeftSegment(Group group, int x, int y) {
+        group.addActor(new TreePart(TextureManager.get("tree_1"), x, y, game.tileSize, game.tileSize));
+        unreachableBounds.add(new Rectangle(x, y, game.tileSize, game.tileSize));
+    }
+
+    private void addBottomRightSegment(Group group, int x, int y) {
+        group.addActor(new TreePart(TextureManager.get("tree_2"), x, y, game.tileSize, game.tileSize));
+        unreachableBounds.add(new Rectangle(x, y, game.tileSize, game.tileSize));
+    }
+
+    public void movePlayerTo(float x, float y) {
+        if (player.checkIsStayed(x, y)) return;
+        if (isUnreachableZone(new Vector2(x, y))) return;
+        if (player.checkMoveLeft(x, y)) player.moveLeft();
+        else if (player.checkMoveRight(x, y)) player.moveRight();
+        else if (player.checkMoveUp(x, y)) player.moveUp();
+        else if (player.checkMoveDown(x, y)) player.moveDown();
+    }
+
+    private boolean isUnreachableZone(Vector2 point) {
+        for (Rectangle r : unreachableBounds)
+            if (r.contains(point)) return true;
+        return false;
     }
 
     public void update() {
-    	for (Rectangle bounds : treesBounds) {
-			if (bounds.overlaps(player.bounds)) {
-				player.stopMoving();
-			}
-		}
+        setPlayerRect();
     }
 
-    // Если игрок пересекся с деревом, возвращаем его назад, чтобы не блокировать движение
-    private void moveBack() {
-
+    public void setPlayerRect() {
+        player.tile.setX((float) (player.getTileX(game.tileSize) * game.tileSize));
+        player.tile.setY((float) (player.getTileY(game.tileSize) * game.tileSize));
     }
 }

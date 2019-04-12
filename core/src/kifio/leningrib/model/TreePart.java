@@ -13,16 +13,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class TreePart extends Actor {
 
 	private TextureRegion treeTexture;
-	private int scale;
 
-	public TreePart(TextureRegion textureRegion, int x, int y, int scale) {
-		this.scale = scale;
+	public TreePart(TextureRegion textureRegion, int x, int y, int width, int heigh) {
 		treeTexture = textureRegion;
 		setX(x); setY(y);
+		setWidth(width); setHeight(heigh);
 	}
 
 	@Override
     public void draw(Batch batch, float alpha){
-		batch.draw(treeTexture, getX(), getY(), treeTexture.getRegionWidth() * scale, treeTexture.getRegionHeight() * scale);
+		batch.draw(treeTexture, getX(), getY(), getWidth(), getHeight());
     }
 }
