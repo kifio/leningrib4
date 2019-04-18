@@ -3,7 +3,7 @@
     package="kifio.leningrib" >
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:isGame="true"
         android:appCategory="game"

@@ -1,7 +1,9 @@
 package kifio.leningrib.model;
 
 import java.lang.*;
+import java.util.Locale;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -26,7 +28,10 @@ public class MovableActor extends Actor {
     private int scale;  // нужен для того, чтоб милипиздрические текстурки растягивать до приемлимых значений
     private int tileSize;  // нужен для того, чтоб милипиздрические текстурки растягивать до приемлимых значений
 
-    public Rectangle tile;  // клетка, в которой находится актор
+    private float tx;
+    private float ty;
+
+//    public Rectangle tile;  // клетка, в которой находится актор
     public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при отрисовке фрейма размер пересчитывается
 
     // TODO: Избавиться от параметра scale, рисовать персонажа в центре квадрата, аки гриб
@@ -42,7 +47,7 @@ public class MovableActor extends Actor {
         this.tileSize = tileSize;
         this.bounds = new Rectangle();
         setX(x); setY(y);
-        this.tile = new Rectangle(x, y, (float) tileSize, (float) tileSize);
+        tx = x; ty = y;
     }
 
     @Override
@@ -67,13 +72,6 @@ public class MovableActor extends Actor {
         bounds.set(getX(), getY(), tileSize, tileSize);
         batch.draw(texture, getX(), getY(), tileSize, tileSize);
     }
-    public int getTileX(int tileSize) {
-        return (int) getX() / tileSize;
-    }
-
-    public int getTileY(int tileSize) {
-        return (int) getY() / tileSize;
-    }
 
     public void moveTo(float targetX, float targetY) {
         MoveToAction moveAction = actionPool.obtain();
@@ -88,41 +86,47 @@ public class MovableActor extends Actor {
         moveAction.setPosition(targetX, targetY);
 
         addAction(moveAction);
+        
+        tx = targetX; ty = targetY;
     }
 
     public boolean checkIsStayed(float x, float y) {
-        return tile.contains(x, y);
+        return Math.abs(x - tx) <= tileSize / 2 && Math.abs(y - ty) <= tileSize / 2;
     }
 
     public boolean checkMoveLeft(float x, float y) {
-        return (x > tile.x - tile.width && x < tile.x) && (y > tile.y && y < tile.y + tile.height);
+        return (x < tx - (tileSize / 2) && x > tx - 3 * (tileSize / 2))
+                && (y > ty - (tileSize / 2) && y < ty + (tileSize / 2));
     }
 
     public boolean checkMoveRight(float x, float y) {
-        return (x > tile.x + tile.width && x < tile.x + 2 * tile.width) && (y > tile.y && y < tile.y + tile.height);
+        return (x > tx + (tileSize / 2) && x < tx + 3 * (tileSize / 2))
+                && (y > ty - (tileSize / 2) && y < ty + (tileSize / 2));
     }
 
     public boolean checkMoveUp(float x, float y) {
-        return (y > tile.y + tile.height && y < tile.y + 2 * tile.height) && (x > tile.x && x < tile.x + tile.width);
+        return (y > ty + (tileSize / 2) && y < ty + 3 * (tileSize / 2))
+                && (x > tx - (tileSize / 2) && x < tx + (tileSize / 2));
     }
 
     public boolean checkMoveDown(float x, float y) {
-        return (y < tile.y && y > tile.y - tile.height) && (x > tile.x && x < tile.x + tile.width);
+        return (y < ty - (tileSize / 2) && y > ty - 3 * (tileSize / 2))
+                && (x > tx - (tileSize / 2) && x < tx + (tileSize / 2));
     }
 
     public void moveLeft() {
-        moveTo(tile.x - tile.width / 2, tile.y + tile.height / 2);
+        moveTo(tx - tileSize, ty);
     }
 
     public void moveRight() {
-        moveTo(tile.x + 1.5f * tile.width, tile.y + tile.height / 2);
+        moveTo(tx + tileSize, ty);
     }
 
     public void moveUp() {
-        moveTo(tile.x + tile.height / 2, tile.y + 1.5f * tile.height);
+        moveTo(tx, ty + tileSize);
     }
 
     public void moveDown() {
-        moveTo(tile.x + tile.height / 2, tile.y - tile.height / 2);
+        moveTo(tx, ty - tileSize);
     }
 }

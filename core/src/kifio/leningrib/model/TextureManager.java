@@ -14,6 +14,7 @@ public class TextureManager {
 
         AssetManager am = new AssetManager();
         am.load("overworld.png", Texture.class);
+        am.load("forest_tiles.png", Texture.class);
         am.load("power_mushroom.png", Texture.class);
         am.finishLoading();
 
@@ -23,7 +24,13 @@ public class TextureManager {
         regions.put("tree_1", new TextureRegion(overworld, 80, 272, 16, 16));
         regions.put("tree_2", new TextureRegion(overworld, 96, 272, 16, 16));
         regions.put("tree_3", new TextureRegion(overworld, 96, 256, 16, 16));
-        regions.put("grass", new TextureRegion(overworld, 0, 0, 16, 16));
+
+        Texture forestTiles = am.get("forest_tiles.png");
+
+        for (int i = 0, k = 0; i < 15; i++) {
+            int row = i / 5, col = i % 5;
+            regions.put("grass_" + i, new TextureRegion(forestTiles, row * 32, col * 32, 32, 32));
+        }
 
         Texture powerMushroom = am.get("power_mushroom.png");
         regions.put("pm_0", new TextureRegion(powerMushroom, 0, 0, 96, 96));
