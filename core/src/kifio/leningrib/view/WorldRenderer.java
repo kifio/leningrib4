@@ -1,55 +1,58 @@
 package kifio.leningrib.view;
 
-import kifio.leningrib.LGCGame;
-import kifio.leningrib.levels.Level;
-import kifio.leningrib.model.*;
-import kifio.leningrib.controller.*;
-
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import kifio.leningrib.levels.Level;
+import kifio.leningrib.model.TextureManager;
 
 public class WorldRenderer {
 
-    private LGCGame game;
-    private WorldController worldController;
     private Stage stage;
-    private ScreenViewport viewport;
+    private Level level;
     private TextureRegion grass;
-    private TiledMap map;
+    private SpriteBatch batch;
+    private ShapeRenderer renderer;
     private OrthographicCamera camera;
-    private OrthogonalTiledMapRenderer renderer;
+    private int tileSize;
+    private int cameraWidth;
+    private int cameraHeight;
 
-    public WorldRenderer(LGCGame game, WorldController worldController, OrthographicCamera camera, Level level) {
-        this.game = game;
-        this.worldController = worldController;
+    public WorldRenderer(Level level,
+                         OrthographicCamera camera,
+                         int tileSize,
+                         int cameraWidth,
+                         int cameraHeight) {
+        this.level = level;
         this.camera = camera;
+        this.tileSize = tileSize;
+        this.cameraWidth = cameraWidth;
+        this.cameraHeight = cameraHeight;
         loadTextures();
-        initMap();
-        viewport = new ScreenViewport(camera);
-        stage = new Stage(viewport, game.batch);
+        batch = new SpriteBatch();
+        renderer = new ShapeRenderer();
+        ScreenViewport viewport = new ScreenViewport(camera);
+        stage = new Stage(viewport, batch);
         resetStage(level);
     }
 
-    private void initMap() {
-        map = new TmxMapLoader().load("lvl_0.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map, game.tileSize / 16);
-    }
-
     private void loadTextures() {
-        grass = new TextureRegion(TextureManager.get("grass_1"));
+        grass = new TextureRegion(TextureManager.get("grass_0"));
     }
 
     public void resetStage(Level level) {
         stage.clear();
-        stage.addActor(worldController.player);
+        stage.addActor(level.player);
+        stage.addActor(level.forester);
         for (Group tree : level.trees) stage.addActor(tree);
     }
 
@@ -59,57 +62,63 @@ public class WorldRenderer {
 
         camera.update();
 
-        if (worldController.player.getY() > Gdx.graphics.getHeight() / 2) {
-            camera.position.y = worldController.player.getY();
+        if (level.player.getY() > Gdx.graphics.getHeight() / 2) {
+            camera.position.y = level.player.getY() + (tileSize / 2f);
         }
 
-        renderer.setView(camera);
-        renderer.render();
+        batch.setProjectionMatrix(camera.combined);
 
-        game.batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        drawGrass();
+        batch.end();
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 
-        game.renderer.setProjectionMatrix(camera.combined);
-        game.renderer.begin(ShapeRenderer.ShapeType.Line);
-        game.renderer.setColor(Color.BLUE);
+        renderer.setProjectionMatrix(camera.combined);
+        renderer.begin(ShapeRenderer.ShapeType.Line);
+        renderer.setColor(Color.BLUE);
 
-        for (int i = 0; i < game.cameraWidth; i++) {
-            game.renderer.line(game.tileSize * i, 0,
-                    game.tileSize * i, game.cameraHeight * game.tileSize);
-        }
+//        for (int i = 0; i < cameraWidth; i++) {
+//            renderer.line(tileSize * i, 0,
+//                    tileSize * i, cameraHeight * tileSize);
+//        }
+//
+//        for (int i = 0; i < cameraHeight; i++) {
+//            renderer.line(0, tileSize * i,
+//                    cameraWidth * tileSize, tileSize * i);
+//        }
 
-        for (int i = 0; i < game.cameraHeight; i++) {
-            game.renderer.line(0, game.tileSize * i,
-                    game.cameraWidth * game.tileSize, game.tileSize * i);
-        }
+        renderer.setColor(Color.RED);
 
-        game.renderer.setColor(Color.RED);
+        renderer.rect(level.player.bounds.x,
+                level.player.bounds.y,
+                level.player.bounds.width,
+                level.player.bounds.height);
 
-        game.renderer.rect(worldController.player.bounds.x,
-                worldController.player.bounds.y,
-                worldController.player.bounds.width,
-                worldController.player.bounds.height);
-
-        game.renderer.setColor(Color.YELLOW);
-        game.renderer.rect(worldController.player.getX() - game.tileSize / 2f,
-                worldController.player.getY() - game.tileSize / 2f,
-                game.tileSize,
-                game.tileSize);
-
-        game.renderer.end();
+        renderer.end();
     }
 
+
     private void drawGrass() {
-        for (int i = 0; i < game.cameraWidth; i++) {
-            for (int j = 0; j < game.cameraHeight; j++) {
-                game.batch.draw(grass, game.tileSize * i, game.tileSize * j, game.tileSize, game.tileSize);
+        int dc = calcDC();  //чтобы трава рисовалась плавно при движении, добавляем ряд травы ниже камеры и выше камеры
+        for (int i = 0; i < cameraWidth; i++) {
+            for (int j = dc > 0 ? -1 : 0; j <= cameraHeight; j++) {
+                batch.draw(grass, tileSize * i, tileSize * (j + dc), tileSize, tileSize);
             }
         }
     }
 
+    private int calcDC() {
+        float dy = camera.position.y - (float) Gdx.graphics.getHeight() / 2;
+        int dc = 0;
+        if (dy > 0) dc = (int) (dy / tileSize);
+        return dc;
+    }
+
     public void dispose() {
+        batch.dispose();
+        renderer.dispose();
         if (stage != null) {
             stage.dispose();
             stage = null;

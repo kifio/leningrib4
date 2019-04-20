@@ -1,42 +1,31 @@
 package kifio.leningrib.controller;
 
-import kifio.leningrib.levels.FirstLevel;
-import kifio.leningrib.levels.Level;
-import kifio.leningrib.model.*;
-
-import java.util.*;
-
-import kifio.leningrib.LGCGame;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.math.Rectangle;
+
+import kifio.leningrib.levels.Level;
+import kifio.leningrib.screens.GameScreen;
 
 public class WorldController {
 
-    private LGCGame game;
+    private GameScreen gameScreen;
     private Level level;
-    public MovableActor player;
 
-    public WorldController(LGCGame game) {
-        this.game = game;
-        this.player = new MovableActor(
-                game.tileSize / 2f,
-                game.tileSize / 2f,
-                game.width / game.tileSize,
-                game.tileSize,
-                "player.txt");
-        this.level = new FirstLevel(game);
+    public WorldController(GameScreen gameScreen, Level level) {
+        this.gameScreen = gameScreen;
+        this.level = level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
     }
 
     public void movePlayerTo(float x, float y) {
-        if (player.checkIsStayed(x, y)) return;
+        if (level.player.checkIsStayed(x, y)) return;
         if (level.isUnreachableZone(new Vector2(x, y))) return;
-        if (player.checkMoveLeft(x, y)) player.moveLeft();
-        else if (player.checkMoveRight(x, y)) player.moveRight();
-        else if (player.checkMoveUp(x, y)) player.moveUp();
-        else if (player.checkMoveDown(x, y)) player.moveDown();
+        if (level.player.checkMoveLeft(x, y)) level.player.moveLeft();
+        else if (level.player.checkMoveRight(x, y)) level.player.moveRight();
+        else if (level.player.checkMoveUp(x, y)) level.player.moveUp();
+        else if (level.player.checkMoveDown(x, y)) level.player.moveDown();
     }
 
     public void update() {
@@ -44,7 +33,6 @@ public class WorldController {
     }
 
     private void checkIsLevelPassed() {
-        if (player.getY() < 0) game.onLevelPassed();
+        if (level.player.getY() < 0) gameScreen.onLevelPassed();
     }
-
 }

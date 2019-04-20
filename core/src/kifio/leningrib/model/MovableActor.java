@@ -25,7 +25,6 @@ public class MovableActor extends Actor {
 
     private Animation actorAnimation;
     private float elapsedTime = 0;
-    private int scale;  // нужен для того, чтоб милипиздрические текстурки растягивать до приемлимых значений
     private int tileSize;  // нужен для того, чтоб милипиздрические текстурки растягивать до приемлимых значений
 
     private float tx;
@@ -34,16 +33,10 @@ public class MovableActor extends Actor {
 //    public Rectangle tile;  // клетка, в которой находится актор
     public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при отрисовке фрейма размер пересчитывается
 
-    // TODO: Избавиться от параметра scale, рисовать персонажа в центре квадрата, аки гриб
-    public MovableActor(int scale, int tileSize, String packFile) {
-        this(0f, 0f, scale, tileSize, packFile);
-    }
-
     // TODO: Сделать с помощью билдера
-    public MovableActor(float x, float y, int scale, int tileSize, String packFile) {
+    public MovableActor(float x, float y, int tileSize, String packFile) {
         TextureAtlas playerAtlas = new TextureAtlas(packFile);
         this.actorAnimation = new Animation<>(1 / 15f, playerAtlas.getRegions());
-        this.scale = scale;
         this.tileSize = tileSize;
         this.bounds = new Rectangle();
         setX(x); setY(y);
@@ -59,13 +52,7 @@ public class MovableActor extends Actor {
     @Override
     public void draw(Batch batch, float alpha) {
         TextureRegion texture = (TextureRegion) actorAnimation.getKeyFrame(elapsedTime, true);
-        if (scale != -1) drawScaled(batch,texture);
-        else drawOnTile(batch, texture);
-    }
-
-    private void drawScaled(Batch batch, TextureRegion texture) {
-        bounds.set(getX(), getY(), texture.getRegionWidth() * scale, texture.getRegionHeight() * scale);
-        batch.draw(texture, getX(), getY(), texture.getRegionWidth() * scale, texture.getRegionHeight() * scale);
+        drawOnTile(batch, texture);
     }
 
     private void drawOnTile(Batch batch, TextureRegion texture) {
@@ -91,27 +78,25 @@ public class MovableActor extends Actor {
     }
 
     public boolean checkIsStayed(float x, float y) {
-        return Math.abs(x - tx) <= tileSize / 2 && Math.abs(y - ty) <= tileSize / 2;
+        // Пользователь ткнул в клетку, не левее и не ниже клетки с персонажем (условия 1 и 2)
+        // Пользователь ткнул в клетку, не правее и не выше клетки с персонажем (условия 3 и 4)
+        return x > tx && y > ty && Math.abs(x - tx) <= tileSize / 2 && Math.abs(y - ty) <= tileSize / 2;
     }
 
     public boolean checkMoveLeft(float x, float y) {
-        return (x < tx - (tileSize / 2) && x > tx - 3 * (tileSize / 2))
-                && (y > ty - (tileSize / 2) && y < ty + (tileSize / 2));
+        return (x < tx  && x > tx - (tileSize)) && (y > ty && y < ty + (tileSize));
     }
 
     public boolean checkMoveRight(float x, float y) {
-        return (x > tx + (tileSize / 2) && x < tx + 3 * (tileSize / 2))
-                && (y > ty - (tileSize / 2) && y < ty + (tileSize / 2));
+        return (x > tx + (tileSize) && x < tx + 2 * (tileSize)) && (y > ty && y < ty + (tileSize));
     }
 
     public boolean checkMoveUp(float x, float y) {
-        return (y > ty + (tileSize / 2) && y < ty + 3 * (tileSize / 2))
-                && (x > tx - (tileSize / 2) && x < tx + (tileSize / 2));
+        return (y > ty + (tileSize) && y < ty + 2 * (tileSize)) && (x > tx && x < tx + (tileSize));
     }
 
     public boolean checkMoveDown(float x, float y) {
-        return (y < ty - (tileSize / 2) && y > ty - 3 * (tileSize / 2))
-                && (x > tx - (tileSize / 2) && x < tx + (tileSize / 2));
+        return (y < ty && y > ty - (tileSize)) && (x > tx && x < tx + (tileSize));
     }
 
     public void moveLeft() {
