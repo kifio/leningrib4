@@ -1,7 +1,7 @@
 enemy.png
 size: 16, 384
 format: RGBA8888
-filter: Linear,Linear
+filter: Nearest,Nearest
 repeat: none
 enemy-0
   rotate: false
