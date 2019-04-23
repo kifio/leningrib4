@@ -5,7 +5,6 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-import kifio.leningrib.LGCGame;
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.FirstLevel;
 import kifio.leningrib.levels.Level;
@@ -17,7 +16,7 @@ public class GameScreen extends InputAdapter implements Screen {
     private WorldController worldController;
     private OrthographicCamera camera;
 
-    public int tileSize;
+    public static int tileSize;
     public int cameraWidth;
     public int cameraHeight;
 
@@ -25,9 +24,9 @@ public class GameScreen extends InputAdapter implements Screen {
         Gdx.input.setInputProcessor(this);
         initScreenSize();
         initCamera();
-        Level level = getNextLevel(this);
+        Level level = getNextLevel();
         this.worldController = new WorldController(this, level);
-        this.worldRenderer = new WorldRenderer(level, camera, tileSize, cameraWidth, cameraHeight);
+        this.worldRenderer = new WorldRenderer(level, camera, cameraWidth, cameraHeight);
     }
 
     // Инициализирует камеру ортгональную карте
@@ -44,18 +43,18 @@ public class GameScreen extends InputAdapter implements Screen {
     // Экран разбит на квадарты, здесь задается количество квадратов по ширине,
     // в зависимости от этого рассчитывается количество кадратов по высоте
     private void initScreenSize() {
-        cameraWidth = 5;
+        cameraWidth = 6;
         tileSize = (Gdx.graphics.getWidth() / cameraWidth) + 1;
         cameraHeight = (Gdx.graphics.getHeight() / tileSize) + 1;
 
     }
 
-    private Level getNextLevel(GameScreen gameScreen) {
-        return new FirstLevel(gameScreen);
+    private Level getNextLevel() {
+        return new FirstLevel();
     }
 
     public void onLevelPassed() {
-        Level level = getNextLevel(this);
+        Level level = getNextLevel();
         this.worldController.setLevel(level);
         this.worldRenderer.resetStage(level);
     }

@@ -5,7 +5,7 @@ import kifio.leningrib.screens.GameScreen;
 
 public class FirstLevel extends Level {
 
-    public FirstLevel(GameScreen gameScreen) {
-        super(gameScreen);
+    public FirstLevel() {
+        super("lvl_1.tmx");
     }
 }

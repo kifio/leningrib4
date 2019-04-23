@@ -14,27 +14,29 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.TextureManager;
+import kifio.leningrib.screens.GameScreen;
 
 public class WorldRenderer {
 
+    private boolean debug = false;
     private Stage stage;
     private Level level;
     private TextureRegion grass;
     private SpriteBatch batch;
     private ShapeRenderer renderer;
     private OrthographicCamera camera;
-    private int tileSize;
     private int cameraWidth;
     private int cameraHeight;
 
+    private Color playerDebugColor = new Color(0f, 0f, 1f, 0.5f);
+    private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
+
     public WorldRenderer(Level level,
                          OrthographicCamera camera,
-                         int tileSize,
                          int cameraWidth,
                          int cameraHeight) {
         this.level = level;
         this.camera = camera;
-        this.tileSize = tileSize;
         this.cameraWidth = cameraWidth;
         this.cameraHeight = cameraHeight;
         loadTextures();
@@ -57,27 +59,16 @@ public class WorldRenderer {
     }
 
     public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 0,0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        camera.update();
-
-        if (level.player.getY() > Gdx.graphics.getHeight() / 2) {
-            camera.position.y = level.player.getY() + (tileSize / 2f);
-        }
-
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
+        updateCamera();
         drawGrass();
-        batch.end();
+        drawDebug();
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 
-        renderer.setProjectionMatrix(camera.combined);
-        renderer.begin(ShapeRenderer.ShapeType.Line);
-        renderer.setColor(Color.BLUE);
 
 //        for (int i = 0; i < cameraWidth; i++) {
 //            renderer.line(tileSize * i, 0,
@@ -88,31 +79,69 @@ public class WorldRenderer {
 //            renderer.line(0, tileSize * i,
 //                    cameraWidth * tileSize, tileSize * i);
 //        }
-
-        renderer.setColor(Color.RED);
-
-        renderer.rect(level.player.bounds.x,
-                level.player.bounds.y,
-                level.player.bounds.width,
-                level.player.bounds.height);
-
-        renderer.end();
     }
 
+    private void updateCamera() {
+        camera.update();
+        float playerY = level.player.getY();
+        if (playerY > Gdx.graphics.getHeight() / 2)
+            camera.position.y = playerY + (GameScreen.tileSize / 2f);
+    }
+
+    private void drawDebug() {
+        if (!debug) return;
+        // Включаем поддержку прозрачности
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        renderer.setProjectionMatrix(camera.combined);
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        // Прямоугольник, на котором находится игрок
+        drawCharacterDebug();
+
+        // Прямоугольник, на котором находится лесник
+        drawForesterDebug();
+
+        renderer.end();
+
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
+
+    private void drawCharacterDebug() {
+        renderer.setColor(playerDebugColor);
+        Rectangle bounds = level.player.bounds;
+        renderer.rect(bounds.x,
+                bounds.y,
+                bounds.width,
+                bounds.height);
+    }
+
+    private void drawForesterDebug() {
+        renderer.setColor(foresterDebugColor);
+        Rectangle rectangle = level.forester.getPatrolRectangle();
+        renderer.rect(rectangle.x,
+                rectangle.y,
+                rectangle.width,
+                rectangle.height);
+    }
 
     private void drawGrass() {
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
         int dc = calcDC();  //чтобы трава рисовалась плавно при движении, добавляем ряд травы ниже камеры и выше камеры
         for (int i = 0; i < cameraWidth; i++) {
             for (int j = dc > 0 ? -1 : 0; j <= cameraHeight; j++) {
-                batch.draw(grass, tileSize * i, tileSize * (j + dc), tileSize, tileSize);
+                batch.draw(grass, GameScreen.tileSize * i, GameScreen.tileSize * (j + dc), GameScreen.tileSize, GameScreen.tileSize);
             }
         }
+        batch.end();
     }
 
     private int calcDC() {
         float dy = camera.position.y - (float) Gdx.graphics.getHeight() / 2;
         int dc = 0;
-        if (dy > 0) dc = (int) (dy / tileSize);
+        if (dy > 0) dc = (int) (dy / GameScreen.tileSize);
         return dc;
     }
 

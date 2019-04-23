@@ -26,6 +26,7 @@ public class WorldController {
         else if (level.player.checkMoveRight(x, y)) level.player.moveRight();
         else if (level.player.checkMoveUp(x, y)) level.player.moveUp();
         else if (level.player.checkMoveDown(x, y)) level.player.moveDown();
+        level.forester.moveToNextPatrolPoint();
     }
 
     public void update() {

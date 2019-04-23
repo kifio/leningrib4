@@ -13,18 +13,17 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import java.util.HashSet;
 import java.util.Set;
 
-import kifio.leningrib.model.MovableActor;
+import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.TextureManager;
 import kifio.leningrib.model.TreePart;
+import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.screens.GameScreen;
 
 public abstract class Level {
 
-    protected int tileSize;
-
     public TiledMap map;
-    public MovableActor player;
-    public MovableActor forester;
+    public Player player;
+    public Forester forester;
 
     // Деревья
     public Set<Group> trees = new HashSet<>();
@@ -32,22 +31,21 @@ public abstract class Level {
     // Множестов зон, в которые нельзя попасть
     public Set<Rectangle> unreachableBounds = new HashSet<>();
 
-    public Level(GameScreen gameScreen) {
-        tileSize = gameScreen.tileSize;
-        init();
+    public Level(String fileName) {
+        init(fileName);
     }
 
-    public void init() {
+    public void init(String fileName) {
         initPlayer();
         initForester();
-        initMap();
+        initMap(fileName);
 //        initTrees();
 //        initMushrooms();
     }
 
     // TODO: не использовать TileMap, использовать свой формат карты и хранить ее в json
-    private void initMap() {
-        map = new TmxMapLoader().load("lvl_0.tmx");
+    private void initMap(String fileName) {
+        map = new TmxMapLoader().load(fileName);
         for (MapLayer layer : map.getLayers()) {
             TiledMapTileLayer tileLayer = (TiledMapTileLayer) layer;
             handleLayers(tileLayer.getWidth(), tileLayer.getHeight(), tileLayer);
@@ -58,7 +56,7 @@ public abstract class Level {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 TiledMapTileLayer.Cell cell = layer.getCell(j, i);
-                if (cell != null) addTreeSegment(j * tileSize, i * tileSize, cell.getTile());
+                if (cell != null) addTreeSegment(j * GameScreen.tileSize, i * GameScreen.tileSize, cell.getTile());
             }
         }
     }
@@ -87,18 +85,22 @@ public abstract class Level {
     }
 
     private void initPlayer() {
-        this.player = new MovableActor(
+        this.player = new Player(
                 0f,
                 0f,
-                tileSize,
                 "player.txt");
     }
 
     private void initForester() {
-        this.forester = new MovableActor(
-                tileSize * 3f,
-                tileSize * 4f,
-                tileSize,
+        Vector2 from = new Vector2(
+                GameScreen.tileSize * 1f,
+                GameScreen.tileSize * 4f);
+
+        Vector2 to = new Vector2(
+                GameScreen.tileSize * 4f,
+                GameScreen.tileSize * 4f);
+
+        this.forester = new Forester(from, to,
                 "enemy.txt");
     }
 
@@ -128,27 +130,27 @@ public abstract class Level {
 
     private void addTree(Group group, int x, int y) {
         addTopLeftSegment(group, x, y);
-        addBottomLeftSegment(group, x, y - tileSize);
-        addTopRightSegment(group, x + tileSize, y);
-        addBottomRightSegment(group, x + tileSize, y - tileSize);
+        addBottomLeftSegment(group, x, y - GameScreen.tileSize);
+        addTopRightSegment(group, x + GameScreen.tileSize, y);
+        addBottomRightSegment(group, x + GameScreen.tileSize, y - GameScreen.tileSize);
     }
 
     private void addTopLeftSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_0"), x, y, tileSize, tileSize));
+        group.addActor(new TreePart(TextureManager.get("tree_0"), x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
     private void addTopRightSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_3"), x, y, tileSize, tileSize));
+        group.addActor(new TreePart(TextureManager.get("tree_3"), x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
     private void addBottomLeftSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_1"), x, y, tileSize, tileSize));
-        unreachableBounds.add(new Rectangle(x, y, tileSize, tileSize));
+        group.addActor(new TreePart(TextureManager.get("tree_1"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+        unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
     private void addBottomRightSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_2"), x, y, tileSize, tileSize));
-        unreachableBounds.add(new Rectangle(x, y, tileSize, tileSize));
+        group.addActor(new TreePart(TextureManager.get("tree_2"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+        unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
     public boolean isUnreachableZone(Vector2 point) {
