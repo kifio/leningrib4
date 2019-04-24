@@ -17,8 +17,8 @@ public class GameScreen extends InputAdapter implements Screen {
     private OrthographicCamera camera;
 
     public static int tileSize;
-    public int cameraWidth;
-    public int cameraHeight;
+    public static int cameraWidth;
+    public static int cameraHeight;
 
     public GameScreen() {
         Gdx.input.setInputProcessor(this);

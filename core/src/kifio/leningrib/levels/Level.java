@@ -1,5 +1,7 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -10,13 +12,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.TextureManager;
 import kifio.leningrib.model.TreePart;
+import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Player;
+import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
 
 public abstract class Level {
@@ -24,11 +29,18 @@ public abstract class Level {
     public TiledMap map;
     public Player player;
     public Forester forester;
+    public int mapWidth;
+    public int mapHeight;
+
+    // Граф поиска пути
+    private ForestGraph forestGraph = new ForestGraph();
+
+    public List<Vector2> path = new ArrayList<>();
 
     // Деревья
     public Set<Group> trees = new HashSet<>();
 
-    // Множестов зон, в которые нельзя попасть
+    // Множество зон, в которые нельзя попасть
     public Set<Rectangle> unreachableBounds = new HashSet<>();
 
     public Level(String fileName) {
@@ -46,17 +58,30 @@ public abstract class Level {
     // TODO: не использовать TileMap, использовать свой формат карты и хранить ее в json
     private void initMap(String fileName) {
         map = new TmxMapLoader().load(fileName);
+        mapWidth = (int) map.getProperties().get("width");
+        mapHeight = (int) map.getProperties().get("height");
+
         for (MapLayer layer : map.getLayers()) {
             TiledMapTileLayer tileLayer = (TiledMapTileLayer) layer;
-            handleLayers(tileLayer.getWidth(), tileLayer.getHeight(), tileLayer);
+            handleLayer(tileLayer.getWidth(), tileLayer.getHeight(), tileLayer);
+        }
+
+        TiledMapTileLayer treesLayer = (TiledMapTileLayer) map.getLayers().get(1); {
+            for (int i = 0; i < treesLayer.getHeight(); i++) {
+                for (int j = 0; j < treesLayer.getWidth(); j++) {
+                    addNeighbours(j, i, treesLayer);
+                }
+            }
         }
     }
 
-    private void handleLayers(int columns, int rows, TiledMapTileLayer layer) {
+    private void handleLayer(int columns, int rows, TiledMapTileLayer layer) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 TiledMapTileLayer.Cell cell = layer.getCell(j, i);
-                if (cell != null) addTreeSegment(j * GameScreen.tileSize, i * GameScreen.tileSize, cell.getTile());
+                if (cell != null) {
+                    addTreeSegment(j * GameScreen.tileSize, i * GameScreen.tileSize, cell.getTile());
+                }
             }
         }
     }
@@ -81,6 +106,55 @@ public abstract class Level {
                     break;
             }
             trees.add(group);
+        }
+    }
+
+    private void addNeighbours(int x, int y, TiledMapTileLayer layer) {
+        if (!isTileAvailable(layer.getCell(x ,y))) return;
+
+        Vector2 from = new Vector2(GameScreen.tileSize * x, GameScreen.tileSize * y);
+
+        if (x > 0 && isTileAvailable(layer.getCell(x - 1, y))) {
+            Vector2 to = new Vector2(GameScreen.tileSize * (x - 1), GameScreen.tileSize * y);
+            forestGraph.addConnection(from ,to);
+        }
+
+        if (x < mapWidth - 1 && isTileAvailable(layer.getCell(x + 1, y))) {
+            Vector2 to = new Vector2(GameScreen.tileSize * (x + 1), GameScreen.tileSize * y);
+            forestGraph.addConnection(from ,to);
+        }
+
+        if (y > 0 && y < mapHeight && isTileAvailable(layer.getCell(x, y + 1))) {
+            Vector2 to = new Vector2(GameScreen.tileSize * x, GameScreen.tileSize * (y + 1));
+            forestGraph.addConnection(from ,to);
+        }
+
+        if (y > 1 && y < mapHeight - 1 && isTileAvailable(layer.getCell(x, y - 1))) {
+            Vector2 to = new Vector2(GameScreen.tileSize * x , GameScreen.tileSize * (y - 1));
+            forestGraph.addConnection(from ,to);
+        }
+    }
+
+    public void resetPath(int x, int y) {
+
+        Vector2 to = new Vector2((x / GameScreen.tileSize) * GameScreen.tileSize,
+                (y / GameScreen.tileSize) * GameScreen.tileSize);
+
+        GraphPath<Vector2> path = forestGraph.getPath(new Vector2(player.getX(), player.getY()), to);
+        this.path.clear();
+        for (int i = 0; i < path.getCount(); i++) this.path.add(path.get(i));
+    }
+
+    private boolean isTileAvailable(TiledMapTileLayer.Cell cell) {
+        if (cell == null) return true;
+        TiledMapTile tile = cell.getTile();
+        if (tile == null) return true;
+        MapProperties properties = tile.getProperties();
+        if (properties.containsKey("index")) {
+            int index = (int) properties.get("index");
+            return (index == 0 || index == 2);
+        } else {
+            return true;
         }
     }
 

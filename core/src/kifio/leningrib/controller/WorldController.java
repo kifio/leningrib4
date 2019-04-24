@@ -20,13 +20,14 @@ public class WorldController {
     }
 
     public void movePlayerTo(float x, float y) {
-        if (level.player.checkIsStayed(x, y)) return;
-        if (level.isUnreachableZone(new Vector2(x, y))) return;
-        if (level.player.checkMoveLeft(x, y)) level.player.moveLeft();
-        else if (level.player.checkMoveRight(x, y)) level.player.moveRight();
-        else if (level.player.checkMoveUp(x, y)) level.player.moveUp();
-        else if (level.player.checkMoveDown(x, y)) level.player.moveDown();
-        level.forester.moveToNextPatrolPoint();
+        level.resetPath((int) x, (int) y);
+//        if (level.player.checkIsStayed(x, y)) return;
+//        if (level.isUnreachableZone(new Vector2(x, y))) return;
+//        if (level.player.checkMoveLeft(x, y)) level.player.moveLeft();
+//        else if (level.player.checkMoveRight(x, y)) level.player.moveRight();
+//        else if (level.player.checkMoveUp(x, y)) level.player.moveUp();
+//        else if (level.player.checkMoveDown(x, y)) level.player.moveDown();
+//        level.forester.moveToNextPatrolPoint();
     }
 
     public void update() {

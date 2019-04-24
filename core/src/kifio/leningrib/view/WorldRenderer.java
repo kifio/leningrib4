@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -18,7 +19,7 @@ import kifio.leningrib.screens.GameScreen;
 
 public class WorldRenderer {
 
-    private boolean debug = false;
+    private boolean debug = true;
     private Stage stage;
     private Level level;
     private TextureRegion grass;
@@ -29,6 +30,7 @@ public class WorldRenderer {
     private int cameraHeight;
 
     private Color playerDebugColor = new Color(0f, 0f, 1f, 0.5f);
+    private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
     private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
 
     public WorldRenderer(Level level,
@@ -84,7 +86,7 @@ public class WorldRenderer {
     private void updateCamera() {
         camera.update();
         float playerY = level.player.getY();
-        if (playerY > Gdx.graphics.getHeight() / 2)
+        if (playerY > Gdx.graphics.getHeight() / 2 && playerY < (level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2))
             camera.position.y = playerY + (GameScreen.tileSize / 2f);
     }
 
@@ -97,6 +99,8 @@ public class WorldRenderer {
         renderer.setProjectionMatrix(camera.combined);
         renderer.begin(ShapeRenderer.ShapeType.Filled);
 
+        drawPlayerPath();
+
         // Прямоугольник, на котором находится игрок
         drawCharacterDebug();
 
@@ -106,6 +110,17 @@ public class WorldRenderer {
         renderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
+
+    private void drawPlayerPath() {
+        renderer.setColor(playerPathDebugColor);
+        for (Vector2 vec: level.path) {
+            renderer.rect(vec.x,
+                    vec.y,
+                    GameScreen.tileSize,
+                    GameScreen.tileSize);
+        }
+
     }
 
     private void drawCharacterDebug() {
@@ -132,7 +147,9 @@ public class WorldRenderer {
         int dc = calcDC();  //чтобы трава рисовалась плавно при движении, добавляем ряд травы ниже камеры и выше камеры
         for (int i = 0; i < cameraWidth; i++) {
             for (int j = dc > 0 ? -1 : 0; j <= cameraHeight; j++) {
-                batch.draw(grass, GameScreen.tileSize * i, GameScreen.tileSize * (j + dc), GameScreen.tileSize, GameScreen.tileSize);
+                int x = GameScreen.tileSize * i;
+                int y = GameScreen.tileSize * (j + dc);
+                batch.draw(grass, x, y, GameScreen.tileSize, GameScreen.tileSize);
             }
         }
         batch.end();
