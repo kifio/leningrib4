@@ -39,23 +39,41 @@ public class Forester extends MovableActor {
             if (tx < to.x && movingState == MovingState.FORWARD) {
                 int from = (int) this.tx;
                 int to = (int) this.to.x;
-                while (from < to) {
+
+                while (true) {
                     from += GameScreen.tileSize;
                     path.add(new Vector2(from, ty));
                     count--;
-                    if (count == 0) return;
+                    if (count == 0) {
+                        if (from == to) {
+                            movingState = MovingState.BACK;
+                        }
+                        return;
+                    }
+                    if (from == to) {
+                        movingState = MovingState.BACK;
+                        return;
+                    }
                 }
-                movingState = MovingState.BACK;
             } else  {
                 int from = (int) this.tx;
                 int to = (int) this.from.x;
-                while (from > to) {
+
+                while (true) {
                     from -= GameScreen.tileSize;
                     path.add(new Vector2(from, ty));
                     count--;
-                    if (count == 0) return;
+                    if (count == 0) {
+                        if (from == to) {
+                            movingState = MovingState.FORWARD;
+                        }
+                        return;
+                    }
+                    if (from == to) {
+                        movingState = MovingState.FORWARD;
+                        return;
+                    }
                 }
-                movingState = MovingState.FORWARD;
             }
         }
     }
