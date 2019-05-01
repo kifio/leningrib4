@@ -1,6 +1,5 @@
 package kifio.leningrib.levels;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapProperties;
@@ -11,13 +10,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import javax.rmi.CORBA.Util;
 
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.TextureManager;
@@ -156,7 +152,13 @@ public abstract class Level {
                 Utils.mapCoordinate(x),
                 Utils.mapCoordinate(y));
         player.stop();
-        for (int i = 0; i < path.getCount(); i++) player.path.add(new Vector2(path.get(i)));
+        forester.stop();
+
+        // Первая точка пути совпадает с координатами игрока,
+        // чтобы игрок не стоял на месте лишнее время ее из пути удаляем.
+        for (int i = 1; i < path.getCount(); i++) {
+            player.path.add(new Vector2(path.get(i)));
+        }
     }
 
     private boolean isTileAvailable(TiledMapTileLayer.Cell cell) {
@@ -248,6 +250,9 @@ public abstract class Level {
     }
 
     public void startMoving() {
-        player.moveOnPath();
+        SequenceAction playerActionsSequence = player.getMoveActionsSequence();
+        SequenceAction foresterActionsSequence = forester.getMoveActionsSequence(player.path.size());
+        player.addAction(playerActionsSequence);
+        forester.addAction(foresterActionsSequence);
     }
 }

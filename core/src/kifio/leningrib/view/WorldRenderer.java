@@ -71,7 +71,6 @@ public class WorldRenderer {
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 
-
 //        for (int i = 0; i < cameraWidth; i++) {
 //            renderer.line(tileSize * i, 0,
 //                    tileSize * i, cameraHeight * tileSize);
