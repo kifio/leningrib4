@@ -114,13 +114,12 @@ public class WorldRenderer {
 
     private void drawPlayerPath() {
         renderer.setColor(playerPathDebugColor);
-        for (Vector2 vec: level.path) {
+        for (Vector2 vec: level.player.path) {
             renderer.rect(vec.x,
                     vec.y,
                     GameScreen.tileSize,
                     GameScreen.tileSize);
         }
-
     }
 
     private void drawCharacterDebug() {

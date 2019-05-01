@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.rmi.CORBA.Util;
+
+import kifio.leningrib.Utils;
 import kifio.leningrib.model.TextureManager;
 import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.actors.Forester;
@@ -34,8 +37,6 @@ public abstract class Level {
 
     // Граф поиска пути
     private ForestGraph forestGraph = new ForestGraph();
-
-    public List<Vector2> path = new ArrayList<>();
 
     // Деревья
     public Set<Group> trees = new HashSet<>();
@@ -66,11 +67,17 @@ public abstract class Level {
             handleLayer(tileLayer.getWidth(), tileLayer.getHeight(), tileLayer);
         }
 
-        TiledMapTileLayer treesLayer = (TiledMapTileLayer) map.getLayers().get(1); {
-            for (int i = 0; i < treesLayer.getHeight(); i++) {
-                for (int j = 0; j < treesLayer.getWidth(); j++) {
-                    addNeighbours(j, i, treesLayer);
-                }
+        TiledMapTileLayer treesLayer = (TiledMapTileLayer) map.getLayers().get(1);
+
+        for (int i = 0; i < treesLayer.getHeight(); i++) {
+            for (int j = 0; j < treesLayer.getWidth(); j++) {
+                forestGraph.addNode(j * GameScreen.tileSize, i * GameScreen.tileSize);
+            }
+        }
+
+        for (int i = 0; i < treesLayer.getHeight(); i++) {
+            for (int j = 0; j < treesLayer.getWidth(); j++) {
+                addNeighbours(j, i, treesLayer);
             }
         }
     }
@@ -110,39 +117,46 @@ public abstract class Level {
     }
 
     private void addNeighbours(int x, int y, TiledMapTileLayer layer) {
-        if (!isTileAvailable(layer.getCell(x ,y))) return;
+        if (!isTileAvailable(layer.getCell(x, y))) return;
 
-        Vector2 from = new Vector2(GameScreen.tileSize * x, GameScreen.tileSize * y);
+        float fromX = GameScreen.tileSize * x;
+        float fromY = GameScreen.tileSize * y;
+
+        float toX, toY;
 
         if (x > 0 && isTileAvailable(layer.getCell(x - 1, y))) {
-            Vector2 to = new Vector2(GameScreen.tileSize * (x - 1), GameScreen.tileSize * y);
-            forestGraph.addConnection(from ,to);
+            toX = GameScreen.tileSize * (x - 1);
+            toY = GameScreen.tileSize * y;
+            forestGraph.addConnection(fromX, fromY, toX, toY);
         }
 
         if (x < mapWidth - 1 && isTileAvailable(layer.getCell(x + 1, y))) {
-            Vector2 to = new Vector2(GameScreen.tileSize * (x + 1), GameScreen.tileSize * y);
-            forestGraph.addConnection(from ,to);
+            toX = GameScreen.tileSize * (x + 1);
+            toY = GameScreen.tileSize * y;
+            forestGraph.addConnection(fromX, fromY, toX, toY);
         }
 
-        if (y > 0 && y < mapHeight && isTileAvailable(layer.getCell(x, y + 1))) {
-            Vector2 to = new Vector2(GameScreen.tileSize * x, GameScreen.tileSize * (y + 1));
-            forestGraph.addConnection(from ,to);
+        if (y < mapHeight - 1 && isTileAvailable(layer.getCell(x, y + 1))) {
+            toX = GameScreen.tileSize * x;
+            toY = GameScreen.tileSize * (y + 1);
+            forestGraph.addConnection(fromX, fromY, toX, toY);
         }
 
-        if (y > 1 && y < mapHeight - 1 && isTileAvailable(layer.getCell(x, y - 1))) {
-            Vector2 to = new Vector2(GameScreen.tileSize * x , GameScreen.tileSize * (y - 1));
-            forestGraph.addConnection(from ,to);
+        if (y > 0 && isTileAvailable(layer.getCell(x, y - 1))) {
+            toX = GameScreen.tileSize * x;
+            toY = GameScreen.tileSize * (y - 1);
+            forestGraph.addConnection(fromX, fromY, toX, toY);
         }
     }
 
-    public void resetPath(int x, int y) {
-
-        Vector2 to = new Vector2((x / GameScreen.tileSize) * GameScreen.tileSize,
-                (y / GameScreen.tileSize) * GameScreen.tileSize);
-
-        GraphPath<Vector2> path = forestGraph.getPath(new Vector2(player.getX(), player.getY()), to);
-        this.path.clear();
-        for (int i = 0; i < path.getCount(); i++) this.path.add(path.get(i));
+    public void resetPath(float x, float y) {
+        GraphPath<Vector2> path = forestGraph.getPath(
+                Utils.mapCoordinate(player.getX()),
+                Utils.mapCoordinate(player.getY()),
+                Utils.mapCoordinate(x),
+                Utils.mapCoordinate(y));
+        player.stop();
+        for (int i = 0; i < path.getCount(); i++) player.path.add(new Vector2(path.get(i)));
     }
 
     private boolean isTileAvailable(TiledMapTileLayer.Cell cell) {
@@ -231,5 +245,9 @@ public abstract class Level {
         for (Rectangle r : unreachableBounds)
             if (r.contains(point)) return true;
         return false;
+    }
+
+    public void startMoving() {
+        player.moveOnPath();
     }
 }

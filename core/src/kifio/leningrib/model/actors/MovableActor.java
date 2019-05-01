@@ -19,7 +19,7 @@ import kifio.leningrib.screens.GameScreen;
 
 public class MovableActor extends Actor {
 
-    protected static final float VELOCITY = 1000f;
+    protected static final float VELOCITY = 2000f;
 
     private Animation actorAnimation;
     private float elapsedTime = 0;
@@ -58,12 +58,12 @@ public class MovableActor extends Actor {
     }
 
     public void moveTo(float targetX, float targetY) {
-        addAction(getMoveAction(targetX, targetY));
+        addAction(getMoveAction(getX(), getY(), targetX, targetY));
     }
 
-    protected Action getMoveAction(float targetX, float targetY) {
-        double dx = (double) (targetX - getX());
-        double dy = (double) (targetY - getY());
+    protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY) {
+        double dx = (double) (targetX - fromX);
+        double dy = (double) (targetY - fromY);
         float length = (float) Math.sqrt(dx * dx + dy * dy);
         Action action = Actions.moveTo(targetX, targetY, length / VELOCITY);
         tx = targetX; ty = targetY;
