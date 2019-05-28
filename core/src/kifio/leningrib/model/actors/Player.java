@@ -8,8 +8,6 @@ import java.util.List;
 
 public class Player extends MovableActor {
 
-    public List<Vector2> path = new ArrayList<>();
-
     public Player(float x, float y, String packFile) {
         super(new Vector2(x, y), packFile);
     }
@@ -27,10 +25,5 @@ public class Player extends MovableActor {
         }
 
         return seq;
-    }
-
-    public void stop() {
-        clearActions();
-        path.clear();
     }
 }

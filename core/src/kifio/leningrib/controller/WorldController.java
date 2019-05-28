@@ -1,8 +1,5 @@
 package kifio.leningrib.controller;
 
-import com.badlogic.gdx.math.Vector2;
-
-import kifio.leningrib.Utils;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.screens.GameScreen;
 
@@ -23,13 +20,6 @@ public class WorldController {
     public void movePlayerTo(float x, float y) {
         level.resetPath(x, y);
         level.startMoving();
-//        if (level.player.checkIsStayed(x, y)) return;
-//        if (level.isUnreachableZone(new Vector2(x, y))) return;
-//        if (level.player.checkMoveLeft(x, y)) level.player.moveLeft();
-//        else if (level.player.checkMoveRight(x, y)) level.player.moveRight();
-//        else if (level.player.checkMoveUp(x, y)) level.player.moveUp();
-//        else if (level.player.checkMoveDown(x, y)) level.player.moveDown();
-//        level.forester.moveToNextPatrolPoint();
     }
 
     public void update() {

@@ -48,8 +48,6 @@ public abstract class Level {
         initPlayer();
         initForester();
         initMap(fileName);
-//        initTrees();
-//        initMushrooms();
     }
 
     // TODO: не использовать TileMap, использовать свой формат карты и хранить ее в json
@@ -152,7 +150,6 @@ public abstract class Level {
                 Utils.mapCoordinate(x),
                 Utils.mapCoordinate(y));
         player.stop();
-        forester.stop();
 
         // Первая точка пути совпадает с координатами игрока,
         // чтобы игрок не стоял на месте лишнее время ее из пути удаляем.
@@ -243,16 +240,8 @@ public abstract class Level {
         unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
-    public boolean isUnreachableZone(Vector2 point) {
-        for (Rectangle r : unreachableBounds)
-            if (r.contains(point)) return true;
-        return false;
-    }
-
     public void startMoving() {
         SequenceAction playerActionsSequence = player.getMoveActionsSequence();
-        SequenceAction foresterActionsSequence = forester.getMoveActionsSequence(player.path.size());
         player.addAction(playerActionsSequence);
-        forester.addAction(foresterActionsSequence);
     }
 }
