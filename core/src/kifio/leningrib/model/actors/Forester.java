@@ -1,18 +1,13 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-
-import javax.rmi.CORBA.Util;
-
-import kifio.leningrib.Utils;
-import kifio.leningrib.model.actors.listeners.OnMovingActionsEmptyListener;
 import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
@@ -106,5 +101,31 @@ public class Forester extends MovableActor {
                 return false;
             }
         };
+    }
+
+    public void checkPlayerNoticed(Player player) {
+        float fl = getX();
+        float fr = getX() + GameScreen.tileSize;
+
+        float pl = player.getX();
+        float pr = player.getX() + GameScreen.tileSize;
+
+        if ((fl > pl && fl < pr) || (fr > pl && fr < pr)) {
+            setPlayerNoticed();
+        }
+    }
+
+    private void setPlayerNoticed() {
+        movingState = MovingState.PURSUE;
+    }
+
+    @Override
+    public void draw(Batch batch, float alpha) {
+        super.draw(batch, alpha);
+//         Включаем поддержку прозрачности
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+//        TODO: рисовать лесника с цветной маской поверх текстуры, если игрок в поле зрения лесника
     }
 }

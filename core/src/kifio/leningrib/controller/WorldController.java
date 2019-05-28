@@ -23,10 +23,11 @@ public class WorldController {
     }
 
     public void update() {
-        checkIsLevelPassed();
-    }
+        if (level.player.getY() < 0) {
+            gameScreen.onLevelPassed();
+            return;
+        }
 
-    private void checkIsLevelPassed() {
-        if (level.player.getY() < 0) gameScreen.onLevelPassed();
+        level.checkIsForesterNoticePlayer();
     }
 }

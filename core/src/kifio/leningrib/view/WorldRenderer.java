@@ -56,7 +56,7 @@ public class WorldRenderer {
     public void resetStage(Level level) {
         stage.clear();
         stage.addActor(level.player);
-        stage.addActor(level.forester);
+        stage.addActor(level.foresters.get(0));
         for (Group tree : level.trees) stage.addActor(tree);
     }
 
@@ -70,22 +70,13 @@ public class WorldRenderer {
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
-
-//        for (int i = 0; i < cameraWidth; i++) {
-//            renderer.line(tileSize * i, 0,
-//                    tileSize * i, cameraHeight * tileSize);
-//        }
-//
-//        for (int i = 0; i < cameraHeight; i++) {
-//            renderer.line(0, tileSize * i,
-//                    cameraWidth * tileSize, tileSize * i);
-//        }
     }
 
     private void updateCamera() {
         camera.update();
         float playerY = level.player.getY();
-        if (playerY > Gdx.graphics.getHeight() / 2 && playerY < (level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2))
+        if (playerY > Gdx.graphics.getHeight() / 2f
+                && playerY < (level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f))
             camera.position.y = playerY;
     }
 
@@ -132,7 +123,7 @@ public class WorldRenderer {
 
     private void drawForesterDebug() {
         renderer.setColor(foresterDebugColor);
-        Rectangle rectangle = level.forester.getPatrolRectangle();
+        Rectangle rectangle = level.foresters.get(0).getPatrolRectangle();
         renderer.rect(rectangle.x,
                 rectangle.y,
                 rectangle.width,

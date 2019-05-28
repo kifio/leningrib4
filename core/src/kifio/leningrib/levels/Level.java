@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapProperties;
@@ -12,7 +13,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import kifio.leningrib.Utils;
@@ -27,7 +30,7 @@ public abstract class Level {
 
     public TiledMap map;
     public Player player;
-    public Forester forester;
+    public List<Forester> foresters;
     public int mapWidth;
     public int mapHeight;
 
@@ -187,8 +190,8 @@ public abstract class Level {
                 GameScreen.tileSize * 4f,
                 GameScreen.tileSize * 4f);
 
-        this.forester = new Forester(from, to,
-                "enemy.txt");
+        this.foresters = Collections.singletonList(new Forester(from, to,
+                "enemy.txt"));
     }
 
     // TODO: Сделать парсинг карты и инициализацию групп актеров.
@@ -243,5 +246,11 @@ public abstract class Level {
     public void startMoving() {
         SequenceAction playerActionsSequence = player.getMoveActionsSequence();
         player.addAction(playerActionsSequence);
+    }
+
+    public void checkIsForesterNoticePlayer() {
+        for (Forester forester : foresters) {
+            forester.checkPlayerNoticed(player);
+        }
     }
 }
