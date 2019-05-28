@@ -6,6 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import java.util.LinkedList;
 
+import javax.rmi.CORBA.Util;
+
+import kifio.leningrib.Utils;
 import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
@@ -34,10 +37,10 @@ public class Forester extends MovableActor {
         return patrolRectangle;
     }
 
-    private void resetPath(int count) {
+    private void resetPath(float tx, float ty, int count) {
         if (to.y == from.y) {
             if (tx < to.x && movingState == MovingState.FORWARD) {
-                int from = (int) this.tx;
+                int from = (int) tx;
                 int to = (int) this.to.x;
 
                 while (true) {
@@ -56,7 +59,7 @@ public class Forester extends MovableActor {
                     }
                 }
             } else  {
-                int from = (int) this.tx;
+                int from = (int) tx;
                 int to = (int) this.from.x;
 
                 while (true) {
@@ -79,21 +82,25 @@ public class Forester extends MovableActor {
     }
 
     public void moveToNextPatrolPoint() {
-        if (path.isEmpty()) resetPath(1000);
+
+        float x = Utils.mapCoordinate(getX());
+        float y = Utils.mapCoordinate(getY());
+        if (path.isEmpty()) resetPath(x, y,1000);
         Vector2 target = path.pop();
         moveTo(target.x, target.y);
     }
 
+    // FIXME: лесник иногда добегает до предпоследнего квадрата, затем разворачивается и убегает
     // Добавляет в путь патрулирования лесника столько-же действий, сколько совешит игрок
     public SequenceAction getMoveActionsSequence(int count) {
         SequenceAction seq = new SequenceAction();
 
-        while (count > 0) {
-            if (path.isEmpty()) resetPath(count);
-            count -= path.size();
+        float x = Utils.mapCoordinate(getX());
+        float y = Utils.mapCoordinate(getY());
 
-            float x = getX();
-            float y = getY();
+        while (count > 0) {
+            if (path.isEmpty()) resetPath(x, y, count);
+            count -= path.size();
 
             while (!path.isEmpty()) {
                 Vector2 target = path.pop();

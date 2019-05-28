@@ -86,7 +86,7 @@ public class WorldRenderer {
         camera.update();
         float playerY = level.player.getY();
         if (playerY > Gdx.graphics.getHeight() / 2 && playerY < (level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2))
-            camera.position.y = playerY + (GameScreen.tileSize / 2f);
+            camera.position.y = playerY;
     }
 
     private void drawDebug() {
