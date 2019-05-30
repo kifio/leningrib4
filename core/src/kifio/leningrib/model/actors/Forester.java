@@ -1,6 +1,7 @@
 package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
@@ -15,6 +16,9 @@ public class Forester extends MovableActor {
     private enum MovingState {
         FORWARD, BACK, PURSUE
     }
+
+    // Количество клеток на расстоянии которых лесник замечает игрока
+    private static final float DISTANCE_COEFFICIENT = 2.5f;
 
     private Vector2 from, to;
     private Rectangle patrolRectangle = new Rectangle();
@@ -75,7 +79,7 @@ public class Forester extends MovableActor {
 
         for (int i = 0; i < path.size(); i++) {
             Vector2 vec = path.get(i);
-            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y));
+            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y, getVelocity()));
             seq.addAction(getDelayAction(0.2f));
             fromX = vec.x;
             fromY = vec.y;
@@ -85,13 +89,6 @@ public class Forester extends MovableActor {
         addAction(seq);
     }
 
-    // Возвращает прямоугольник, в котором двигается персонаж
-    public Rectangle getPatrolRectangle() {
-        float width = to.x - from.x + GameScreen.tileSize;
-        float height = GameScreen.tileSize;
-        patrolRectangle.set(from.x, from.y, width, height);
-        return patrolRectangle;
-    }
 
     private Action getCompleteAction() {
         return new Action() {
@@ -104,28 +101,40 @@ public class Forester extends MovableActor {
     }
 
     public void checkPlayerNoticed(Player player) {
-        float fl = getX();
-        float fr = getX() + GameScreen.tileSize;
+        float px = player.getX() + (GameScreen.tileSize / 2f);
+        float py = player.getY() - (GameScreen.tileSize / 2f);
 
-        float pl = player.getX();
-        float pr = player.getX() + GameScreen.tileSize;
+        float fx = getX() + (GameScreen.tileSize / 2f);
+        float fy = getY() - (GameScreen.tileSize / 2f);
 
-        if ((fl > pl && fl < pr) || (fr > pl && fr < pr)) {
+        if (Math.abs(fx - px) < (DISTANCE_COEFFICIENT * GameScreen.tileSize)
+                && Math.abs(fy - py) < (DISTANCE_COEFFICIENT * GameScreen.tileSize)) {
             setPlayerNoticed();
         }
     }
 
     private void setPlayerNoticed() {
+        stop();
         movingState = MovingState.PURSUE;
     }
 
+    private Color foresterFoundLeninColor = new Color(.5f, 1f, .5f, 1f);
+    private Color commonColor = new Color(1f, 1f, 1f, 1f);
+
     @Override
     public void draw(Batch batch, float alpha) {
-        super.draw(batch, alpha);
-//         Включаем поддержку прозрачности
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        if (movingState == MovingState.PURSUE) batch.setColor(foresterFoundLeninColor);
+        super.draw(batch, alpha);
+        batch.setColor(commonColor);
+    }
 
-//        TODO: рисовать лесника с цветной маской поверх текстуры, если игрок в поле зрения лесника
+    public boolean isPursuePlayer() {
+        return movingState == MovingState.PURSUE;
+    }
+
+    public float getVelocity() {
+        return 500f;
     }
 }

@@ -28,6 +28,6 @@ public class WorldController {
             return;
         }
 
-        level.checkIsForesterNoticePlayer();
+        level.updateForesters();
     }
 }

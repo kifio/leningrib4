@@ -123,11 +123,12 @@ public class WorldRenderer {
 
     private void drawForesterDebug() {
         renderer.setColor(foresterDebugColor);
-        Rectangle rectangle = level.foresters.get(0).getPatrolRectangle();
-        renderer.rect(rectangle.x,
-                rectangle.y,
-                rectangle.width,
-                rectangle.height);
+        for (Vector2 vec: level.foresters.get(0).path) {
+            renderer.rect(vec.x,
+                    vec.y,
+                    GameScreen.tileSize,
+                    GameScreen.tileSize);
+        }
     }
 
     private void drawGrass() {

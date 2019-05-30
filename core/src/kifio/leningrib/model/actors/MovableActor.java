@@ -9,15 +9,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import kifio.leningrib.screens.GameScreen;
 
-public class MovableActor extends Actor {
-
-    protected static final float VELOCITY = 2000f;
+public abstract class MovableActor extends Actor {
 
     public List<Vector2> path = new ArrayList<>();
     private Animation actorAnimation;
@@ -51,19 +50,36 @@ public class MovableActor extends Actor {
         batch.draw(texture, getX(), getY(), GameScreen.tileSize, GameScreen.tileSize);
     }
 
-    protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY) {
+    protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY, float velocity) {
         double dx = (double) (targetX - fromX);
         double dy = (double) (targetY - fromY);
         float length = (float) Math.sqrt(dx * dx + dy * dy);
-        return Actions.moveTo(targetX, targetY, length / VELOCITY);
+        return Actions.moveTo(targetX, targetY, length / velocity);
     }
 
     protected Action getDelayAction(float duration) {
         return Actions.delay(duration);
     }
 
+    protected abstract float getVelocity();
+
     public void stop() {
         clear();
         path.clear();
+    }
+
+    public SequenceAction getMoveActionsSequence() {
+        SequenceAction seq = new SequenceAction();
+        float fromX = getX();
+        float fromY = getY();
+        for (int i = 0; i < path.size(); i++) {
+            Vector2 vec = path.get(i);
+            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y, getVelocity()));
+            seq.addAction(getDelayAction(0.2f));
+            fromX = vec.x;
+            fromY = vec.y;
+        }
+
+        return seq;
     }
 }

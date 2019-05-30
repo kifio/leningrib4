@@ -12,18 +12,7 @@ public class Player extends MovableActor {
         super(new Vector2(x, y), packFile);
     }
 
-    public SequenceAction getMoveActionsSequence() {
-        SequenceAction seq = new SequenceAction();
-        float fromX = getX();
-        float fromY = getY();
-        for (int i = 0; i < path.size(); i++) {
-            Vector2 vec = path.get(i);
-            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y));
-            seq.addAction(getDelayAction(0.2f));
-            fromX = vec.x;
-            fromY = vec.y;
-        }
-
-        return seq;
+    public float getVelocity() {
+        return 2000f;
     }
 }

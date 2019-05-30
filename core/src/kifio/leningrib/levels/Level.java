@@ -248,9 +248,27 @@ public abstract class Level {
         player.addAction(playerActionsSequence);
     }
 
-    public void checkIsForesterNoticePlayer() {
+    public void updateForesters() {
         for (Forester forester : foresters) {
             forester.checkPlayerNoticed(player);
+            if (forester.isPursuePlayer()) {
+
+                GraphPath<Vector2> path = forestGraph.getPath(
+                        Utils.mapCoordinate(forester.getX()),
+                        Utils.mapCoordinate(forester.getY()),
+                        Utils.mapCoordinate(player.getX()),
+                        Utils.mapCoordinate(player.getY()));
+
+                forester.stop();
+
+                // Первая точка пути совпадает с координатами игрока,
+                // чтобы лесник не стоял на месте лишнее время ее из пути удаляем.
+                for (int i = 1; i < path.getCount(); i++) {
+                    forester.path.add(new Vector2(path.get(i)));
+                }
+
+                forester.addAction(forester.getMoveActionsSequence());
+            }
         }
     }
 }
