@@ -15,4 +15,9 @@ public class Player extends MovableActor {
     public float getVelocity() {
         return 2000f;
     }
+
+    @Override
+    protected float getFrameDuration() {
+        return 1 / 15f;
+    }
 }

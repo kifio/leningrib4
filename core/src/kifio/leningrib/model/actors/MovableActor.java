@@ -27,7 +27,7 @@ public abstract class MovableActor extends Actor {
     // TODO: Сделать с помощью билдера
     public MovableActor(Vector2 xy, String packFile) {
         TextureAtlas playerAtlas = new TextureAtlas(packFile);
-        this.actorAnimation = new Animation<>(1 / 15f, playerAtlas.getRegions());
+        this.actorAnimation = new Animation<>(getFrameDuration() , playerAtlas.getRegions());
         this.bounds = new Rectangle();
         setX(xy.x);
         setY(xy.y);
@@ -62,6 +62,8 @@ public abstract class MovableActor extends Actor {
     }
 
     protected abstract float getVelocity();
+
+    protected abstract float getFrameDuration();
 
     public void stop() {
         clear();

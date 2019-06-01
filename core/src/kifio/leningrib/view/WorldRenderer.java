@@ -9,12 +9,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.TextureManager;
+import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.screens.GameScreen;
 
 public class WorldRenderer {
@@ -56,12 +58,13 @@ public class WorldRenderer {
     public void resetStage(Level level) {
         stage.clear();
         stage.addActor(level.player);
-        stage.addActor(level.foresters.get(0));
+        for (Forester forester : level.foresters) stage.addActor(forester);
         for (Group tree : level.trees) stage.addActor(tree);
+        for (Actor mushroom : level.mushrooms) stage.addActor(mushroom);
     }
 
     public void render() {
-        Gdx.gl.glClearColor(0, 0,0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         updateCamera();
@@ -89,13 +92,13 @@ public class WorldRenderer {
         renderer.setProjectionMatrix(camera.combined);
         renderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        drawPlayerPath();
+//        drawPlayerPath();
 
         // Прямоугольник, на котором находится игрок
-        drawCharacterDebug();
+//        drawCharacterDebug();
 
         // Прямоугольник, на котором находится лесник
-        drawForesterDebug();
+//        drawForesterDebug();
 
         renderer.end();
 
@@ -104,7 +107,7 @@ public class WorldRenderer {
 
     private void drawPlayerPath() {
         renderer.setColor(playerPathDebugColor);
-        for (Vector2 vec: level.player.path) {
+        for (Vector2 vec : level.player.path) {
             renderer.rect(vec.x,
                     vec.y,
                     GameScreen.tileSize,
@@ -123,7 +126,11 @@ public class WorldRenderer {
 
     private void drawForesterDebug() {
         renderer.setColor(foresterDebugColor);
-        for (Vector2 vec: level.foresters.get(0).path) {
+        for (Forester forester : level.foresters) drawForesterPath(forester);
+    }
+
+    private void drawForesterPath(Forester forester) {
+        for (Vector2 vec : forester.path) {
             renderer.rect(vec.x,
                     vec.y,
                     GameScreen.tileSize,

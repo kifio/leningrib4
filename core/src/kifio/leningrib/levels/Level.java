@@ -1,6 +1,5 @@
 package kifio.leningrib.levels;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapProperties;
@@ -15,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +22,7 @@ import kifio.leningrib.Utils;
 import kifio.leningrib.model.TextureManager;
 import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
@@ -39,6 +40,7 @@ public abstract class Level {
 
     // Деревья
     public Set<Group> trees = new HashSet<>();
+    public Set<Mushroom> mushrooms = new HashSet<>();
 
     // Множество зон, в которые нельзя попасть
     public Set<Rectangle> unreachableBounds = new HashSet<>();
@@ -48,6 +50,7 @@ public abstract class Level {
     }
 
     public void init(String fileName) {
+        initMushrooms();
         initPlayer();
         initForester();
         initMap(fileName);
@@ -190,39 +193,13 @@ public abstract class Level {
                 GameScreen.tileSize * 4f,
                 GameScreen.tileSize * 4f);
 
-        this.foresters = Collections.singletonList(new Forester(from, to,
-                "enemy.txt"));
+//        this.foresters = Collections.singletonList(new Forester(from, to, "enemy.txt"));
+        this.foresters = Collections.emptyList();
     }
 
     // TODO: Сделать парсинг карты и инициализацию групп актеров.
     private void initMushrooms() {
-//        Group group = new Group();
-//        group.addActor(new MovableActor(tileSize * 3, tileSize * 3, -1,
-//                tileSize, "power_mushroom.txt"));
-//        trees.add(group);
-    }
-
-    private void initTrees() {
-        // TODO: Разные группы будут отвечать за разные эффекты деревьев
-//        Group group = new Group();
-//        addTree(group, tileSize, 3 * tileSize);
-//        addTree(group, tileSize * 3, 5 * tileSize);
-//        addTree(group, tileSize * 4, 2 * tileSize);
-//
-//        addTopLeftSegment(group, tileSize, 0);
-//        addTopRightSegment(group, 2 * tileSize, 0);
-//
-//        addBottomRightSegment(group, 0, 4 * tileSize);
-//        addTopRightSegment(group, 0, 5 * tileSize);
-//
-//        trees.add(group);
-    }
-
-    private void addTree(Group group, int x, int y) {
-        addTopLeftSegment(group, x, y);
-        addBottomLeftSegment(group, x, y - GameScreen.tileSize);
-        addTopRightSegment(group, x + GameScreen.tileSize, y);
-        addBottomRightSegment(group, x + GameScreen.tileSize, y - GameScreen.tileSize);
+        mushrooms.add(new Mushroom(new Vector2(GameScreen.tileSize * 3, GameScreen.tileSize * 3), "power_mushroom.txt"));
     }
 
     private void addTopLeftSegment(Group group, int x, int y) {
@@ -248,7 +225,7 @@ public abstract class Level {
         player.addAction(playerActionsSequence);
     }
 
-    public void updateForesters() {
+    public void update() {
         for (Forester forester : foresters) {
             forester.checkPlayerNoticed(player);
             if (forester.isPursuePlayer()) {
@@ -268,6 +245,15 @@ public abstract class Level {
                 }
 
                 forester.addAction(forester.getMoveActionsSequence());
+            }
+        }
+
+        Iterator<Mushroom> iterator = mushrooms.iterator();
+        while (iterator.hasNext()) {
+            Mushroom m = iterator.next();
+            if (m.bounds.overlaps(player.bounds)) {
+                m.remove();
+                iterator.remove();
             }
         }
     }

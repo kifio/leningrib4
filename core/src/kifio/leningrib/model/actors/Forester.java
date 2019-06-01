@@ -137,4 +137,9 @@ public class Forester extends MovableActor {
     public float getVelocity() {
         return 500f;
     }
+
+    @Override
+    protected float getFrameDuration() {
+        return 1 / 15f;
+    }
 }
