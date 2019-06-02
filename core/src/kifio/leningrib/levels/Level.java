@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import kifio.leningrib.Utils;
-import kifio.leningrib.model.TextureManager;
+import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
@@ -200,23 +200,24 @@ public abstract class Level {
     // TODO: Сделать парсинг карты и инициализацию групп актеров.
     private void initMushrooms() {
         mushrooms.add(new Mushroom(new Vector2(GameScreen.tileSize * 3, GameScreen.tileSize * 3), "power_mushroom.txt"));
+        mushrooms.add(new Mushroom(new Vector2(GameScreen.tileSize * 4, GameScreen.tileSize * 8), "power_mushroom.txt"));
     }
 
     private void addTopLeftSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_0"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+        group.addActor(new TreePart(ResourcesManager.get("tree_0"), x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
     private void addTopRightSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_3"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+        group.addActor(new TreePart(ResourcesManager.get("tree_3"), x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
     private void addBottomLeftSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_1"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+        group.addActor(new TreePart(ResourcesManager.get("tree_1"), x, y, GameScreen.tileSize, GameScreen.tileSize));
         unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
     private void addBottomRightSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(TextureManager.get("tree_2"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+        group.addActor(new TreePart(ResourcesManager.get("tree_2"), x, y, GameScreen.tileSize, GameScreen.tileSize));
         unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 

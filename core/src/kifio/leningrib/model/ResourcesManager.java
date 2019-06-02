@@ -3,12 +3,14 @@ package kifio.leningrib.model;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.HashMap;
 
-public class TextureManager {
+public class ResourcesManager {
 
     private static HashMap<String, TextureRegion> regions = new HashMap<>();
+    private static I18NBundle mushroomsSpeechBundle;
 
     public static void init() {
 
@@ -37,9 +39,15 @@ public class TextureManager {
         Texture powerMushroom = am.get("power_mushroom.png");
         regions.put("pm_0", new TextureRegion(powerMushroom, 0, 0, 96, 96));
         regions.put("pm1", new TextureRegion(powerMushroom, 0, 96, 96, 96));
+
+        mushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);
     }
 
     public static TextureRegion get(String name) {
         return regions.get(name);
+    }
+
+    public static I18NBundle getMushroomSpeechBundle() {
+        return mushroomsSpeechBundle;
     }
 }

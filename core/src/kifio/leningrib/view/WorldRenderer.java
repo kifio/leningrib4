@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import kifio.leningrib.levels.Level;
-import kifio.leningrib.model.TextureManager;
+import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.screens.GameScreen;
 
@@ -52,7 +52,7 @@ public class WorldRenderer {
     }
 
     private void loadTextures() {
-        grass = new TextureRegion(TextureManager.get("grass_0"));
+        grass = new TextureRegion(ResourcesManager.get("grass_0"));
     }
 
     public void resetStage(Level level) {

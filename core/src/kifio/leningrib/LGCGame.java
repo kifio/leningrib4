@@ -3,7 +3,7 @@ package kifio.leningrib;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 
-import kifio.leningrib.model.TextureManager;
+import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class LGCGame extends Game {
@@ -12,7 +12,7 @@ public class LGCGame extends Game {
 
     @Override
 	public void create () {
-		TextureManager.init();
+		ResourcesManager.init();
 		currentScreen = new GameScreen();
 		setScreen(currentScreen);
 	}

@@ -1,10 +1,6 @@
 package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Player extends MovableActor {
 
