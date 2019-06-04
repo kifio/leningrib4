@@ -19,6 +19,8 @@ public class ResourcesManager {
         am.load("forest_tiles.png", Texture.class);
         am.load("power_mushroom.png", Texture.class);
         am.load("mushroom.png", Texture.class);
+        am.load("mushroom.png", Texture.class);
+        am.load("i18n/mushroom_speech", I18NBundle.class);
         am.finishLoading();
 
         Texture overworld = am.get("overworld.png");

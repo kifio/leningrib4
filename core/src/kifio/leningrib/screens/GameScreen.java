@@ -46,7 +46,6 @@ public class GameScreen extends InputAdapter implements Screen {
         cameraWidth = 6;
         tileSize = (Gdx.graphics.getWidth() / cameraWidth) + 1;
         cameraHeight = (Gdx.graphics.getHeight() / tileSize) + 1;
-
     }
 
     private Level getNextLevel() {

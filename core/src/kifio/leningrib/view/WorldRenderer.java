@@ -57,10 +57,10 @@ public class WorldRenderer {
 
     public void resetStage(Level level) {
         stage.clear();
+        for (Actor mushroom : level.mushrooms) stage.addActor(mushroom);
         stage.addActor(level.player);
         for (Forester forester : level.foresters) stage.addActor(forester);
         for (Group tree : level.trees) stage.addActor(tree);
-        for (Actor mushroom : level.mushrooms) stage.addActor(mushroom);
     }
 
     public void render() {
@@ -78,9 +78,15 @@ public class WorldRenderer {
     private void updateCamera() {
         camera.update();
         float playerY = level.player.getY();
-        if (playerY > Gdx.graphics.getHeight() / 2f
-                && playerY < (level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f))
+        float bottomTreshold = Gdx.graphics.getHeight() / 2f;
+        float topTreshold = level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
+        if (playerY < bottomTreshold) {
+            camera.position.y = bottomTreshold;
+        } else if (playerY > topTreshold) {
+            camera.position.y = topTreshold;
+        } else {
             camera.position.y = playerY;
+        }
     }
 
     private void drawDebug() {

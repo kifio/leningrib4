@@ -1,6 +1,8 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -45,15 +48,15 @@ public abstract class Level {
     // Множество зон, в которые нельзя попасть
     public Set<Rectangle> unreachableBounds = new HashSet<>();
 
-    public Level(String fileName) {
-        init(fileName);
+    public Level(String levelName) {
+        init(levelName);
     }
 
-    public void init(String fileName) {
-        initMushrooms();
+    public void init(String levelName) {
+        initMushrooms("mushrooms_" + levelName);
         initPlayer();
         initForester();
-        initMap(fileName);
+        initMap(levelName + ".tmx");
     }
 
     // TODO: не использовать TileMap, использовать свой формат карты и хранить ее в json
@@ -193,14 +196,28 @@ public abstract class Level {
                 GameScreen.tileSize * 4f,
                 GameScreen.tileSize * 4f);
 
-//        this.foresters = Collections.singletonList(new Forester(from, to, "enemy.txt"));
         this.foresters = Collections.emptyList();
     }
 
+    private static final String NEW_LINE = "\n";
+    private static final String COMMA = ",";
+    private static final String POWER_MUSHROOM = "power_mushroom.txt";
+
     // TODO: Сделать парсинг карты и инициализацию групп актеров.
-    private void initMushrooms() {
-        mushrooms.add(new Mushroom(new Vector2(GameScreen.tileSize * 3, GameScreen.tileSize * 3), "power_mushroom.txt"));
-        mushrooms.add(new Mushroom(new Vector2(GameScreen.tileSize * 4, GameScreen.tileSize * 8), "power_mushroom.txt"));
+    private void initMushrooms(String fileName) {
+        try {
+            FileHandle handle = Gdx.files.internal(fileName);
+            String content = handle.readString();
+            String[] positions = content.split(NEW_LINE);
+
+            for (String position : positions) {
+                String[] coordinates = position.split(COMMA);
+                mushrooms.add(new Mushroom(Integer.parseInt(coordinates[0]),
+                        Integer.parseInt(coordinates[1]), POWER_MUSHROOM));
+            }
+        } catch (GdxRuntimeException e) {
+            e.printStackTrace();
+        }
     }
 
     private void addTopLeftSegment(Group group, int x, int y) {
