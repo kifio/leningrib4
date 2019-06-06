@@ -19,6 +19,7 @@ public class GameScreen extends InputAdapter implements Screen {
     public static int tileSize;
     public static int cameraWidth;
     public static int cameraHeight;
+    public static boolean gameOver;
 
     public GameScreen() {
         Gdx.input.setInputProcessor(this);
@@ -60,8 +61,12 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        worldController.update();
-        worldRenderer.render();
+        if (gameOver) {
+            worldRenderer.renderBlackScreen(delta);
+        } else {
+            worldController.update(delta);
+            worldRenderer.render();
+        }
     }
 
     @Override
@@ -99,9 +104,11 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
-        worldController.movePlayerTo(
-                camera.position.x - (Gdx.graphics.getWidth() / 2f) + x,
-                camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y));
+        if (!gameOver) {
+            worldController.movePlayerTo(
+                    camera.position.x - (Gdx.graphics.getWidth() / 2f) + x,
+                    camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y));
+        }
         return true;
     }
 }

@@ -35,6 +35,9 @@ public class WorldRenderer {
     private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
     private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
 
+    private static float GAME_OVER_ANIMATION_TIME = 2f;
+    private float gameOverTime;
+
     public WorldRenderer(Level level,
                          OrthographicCamera camera,
                          int cameraWidth,
@@ -61,6 +64,22 @@ public class WorldRenderer {
         stage.addActor(level.player);
         for (Forester forester : level.foresters) stage.addActor(forester);
         for (Group tree : level.trees) stage.addActor(tree);
+    }
+
+    public void renderBlackScreen(float delta) {
+        render();
+
+        gameOverTime += delta;
+        float alpha = Math.min(gameOverTime / GAME_OVER_ANIMATION_TIME, 1);
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        renderer.setProjectionMatrix(camera.combined);
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(0f, 0f, 0f, alpha);
+        renderer.rect(0f, 0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        renderer.end();
     }
 
     public void render() {

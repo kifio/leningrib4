@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -188,15 +188,22 @@ public abstract class Level {
     }
 
     private void initForester() {
-        Vector2 from = new Vector2(
-                GameScreen.tileSize * 1f,
-                GameScreen.tileSize * 4f);
+        this.foresters = new ArrayList<>();
+        this.foresters.add(new Forester(
+                new Vector2(
+                        GameScreen.tileSize * 1f,
+                        GameScreen.tileSize * 13f),
+                new Vector2(
+                        GameScreen.tileSize * 4f,
+                        GameScreen.tileSize * 13f), "enemy.txt"));
 
-        Vector2 to = new Vector2(
-                GameScreen.tileSize * 4f,
-                GameScreen.tileSize * 4f);
-
-        this.foresters = Collections.emptyList();
+        this.foresters.add(new Forester(
+                new Vector2(
+                        GameScreen.tileSize * 1f,
+                        GameScreen.tileSize * 4f),
+                new Vector2(
+                        GameScreen.tileSize * 4f,
+                        GameScreen.tileSize * 4f), "enemy.txt"));
     }
 
     private static final String NEW_LINE = "\n";
@@ -243,29 +250,45 @@ public abstract class Level {
         player.addAction(playerActionsSequence);
     }
 
-    public void update() {
+    public void update(float delta) {
+        updateForesters(delta);
+        updateMushrooms();
+    }
+
+    private void updateForesters(float delta) {
         for (Forester forester : foresters) {
-            forester.checkPlayerNoticed(player);
-            if (forester.isPursuePlayer()) {
-
-                GraphPath<Vector2> path = forestGraph.getPath(
-                        Utils.mapCoordinate(forester.getX()),
-                        Utils.mapCoordinate(forester.getY()),
-                        Utils.mapCoordinate(player.getX()),
-                        Utils.mapCoordinate(player.getY()));
-
-                forester.stop();
-
-                // Первая точка пути совпадает с координатами игрока,
-                // чтобы лесник не стоял на месте лишнее время ее из пути удаляем.
-                for (int i = 1; i < path.getCount(); i++) {
-                    forester.path.add(new Vector2(path.get(i)));
-                }
-
-                forester.addAction(forester.getMoveActionsSequence());
+            if (forester.bounds.overlaps(player.bounds)) {
+                GameScreen.gameOver = true;
+                player.stop();
+            } else {
+                updateForestersPath(forester, delta);
             }
         }
+    }
 
+    private void updateForestersPath(Forester forester, float delta) {
+        forester.updateMoving(player, delta);
+        if (forester.isPursuePlayer()) {
+
+            GraphPath<Vector2> path = forestGraph.getPath(
+                    Utils.mapCoordinate(forester.getX()),
+                    Utils.mapCoordinate(forester.getY()),
+                    Utils.mapCoordinate(player.getX()),
+                    Utils.mapCoordinate(player.getY()));
+
+            forester.stop();
+
+            // Первая точка пути совпадает с координатами игрока,
+            // чтобы лесник не стоял на месте лишнее время ее из пути удаляем.
+            for (int i = 1; i < path.getCount(); i++) {
+                forester.path.add(new Vector2(path.get(i)));
+            }
+
+            forester.addAction(forester.getMoveActionsSequence());
+        }
+    }
+
+    private void updateMushrooms() {
         Iterator<Mushroom> iterator = mushrooms.iterator();
         while (iterator.hasNext()) {
             Mushroom m = iterator.next();

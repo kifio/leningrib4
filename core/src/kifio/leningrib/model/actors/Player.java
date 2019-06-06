@@ -9,7 +9,7 @@ public class Player extends MovableActor {
     }
 
     public float getVelocity() {
-        return 2000f;
+        return 1000f;
     }
 
     @Override

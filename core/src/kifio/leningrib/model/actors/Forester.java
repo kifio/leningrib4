@@ -14,15 +14,16 @@ import kifio.leningrib.screens.GameScreen;
 public class Forester extends MovableActor {
 
     private enum MovingState {
-        FORWARD, BACK, PURSUE
+        FORWARD, BACK, PURSUE, STOP
     }
 
     // Количество клеток на расстоянии которых лесник замечает игрока
-    private static final float DISTANCE_COEFFICIENT = 2.5f;
+    private static final float DISTANCE_COEFFICIENT = 2f;
 
     private Vector2 from, to;
     private Rectangle patrolRectangle = new Rectangle();
     private MovingState movingState = MovingState.FORWARD;
+    private float stoppingTime = 0f;
 
     // Лесники начинают с патрулирования леса, поэтому у них две координаты
     public Forester(Vector2 from, Vector2 to, String packFile) {
@@ -100,7 +101,13 @@ public class Forester extends MovableActor {
         };
     }
 
-    public void checkPlayerNoticed(Player player) {
+    public void updateMoving(Player player, float delta) {
+
+        if (GameScreen.gameOver) {
+            stopPursuing();
+            return;
+        }
+
         float px = player.getX() + (GameScreen.tileSize / 2f);
         float py = player.getY() - (GameScreen.tileSize / 2f);
 
@@ -110,12 +117,31 @@ public class Forester extends MovableActor {
         if (Math.abs(fx - px) < (DISTANCE_COEFFICIENT * GameScreen.tileSize)
                 && Math.abs(fy - py) < (DISTANCE_COEFFICIENT * GameScreen.tileSize)) {
             setPlayerNoticed();
+        } else if (movingState == MovingState.PURSUE) {
+            stopPursuing();
+        } else if (movingState == MovingState.STOP) {
+            if (stoppingTime < 2f) {
+                stoppingTime += delta;
+            } else {
+                startPatrol(new Vector2(fx, fy));
+            }
         }
     }
 
     private void setPlayerNoticed() {
         stop();
         movingState = MovingState.PURSUE;
+    }
+
+    private void stopPursuing() {
+        stop();
+        movingState = MovingState.STOP;
+    }
+
+    private void startPatrol(Vector2 from) {
+        stoppingTime = 0f;
+        movingState = MovingState.FORWARD;
+        setPatrolRoute(from, to);
     }
 
     private Color foresterFoundLeninColor = new Color(.5f, 1f, .5f, 1f);

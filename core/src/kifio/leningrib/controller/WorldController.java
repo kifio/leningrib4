@@ -22,12 +22,12 @@ public class WorldController {
         level.startMoving();
     }
 
-    public void update() {
+    public void update(float delta) {
         if (level.player.getY() < 0) {
             gameScreen.onLevelPassed();
             return;
         }
 
-        level.update();
+        level.update(delta);
     }
 }
