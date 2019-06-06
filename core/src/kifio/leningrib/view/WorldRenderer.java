@@ -78,7 +78,7 @@ public class WorldRenderer {
         renderer.setProjectionMatrix(camera.combined);
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setColor(0f, 0f, 0f, alpha);
-        renderer.rect(0f, 0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        renderer.rect(0f, camera.position.y - Gdx.graphics.getHeight() / 2f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         renderer.end();
     }
 
@@ -120,10 +120,10 @@ public class WorldRenderer {
 //        drawPlayerPath();
 
         // Прямоугольник, на котором находится игрок
-//        drawCharacterDebug();
+        drawCharacterDebug();
 
         // Прямоугольник, на котором находится лесник
-//        drawForesterDebug();
+        drawForesterDebug();
 
         renderer.end();
 

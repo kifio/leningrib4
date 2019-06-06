@@ -183,7 +183,7 @@ public abstract class Level {
     private void initPlayer() {
         this.player = new Player(
                 0f,
-                0f,
+                10f,
                 "player.txt");
     }
 
@@ -268,7 +268,7 @@ public abstract class Level {
 
     private void updateForestersPath(Forester forester, float delta) {
         forester.updateMoving(player, delta);
-        if (forester.isPursuePlayer()) {
+        if (forester.isPursuePlayer() && !GameScreen.gameOver) {
 
             GraphPath<Vector2> path = forestGraph.getPath(
                     Utils.mapCoordinate(forester.getX()),
