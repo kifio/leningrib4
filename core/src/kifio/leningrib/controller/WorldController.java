@@ -19,7 +19,6 @@ public class WorldController {
 
     public void movePlayerTo(float x, float y) {
         level.resetPath(x, y);
-        level.startMoving();
     }
 
     public void update(float delta) {

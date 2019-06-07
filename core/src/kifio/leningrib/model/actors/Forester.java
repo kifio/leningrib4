@@ -90,7 +90,6 @@ public class Forester extends MovableActor {
         addAction(seq);
     }
 
-
     private Action getCompleteAction() {
         return new Action() {
             @Override
@@ -109,8 +108,8 @@ public class Forester extends MovableActor {
         float fx = getX() + (GameScreen.tileSize / 2f);
         float fy = getY() - (GameScreen.tileSize / 2f);
 
-        if (Math.abs(fx - px) < (DISTANCE_COEFFICIENT * GameScreen.tileSize)
-                && Math.abs(fy - py) < (DISTANCE_COEFFICIENT * GameScreen.tileSize)) {
+        if (Math.abs(fx - px) <= (DISTANCE_COEFFICIENT * GameScreen.tileSize)
+                && Math.abs(fy - py) <= (DISTANCE_COEFFICIENT * GameScreen.tileSize)) {
             setPlayerNoticed();
         } else if (movingState == MovingState.PURSUE) {
             stopPursuing();
@@ -157,6 +156,11 @@ public class Forester extends MovableActor {
 
     public float getVelocity() {
         return 500f;
+    }
+
+    @Override
+    protected float getDelayTime() {
+        return 0.2f;
     }
 
     @Override

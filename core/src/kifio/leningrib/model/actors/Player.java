@@ -13,6 +13,11 @@ public class Player extends MovableActor {
     }
 
     @Override
+    protected float getDelayTime() {
+        return 0.0f;
+    }
+
+    @Override
     protected float getFrameDuration() {
         return 1 / 15f;
     }

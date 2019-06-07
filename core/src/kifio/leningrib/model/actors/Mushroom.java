@@ -16,6 +16,11 @@ public class Mushroom extends MovableActor {
     }
 
     @Override
+    protected float getDelayTime() {
+        return 0;
+    }
+
+    @Override
     protected float getFrameDuration() {
         return 1 / 2f;
     }

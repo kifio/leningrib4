@@ -63,6 +63,8 @@ public abstract class MovableActor extends Actor {
 
     protected abstract float getVelocity();
 
+    protected abstract float getDelayTime();
+
     protected abstract float getFrameDuration();
 
     public void stop() {

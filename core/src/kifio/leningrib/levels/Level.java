@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.ResourcesManager;
@@ -212,6 +213,14 @@ public abstract class Level {
                 new Vector2(
                         GameScreen.tileSize * 4f,
                         GameScreen.tileSize * 4f), "enemy.txt"));
+
+        this.foresters.add(new Forester(
+                new Vector2(
+                        GameScreen.tileSize * 0f,
+                        GameScreen.tileSize * 24f),
+                new Vector2(
+                        GameScreen.tileSize * 4f,
+                        GameScreen.tileSize * 24f), "enemy.txt"));
     }
 
     private static final String NEW_LINE = "\n";
@@ -253,10 +262,6 @@ public abstract class Level {
         unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
     }
 
-    public void startMoving() {
-
-    }
-
     public void update(float delta) {
         updateForesters(delta);
         updateMushrooms();
@@ -264,11 +269,15 @@ public abstract class Level {
 
     private void updateForesters(float delta) {
         for (Forester forester : foresters) {
-//            if (forester.bounds.overlaps(player.bounds)) {
+            result.set(0f, 0f, 0f, 0f);
             if (isPlayerCaught(forester.bounds, player.bounds)) {
                 GameScreen.gameOver = true;
                 player.stop();
-                setForesterPath(forester, player.bounds.x, player.bounds.y);
+                forester.stop();
+                forester.path.add(new Vector2(player.getX(), player.getY()));
+                forester.addAction(forester.getMoveActionsSequence());
+            } else if (GameScreen.gameOver) {
+                forester.stop();
             } else {
                 updateForestersPath(forester, delta);
             }
@@ -277,12 +286,13 @@ public abstract class Level {
 
     private boolean isPlayerCaught(Rectangle f, Rectangle p) {
         Intersector.intersectRectangles(f, p, result);
-        return result.area() >= caughtArea;
+        float resultArea = result.area();
+        return resultArea >= caughtArea;
     }
 
     private void updateForestersPath(Forester forester, float delta) {
         forester.updateMoving(player, delta);
-        if (forester.isPursuePlayer() && !GameScreen.gameOver) {
+        if (forester.isPursuePlayer()) {
             setForesterPath(forester, player.getX(), player.getY());
         }
     }

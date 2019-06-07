@@ -115,17 +115,17 @@ public class WorldRenderer {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         renderer.setProjectionMatrix(camera.combined);
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
+//        renderer.begin(ShapeRenderer.ShapeType.Filled);
 
 //        drawPlayerPath();
 
         // Прямоугольник, на котором находится игрок
-        drawCharacterDebug();
+//        drawCharacterDebug();
 
         // Прямоугольник, на котором находится лесник
-        drawForesterDebug();
+//        drawForesterDebug();
 
-        renderer.end();
+//        renderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
