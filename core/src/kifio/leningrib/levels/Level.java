@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -37,6 +38,10 @@ public abstract class Level {
     public List<Forester> foresters;
     public int mapWidth;
     public int mapHeight;
+
+    private Rectangle result = new Rectangle();
+
+    private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
     // Граф поиска пути
     private ForestGraph forestGraph = new ForestGraph();
@@ -165,6 +170,9 @@ public abstract class Level {
         for (int i = 1; i < path.getCount(); i++) {
             player.path.add(new Vector2(path.get(i)));
         }
+
+        SequenceAction playerActionsSequence = player.getMoveActionsSequence();
+        player.addAction(playerActionsSequence);
     }
 
     private boolean isTileAvailable(TiledMapTileLayer.Cell cell) {
@@ -246,8 +254,7 @@ public abstract class Level {
     }
 
     public void startMoving() {
-        SequenceAction playerActionsSequence = player.getMoveActionsSequence();
-        player.addAction(playerActionsSequence);
+
     }
 
     public void update(float delta) {
@@ -257,35 +264,45 @@ public abstract class Level {
 
     private void updateForesters(float delta) {
         for (Forester forester : foresters) {
-            if (forester.bounds.overlaps(player.bounds)) {
+//            if (forester.bounds.overlaps(player.bounds)) {
+            if (isPlayerCaught(forester.bounds, player.bounds)) {
                 GameScreen.gameOver = true;
                 player.stop();
+                setForesterPath(forester, player.bounds.x, player.bounds.y);
             } else {
                 updateForestersPath(forester, delta);
             }
         }
     }
 
+    private boolean isPlayerCaught(Rectangle f, Rectangle p) {
+        Intersector.intersectRectangles(f, p, result);
+        return result.area() >= caughtArea;
+    }
+
     private void updateForestersPath(Forester forester, float delta) {
         forester.updateMoving(player, delta);
         if (forester.isPursuePlayer() && !GameScreen.gameOver) {
-
-            GraphPath<Vector2> path = forestGraph.getPath(
-                    Utils.mapCoordinate(forester.getX()),
-                    Utils.mapCoordinate(forester.getY()),
-                    Utils.mapCoordinate(player.getX()),
-                    Utils.mapCoordinate(player.getY()));
-
-            forester.stop();
-
-            // Первая точка пути совпадает с координатами игрока,
-            // чтобы лесник не стоял на месте лишнее время ее из пути удаляем.
-            for (int i = 1; i < path.getCount(); i++) {
-                forester.path.add(new Vector2(path.get(i)));
-            }
-
-            forester.addAction(forester.getMoveActionsSequence());
+            setForesterPath(forester, player.getX(), player.getY());
         }
+    }
+
+    private void setForesterPath(Forester forester, float tx, float ty) {
+        GraphPath<Vector2> path = forestGraph.getPath(
+                Utils.mapCoordinate(forester.getX()),
+                Utils.mapCoordinate(forester.getY()),
+                Utils.mapCoordinate(tx),
+                Utils.mapCoordinate(ty));
+
+        forester.stop();
+
+        // Первая точка пути совпадает с координатами игрока,
+        // чтобы лесник не стоял на месте лишнее время ее из пути удаляем.
+        for (int i = 1; i < path.getCount(); i++) {
+            forester.path.add(new Vector2(path.get(i)));
+        }
+
+        forester.addAction(forester.getMoveActionsSequence());
     }
 
     private void updateMushrooms() {

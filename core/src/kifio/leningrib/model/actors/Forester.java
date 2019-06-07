@@ -103,11 +103,6 @@ public class Forester extends MovableActor {
 
     public void updateMoving(Player player, float delta) {
 
-        if (GameScreen.gameOver) {
-            stopPursuing();
-            return;
-        }
-
         float px = player.getX() + (GameScreen.tileSize / 2f);
         float py = player.getY() - (GameScreen.tileSize / 2f);
 
