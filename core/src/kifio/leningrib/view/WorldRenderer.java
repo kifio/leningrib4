@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class WorldRenderer {
@@ -28,6 +29,7 @@ public class WorldRenderer {
     private SpriteBatch batch;
     private ShapeRenderer renderer;
     private OrthographicCamera camera;
+    private SpeechManager speechManager;
     private int cameraWidth;
     private int cameraHeight;
 
@@ -35,30 +37,28 @@ public class WorldRenderer {
     private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
     private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
 
-    private static float GAME_OVER_ANIMATION_TIME = 2f;
-    private float gameOverTime;
+    private static final String GAME_OVER_TEXT = "ЕБАНИ МЕНЯ ПАЛЬЦЕМ ЧТОБЫ НАЧАТЬ СНАЧАЛА";
+    private static final String TEST_OVER_TEXT = "ЭТО САМАЯ ЧТО НИ НА ЕСТЬ ПОБЕДА!\nТЕПЕРЬ\n" + GAME_OVER_TEXT;
 
-    public WorldRenderer(Level level,
-                         OrthographicCamera camera,
+    public WorldRenderer(OrthographicCamera camera,
                          int cameraWidth,
                          int cameraHeight) {
-        this.level = level;
         this.camera = camera;
         this.cameraWidth = cameraWidth;
         this.cameraHeight = cameraHeight;
-        loadTextures();
-        batch = new SpriteBatch();
-        renderer = new ShapeRenderer();
-        ScreenViewport viewport = new ScreenViewport(camera);
-        stage = new Stage(viewport, batch);
+        this.grass = new TextureRegion(ResourcesManager.get("grass_0"));
+        this.speechManager = new SpeechManager();
+        this.batch = new SpriteBatch();
+        this.renderer = new ShapeRenderer();
+        this.stage = new Stage(new ScreenViewport(camera), batch);
+    }
+
+    public void reset(Level level) {
+        this.level = level;
         resetStage(level);
     }
 
-    private void loadTextures() {
-        grass = new TextureRegion(ResourcesManager.get("grass_0"));
-    }
-
-    public void resetStage(Level level) {
+    private void resetStage(Level level) {
         stage.clear();
         for (Actor mushroom : level.mushrooms) stage.addActor(mushroom);
         stage.addActor(level.player);
@@ -66,11 +66,10 @@ public class WorldRenderer {
         for (Group tree : level.trees) stage.addActor(tree);
     }
 
-    public void renderBlackScreen(float delta) {
+    public void renderBlackScreen(float delta, float gameOverTime, float gameOverAnimationTime) {
         render();
 
-        gameOverTime += delta;
-        float alpha = Math.min(gameOverTime / GAME_OVER_ANIMATION_TIME, 1);
+        float alpha = Math.min(gameOverTime / gameOverAnimationTime, 1);
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -80,6 +79,8 @@ public class WorldRenderer {
         renderer.setColor(0f, 0f, 0f, alpha);
         renderer.rect(0f, camera.position.y - Gdx.graphics.getHeight() / 2f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         renderer.end();
+
+        drawGameOverText(GameScreen.win ? TEST_OVER_TEXT : GAME_OVER_TEXT);
     }
 
     public void render() {
@@ -115,7 +116,7 @@ public class WorldRenderer {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         renderer.setProjectionMatrix(camera.combined);
-//        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
 
 //        drawPlayerPath();
 
@@ -125,7 +126,9 @@ public class WorldRenderer {
         // Прямоугольник, на котором находится лесник
 //        drawForesterDebug();
 
-//        renderer.end();
+//        drawExitRect();
+
+        renderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
@@ -152,6 +155,20 @@ public class WorldRenderer {
     private void drawForesterDebug() {
         renderer.setColor(foresterDebugColor);
         for (Forester forester : level.foresters) drawForesterPath(forester);
+    }
+
+    private void drawExitRect() {
+        renderer.setColor(playerDebugColor);
+
+        renderer.rect(GameScreen.tileSize * 3f,
+                GameScreen.tileSize * 24f,
+                GameScreen.tileSize,
+                GameScreen.tileSize);
+
+        renderer.rect(GameScreen.tileSize * 4f,
+                GameScreen.tileSize * 24f,
+                GameScreen.tileSize,
+                GameScreen.tileSize);
     }
 
     private void drawForesterPath(Forester forester) {
@@ -182,6 +199,14 @@ public class WorldRenderer {
         int dc = 0;
         if (dy > 0) dc = (int) (dy / GameScreen.tileSize);
         return dc;
+    }
+
+    private void drawGameOverText(String text) {
+        batch.begin();
+        float x = (Gdx.graphics.getWidth() / 2f) - (speechManager.getTextWidth(text) / 2);
+        float y = camera.position.y - (speechManager.getTextHeight(text) / 2);
+        speechManager.getBitmapFont().draw(batch, text, x, y);
+        batch.end();
     }
 
     public void dispose() {

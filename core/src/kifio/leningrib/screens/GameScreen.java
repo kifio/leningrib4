@@ -12,6 +12,8 @@ import kifio.leningrib.view.WorldRenderer;
 
 public class GameScreen extends InputAdapter implements Screen {
 
+    private static final float GAME_OVER_ANIMATION_TIME = 1f;
+
     private WorldRenderer worldRenderer;
     private WorldController worldController;
     private OrthographicCamera camera;
@@ -20,14 +22,17 @@ public class GameScreen extends InputAdapter implements Screen {
     public static int cameraWidth;
     public static int cameraHeight;
     public static boolean gameOver;
+    public static boolean win;
+
+    private float gameOverTime;
 
     public GameScreen() {
         Gdx.input.setInputProcessor(this);
         initScreenSize();
         initCamera();
-        Level level = getNextLevel();
-        this.worldController = new WorldController(this, level);
-        this.worldRenderer = new WorldRenderer(level, camera, cameraWidth, cameraHeight);
+        this.worldController = new WorldController(this);
+        this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight);
+        setLevel(getNextLevel());
     }
 
     // Инициализирует камеру ортгональную карте
@@ -53,18 +58,18 @@ public class GameScreen extends InputAdapter implements Screen {
         return new FirstLevel();
     }
 
-    public void onLevelPassed() {
-        Level level = getNextLevel();
-        this.worldController.setLevel(level);
-        this.worldRenderer.resetStage(level);
+    public void setLevel(Level level) {
+        this.worldController.reset(level);
+        this.worldRenderer.reset(level);
     }
 
     @Override
     public void render(float delta) {
         if (gameOver) {
-//            worldRenderer.renderBlackScreen(delta);
-            worldRenderer.render();
+            gameOverTime += delta;
             worldController.update(delta);
+            worldRenderer.renderBlackScreen(delta, gameOverTime, GAME_OVER_ANIMATION_TIME);
+//            worldRenderer.render();
         } else {
             worldController.update(delta);
             worldRenderer.render();
@@ -110,7 +115,17 @@ public class GameScreen extends InputAdapter implements Screen {
             worldController.movePlayerTo(
                     camera.position.x - (Gdx.graphics.getWidth() / 2f) + x,
                     camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y));
+        } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
+            setLevel(getNextLevel());
+            gameOverTime = 0f;
+            gameOver = false;
+            win = false;
         }
         return true;
+    }
+
+    public void onLevelPassed() {
+        gameOver = true;
+        win = true;
     }
 }

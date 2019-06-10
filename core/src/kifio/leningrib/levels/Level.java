@@ -200,7 +200,7 @@ public abstract class Level {
         this.foresters = new ArrayList<>();
         this.foresters.add(new Forester(
                 new Vector2(
-                        GameScreen.tileSize * 1f,
+                        GameScreen.tileSize * 0f,
                         GameScreen.tileSize * 13f),
                 new Vector2(
                         GameScreen.tileSize * 4f,
@@ -209,18 +209,18 @@ public abstract class Level {
         this.foresters.add(new Forester(
                 new Vector2(
                         GameScreen.tileSize * 1f,
-                        GameScreen.tileSize * 4f),
+                        GameScreen.tileSize * 5f),
                 new Vector2(
                         GameScreen.tileSize * 4f,
-                        GameScreen.tileSize * 4f), "enemy.txt"));
+                        GameScreen.tileSize * 5f), "enemy.txt"));
 
         this.foresters.add(new Forester(
                 new Vector2(
                         GameScreen.tileSize * 0f,
-                        GameScreen.tileSize * 24f),
+                        GameScreen.tileSize * 23f),
                 new Vector2(
                         GameScreen.tileSize * 4f,
-                        GameScreen.tileSize * 24f), "enemy.txt"));
+                        GameScreen.tileSize * 23f), "enemy.txt"));
     }
 
     private static final String NEW_LINE = "\n";
@@ -293,7 +293,7 @@ public abstract class Level {
     private void updateForestersPath(Forester forester, float delta) {
         forester.updateMoving(player, delta);
         if (forester.isPursuePlayer()) {
-            setForesterPath(forester, player.getX(), player.getY());
+            setForesterPath(forester, player.bounds.x, player.bounds.y);
         }
     }
 
@@ -308,7 +308,8 @@ public abstract class Level {
 
         // Первая точка пути совпадает с координатами игрока,
         // чтобы лесник не стоял на месте лишнее время ее из пути удаляем.
-        for (int i = 1; i < path.getCount(); i++) {
+        int start = path.getCount() > 1 ? 1 : 0;
+        for (int i = start; i < path.getCount(); i++) {
             forester.path.add(new Vector2(path.get(i)));
         }
 

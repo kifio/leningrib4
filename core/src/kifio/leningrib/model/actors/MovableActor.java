@@ -79,7 +79,7 @@ public abstract class MovableActor extends Actor {
         for (int i = 0; i < path.size(); i++) {
             Vector2 vec = path.get(i);
             seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y, getVelocity()));
-            seq.addAction(getDelayAction(0.2f));
+            seq.addAction(getDelayAction(getDelayTime()));
             fromX = vec.x;
             fromY = vec.y;
         }

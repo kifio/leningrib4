@@ -12,13 +12,13 @@ import kifio.leningrib.model.ResourcesManager;
 /**
  * Created by kifio on 19/02/2018.
  */
-class SpeechManager {
+public class SpeechManager {
 
     private BitmapFont bitmapFont;
     private I18NBundle speechBundle;
     private GlyphLayout glyphLayout;
 
-    SpeechManager() {
+    public SpeechManager() {
         bitmapFont = generateFont();
         speechBundle = ResourcesManager.getMushroomSpeechBundle();
         glyphLayout = new GlyphLayout();
@@ -39,17 +39,21 @@ class SpeechManager {
         return parameter;
     }
 
-    float getTextWidth(String text) {
+    public float getTextWidth(String text) {
         glyphLayout.setText(bitmapFont, text);
         return glyphLayout.width;
     }
 
-    float getTextHeight(String text) {
+    public float getTextHeight(String text) {
         glyphLayout.setText(bitmapFont, text);
         return glyphLayout.height;
     }
 
-    void scale(float scale) {
+    public void scale(float scale) {
         bitmapFont.getData().setScale(scale);
+    }
+
+    public BitmapFont getBitmapFont() {
+        return bitmapFont;
     }
 }

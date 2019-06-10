@@ -1,5 +1,7 @@
 package kifio.leningrib.controller;
 
+import com.badlogic.gdx.Gdx;
+
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.screens.GameScreen;
 
@@ -8,12 +10,11 @@ public class WorldController {
     private GameScreen gameScreen;
     private Level level;
 
-    public WorldController(GameScreen gameScreen, Level level) {
+    public WorldController(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
-        this.level = level;
     }
 
-    public void setLevel(Level level) {
+    public void reset(Level level) {
         this.level = level;
     }
 
@@ -22,7 +23,7 @@ public class WorldController {
     }
 
     public void update(float delta) {
-        if (level.player.getY() < 0) {
+        if (level.mushrooms.isEmpty()) {
             gameScreen.onLevelPassed();
             return;
         }
