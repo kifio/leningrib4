@@ -63,10 +63,10 @@ public class WorldRenderer {
         for (Actor mushroom : level.mushrooms) stage.addActor(mushroom);
         stage.addActor(level.player);
         for (Forester forester : level.foresters) stage.addActor(forester);
-        for (Group tree : level.trees) stage.addActor(tree);
+        for (Actor tree : level.trees) stage.addActor(tree);
     }
 
-    public void renderBlackScreen(float delta, float gameOverTime, float gameOverAnimationTime) {
+    public void renderBlackScreen(float gameOverTime, float gameOverAnimationTime) {
         render();
 
         float alpha = Math.min(gameOverTime / gameOverAnimationTime, 1);

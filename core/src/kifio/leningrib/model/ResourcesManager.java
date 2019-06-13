@@ -27,8 +27,16 @@ public class ResourcesManager {
 
         regions.put("tree_0", new TextureRegion(overworld, 80, 256, 16, 16));
         regions.put("tree_1", new TextureRegion(overworld, 80, 272, 16, 16));
-        regions.put("tree_2", new TextureRegion(overworld, 96, 272, 16, 16));
-        regions.put("tree_3", new TextureRegion(overworld, 96, 256, 16, 16));
+        regions.put("tree_2", new TextureRegion(overworld, 96, 256, 16, 16));
+        regions.put("tree_3", new TextureRegion(overworld, 96, 272, 16, 16));
+        regions.put("log_0", new TextureRegion(overworld, 16 * 3, 16 * 5, 16, 16));
+        regions.put("log_1", new TextureRegion(overworld, 16 * 4, 16 * 5, 16, 16));
+        regions.put("log_2", new TextureRegion(overworld, 16 * 5, 16 * 5, 16, 16));
+        regions.put("stone_0", new TextureRegion(overworld, 16 * 6, 16 * 5, 16, 16));
+        regions.put("stone_1", new TextureRegion(overworld, 16 * 7, 16 * 5, 16, 16));
+        regions.put("stone_2", new TextureRegion(overworld, 16 * 8, 16 * 5, 16, 16));
+        regions.put("stone_3", new TextureRegion(overworld, 16 * 9, 16 * 5, 16, 16));
+        regions.put("stone_4", new TextureRegion(overworld, 16 * 10, 16 * 5, 16, 16));
 
         Texture forestTiles = am.get("forest_tiles.png");
         regions.put("m_0", new TextureRegion(forestTiles, 416, 0, 32, 32));

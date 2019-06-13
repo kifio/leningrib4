@@ -1,7 +1,5 @@
 package kifio.leningrib.controller;
 
-import com.badlogic.gdx.Gdx;
-
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.screens.GameScreen;
 
@@ -19,7 +17,7 @@ public class WorldController {
     }
 
     public void movePlayerTo(float x, float y) {
-        level.resetPath(x, y);
+        level.resetPlayerPath(x, y);
     }
 
     public void update(float delta) {

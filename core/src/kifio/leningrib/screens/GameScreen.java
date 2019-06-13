@@ -68,7 +68,7 @@ public class GameScreen extends InputAdapter implements Screen {
         if (gameOver) {
             gameOverTime += delta;
             worldController.update(delta);
-            worldRenderer.renderBlackScreen(delta, gameOverTime, GAME_OVER_ANIMATION_TIME);
+            worldRenderer.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME);
 //            worldRenderer.render();
         } else {
             worldController.update(delta);

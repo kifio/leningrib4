@@ -12,7 +12,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-import java.util.Vector;
 
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.ResourcesManager;
@@ -47,12 +47,9 @@ public abstract class Level {
     // Граф поиска пути
     private ForestGraph forestGraph = new ForestGraph();
 
-    // Деревья
-    public Set<Group> trees = new HashSet<>();
+    // Объекты
+    public Set<Actor> trees = new HashSet<>();
     public Set<Mushroom> mushrooms = new HashSet<>();
-
-    // Множество зон, в которые нельзя попасть
-    public Set<Rectangle> unreachableBounds = new HashSet<>();
 
     public Level(String levelName) {
         init(levelName);
@@ -65,7 +62,6 @@ public abstract class Level {
         initMap(levelName + ".tmx");
     }
 
-    // TODO: не использовать TileMap, использовать свой формат карты и хранить ее в json
     private void initMap(String fileName) {
         map = new TmxMapLoader().load(fileName);
         mapWidth = (int) map.getProperties().get("width");
@@ -96,33 +92,33 @@ public abstract class Level {
             for (int j = 0; j < columns; j++) {
                 TiledMapTileLayer.Cell cell = layer.getCell(j, i);
                 if (cell != null) {
-                    addTreeSegment(j * GameScreen.tileSize, i * GameScreen.tileSize, cell.getTile());
+                    handleCell(j * GameScreen.tileSize, i * GameScreen.tileSize, cell.getTile());
                 }
             }
         }
     }
 
-    private void addTreeSegment(int x, int y, TiledMapTile tile) {
+    private void handleCell(int x, int y, TiledMapTile tile) {
         if (tile == null) return;
-        MapProperties properties = tile.getProperties();
+        Actor group = getActorFromCell(tile.getProperties(), x, y);
+        if (group != null) trees.add(group);
+    }
+
+    private Actor getActorFromCell(MapProperties properties, int x, int y) {
         if (properties.containsKey("index")) {
-            Group group = new Group();
-            switch ((int) properties.get("index")) {
-                case 0:
-                    addTopLeftSegment(group, x, y);
-                    break;
-                case 1:
-                    addBottomLeftSegment(group, x, y);
-                    break;
-                case 2:
-                    addTopRightSegment(group, x, y);
-                    break;
-                case 3:
-                    addBottomRightSegment(group, x, y);
-                    break;
-            }
-            trees.add(group);
+            return getObstacle("tree", (int) properties.get("index"), x, y);
+        } else if (properties.containsKey("log")) {
+            return getObstacle("log", (int) properties.get("log"), x, y);
+        } else if (properties.containsKey("stone")) {
+            return getObstacle("stone", (int) properties.get("stone"), x, y);
+        } else {
+            return null;
         }
+    }
+
+    private Actor getObstacle(String name, int value, int x, int y) {
+        return new TreePart(ResourcesManager.get(String.format(Locale.getDefault(), "%s_%d", name, value)), x, y,
+                GameScreen.tileSize, GameScreen.tileSize);
     }
 
     private void addNeighbours(int x, int y, TiledMapTileLayer layer) {
@@ -158,12 +154,13 @@ public abstract class Level {
         }
     }
 
-    public void resetPath(float x, float y) {
+    public void resetPlayerPath(float x, float y) {
         GraphPath<Vector2> path = forestGraph.getPath(
                 Utils.mapCoordinate(player.getX()),
                 Utils.mapCoordinate(player.getY()),
                 Utils.mapCoordinate(x),
                 Utils.mapCoordinate(y));
+
         player.stop();
 
         // Первая точка пути совпадает с координатами игрока,
@@ -185,42 +182,40 @@ public abstract class Level {
             int index = (int) properties.get("index");
             return (index == 0 || index == 2);
         } else {
-            return true;
+            return !properties.containsKey("log") && !properties.containsKey("stone");
         }
     }
 
     private void initPlayer() {
         this.player = new Player(
-                0f,
-                10f,
-                "player.txt");
+                0f, GameScreen.tileSize, "player.txt");
     }
 
     private void initForester() {
         this.foresters = new ArrayList<>();
-        this.foresters.add(new Forester(
-                new Vector2(
-                        GameScreen.tileSize * 0f,
-                        GameScreen.tileSize * 13f),
-                new Vector2(
-                        GameScreen.tileSize * 4f,
-                        GameScreen.tileSize * 13f), "enemy.txt"));
+//        this.foresters.add(new Forester(
+//                new Vector2(
+//                        GameScreen.tileSize * 0f,
+//                        GameScreen.tileSize * 13f),
+//                new Vector2(
+//                        GameScreen.tileSize * 4f,
+//                        GameScreen.tileSize * 13f), "enemy.txt"));
 
-        this.foresters.add(new Forester(
-                new Vector2(
-                        GameScreen.tileSize * 1f,
-                        GameScreen.tileSize * 5f),
-                new Vector2(
-                        GameScreen.tileSize * 4f,
-                        GameScreen.tileSize * 5f), "enemy.txt"));
+//        this.foresters.add(new Forester(
+//                new Vector2(
+//                        GameScreen.tileSize * 1f,
+//                        GameScreen.tileSize * 5f),
+//                new Vector2(
+//                        GameScreen.tileSize * 4f,
+//                        GameScreen.tileSize * 5f), "enemy.txt"));
 
-        this.foresters.add(new Forester(
-                new Vector2(
-                        GameScreen.tileSize * 0f,
-                        GameScreen.tileSize * 23f),
-                new Vector2(
-                        GameScreen.tileSize * 4f,
-                        GameScreen.tileSize * 23f), "enemy.txt"));
+//        this.foresters.add(new Forester(
+//                new Vector2(
+//                        GameScreen.tileSize * 0f,
+//                        GameScreen.tileSize * 23f),
+//                new Vector2(
+//                        GameScreen.tileSize * 4f,
+//                        GameScreen.tileSize * 23f), "enemy.txt"));
     }
 
     private static final String NEW_LINE = "\n";
@@ -244,22 +239,20 @@ public abstract class Level {
         }
     }
 
-    private void addTopLeftSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(ResourcesManager.get("tree_0"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+    private Actor getTopLeftSegment(int x, int y) {
+        return new TreePart(ResourcesManager.get("tree_0"), x, y, GameScreen.tileSize, GameScreen.tileSize);
     }
 
-    private void addTopRightSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(ResourcesManager.get("tree_3"), x, y, GameScreen.tileSize, GameScreen.tileSize));
+    private Actor getTopRightSegment(int x, int y) {
+        return new TreePart(ResourcesManager.get("tree_3"), x, y, GameScreen.tileSize, GameScreen.tileSize);
     }
 
-    private void addBottomLeftSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(ResourcesManager.get("tree_1"), x, y, GameScreen.tileSize, GameScreen.tileSize));
-        unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
+    private Actor getBottomLeftSegment(int x, int y) {
+        return new TreePart(ResourcesManager.get("tree_1"), x, y, GameScreen.tileSize, GameScreen.tileSize);
     }
 
-    private void addBottomRightSegment(Group group, int x, int y) {
-        group.addActor(new TreePart(ResourcesManager.get("tree_2"), x, y, GameScreen.tileSize, GameScreen.tileSize));
-        unreachableBounds.add(new Rectangle(x, y, GameScreen.tileSize, GameScreen.tileSize));
+    private Actor getBottomRightSegment(int x, int y) {
+        return new TreePart(ResourcesManager.get("tree_2"), x, y, GameScreen.tileSize, GameScreen.tileSize);
     }
 
     public void update(float delta) {
