@@ -63,13 +63,17 @@ public class GameScreen extends InputAdapter implements Screen {
         this.worldRenderer.reset(level);
     }
 
+    /*
+        I/kifio: Delta: 0.01672223
+        I/kifio: Delta: 0.015889948
+        I/kifio: Delta: 0.015999753
+    */
     @Override
     public void render(float delta) {
         if (gameOver) {
             gameOverTime += delta;
             worldController.update(delta);
             worldRenderer.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME);
-//            worldRenderer.render();
         } else {
             worldController.update(delta);
             worldRenderer.render();

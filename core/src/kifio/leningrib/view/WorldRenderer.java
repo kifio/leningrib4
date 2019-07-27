@@ -47,7 +47,6 @@ public class WorldRenderer {
         this.cameraWidth = cameraWidth;
         this.cameraHeight = cameraHeight;
         this.grass = new TextureRegion(ResourcesManager.get("grass_0"));
-        this.speechManager = new SpeechManager();
         this.batch = new SpriteBatch();
         this.renderer = new ShapeRenderer();
         this.stage = new Stage(new ScreenViewport(camera), batch);

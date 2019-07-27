@@ -7,7 +7,11 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.I18NBundle;
 
+import java.util.ArrayList;
+
 import kifio.leningrib.model.ResourcesManager;
+
+import static com.badlogic.gdx.math.MathUtils.random;
 
 /**
  * Created by kifio on 19/02/2018.
@@ -15,12 +19,28 @@ import kifio.leningrib.model.ResourcesManager;
 public class SpeechManager {
 
     private BitmapFont bitmapFont;
-    private I18NBundle speechBundle;
     private GlyphLayout glyphLayout;
+    private float speechLineHeight = 0;
 
-    public SpeechManager() {
+    private static SpeechManager speechManager;
+
+    public static SpeechManager getInstance() {
+        if (speechManager == null) {
+            speechManager = new SpeechManager();
+        }
+        return speechManager;
+    }
+
+    public float getSpeechLineHalfHeight() {
+        if (speechLineHeight == 0) {
+            glyphLayout.setText(bitmapFont, "0");
+            speechLineHeight =  glyphLayout.height;
+        }
+        return speechLineHeight;
+    }
+
+    private SpeechManager() {
         bitmapFont = generateFont();
-        speechBundle = ResourcesManager.getMushroomSpeechBundle();
         glyphLayout = new GlyphLayout();
     }
 
@@ -49,11 +69,23 @@ public class SpeechManager {
         return glyphLayout.height;
     }
 
+    // Y of center text
+    public boolean isSpeechCanBeOverlapped(float y, Speech speech) {
+        float top = speech.getY() + getTextHeight(speech.getSpeech());
+        float bottom = speech.getY() - getTextHeight(speech.getSpeech());
+        return y >= top && y <= bottom;
+    }
+
     public void scale(float scale) {
         bitmapFont.getData().setScale(scale);
     }
 
     public BitmapFont getBitmapFont() {
         return bitmapFont;
+    }
+
+    public String getRandomSpeech() {
+        String speechId = String.valueOf(random(1, 35));
+        return ResourcesManager.getMushroomSpeechBundle().get(speechId);
     }
 }

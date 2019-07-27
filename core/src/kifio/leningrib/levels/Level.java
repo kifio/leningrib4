@@ -15,12 +15,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import kifio.leningrib.Utils;
@@ -30,7 +33,12 @@ import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
+import kifio.leningrib.model.speech.Speech;
+import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
+
+import static com.badlogic.gdx.math.MathUtils.floor;
+import static com.badlogic.gdx.math.MathUtils.random;
 
 public abstract class Level {
 
@@ -40,7 +48,10 @@ public abstract class Level {
     public int mapWidth;
     public int mapHeight;
 
+    private ArrayList<Speech> speeches = new ArrayList<>(8);
+
     private Rectangle result = new Rectangle();
+    private Random random = new Random();
 
     private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
@@ -239,6 +250,28 @@ public abstract class Level {
         }
     }
 
+    private void addSpeech(float x, float y, float startTime, float stateTime) {
+
+        float newSpeechCenter = SpeechManager.getInstance().getSpeechLineHalfHeight() + y;
+
+        Iterator<Speech> iterator = speeches.iterator();
+        while (iterator.hasNext()) {
+            Speech sp = iterator.next();
+
+            if (stateTime - sp.getStartTime() > 1) {
+                iterator.remove();
+            }
+
+            boolean isSpeechCanBeOverlapped = SpeechManager.getInstance()
+                    .isSpeechCanBeOverlapped(newSpeechCenter, sp);
+
+            if (random.nextBoolean() && !isSpeechCanBeOverlapped
+                    && player.getMushroomsCount() / 5 > speeches.size()) {
+                speeches.add(new Speech(x, y, startTime, SpeechManager.getInstance().getRandomSpeech()));
+            }
+        }
+    }
+
     private Actor getTopLeftSegment(int x, int y) {
         return new TreePart(ResourcesManager.get("tree_0"), x, y, GameScreen.tileSize, GameScreen.tileSize);
     }
@@ -316,6 +349,7 @@ public abstract class Level {
             if (m.bounds.overlaps(player.bounds)) {
                 m.remove();
                 iterator.remove();
+                player.increaseMushroomCount();
             }
         }
     }
