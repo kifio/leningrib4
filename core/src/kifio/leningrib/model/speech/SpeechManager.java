@@ -31,17 +31,10 @@ public class SpeechManager {
         return speechManager;
     }
 
-    public float getSpeechLineHalfHeight() {
-        if (speechLineHeight == 0) {
-            glyphLayout.setText(bitmapFont, "0");
-            speechLineHeight =  glyphLayout.height;
-        }
-        return speechLineHeight;
-    }
-
     private SpeechManager() {
         bitmapFont = generateFont();
         glyphLayout = new GlyphLayout();
+        scale(Gdx.graphics.getDensity() / 2f);
     }
 
     private BitmapFont generateFont() {

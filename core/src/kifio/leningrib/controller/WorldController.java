@@ -20,12 +20,12 @@ public class WorldController {
         level.resetPlayerPath(x, y);
     }
 
-    public void update(float delta) {
+    public void update(float delta, float gameTime) {
         if (level.mushrooms.isEmpty()) {
             gameScreen.onLevelPassed();
             return;
         }
 
-        level.update(delta);
+        level.update(delta, gameTime);
     }
 }

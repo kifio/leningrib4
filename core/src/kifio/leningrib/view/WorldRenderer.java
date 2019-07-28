@@ -14,9 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import javax.management.timer.TimerMBean;
+
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
@@ -92,6 +95,7 @@ public class WorldRenderer {
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
+        drawSpeeches();
     }
 
     private void updateCamera() {
@@ -189,6 +193,19 @@ public class WorldRenderer {
                 int y = GameScreen.tileSize * (j + dc);
                 batch.draw(grass, x, y, GameScreen.tileSize, GameScreen.tileSize);
             }
+        }
+        batch.end();
+    }
+
+    private void drawSpeeches() {
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        for (Speech speech : level.speeches)  {
+            SpeechManager.getInstance().getBitmapFont().draw(batch,
+                    speech.getSpeech(),
+                    speech.getX(),
+                    speech.getY());
+            speech.increaseY(0.5f);
         }
         batch.end();
     }

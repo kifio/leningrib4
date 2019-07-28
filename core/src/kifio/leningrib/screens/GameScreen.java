@@ -25,6 +25,7 @@ public class GameScreen extends InputAdapter implements Screen {
     public static boolean win;
 
     private float gameOverTime;
+    private float gameTime;
 
     public GameScreen() {
         Gdx.input.setInputProcessor(this);
@@ -72,10 +73,12 @@ public class GameScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         if (gameOver) {
             gameOverTime += delta;
-            worldController.update(delta);
+            gameTime = 0f;
+            worldController.update(delta, gameOverTime);
             worldRenderer.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME);
         } else {
-            worldController.update(delta);
+            gameTime += delta;
+            worldController.update(delta, gameTime);
             worldRenderer.render();
         }
     }
@@ -122,6 +125,7 @@ public class GameScreen extends InputAdapter implements Screen {
         } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
             setLevel(getNextLevel());
             gameOverTime = 0f;
+            gameTime = 0f;
             gameOver = false;
             win = false;
         }

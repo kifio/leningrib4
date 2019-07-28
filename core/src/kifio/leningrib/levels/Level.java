@@ -48,8 +48,6 @@ public abstract class Level {
     public int mapWidth;
     public int mapHeight;
 
-    private ArrayList<Speech> speeches = new ArrayList<>(8);
-
     private Rectangle result = new Rectangle();
     private Random random = new Random();
 
@@ -59,8 +57,9 @@ public abstract class Level {
     private ForestGraph forestGraph = new ForestGraph();
 
     // Объекты
-    public Set<Actor> trees = new HashSet<>();
-    public Set<Mushroom> mushrooms = new HashSet<>();
+    public ArrayList<Actor> trees = new ArrayList<>();
+    public ArrayList<Mushroom> mushrooms = new ArrayList<>();
+    public ArrayList<Speech> speeches = new ArrayList<>(8);
 
     public Level(String levelName) {
         init(levelName);
@@ -250,25 +249,15 @@ public abstract class Level {
         }
     }
 
-    private void addSpeech(float x, float y, float startTime, float stateTime) {
+    private void addSpeech(Mushroom m, float stateTime) {
 
-        float newSpeechCenter = SpeechManager.getInstance().getSpeechLineHalfHeight() + y;
+        for (Speech speech : speeches) {
+            if (speech.getMushroom().equals(m)) return;
+        }
 
-        Iterator<Speech> iterator = speeches.iterator();
-        while (iterator.hasNext()) {
-            Speech sp = iterator.next();
-
-            if (stateTime - sp.getStartTime() > 1) {
-                iterator.remove();
-            }
-
-            boolean isSpeechCanBeOverlapped = SpeechManager.getInstance()
-                    .isSpeechCanBeOverlapped(newSpeechCenter, sp);
-
-            if (random.nextBoolean() && !isSpeechCanBeOverlapped
-                    && player.getMushroomsCount() / 5 > speeches.size()) {
-                speeches.add(new Speech(x, y, startTime, SpeechManager.getInstance().getRandomSpeech()));
-            }
+        // С некоторой вероятностью добавляем новую речь
+        if (random.nextInt(128) / 8 == 0) {
+            speeches.add(new Speech(m, stateTime, SpeechManager.getInstance().getRandomSpeech()));
         }
     }
 
@@ -288,9 +277,9 @@ public abstract class Level {
         return new TreePart(ResourcesManager.get("tree_2"), x, y, GameScreen.tileSize, GameScreen.tileSize);
     }
 
-    public void update(float delta) {
+    public void update(float delta, float gameTime) {
         updateForesters(delta);
-        updateMushrooms();
+        updateMushrooms(gameTime);
     }
 
     private void updateForesters(float delta) {
@@ -342,7 +331,19 @@ public abstract class Level {
         forester.addAction(forester.getMoveActionsSequence());
     }
 
-    private void updateMushrooms() {
+    private void updateMushrooms(float stateTime) {
+
+        // Удаляем просроченные реплики
+        Iterator<Speech> speechIterator = speeches.iterator();
+        while (speechIterator.hasNext()) {
+            Speech sp = speechIterator.next();
+            if (stateTime - sp.getStartTime() > 1) {
+                sp.dispose();
+                speechIterator.remove();
+            }
+        }
+
+        // Удаляем съеденные грибы, несъеденным добавляем реплики
         Iterator<Mushroom> iterator = mushrooms.iterator();
         while (iterator.hasNext()) {
             Mushroom m = iterator.next();
@@ -350,6 +351,9 @@ public abstract class Level {
                 m.remove();
                 iterator.remove();
                 player.increaseMushroomCount();
+            } else if (player.getMushroomsCount()  > 0) {
+                if (speeches.size() > 0) return;
+                addSpeech(m, stateTime);
             }
         }
     }

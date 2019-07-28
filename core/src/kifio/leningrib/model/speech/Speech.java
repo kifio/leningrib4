@@ -1,15 +1,21 @@
 package kifio.leningrib.model.speech;
 
+import com.badlogic.gdx.Gdx;
+
+import kifio.leningrib.model.actors.Mushroom;
+
 public class Speech {
 
     private float x;
     private float y;
     private float startTime;
+    private Mushroom mushroom;
     private String speech;
 
-    public Speech(float x, float y, float startTime, String speech) {
-        this.x = x;
-        this.y = y;
+    public Speech(Mushroom mushroom, float startTime, String speech) {
+        this.x = mushroom.getX() + (mushroom.bounds.getWidth() / 2) - (SpeechManager.getInstance().getTextWidth(speech) / 2);
+        this.y = mushroom.getY() + mushroom.bounds.getHeight();
+        this.mushroom = mushroom;
         this.startTime = startTime;
         this.speech = speech;
     }
@@ -44,5 +50,17 @@ public class Speech {
 
     public void setSpeech(String speech) {
         this.speech = speech;
+    }
+
+    public void increaseY(float dy) {
+        this.y += dy;
+    }
+
+    public void dispose() {
+        mushroom = null;
+    }
+
+    public Mushroom getMushroom() {
+        return mushroom;
     }
 }
