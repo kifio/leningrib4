@@ -6,9 +6,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import kifio.leningrib.controller.WorldController;
-import kifio.leningrib.levels.FirstLevel;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.view.WorldRenderer;
+import model.WorldMap;
 
 public class GameScreen extends InputAdapter implements Screen {
 
@@ -17,6 +17,7 @@ public class GameScreen extends InputAdapter implements Screen {
     private WorldRenderer worldRenderer;
     private WorldController worldController;
     private OrthographicCamera camera;
+    private WorldMap worldMap;
 
     public static int tileSize;
     public static int cameraWidth;
@@ -33,7 +34,8 @@ public class GameScreen extends InputAdapter implements Screen {
         initCamera();
         this.worldController = new WorldController(this);
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight);
-        setLevel(getNextLevel());
+        this.worldMap = new WorldMap();
+        setLevel(getNextLevel(0, 0));
     }
 
     // Инициализирует камеру ортгональную карте
@@ -55,8 +57,8 @@ public class GameScreen extends InputAdapter implements Screen {
         cameraHeight = (Gdx.graphics.getHeight() / tileSize) + 1;
     }
 
-    private Level getNextLevel() {
-        return new FirstLevel();
+    private Level getNextLevel(int x, int y) {
+        return new Level(0, 0, worldMap);
     }
 
     public void setLevel(Level level) {
@@ -123,7 +125,7 @@ public class GameScreen extends InputAdapter implements Screen {
                     camera.position.x - (Gdx.graphics.getWidth() / 2f) + x,
                     camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y));
         } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
-            setLevel(getNextLevel());
+            setLevel(getNextLevel(0, 0));
             gameOverTime = 0f;
             gameTime = 0f;
             gameOver = false;

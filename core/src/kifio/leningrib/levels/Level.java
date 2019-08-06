@@ -3,26 +3,20 @@ package kifio.leningrib.levels;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -36,17 +30,26 @@ import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
+import model.GeneratorKt;
+import model.LevelConstantsKt;
+import model.LevelMap;
+import model.Segment;
+import model.WorldMap;
 
-import static com.badlogic.gdx.math.MathUtils.floor;
+import static com.badlogic.gdx.math.MathUtils.nanoToSec;
 import static com.badlogic.gdx.math.MathUtils.random;
 
-public abstract class Level {
+public class Level {
 
-    public TiledMap map;
     public Player player;
     public List<Forester> foresters;
-    public int mapWidth;
-    public int mapHeight;
+
+    // FIXME: these parameters should be passed to lib.
+    public int mapWidth = LevelConstantsKt.LEVEL_WIDTH;
+    public int mapHeight = LevelConstantsKt.LEVEL_HEIGHT;
+
+    private static final int INITIAL_NEIGHBORS_CAPACITY = 5;
+    private List<Tile> neighbours = new ArrayList<>(INITIAL_NEIGHBORS_CAPACITY);
 
     private Rectangle result = new Rectangle();
     private Random random = new Random();
@@ -61,66 +64,51 @@ public abstract class Level {
     public ArrayList<Mushroom> mushrooms = new ArrayList<>();
     public ArrayList<Speech> speeches = new ArrayList<>(8);
 
-    public Level(String levelName) {
-        init(levelName);
-    }
-
-    public void init(String levelName) {
-        initMushrooms("mushrooms_" + levelName);
+    public Level(int x, int y, WorldMap worldMap) {
+        initMap(x, y, worldMap);
         initPlayer();
+        initMushrooms("mushrooms_lvl_1");
         initForester();
-        initMap(levelName + ".tmx");
     }
 
-    private void initMap(String fileName) {
-        map = new TmxMapLoader().load(fileName);
-        mapWidth = (int) map.getProperties().get("width");
-        mapHeight = (int) map.getProperties().get("height");
+    private void initMap(int x, int y, WorldMap worldMap) {
 
-        for (MapLayer layer : map.getLayers()) {
-            TiledMapTileLayer tileLayer = (TiledMapTileLayer) layer;
-            handleLayer(tileLayer.getWidth(), tileLayer.getHeight(), tileLayer);
+        LevelMap levelMap = GeneratorKt.generateLevel(x, y, worldMap);
+        Set<Segment> treesSegments = levelMap.getSegments();
+
+        for (Segment s : treesSegments) {
+            handleCell(s.getValue(), s.getX() * GameScreen.tileSize, s.getY() * GameScreen.tileSize);
         }
 
-        TiledMapTileLayer treesLayer = (TiledMapTileLayer) map.getLayers().get(1);
-
-        for (int i = 0; i < treesLayer.getHeight(); i++) {
-            for (int j = 0; j < treesLayer.getWidth(); j++) {
-                forestGraph.addNode(j * GameScreen.tileSize, i * GameScreen.tileSize);
+        for (int i = 0; i < mapWidth; i++) {
+            for (int j = 0; j < mapHeight; j++) {
+                forestGraph.addNode(i, j);
             }
         }
 
-        for (int i = 0; i < treesLayer.getHeight(); i++) {
-            for (int j = 0; j < treesLayer.getWidth(); j++) {
-                addNeighbours(j, i, treesLayer);
+        for (int i = 0; i < mapWidth; i++) {
+            for (int j = 0; j < mapHeight; j++) {
+                addNeighbours(i, j, treesSegments);
             }
         }
     }
 
-    private void handleLayer(int columns, int rows, TiledMapTileLayer layer) {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                TiledMapTileLayer.Cell cell = layer.getCell(j, i);
-                if (cell != null) {
-                    handleCell(j * GameScreen.tileSize, i * GameScreen.tileSize, cell.getTile());
-                }
-            }
-        }
-    }
-
-    private void handleCell(int x, int y, TiledMapTile tile) {
-        if (tile == null) return;
-        Actor group = getActorFromCell(tile.getProperties(), x, y);
+    private void handleCell(int value, int x, int y) {
+        Actor group = getActorFromCell(value, x, y);
         if (group != null) trees.add(group);
     }
 
-    private Actor getActorFromCell(MapProperties properties, int x, int y) {
-        if (properties.containsKey("index")) {
-            return getObstacle("tree", (int) properties.get("index"), x, y);
-        } else if (properties.containsKey("log")) {
-            return getObstacle("log", (int) properties.get("log"), x, y);
-        } else if (properties.containsKey("stone")) {
-            return getObstacle("stone", (int) properties.get("stone"), x, y);
+    private Actor getActorFromCell(int value, int x, int y) {
+        if (value == LevelConstantsKt.TREE_TOP_LEFT) {
+            return getObstacle("tree", 0, x, y);
+        } else if (value == LevelConstantsKt.TREE_TOP_RIGHT) {
+            return getObstacle("tree", 2, x, y);
+        } else if (value == LevelConstantsKt.TREE_BOTTOM_LEFT) {
+            return getObstacle("tree", 1, x, y);
+        } else if (value == LevelConstantsKt.TREE_BOTTOM_RIGHT) {
+            return getObstacle("tree", 3, x, y);
+        } if (value == LevelConstantsKt.STONE) {
+            return getObstacle("stone", 0, x, y);
         } else {
             return null;
         }
@@ -131,36 +119,65 @@ public abstract class Level {
                 GameScreen.tileSize, GameScreen.tileSize);
     }
 
-    private void addNeighbours(int x, int y, TiledMapTileLayer layer) {
-        if (!isTileAvailable(layer.getCell(x, y))) return;
+    // FIXME: Very non optimized code
+    private void addNeighbours(int x, int y, Set<Segment> segments) {
+        if (isTileAvailable(x, y, segments)) {
 
-        float fromX = GameScreen.tileSize * x;
-        float fromY = GameScreen.tileSize * y;
+            float fromX = GameScreen.tileSize * x;
+            float fromY = GameScreen.tileSize * y;
 
-        float toX, toY;
+            for (Tile tile : neighbours) {
+                if (tile != null && tile.x != x && tile.y != y) {
+                    forestGraph.addConnection(fromX, fromY,
+                            GameScreen.tileSize * tile.x,
+                            GameScreen.tileSize * tile.y);
+                }
+            }
+        }
+    }
 
-        if (x > 0 && isTileAvailable(layer.getCell(x - 1, y))) {
-            toX = GameScreen.tileSize * (x - 1);
-            toY = GameScreen.tileSize * y;
-            forestGraph.addConnection(fromX, fromY, toX, toY);
+    private boolean isTileAvailable(int x, int y, Set<Segment> segments) {
+
+        Tile origin = new Tile(x, y);
+
+        neighbours.clear();
+        neighbours.add(origin);
+        if (x > 0) neighbours.add(new Tile(x - 1, y));
+        if (x < mapWidth - 1) neighbours.add(new Tile(x + 1, y));
+        if (y < mapHeight - 1) neighbours.add(new Tile(x, y - 1));
+        if (y > 0) neighbours.add(new Tile(x, y + 1));
+
+        int index;
+        for (Segment segment : segments) {
+            index = neighbours.indexOf(new Tile(segment.getX(), segment.getY()));
+            if (index != -1) neighbours.set(index, null);
         }
 
-        if (x < mapWidth - 1 && isTileAvailable(layer.getCell(x + 1, y))) {
-            toX = GameScreen.tileSize * (x + 1);
-            toY = GameScreen.tileSize * y;
-            forestGraph.addConnection(fromX, fromY, toX, toY);
+        return neighbours.contains(origin);
+    }
+
+    private static class Tile {
+        int x, y;
+
+        Tile(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
 
-        if (y < mapHeight - 1 && isTileAvailable(layer.getCell(x, y + 1))) {
-            toX = GameScreen.tileSize * x;
-            toY = GameScreen.tileSize * (y + 1);
-            forestGraph.addConnection(fromX, fromY, toX, toY);
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Tile)) return false;
+            Tile other = (Tile) o;
+            return x == other.x && y == other.y;
         }
 
-        if (y > 0 && isTileAvailable(layer.getCell(x, y - 1))) {
-            toX = GameScreen.tileSize * x;
-            toY = GameScreen.tileSize * (y - 1);
-            forestGraph.addConnection(fromX, fromY, toX, toY);
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + x;
+            result = prime * result + y;
+            return result;
         }
     }
 
@@ -181,19 +198,6 @@ public abstract class Level {
 
         SequenceAction playerActionsSequence = player.getMoveActionsSequence();
         player.addAction(playerActionsSequence);
-    }
-
-    private boolean isTileAvailable(TiledMapTileLayer.Cell cell) {
-        if (cell == null) return true;
-        TiledMapTile tile = cell.getTile();
-        if (tile == null) return true;
-        MapProperties properties = tile.getProperties();
-        if (properties.containsKey("index")) {
-            int index = (int) properties.get("index");
-            return (index == 0 || index == 2);
-        } else {
-            return !properties.containsKey("log") && !properties.containsKey("stone");
-        }
     }
 
     private void initPlayer() {
@@ -351,7 +355,7 @@ public abstract class Level {
                 m.remove();
                 iterator.remove();
                 player.increaseMushroomCount();
-            } else if (player.getMushroomsCount()  > 0) {
+            } else if (player.getMushroomsCount() > 0) {
                 if (speeches.size() > 0) return;
                 addSpeech(m, stateTime);
             }
