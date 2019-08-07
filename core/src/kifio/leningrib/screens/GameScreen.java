@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.view.WorldRenderer;
+import model.LevelConstantsKt;
 import model.WorldMap;
 
 public class GameScreen extends InputAdapter implements Screen {
@@ -52,7 +53,7 @@ public class GameScreen extends InputAdapter implements Screen {
     // Экран разбит на квадарты, здесь задается количество квадратов по ширине,
     // в зависимости от этого рассчитывается количество кадратов по высоте
     private void initScreenSize() {
-        cameraWidth = 6;
+        cameraWidth = LevelConstantsKt.LEVEL_WIDTH;
         tileSize = (Gdx.graphics.getWidth() / cameraWidth) + 1;
         cameraHeight = (Gdx.graphics.getHeight() / tileSize) + 1;
     }

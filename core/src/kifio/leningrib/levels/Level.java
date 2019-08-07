@@ -36,9 +36,6 @@ import model.LevelMap;
 import model.Segment;
 import model.WorldMap;
 
-import static com.badlogic.gdx.math.MathUtils.nanoToSec;
-import static com.badlogic.gdx.math.MathUtils.random;
-
 public class Level {
 
     public Player player;
@@ -82,7 +79,7 @@ public class Level {
 
         for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
-                forestGraph.addNode(i, j);
+                forestGraph.addNode(GameScreen.tileSize * i, GameScreen.tileSize *j);
             }
         }
 
@@ -127,7 +124,7 @@ public class Level {
             float fromY = GameScreen.tileSize * y;
 
             for (Tile tile : neighbours) {
-                if (tile != null && tile.x != x && tile.y != y) {
+                if (tile != null && (tile.x != x || tile.y != y)) {
                     forestGraph.addConnection(fromX, fromY,
                             GameScreen.tileSize * tile.x,
                             GameScreen.tileSize * tile.y);
