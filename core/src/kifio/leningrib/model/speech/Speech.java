@@ -1,21 +1,20 @@
 package kifio.leningrib.model.speech;
 
-import com.badlogic.gdx.Gdx;
-
-import kifio.leningrib.model.actors.Mushroom;
+import com.badlogic.gdx.math.Vector2;
 
 public class Speech {
 
     private float x;
     private float y;
     private float startTime;
-    private Mushroom mushroom;
+    private SpeechProducer speechProducer;
     private String speech;
 
-    public Speech(Mushroom mushroom, float startTime, String speech) {
-        this.x = mushroom.getX() + (mushroom.bounds.getWidth() / 2) - (SpeechManager.getInstance().getTextWidth(speech) / 2);
-        this.y = mushroom.getY() + mushroom.bounds.getHeight();
-        this.mushroom = mushroom;
+    public Speech(SpeechProducer speechProducer, float startTime, String speech) {
+        Vector2 position = speechProducer.getSpeechPosition(speech);
+        this.x = position.x;
+        this.y = position.y;
+        this.speechProducer = speechProducer;
         this.startTime = startTime;
         this.speech = speech;
     }
@@ -57,10 +56,18 @@ public class Speech {
     }
 
     public void dispose() {
-        mushroom = null;
+        speechProducer = null;
     }
 
-    public Mushroom getMushroom() {
-        return mushroom;
+    public SpeechProducer getSpeechProducer() {
+        return speechProducer;
+    }
+
+    public void decreaseX(float dx) {
+        this.x -= dx;
+    }
+
+    public interface SpeechProducer {
+        Vector2 getSpeechPosition(String speech);
     }
 }

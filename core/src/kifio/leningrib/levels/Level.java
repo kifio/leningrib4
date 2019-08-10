@@ -1,25 +1,20 @@
 package kifio.leningrib.levels;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
+import generator.ConstantsConfig;
+import generator.Side;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.TreePart;
@@ -28,10 +23,7 @@ import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.Speech;
-import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
-import model.GeneratorKt;
-import model.LevelConstantsKt;
 import model.LevelMap;
 import model.Segment;
 import model.WorldMap;
@@ -41,9 +33,8 @@ public class Level {
     public Player player;
     public List<Forester> foresters;
 
-    // FIXME: these parameters should be passed to lib.
-    public int mapWidth = LevelConstantsKt.LEVEL_WIDTH;
-    public int mapHeight = LevelConstantsKt.LEVEL_HEIGHT;
+    public int mapWidth;
+    public int mapHeight;
 
     private static final int INITIAL_NEIGHBORS_CAPACITY = 5;
     private List<Tile> neighbours = new ArrayList<>(INITIAL_NEIGHBORS_CAPACITY);
@@ -58,23 +49,36 @@ public class Level {
 
     // Объекты
     public ArrayList<Actor> trees = new ArrayList<>();
-    public ArrayList<Mushroom> mushrooms = new ArrayList<>();
-    public ArrayList<Speech> speeches = new ArrayList<>(8);
 
-    public Level(int x, int y, WorldMap worldMap) {
-        initMap(x, y, worldMap);
+    private MushroomsManager mushroomsManager = new MushroomsManager(random);
+    private ExitsManager exitsManager = new ExitsManager(random);
+
+
+    public Level(int x, int y, WorldMap worldMap,
+                 ConstantsConfig constantsConfig) {
+        LevelMap levelMap = initMap(x, y, worldMap, constantsConfig);
         initPlayer();
-        initMushrooms("mushrooms_lvl_1");
+        mushroomsManager.initMushrooms("mushrooms_lvl_1");
         initForester();
+        exitsManager.init(levelMap.getExits(Side.RIGHT));
     }
 
-    private void initMap(int x, int y, WorldMap worldMap) {
+    private LevelMap initMap(int x, int y, WorldMap worldMap, ConstantsConfig constantsConfig) {
 
-        LevelMap levelMap = GeneratorKt.generateLevel(x, y, worldMap);
+        this.mapWidth = constantsConfig.getLevelWidth();
+        this.mapHeight= constantsConfig.getLevelHeight();
+
+        worldMap.addLevel(x, y, constantsConfig);
+
+        LevelMap levelMap = worldMap.getLevel(x, y);
         Set<Segment> treesSegments = levelMap.getSegments();
 
         for (Segment s : treesSegments) {
-            handleCell(s.getValue(), s.getX() * GameScreen.tileSize, s.getY() * GameScreen.tileSize);
+            Actor group = getActorFromCell(s.getValue(),
+                    s.getX() * GameScreen.tileSize,
+                    s.getY() * GameScreen.tileSize,
+                    constantsConfig);
+            if (group != null) trees.add(group);
         }
 
         for (int i = 0; i < mapWidth; i++) {
@@ -88,23 +92,20 @@ public class Level {
                 addNeighbours(i, j, treesSegments);
             }
         }
+
+        return levelMap;
     }
 
-    private void handleCell(int value, int x, int y) {
-        Actor group = getActorFromCell(value, x, y);
-        if (group != null) trees.add(group);
-    }
-
-    private Actor getActorFromCell(int value, int x, int y) {
-        if (value == LevelConstantsKt.TREE_TOP_LEFT) {
+    private Actor getActorFromCell(int value, int x, int y, ConstantsConfig constantsConfig) {
+        if (value == constantsConfig.getTreeTopLeft()) {
             return getObstacle("tree", 0, x, y);
-        } else if (value == LevelConstantsKt.TREE_TOP_RIGHT) {
+        } else if (value == constantsConfig.getTreeTopRight()) {
             return getObstacle("tree", 2, x, y);
-        } else if (value == LevelConstantsKt.TREE_BOTTOM_LEFT) {
+        } else if (value == constantsConfig.getTreeBottomLeft()) {
             return getObstacle("tree", 1, x, y);
-        } else if (value == LevelConstantsKt.TREE_BOTTOM_RIGHT) {
+        } else if (value == constantsConfig.getTreeBottomRight()) {
             return getObstacle("tree", 3, x, y);
-        } if (value == LevelConstantsKt.STONE) {
+        } if (value == constantsConfig.getStone()) {
             return getObstacle("stone", 0, x, y);
         } else {
             return null;
@@ -229,58 +230,10 @@ public class Level {
 //                        GameScreen.tileSize * 23f), "enemy.txt"));
     }
 
-    private static final String NEW_LINE = "\n";
-    private static final String COMMA = ",";
-    private static final String POWER_MUSHROOM = "power_mushroom.txt";
-
-    // TODO: Сделать парсинг карты и инициализацию групп актеров.
-    private void initMushrooms(String fileName) {
-        try {
-            FileHandle handle = Gdx.files.internal(fileName);
-            String content = handle.readString();
-            String[] positions = content.split(NEW_LINE);
-
-            for (String position : positions) {
-                String[] coordinates = position.split(COMMA);
-                mushrooms.add(new Mushroom(Integer.parseInt(coordinates[0]),
-                        Integer.parseInt(coordinates[1]), POWER_MUSHROOM));
-            }
-        } catch (GdxRuntimeException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void addSpeech(Mushroom m, float stateTime) {
-
-        for (Speech speech : speeches) {
-            if (speech.getMushroom().equals(m)) return;
-        }
-
-        // С некоторой вероятностью добавляем новую речь
-        if (random.nextInt(128) / 8 == 0) {
-            speeches.add(new Speech(m, stateTime, SpeechManager.getInstance().getRandomSpeech()));
-        }
-    }
-
-    private Actor getTopLeftSegment(int x, int y) {
-        return new TreePart(ResourcesManager.get("tree_0"), x, y, GameScreen.tileSize, GameScreen.tileSize);
-    }
-
-    private Actor getTopRightSegment(int x, int y) {
-        return new TreePart(ResourcesManager.get("tree_3"), x, y, GameScreen.tileSize, GameScreen.tileSize);
-    }
-
-    private Actor getBottomLeftSegment(int x, int y) {
-        return new TreePart(ResourcesManager.get("tree_1"), x, y, GameScreen.tileSize, GameScreen.tileSize);
-    }
-
-    private Actor getBottomRightSegment(int x, int y) {
-        return new TreePart(ResourcesManager.get("tree_2"), x, y, GameScreen.tileSize, GameScreen.tileSize);
-    }
-
     public void update(float delta, float gameTime) {
         updateForesters(delta);
-        updateMushrooms(gameTime);
+        mushroomsManager.updateMushrooms(gameTime, player);
+        exitsManager.updateExits(gameTime);
     }
 
     private void updateForesters(float delta) {
@@ -332,30 +285,15 @@ public class Level {
         forester.addAction(forester.getMoveActionsSequence());
     }
 
-    private void updateMushrooms(float stateTime) {
+    public List<Mushroom> getMushrooms() {
+        return mushroomsManager.mushrooms;
+    }
 
-        // Удаляем просроченные реплики
-        Iterator<Speech> speechIterator = speeches.iterator();
-        while (speechIterator.hasNext()) {
-            Speech sp = speechIterator.next();
-            if (stateTime - sp.getStartTime() > 1) {
-                sp.dispose();
-                speechIterator.remove();
-            }
-        }
+    public List<Speech> getMushroomsSpeeches() {
+        return mushroomsManager.mushroomsSpeeches;
+    }
 
-        // Удаляем съеденные грибы, несъеденным добавляем реплики
-        Iterator<Mushroom> iterator = mushrooms.iterator();
-        while (iterator.hasNext()) {
-            Mushroom m = iterator.next();
-            if (m.bounds.overlaps(player.bounds)) {
-                m.remove();
-                iterator.remove();
-                player.increaseMushroomCount();
-            } else if (player.getMushroomsCount() > 0) {
-                if (speeches.size() > 0) return;
-                addSpeech(m, stateTime);
-            }
-        }
+    public List<Speech> getExitsSpeeches() {
+        return exitsManager.exitsSpeeches;
     }
 }

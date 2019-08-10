@@ -10,11 +10,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import javax.management.timer.TimerMBean;
 
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
@@ -62,7 +59,7 @@ public class WorldRenderer {
 
     private void resetStage(Level level) {
         stage.clear();
-        for (Actor mushroom : level.mushrooms) stage.addActor(mushroom);
+        for (Actor mushroom : level.getMushrooms()) stage.addActor(mushroom);
         stage.addActor(level.player);
         for (Forester forester : level.foresters) stage.addActor(forester);
         for (Actor tree : level.trees) stage.addActor(tree);
@@ -200,13 +197,23 @@ public class WorldRenderer {
     private void drawSpeeches() {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        for (Speech speech : level.speeches)  {
+
+        for (Speech speech : level.getMushroomsSpeeches())  {
             SpeechManager.getInstance().getBitmapFont().draw(batch,
                     speech.getSpeech(),
                     speech.getX(),
                     speech.getY());
             speech.increaseY(0.5f);
         }
+
+        for (Speech speech : level.getExitsSpeeches())  {
+            SpeechManager.getInstance().getBitmapFont().draw(batch,
+                    speech.getSpeech(),
+                    speech.getX(),
+                    speech.getY());
+            speech.decreaseX(0.5f);
+        }
+
         batch.end();
     }
 

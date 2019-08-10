@@ -21,7 +21,7 @@ public class WorldController {
     }
 
     public void update(float delta, float gameTime) {
-        if (level.mushrooms.isEmpty()) {
+        if (level.player.getY() < 0) {
             gameScreen.onLevelPassed();
             return;
         }

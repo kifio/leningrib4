@@ -62,13 +62,6 @@ public class SpeechManager {
         return glyphLayout.height;
     }
 
-    // Y of center text
-    public boolean isSpeechCanBeOverlapped(float y, Speech speech) {
-        float top = speech.getY() + getTextHeight(speech.getSpeech());
-        float bottom = speech.getY() - getTextHeight(speech.getSpeech());
-        return y >= top && y <= bottom;
-    }
-
     public void scale(float scale) {
         bitmapFont.getData().setScale(scale);
     }
@@ -77,8 +70,13 @@ public class SpeechManager {
         return bitmapFont;
     }
 
-    public String getRandomSpeech() {
-        String speechId = String.valueOf(random(1, 35));
+    public String getRandomMushroomSpeech() {
+        String speechId = String.valueOf(random(1, 71));
         return ResourcesManager.getMushroomSpeechBundle().get(speechId);
+    }
+
+    public String getRandomExitSpeech() {
+        String speechId = String.valueOf(random(1, 12));
+        return ResourcesManager.getExitSpeechBuтdle().get(speechId);
     }
 }

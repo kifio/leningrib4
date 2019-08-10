@@ -5,10 +5,11 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+import generator.ConstantsConfig;
+
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.view.WorldRenderer;
-import model.LevelConstantsKt;
 import model.WorldMap;
 
 public class GameScreen extends InputAdapter implements Screen {
@@ -28,6 +29,17 @@ public class GameScreen extends InputAdapter implements Screen {
 
     private float gameOverTime;
     private float gameTime;
+
+    private ConstantsConfig constantsConfig = new ConstantsConfig(
+            7,
+            30,
+            2,
+            0,
+            1,
+            2,
+            3,
+            4
+    );
 
     public GameScreen() {
         Gdx.input.setInputProcessor(this);
@@ -53,13 +65,13 @@ public class GameScreen extends InputAdapter implements Screen {
     // Экран разбит на квадарты, здесь задается количество квадратов по ширине,
     // в зависимости от этого рассчитывается количество кадратов по высоте
     private void initScreenSize() {
-        cameraWidth = LevelConstantsKt.LEVEL_WIDTH;
+        cameraWidth = constantsConfig.getLevelWidth();
         tileSize = (Gdx.graphics.getWidth() / cameraWidth) + 1;
         cameraHeight = (Gdx.graphics.getHeight() / tileSize) + 1;
     }
 
     private Level getNextLevel(int x, int y) {
-        return new Level(0, 0, worldMap);
+        return new Level(0, 0, worldMap, constantsConfig);
     }
 
     public void setLevel(Level level) {

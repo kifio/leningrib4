@@ -11,6 +11,7 @@ public class ResourcesManager {
 
     private static HashMap<String, TextureRegion> regions = new HashMap<>();
     private static I18NBundle mushroomsSpeechBundle;
+    private static I18NBundle exitsSpeechBumdle;
 
     public static void init() {
 
@@ -21,6 +22,7 @@ public class ResourcesManager {
         am.load("mushroom.png", Texture.class);
         am.load("mushroom.png", Texture.class);
         am.load("i18n/mushroom_speech", I18NBundle.class);
+        am.load("i18n/exit_speech", I18NBundle.class);
         am.finishLoading();
 
         Texture overworld = am.get("overworld.png");
@@ -51,6 +53,7 @@ public class ResourcesManager {
         regions.put("pm1", new TextureRegion(powerMushroom, 0, 96, 96, 96));
 
         mushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);
+        exitsSpeechBumdle = am.get("i18n/exit_speech", I18NBundle.class);
     }
 
     public static TextureRegion get(String name) {
@@ -59,5 +62,9 @@ public class ResourcesManager {
 
     public static I18NBundle getMushroomSpeechBundle() {
         return mushroomsSpeechBundle;
+    }
+
+    public static I18NBundle getExitSpeechBuтdle() {
+        return exitsSpeechBumdle;
     }
 }
