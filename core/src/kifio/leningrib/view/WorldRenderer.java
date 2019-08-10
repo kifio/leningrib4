@@ -29,7 +29,6 @@ public class WorldRenderer {
     private SpriteBatch batch;
     private ShapeRenderer renderer;
     private OrthographicCamera camera;
-    private SpeechManager speechManager;
     private int cameraWidth;
     private int cameraHeight;
 
@@ -53,6 +52,7 @@ public class WorldRenderer {
     }
 
     public void reset(Level level) {
+        if (this.level != null) this.level.dispose();
         this.level = level;
         resetStage(level);
     }
@@ -60,7 +60,7 @@ public class WorldRenderer {
     private void resetStage(Level level) {
         stage.clear();
         for (Actor mushroom : level.getMushrooms()) stage.addActor(mushroom);
-        stage.addActor(level.player);
+        stage.addActor(level.getPlayer());
         for (Forester forester : level.foresters) stage.addActor(forester);
         for (Actor tree : level.trees) stage.addActor(tree);
     }
@@ -79,7 +79,7 @@ public class WorldRenderer {
         renderer.rect(0f, camera.position.y - Gdx.graphics.getHeight() / 2f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         renderer.end();
 
-        drawGameOverText(GameScreen.win ? TEST_OVER_TEXT : GAME_OVER_TEXT);
+//        drawGameOverText(GameScreen.win ? TEST_OVER_TEXT : GAME_OVER_TEXT);
     }
 
     public void render() {
@@ -97,7 +97,7 @@ public class WorldRenderer {
 
     private void updateCamera() {
         camera.update();
-        float playerY = level.player.getY();
+        float playerY = level.getPlayer().getY();
         float bottomTreshold = Gdx.graphics.getHeight() / 2f;
         float topTreshold = level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
         if (playerY < bottomTreshold) {
@@ -135,7 +135,7 @@ public class WorldRenderer {
 
     private void drawPlayerPath() {
         renderer.setColor(playerPathDebugColor);
-        for (Vector2 vec : level.player.path) {
+        for (Vector2 vec : level.getPlayer().path) {
             renderer.rect(vec.x,
                     vec.y,
                     GameScreen.tileSize,
@@ -145,7 +145,7 @@ public class WorldRenderer {
 
     private void drawCharacterDebug() {
         renderer.setColor(playerDebugColor);
-        Rectangle bounds = level.player.bounds;
+        Rectangle bounds = level.getPlayer().bounds;
         renderer.rect(bounds.x,
                 bounds.y,
                 bounds.width,
@@ -226,6 +226,7 @@ public class WorldRenderer {
 
     private void drawGameOverText(String text) {
         batch.begin();
+        SpeechManager speechManager = SpeechManager.getInstance();
         float x = (Gdx.graphics.getWidth() / 2f) - (speechManager.getTextWidth(text) / 2);
         float y = camera.position.y - (speechManager.getTextHeight(text) / 2);
         speechManager.getBitmapFont().draw(batch, text, x, y);

@@ -20,7 +20,6 @@ public class ResourcesManager {
         am.load("forest_tiles.png", Texture.class);
         am.load("power_mushroom.png", Texture.class);
         am.load("mushroom.png", Texture.class);
-        am.load("mushroom.png", Texture.class);
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/exit_speech", I18NBundle.class);
         am.finishLoading();
@@ -64,7 +63,7 @@ public class ResourcesManager {
         return mushroomsSpeechBundle;
     }
 
-    public static I18NBundle getExitSpeechBuтdle() {
+    public static I18NBundle getExitSpeechBundle() {
         return exitsSpeechBumdle;
     }
 }

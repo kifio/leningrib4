@@ -1,5 +1,6 @@
 package kifio.leningrib.model.pathfinding;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;
@@ -41,7 +42,11 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         Vector2 vec = getVector2(fromVector2.x, fromVector2.y);
         int index = this.nodes.indexOf(vec, false);
         if (index == -1) return new Array<>();
-        return this.connections.get(index);
+        Array<Connection<Vector2>> connections = this.connections.get(index);
+        if (connections.size == 0) {
+            Gdx.app.log("kifio", fromVector2.toString() + " has no connections!");
+        }
+        return connections;
     }
 
     public void addNode(float x, float y){
@@ -71,8 +76,10 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         Vector2 f = getVector2(fromX, fromY);
         Vector2 t = getVector2(toX, toY);
         GraphPath<Vector2> path = new DefaultGraphPath<>();
-        IndexedAStarPathFinder<Vector2> pathFinder = new IndexedAStarPathFinder<>(this);
-        pathFinder.searchNodePath(f, t, heuristic, path);
+        if (f != null && t != null) {
+            IndexedAStarPathFinder<Vector2> pathFinder = new IndexedAStarPathFinder<>(this);
+            pathFinder.searchNodePath(f, t, heuristic, path);
+        }
         return path;
     }
 

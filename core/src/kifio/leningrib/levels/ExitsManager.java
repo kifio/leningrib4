@@ -71,4 +71,15 @@ public class ExitsManager {
             );
         }
     }
+
+    void dispose() {
+        Iterator<Speech> speechIterator = exitsSpeeches.iterator();
+        while (speechIterator.hasNext()) {
+            speechIterator.next().dispose();
+            speechIterator.remove();
+        }
+        exits.clear();
+        exitsSpeeches = null;
+        exits = null;
+    }
 }

@@ -9,6 +9,7 @@ import generator.ConstantsConfig;
 
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.Level;
+import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.view.WorldRenderer;
 import model.WorldMap;
 
@@ -19,18 +20,22 @@ public class GameScreen extends InputAdapter implements Screen {
     private WorldRenderer worldRenderer;
     private WorldController worldController;
     private OrthographicCamera camera;
-    private WorldMap worldMap;
 
     public static int tileSize;
     public static int cameraWidth;
     public static int cameraHeight;
     public static boolean gameOver;
     public static boolean win;
+    private int nextLevelX = 0;
+    private int nextLevelY = 0;
 
     private float gameOverTime;
     private float gameTime;
 
-    private ConstantsConfig constantsConfig = new ConstantsConfig(
+    public WorldMap worldMap;
+    public Player player;
+
+    public ConstantsConfig constantsConfig = new ConstantsConfig(
             7,
             30,
             2,
@@ -48,7 +53,7 @@ public class GameScreen extends InputAdapter implements Screen {
         this.worldController = new WorldController(this);
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight);
         this.worldMap = new WorldMap();
-        setLevel(getNextLevel(0, 0));
+        setLevel(getNextLevel(nextLevelX, nextLevelY));
     }
 
     // Инициализирует камеру ортгональную карте
@@ -71,10 +76,17 @@ public class GameScreen extends InputAdapter implements Screen {
     }
 
     private Level getNextLevel(int x, int y) {
-        return new Level(0, 0, worldMap, constantsConfig);
+        return new Level(x, y, this);
     }
 
     public void setLevel(Level level) {
+        if (player == null) {
+            player = new Player(0f, GameScreen.tileSize, "player.txt");
+        } else if (player.getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
+            player.setY(0);
+        } else if (player.getX() >= (level.mapWidth - 1) * GameScreen.tileSize) {
+            player.setX(0);
+        }
         this.worldController.reset(level);
         this.worldRenderer.reset(level);
     }
@@ -86,11 +98,17 @@ public class GameScreen extends InputAdapter implements Screen {
     */
     @Override
     public void render(float delta) {
-        if (gameOver) {
+        if (gameOver && gameOverTime < 1f) {
             gameOverTime += delta;
             gameTime = 0f;
             worldController.update(delta, gameOverTime);
             worldRenderer.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME);
+        } else if (gameOverTime >= GAME_OVER_ANIMATION_TIME) {
+            setLevel(getNextLevel(nextLevelX, nextLevelY));
+            gameOverTime = 0f;
+            gameTime = 0f;
+            gameOver = false;
+            win = false;
         } else {
             gameTime += delta;
             worldController.update(delta, gameTime);
@@ -138,11 +156,10 @@ public class GameScreen extends InputAdapter implements Screen {
                     camera.position.x - (Gdx.graphics.getWidth() / 2f) + x,
                     camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y));
         } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
-            setLevel(getNextLevel(0, 0));
-            gameOverTime = 0f;
-            gameTime = 0f;
-            gameOver = false;
-            win = false;
+//            gameOverTime = 0f;
+//            gameTime = 0f;
+//            gameOver = false;
+//            win = false;
         }
         return true;
     }
@@ -150,5 +167,13 @@ public class GameScreen extends InputAdapter implements Screen {
     public void onLevelPassed() {
         gameOver = true;
         win = true;
+    }
+
+    public void onGoRight() {
+        nextLevelX++;
+    }
+
+    public void onGoUp() {
+        nextLevelY++;
     }
 }

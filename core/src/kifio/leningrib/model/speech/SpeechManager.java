@@ -5,9 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.utils.I18NBundle;
-
-import java.util.ArrayList;
 
 import kifio.leningrib.model.ResourcesManager;
 
@@ -20,7 +17,6 @@ public class SpeechManager {
 
     private BitmapFont bitmapFont;
     private GlyphLayout glyphLayout;
-    private float speechLineHeight = 0;
 
     private static SpeechManager speechManager;
 
@@ -76,7 +72,7 @@ public class SpeechManager {
     }
 
     public String getRandomExitSpeech() {
-        String speechId = String.valueOf(random(1, 12));
-        return ResourcesManager.getExitSpeechBuтdle().get(speechId);
+        String speechId = String.valueOf(random(1, 5));
+        return ResourcesManager.getExitSpeechBundle().get(speechId);
     }
 }

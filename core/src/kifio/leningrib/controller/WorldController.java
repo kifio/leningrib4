@@ -13,6 +13,7 @@ public class WorldController {
     }
 
     public void reset(Level level) {
+        if (this.level != null) this.level.dispose();
         this.level = level;
     }
 
@@ -21,7 +22,12 @@ public class WorldController {
     }
 
     public void update(float delta, float gameTime) {
-        if (level.player.getY() < 0) {
+        if (!GameScreen.gameOver && level.getPlayer().getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
+            gameScreen.onGoUp();
+            gameScreen.onLevelPassed();
+            return;
+        } else if (!GameScreen.gameOver && level.getPlayer().getX() >= (level.mapWidth - 1) * GameScreen.tileSize) {
+            gameScreen.onGoRight();
             gameScreen.onLevelPassed();
             return;
         }

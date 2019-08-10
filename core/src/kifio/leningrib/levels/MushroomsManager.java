@@ -21,28 +21,11 @@ public class MushroomsManager {
         this.random = random;
     }
 
-    // TODO: Генерировать грибы в генераторе
-    private static final String NEW_LINE = "\n";
-    private static final String COMMA = ",";
-    private static final String POWER_MUSHROOM = "power_mushroom.txt";
-
     ArrayList<Mushroom> mushrooms = new ArrayList<>();
     ArrayList<Speech> mushroomsSpeeches = new ArrayList<>(8);
 
-    void initMushrooms(String fileName) {
-        try {
-            FileHandle handle = Gdx.files.internal(fileName);
-            String content = handle.readString();
-            String[] positions = content.split(NEW_LINE);
-
-            for (String position : positions) {
-                String[] coordinates = position.split(COMMA);
-                mushrooms.add(new Mushroom(Integer.parseInt(coordinates[0]),
-                        Integer.parseInt(coordinates[1]), POWER_MUSHROOM));
-            }
-        } catch (GdxRuntimeException e) {
-            e.printStackTrace();
-        }
+    void initMushrooms(ArrayList<Mushroom> mushrooms) {
+        this.mushrooms = mushrooms;
     }
 
     void updateMushrooms(float stateTime, Player player) {
@@ -82,6 +65,18 @@ public class MushroomsManager {
         if (random.nextInt(128) / 8 == 0) {
             mushroomsSpeeches.add(new Speech(m, stateTime, SpeechManager.getInstance().getRandomMushroomSpeech()));
         }
+    }
+
+
+    void dispose() {
+        Iterator<Speech> speechIterator = mushroomsSpeeches.iterator();
+        while (speechIterator.hasNext()) {
+            speechIterator.next().dispose();
+            speechIterator.remove();
+        }
+        mushrooms.clear();
+        mushroomsSpeeches = null;
+        mushrooms = null;
     }
 
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -26,19 +27,18 @@ import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
 import model.Segment;
-import model.WorldMap;
 
 public class Level {
 
-    public Player player;
     public List<Forester> foresters;
 
     public int mapWidth;
     public int mapHeight;
 
-    private static final int INITIAL_NEIGHBORS_CAPACITY = 5;
-    private List<Tile> neighbours = new ArrayList<>(INITIAL_NEIGHBORS_CAPACITY);
+    private GameScreen gameScreen;
 
+    private static final int INITIAL_NEIGHBORS_CAPACITY = 5;
+    private List<Vector2> neighbours = new ArrayList<>(INITIAL_NEIGHBORS_CAPACITY);
     private Rectangle result = new Rectangle();
     private Random random = new Random();
 
@@ -53,24 +53,22 @@ public class Level {
     private MushroomsManager mushroomsManager = new MushroomsManager(random);
     private ExitsManager exitsManager = new ExitsManager(random);
 
+    private boolean isDisposed = false;
 
-    public Level(int x, int y, WorldMap worldMap,
-                 ConstantsConfig constantsConfig) {
-        LevelMap levelMap = initMap(x, y, worldMap, constantsConfig);
-        initPlayer();
-        mushroomsManager.initMushrooms("mushrooms_lvl_1");
+    public Level(int x, int y, GameScreen gameScreen) {
+        this.gameScreen = gameScreen;
+        LevelMap levelMap = initMap(gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig),
+                gameScreen.constantsConfig);
+        mushroomsManager.initMushrooms(new ArrayList<Mushroom>());
         initForester();
         exitsManager.init(levelMap.getExits(Side.RIGHT));
     }
 
-    private LevelMap initMap(int x, int y, WorldMap worldMap, ConstantsConfig constantsConfig) {
+    private LevelMap initMap(LevelMap levelMap, ConstantsConfig constantsConfig) {
 
         this.mapWidth = constantsConfig.getLevelWidth();
         this.mapHeight= constantsConfig.getLevelHeight();
 
-        worldMap.addLevel(x, y, constantsConfig);
-
-        LevelMap levelMap = worldMap.getLevel(x, y);
         Set<Segment> treesSegments = levelMap.getSegments();
 
         for (Segment s : treesSegments) {
@@ -81,19 +79,33 @@ public class Level {
             if (group != null) trees.add(group);
         }
 
-        for (int i = 0; i < mapWidth; i++) {
-            for (int j = 0; j < mapHeight; j++) {
-                forestGraph.addNode(GameScreen.tileSize * i, GameScreen.tileSize *j);
-            }
-        }
+        Set<Vector2> nodes = new HashSet<>();
 
         for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
-                addNeighbours(i, j, treesSegments);
+                if (!isSegment(i, j, treesSegments)) {
+                    nodes.add(new Vector2(i , j));
+                        forestGraph.addNode(GameScreen.tileSize * i, GameScreen.tileSize * j);
+                }
+            }
+        }
+
+        for (Vector2 node : nodes) {
+            if (isTileAvailable(node, treesSegments)) {
+                addNeighbours(node);
             }
         }
 
         return levelMap;
+    }
+
+    private boolean isSegment(int x, int y, Set<Segment> treesSegments) {
+        for (Segment segment : treesSegments) {
+            if (segment.getX() == x && segment.getY() == y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Actor getActorFromCell(int value, int x, int y, ConstantsConfig constantsConfig) {
@@ -117,90 +129,71 @@ public class Level {
                 GameScreen.tileSize, GameScreen.tileSize);
     }
 
-    // FIXME: Very non optimized code
-    private void addNeighbours(int x, int y, Set<Segment> segments) {
-        if (isTileAvailable(x, y, segments)) {
+    private void addNeighbours(Vector2 origin) {
 
-            float fromX = GameScreen.tileSize * x;
-            float fromY = GameScreen.tileSize * y;
+        float fromX = GameScreen.tileSize * origin.x;
+        float fromY = GameScreen.tileSize * origin.y;
 
-            for (Tile tile : neighbours) {
-                if (tile != null && (tile.x != x || tile.y != y)) {
-                    forestGraph.addConnection(fromX, fromY,
-                            GameScreen.tileSize * tile.x,
-                            GameScreen.tileSize * tile.y);
-                }
+        for (Vector2 node : neighbours) {
+            if (node != null && (node.x != origin.x || node.y != origin.y)) {
+                forestGraph.addConnection(fromX, fromY,
+                        GameScreen.tileSize * node.x,
+                        GameScreen.tileSize * node.y);
             }
         }
     }
 
-    private boolean isTileAvailable(int x, int y, Set<Segment> segments) {
-
-        Tile origin = new Tile(x, y);
+    private boolean isTileAvailable(Vector2 origin, Set<Segment> segments) {
 
         neighbours.clear();
         neighbours.add(origin);
-        if (x > 0) neighbours.add(new Tile(x - 1, y));
-        if (x < mapWidth - 1) neighbours.add(new Tile(x + 1, y));
-        if (y < mapHeight - 1) neighbours.add(new Tile(x, y - 1));
-        if (y > 0) neighbours.add(new Tile(x, y + 1));
+        if (origin.x > 0) neighbours.add(new Vector2(origin.x - 1, origin.y));
+        if (origin.x < mapWidth - 1) neighbours.add(new Vector2(origin.x + 1, origin.y));
+        if (origin.y < mapHeight - 1) neighbours.add(new Vector2(origin.x, origin.y + 1));
+        if (origin.y > 0) neighbours.add(new Vector2(origin.x, origin.y - 1));
 
         int index;
         for (Segment segment : segments) {
-            index = neighbours.indexOf(new Tile(segment.getX(), segment.getY()));
+            index = neighbours.indexOf(new Vector2(segment.getX(), segment.getY()));
             if (index != -1) neighbours.set(index, null);
         }
 
         return neighbours.contains(origin);
     }
 
-    private static class Tile {
-        int x, y;
+    public void dispose() {
+        if (isDisposed) return;
+        mushroomsManager.dispose();
+        exitsManager.dispose();
+        forestGraph = null;
+        foresters.clear();
+        neighbours.clear();
+        trees.clear();
+        gameScreen = null;
+        isDisposed = true;
+    }
 
-        Tile(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof Tile)) return false;
-            Tile other = (Tile) o;
-            return x == other.x && y == other.y;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + x;
-            result = prime * result + y;
-            return result;
-        }
+    public Player getPlayer() {
+        return gameScreen.player;
     }
 
     public void resetPlayerPath(float x, float y) {
         GraphPath<Vector2> path = forestGraph.getPath(
-                Utils.mapCoordinate(player.getX()),
-                Utils.mapCoordinate(player.getY()),
+                Utils.mapCoordinate(gameScreen.player.getX()),
+                Utils.mapCoordinate(gameScreen.player.getY()),
                 Utils.mapCoordinate(x),
                 Utils.mapCoordinate(y));
 
-        player.stop();
+        gameScreen.player.stop();
 
         // Первая точка пути совпадает с координатами игрока,
         // чтобы игрок не стоял на месте лишнее время ее из пути удаляем.
         for (int i = 1; i < path.getCount(); i++) {
-            player.path.add(new Vector2(path.get(i)));
+            gameScreen.player.path.add(new Vector2(path.get(i)));
         }
 
-        SequenceAction playerActionsSequence = player.getMoveActionsSequence();
-        player.addAction(playerActionsSequence);
-    }
-
-    private void initPlayer() {
-        this.player = new Player(
-                0f, GameScreen.tileSize, "player.txt");
+        SequenceAction playerActionsSequence = gameScreen.player.getMoveActionsSequence();
+        gameScreen.player.addAction(playerActionsSequence);
     }
 
     private void initForester() {
@@ -232,18 +225,18 @@ public class Level {
 
     public void update(float delta, float gameTime) {
         updateForesters(delta);
-        mushroomsManager.updateMushrooms(gameTime, player);
+        mushroomsManager.updateMushrooms(gameTime, gameScreen.player);
         exitsManager.updateExits(gameTime);
     }
 
     private void updateForesters(float delta) {
         for (Forester forester : foresters) {
             result.set(0f, 0f, 0f, 0f);
-            if (isPlayerCaught(forester.bounds, player.bounds)) {
+            if (isPlayerCaught(forester.bounds, gameScreen.player.bounds)) {
                 GameScreen.gameOver = true;
-                player.stop();
+                gameScreen.player.stop();
                 forester.stop();
-                forester.path.add(new Vector2(player.getX(), player.getY()));
+                forester.path.add(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
                 forester.addAction(forester.getMoveActionsSequence());
             } else if (GameScreen.gameOver) {
                 forester.stop();
@@ -260,9 +253,9 @@ public class Level {
     }
 
     private void updateForestersPath(Forester forester, float delta) {
-        forester.updateMoving(player, delta);
+        forester.updateMoving(gameScreen.player, delta);
         if (forester.isPursuePlayer()) {
-            setForesterPath(forester, player.bounds.x, player.bounds.y);
+            setForesterPath(forester, gameScreen.player.bounds.x, gameScreen.player.bounds.y);
         }
     }
 
