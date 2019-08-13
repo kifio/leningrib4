@@ -1,7 +1,9 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,6 +28,7 @@ import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
+import model.Room;
 import model.Segment;
 
 public class Level {
@@ -57,10 +60,16 @@ public class Level {
 
     public Level(int x, int y, GameScreen gameScreen) {
         this.gameScreen = gameScreen;
+        Gdx.app.log("kifio", "new level: x: " + x + "; y: " + y);
+        // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
+        if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
+            gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.constantsConfig);
+        }
+
         LevelMap levelMap = initMap(gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig),
                 gameScreen.constantsConfig);
         mushroomsManager.initMushrooms(new ArrayList<Mushroom>());
-        initForester();
+        initForester(x, y, getRoomsRectangles(levelMap));
         exitsManager.init(levelMap.getExits(Side.RIGHT));
     }
 
@@ -196,8 +205,28 @@ public class Level {
         gameScreen.player.addAction(playerActionsSequence);
     }
 
-    private void initForester() {
+    private void initForester(int levelX, int levelY, Rectangle[] roomsRectangles) {
         this.foresters = new ArrayList<>();
+        Vector2 playerPosition;
+
+        if (levelX == 0 && levelY == 0) {
+            playerPosition = new Vector2(0, 1);
+        } else {
+            playerPosition = new Vector2(gameScreen.player.getX(), gameScreen.player.getY());
+        }
+
+        for (Rectangle rectangle : roomsRectangles) {
+            if (!rectangle.contains(playerPosition) && rectangle.height > 1) {
+                float y = GameScreen.tileSize * MathUtils.random(rectangle.y, rectangle.y + (rectangle.height - 2));
+                this.foresters.add(new Forester(
+                new Vector2(
+                        GameScreen.tileSize * (rectangle.x + 1),
+                        y),
+                new Vector2(
+                        GameScreen.tileSize * (rectangle.width - 2),
+                        y), "enemy.txt"));
+            }
+        }
 //        this.foresters.add(new Forester(
 //                new Vector2(
 //                        GameScreen.tileSize * 0f,
@@ -288,5 +317,18 @@ public class Level {
 
     public List<Speech> getExitsSpeeches() {
         return exitsManager.exitsSpeeches;
+    }
+
+    private Rectangle[] getRoomsRectangles(LevelMap levelMap) {
+        List<Room> rooms = levelMap.getRooms();
+        int size = rooms.size();
+        Rectangle[] rectangles = new Rectangle[size];
+
+        for (int i = 0; i < size; i++) {
+            Room room = rooms.get(i);
+            rectangles[i] = new Rectangle(0, room.getY()
+                    , mapWidth,room.getHeight() - 2);
+        }
+        return rectangles;
     }
 }

@@ -30,7 +30,6 @@ public class SpeechManager {
     private SpeechManager() {
         bitmapFont = generateFont();
         glyphLayout = new GlyphLayout();
-        scale(Gdx.graphics.getDensity() / 2f);
     }
 
     private BitmapFont generateFont() {
@@ -58,20 +57,18 @@ public class SpeechManager {
         return glyphLayout.height;
     }
 
-    public void scale(float scale) {
-        bitmapFont.getData().setScale(scale);
-    }
-
     public BitmapFont getBitmapFont() {
         return bitmapFont;
     }
 
-    public String getRandomMushroomSpeech() {
+    public String getRandomMushroomSpeech(float scale) {
+        bitmapFont.getData().setScale(scale);
         String speechId = String.valueOf(random(1, 71));
         return ResourcesManager.getMushroomSpeechBundle().get(speechId);
     }
 
-    public String getRandomExitSpeech() {
+    public String getRandomExitSpeech(float scale) {
+        bitmapFont.getData().setScale(scale);
         String speechId = String.valueOf(random(1, 5));
         return ResourcesManager.getExitSpeechBundle().get(speechId);
     }

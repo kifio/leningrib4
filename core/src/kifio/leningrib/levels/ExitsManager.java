@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
@@ -48,7 +49,8 @@ public class ExitsManager {
             }
 
             if (random.nextInt(128) / 8 == 0) {
-                exitsSpeeches.add(new Speech(exit, stateTime, SpeechManager.getInstance().getRandomExitSpeech()));
+                exitsSpeeches.add(new Speech(exit, stateTime,
+                        SpeechManager.getInstance().getRandomExitSpeech(Gdx.graphics.getDensity())));
             }
         }
     }

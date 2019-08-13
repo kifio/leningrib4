@@ -63,7 +63,8 @@ public class MushroomsManager {
 
         // С некоторой вероятностью добавляем новую речь
         if (random.nextInt(128) / 8 == 0) {
-            mushroomsSpeeches.add(new Speech(m, stateTime, SpeechManager.getInstance().getRandomMushroomSpeech()));
+            mushroomsSpeeches.add(new Speech(m, stateTime,
+                    SpeechManager.getInstance().getRandomMushroomSpeech(Gdx.graphics.getDensity() / 2)));
         }
     }
 
