@@ -93,6 +93,7 @@ public class WorldRenderer {
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
         drawSpeeches();
+        drawMushroomCount(level.getPlayer().getMushroomsCount());
     }
 
     private void updateCamera() {
@@ -213,6 +214,18 @@ public class WorldRenderer {
                     speech.getY());
             speech.decreaseX(0.5f);
         }
+
+        batch.end();
+    }
+
+    private void drawMushroomCount(String mushroomsCount) {
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+
+        SpeechManager.getInstance().getBitmapFont().draw(batch,
+            mushroomsCount,
+            Gdx.graphics.getWidth() - 64,
+            Gdx.graphics.getHeight() - 64);
 
         batch.end();
     }

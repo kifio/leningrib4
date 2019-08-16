@@ -1,19 +1,21 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
-
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
+import model.Room;
 
-public class MushroomsManager {
+class MushroomsManager {
+
+    private static final String POWER_MUSHROOM = "power_mushroom.txt";
+    private static final String ZERO = "0";
 
     private Random random;
 
@@ -24,8 +26,33 @@ public class MushroomsManager {
     ArrayList<Mushroom> mushrooms = new ArrayList<>();
     ArrayList<Speech> mushroomsSpeeches = new ArrayList<>(8);
 
-    void initMushrooms(ArrayList<Mushroom> mushrooms) {
-        this.mushrooms = mushrooms;
+    void initMushrooms(Rectangle[] rooms) {
+        Random rand = new Random();
+        int[] counters = getMushroomsCounts(rooms);
+        for (int i = 0; i < rooms.length; i++) {
+            Rectangle room = rooms[i];
+            int mushroomsCount = counters[i];
+            for (int j = 0; j < mushroomsCount; j++) {
+                int x = pickRandomPointBetween(rand, room.x, room.x + room.width);
+                int y = pickRandomPointBetween(rand, room.y, room.y + room.height);
+                mushrooms.add(new Mushroom(x, y, POWER_MUSHROOM));
+            }
+        }
+    }
+
+    private int pickRandomPointBetween(Random rand, float p1, float p2) {
+        if (p1 == p2) return MathUtils.round(p1);
+        float delta = p2 - p1;
+        float offset = rand.nextFloat() * delta;
+        return MathUtils.round(p1 + offset);
+    }
+
+    private int[] getMushroomsCounts(Rectangle[] rooms) {
+        int[] counters = new int[rooms.length];
+        for (int i = 0; i < rooms.length; i++) {
+            counters[i] = random.nextInt((int) rooms[i].height);
+        }
+        return counters;
     }
 
     void updateMushrooms(float stateTime, Player player) {
@@ -48,7 +75,7 @@ public class MushroomsManager {
                 m.remove();
                 iterator.remove();
                 player.increaseMushroomCount();
-            } else if (player.getMushroomsCount() > 0) {
+            } else if (!player.getMushroomsCount().equals(ZERO)) {
                 if (mushroomsSpeeches.size() > 0) return;
                 addMushroomSpeech(m, stateTime);
             }

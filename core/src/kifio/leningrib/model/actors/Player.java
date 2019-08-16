@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Player extends MovableActor {
 
-    private int mushroomsCount;
+    private String mushroomsCount = "0";
 
     public Player(float x, float y, String packFile) {
         super(new Vector2(x, y), packFile);
@@ -15,10 +15,12 @@ public class Player extends MovableActor {
     }
 
     public void increaseMushroomCount() {
+        int mushroomsCount = Integer.parseInt(this.mushroomsCount);
         mushroomsCount++;
+        this.mushroomsCount = Integer.toString(mushroomsCount);
     }
 
-    public int getMushroomsCount() {
+    public String getMushroomsCount() {
         return mushroomsCount;
     }
 

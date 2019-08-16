@@ -70,6 +70,10 @@ public class Forester extends MovableActor {
     public void setPatrolRoute(Vector2 from, Vector2 to) {
         SequenceAction seq = new SequenceAction();
 
+        if (from == null || to == null) {
+            Gdx.app.log("kifio", "something wrong!");
+        }
+
         float dy = Math.abs(to.y - from.y);
         float dx = Math.abs(to.x - from.x);
         int steps = 0;

@@ -69,8 +69,9 @@ public class Level {
 
         LevelMap levelMap = initMap(gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig),
                 gameScreen.constantsConfig);
-        mushroomsManager.initMushrooms(new ArrayList<Mushroom>());
-        initForester(x, y, getRoomsRectangles(levelMap));
+        Rectangle[] roomRectangles = getRoomsRectangles(levelMap);
+        mushroomsManager.initMushrooms(roomRectangles);
+        initForester(x, y, roomRectangles);
         exitsManager.init(levelMap.getExits(Side.RIGHT));
     }
 
@@ -213,7 +214,8 @@ public class Level {
         if (levelX == 0 && levelY == 0) {
             playerPosition = new Vector2(0, 1);
         } else {
-            playerPosition = new Vector2(gameScreen.player.getX(), gameScreen.player.getY());
+            playerPosition = new Vector2(gameScreen.player.getX() / GameScreen.tileSize,
+                gameScreen.player.getY() / GameScreen.tileSize);
         }
 
         for (Rectangle rectangle : roomsRectangles) {
