@@ -52,7 +52,6 @@ public class WorldRenderer {
     }
 
     public void reset(Level level) {
-        if (this.level != null) this.level.dispose();
         this.level = level;
         resetStage(level);
     }
@@ -65,7 +64,7 @@ public class WorldRenderer {
         for (Actor tree : level.trees) stage.addActor(tree);
     }
 
-    public void renderBlackScreen(float gameOverTime, float gameOverAnimationTime) {
+    public void renderBlackScreen(boolean levelPassed, float gameOverTime, float gameOverAnimationTime) {
         render();
 
         float alpha = Math.min(gameOverTime / gameOverAnimationTime, 1);
@@ -79,7 +78,8 @@ public class WorldRenderer {
         renderer.rect(0f, camera.position.y - Gdx.graphics.getHeight() / 2f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         renderer.end();
 
-//        drawGameOverText(GameScreen.win ? TEST_OVER_TEXT : GAME_OVER_TEXT);
+        if (!levelPassed)
+            drawGameOverText(GAME_OVER_TEXT);
     }
 
     public void render() {
@@ -240,5 +240,6 @@ public class WorldRenderer {
             stage.dispose();
             stage = null;
         }
+        camera = null;
     }
 }

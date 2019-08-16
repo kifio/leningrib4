@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
+import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +61,7 @@ public class Level {
 
     public Level(int x, int y, GameScreen gameScreen) {
         this.gameScreen = gameScreen;
-        Gdx.app.log("kifio", "new level: x: " + x + "; y: " + y);
+
         // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
         if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
             gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.constantsConfig);
@@ -217,39 +218,28 @@ public class Level {
 
         for (Rectangle rectangle : roomsRectangles) {
             if (!rectangle.contains(playerPosition) && rectangle.height > 1) {
-                float y = GameScreen.tileSize * MathUtils.random(rectangle.y, rectangle.y + (rectangle.height - 2));
-                this.foresters.add(new Forester(
-                new Vector2(
-                        GameScreen.tileSize * (rectangle.x + 1),
-                        y),
-                new Vector2(
-                        GameScreen.tileSize * (rectangle.width - 2),
-                        y), "enemy.txt"));
+                boolean generateDifficultWay = false;
+                if (rectangle.height > 3) generateDifficultWay = random.nextBoolean();
+
+                if (generateDifficultWay) {
+                    Array<Vector2> points = new Array<>();
+                    float y0 = rectangle.y + (rectangle.height - 1);
+                    float y1 = rectangle.y + 1;
+
+                    points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y0));
+                    points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y0));
+                    points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y1));
+                    points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y1));
+
+                    this.foresters.add(new Forester(points, "enemy.txt"));
+                } else {
+                    float y = GameScreen.tileSize * MathUtils.random(rectangle.y, rectangle.y + (rectangle.height - 2));
+                    this.foresters.add(new Forester(
+                        new Vector2(GameScreen.tileSize * (rectangle.x + 1), y),
+                        new Vector2(GameScreen.tileSize * (rectangle.width - 2), y), "enemy.txt"));
+                }
             }
         }
-//        this.foresters.add(new Forester(
-//                new Vector2(
-//                        GameScreen.tileSize * 0f,
-//                        GameScreen.tileSize * 13f),
-//                new Vector2(
-//                        GameScreen.tileSize * 4f,
-//                        GameScreen.tileSize * 13f), "enemy.txt"));
-
-//        this.foresters.add(new Forester(
-//                new Vector2(
-//                        GameScreen.tileSize * 1f,
-//                        GameScreen.tileSize * 5f),
-//                new Vector2(
-//                        GameScreen.tileSize * 4f,
-//                        GameScreen.tileSize * 5f), "enemy.txt"));
-
-//        this.foresters.add(new Forester(
-//                new Vector2(
-//                        GameScreen.tileSize * 0f,
-//                        GameScreen.tileSize * 23f),
-//                new Vector2(
-//                        GameScreen.tileSize * 4f,
-//                        GameScreen.tileSize * 23f), "enemy.txt"));
     }
 
     public void update(float delta, float gameTime) {
@@ -262,12 +252,12 @@ public class Level {
         for (Forester forester : foresters) {
             result.set(0f, 0f, 0f, 0f);
             if (isPlayerCaught(forester.bounds, gameScreen.player.bounds)) {
-                GameScreen.gameOver = true;
+                gameScreen.gameOver = true;
                 gameScreen.player.stop();
                 forester.stop();
                 forester.path.add(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
                 forester.addAction(forester.getMoveActionsSequence());
-            } else if (GameScreen.gameOver) {
+            } else if (gameScreen.isGameOver()) {
                 forester.stop();
             } else {
                 updateForestersPath(forester, delta);

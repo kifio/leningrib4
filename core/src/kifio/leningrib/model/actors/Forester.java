@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
+import com.badlogic.gdx.utils.Array;
 import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
@@ -21,7 +21,8 @@ public class Forester extends MovableActor {
     private static final float DISTANCE_COEFFICIENT = 2f;
 
     private Vector2 from, to;
-    private Rectangle patrolRectangle = new Rectangle();
+    private Array<Vector2> patrolRectangle = null;
+    private int routePointFrom, routePointTo;
     private MovingState movingState = MovingState.FORWARD;
     private float stoppingTime = 0f;
 
@@ -33,11 +34,33 @@ public class Forester extends MovableActor {
         setPatrolRoute(from, to);
     }
 
-    public void resetPatrolRoute() {
+    public Forester(Array<Vector2> routePoints, String packFile) {
+        super(routePoints.get(0), packFile);
+        this.patrolRectangle = routePoints;
+        routePointFrom = 0;
+        routePointTo = 1;
+        setPatrolRoute(routePoints.get(routePointFrom), routePoints.get(routePointTo));
+    }
+
+    private void resetPatrolRoute() {
         stop();
         if (movingState == MovingState.FORWARD) {
-            movingState = MovingState.BACK;
-            setPatrolRoute(to, from);
+            if (patrolRectangle != null) {
+                if (routePointTo == patrolRectangle.size - 1) {
+                    routePointTo = 0;
+                    routePointFrom = patrolRectangle.size - 1; // routePointTo++;
+                } else if (routePointTo == 0) {
+                    routePointTo++;
+                    routePointFrom = 0; // routePointTo++;
+                } else {
+                    routePointTo++;
+                    routePointFrom++;
+                }
+                setPatrolRoute(patrolRectangle.get(routePointFrom), patrolRectangle.get(routePointTo));
+            } else {
+                movingState = MovingState.BACK;
+                setPatrolRoute(to, from);
+            }
         } else if (movingState == MovingState.BACK) {
             movingState = MovingState.FORWARD;
             setPatrolRoute(from, to);

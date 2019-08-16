@@ -13,8 +13,7 @@ public class LGCGame extends Game {
     @Override
 	public void create () {
 		ResourcesManager.init();
-		currentScreen = new GameScreen();
-		setScreen(currentScreen);
+		showGameScreen();
 	}
 
     @Override
@@ -25,5 +24,14 @@ public class LGCGame extends Game {
 	@Override
 	public void dispose () {
 		currentScreen.dispose();
+	}
+
+	public void showGameScreen() {
+		currentScreen = new GameScreen(this);
+		setScreen(currentScreen);
+	}
+
+	public void showMenuScreen() {
+
 	}
 }

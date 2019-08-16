@@ -22,16 +22,22 @@ public class WorldController {
     }
 
     public void update(float delta, float gameTime) {
-        if (!GameScreen.gameOver && level.getPlayer().getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
+        if (!gameScreen.isGameOver() && level.getPlayer().getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
             gameScreen.onGoUp();
             gameScreen.onLevelPassed();
             return;
-        } else if (!GameScreen.gameOver && level.getPlayer().getX() >= (level.mapWidth - 1) * GameScreen.tileSize) {
+        } else if (!gameScreen.isGameOver() && level.getPlayer().getX() >= (level.mapWidth - 1) * GameScreen.tileSize) {
             gameScreen.onGoRight();
             gameScreen.onLevelPassed();
             return;
         }
 
         level.update(delta, gameTime);
+    }
+
+    public void dispose() {
+        this.level.dispose();
+        gameScreen = null;
+        level = null;
     }
 }

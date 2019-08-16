@@ -1,5 +1,6 @@
 package kifio.leningrib.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import generator.ConstantsConfig;
 
+import kifio.leningrib.LGCGame;
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.actors.Player;
@@ -17,15 +19,16 @@ public class GameScreen extends InputAdapter implements Screen {
 
     private static final float GAME_OVER_ANIMATION_TIME = 1f;
 
+    private LGCGame game;
     private WorldRenderer worldRenderer;
     private WorldController worldController;
     private OrthographicCamera camera;
 
     public static int tileSize;
-    public static int cameraWidth;
-    public static int cameraHeight;
-    public static boolean gameOver;
-    public static boolean win;
+    private static int cameraWidth;
+    private static int cameraHeight;
+    public boolean gameOver;
+    public boolean win;
     private int nextLevelX = 0;
     private int nextLevelY = 0;
 
@@ -46,10 +49,11 @@ public class GameScreen extends InputAdapter implements Screen {
             4
     );
 
-    public GameScreen() {
+    public GameScreen(LGCGame game) {
         Gdx.input.setInputProcessor(this);
         initScreenSize();
         initCamera();
+        this.game = game;
         this.worldController = new WorldController(this);
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight);
         this.worldMap = new WorldMap();
@@ -98,18 +102,17 @@ public class GameScreen extends InputAdapter implements Screen {
     */
     @Override
     public void render(float delta) {
-        if (gameOver && gameOverTime < 1f) {
+        if (isGameOver() && gameOverTime < 1f) {
             gameOverTime += delta;
             gameTime = 0f;
             worldController.update(delta, gameOverTime);
-            worldRenderer.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME);
-        } else if (gameOverTime >= GAME_OVER_ANIMATION_TIME) {
+            worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);
+        } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
             setLevel(getNextLevel(nextLevelX, nextLevelY));
             gameOverTime = 0f;
             gameTime = 0f;
-            gameOver = false;
             win = false;
-        } else {
+        } else if (!gameOver) {
             gameTime += delta;
             worldController.update(delta, gameTime);
             worldRenderer.render();
@@ -118,11 +121,17 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void dispose() {
+        Gdx.app.log("kifio", "GameScreen.dispose");
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
         }
-    }
+
+
+        if (worldController != null) {
+            worldController.dispose();
+            worldController = null;
+    }   }
 
     @Override
     public void resize(int width, int height) {
@@ -151,21 +160,18 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
-        if (!gameOver) {
+        if (!isGameOver()) {
             worldController.movePlayerTo(
                     camera.position.x - (Gdx.graphics.getWidth() / 2f) + x,
                     camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y));
         } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
-//            gameOverTime = 0f;
-//            gameTime = 0f;
-//            gameOver = false;
-//            win = false;
+            game.showGameScreen();
+            dispose();
         }
         return true;
     }
 
     public void onLevelPassed() {
-        gameOver = true;
         win = true;
     }
 
@@ -175,5 +181,9 @@ public class GameScreen extends InputAdapter implements Screen {
 
     public void onGoUp() {
         nextLevelY++;
+    }
+
+    public boolean isGameOver() {
+        return gameOver || win;
     }
 }
