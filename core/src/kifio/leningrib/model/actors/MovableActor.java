@@ -24,13 +24,16 @@ public abstract class MovableActor extends Actor {
 
     public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при отрисовке фрейма размер пересчитывается
 
-    // TODO: Сделать с помощью билдера
     public MovableActor(Vector2 xy, String packFile) {
-        TextureAtlas playerAtlas = new TextureAtlas(packFile);
-        this.actorAnimation = new Animation<>(getFrameDuration() , playerAtlas.getRegions());
         this.bounds = new Rectangle();
+        updatePackFile(packFile);
         setX(xy.x);
         setY(xy.y);
+    }
+
+    public void updatePackFile(String packFile) {
+        TextureAtlas playerAtlas = new TextureAtlas(packFile);
+        this.actorAnimation = new Animation<>(getFrameDuration() , playerAtlas.getRegions());
     }
 
     @Override

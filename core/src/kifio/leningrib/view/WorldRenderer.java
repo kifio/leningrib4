@@ -222,10 +222,13 @@ public class WorldRenderer {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
+        Gdx.app.log("kifio", "height: " + Gdx.graphics.getHeight());
+        Gdx.app.log("kifio", "camera postition: " + camera.position.y);
+
         SpeechManager.getInstance().getBitmapFont().draw(batch,
             mushroomsCount,
             Gdx.graphics.getWidth() - 64,
-            Gdx.graphics.getHeight() - 64);
+            camera.position.y + (Gdx.graphics.getHeight() / 2) - 64);
 
         batch.end();
     }

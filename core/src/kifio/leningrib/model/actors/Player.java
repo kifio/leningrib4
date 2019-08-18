@@ -1,10 +1,13 @@
 package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.math.Vector2;
+import kifio.leningrib.model.actors.Mushroom.Effect;
 
 public class Player extends MovableActor {
 
     private String mushroomsCount = "0";
+    private long effectiveMushroomTakeTime = 0L;
+    private Effect effect;
 
     public Player(float x, float y, String packFile) {
         super(new Vector2(x, y), packFile);
@@ -18,6 +21,11 @@ public class Player extends MovableActor {
         int mushroomsCount = Integer.parseInt(this.mushroomsCount);
         mushroomsCount++;
         this.mushroomsCount = Integer.toString(mushroomsCount);
+    }
+
+    public void onEffectiveMushroomTake(Mushroom mushroom) {
+        effectiveMushroomTakeTime = System.nanoTime();
+        effect = mushroom.getEffect();
     }
 
     public String getMushroomsCount() {

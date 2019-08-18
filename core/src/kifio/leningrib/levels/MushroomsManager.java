@@ -33,9 +33,9 @@ class MushroomsManager {
             Rectangle room = rooms[i];
             int mushroomsCount = counters[i];
             for (int j = 0; j < mushroomsCount; j++) {
-                int x = pickRandomPointBetween(rand, room.x, room.x + room.width);
-                int y = pickRandomPointBetween(rand, room.y, room.y + room.height);
-                mushrooms.add(new Mushroom(x, y, POWER_MUSHROOM));
+                int x = pickRandomPointBetween(rand, room.x, (room.x + 1) + (room.width - 2));
+                int y = pickRandomPointBetween(rand, room.y, room.y + (room.height - 1));
+                mushrooms.add(new Mushroom(x, y, POWER_MUSHROOM, random));
             }
         }
     }
@@ -74,6 +74,7 @@ class MushroomsManager {
             if (m.bounds.overlaps(player.bounds)) {
                 m.remove();
                 iterator.remove();
+                if (m.getEffect() != null) player.onEffectiveMushroomTake(m);
                 player.increaseMushroomCount();
             } else if (!player.getMushroomsCount().equals(ZERO)) {
                 if (mushroomsSpeeches.size() > 0) return;
@@ -91,7 +92,7 @@ class MushroomsManager {
         // С некоторой вероятностью добавляем новую речь
         if (random.nextInt(128) / 8 == 0) {
             mushroomsSpeeches.add(new Speech(m, stateTime,
-                    SpeechManager.getInstance().getRandomMushroomSpeech(Gdx.graphics.getDensity() / 2)));
+                    SpeechManager.getInstance().getRandomMushroomSpeech(Gdx.graphics.getDensity())));
         }
     }
 

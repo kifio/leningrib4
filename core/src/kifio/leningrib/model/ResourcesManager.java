@@ -19,6 +19,7 @@ public class ResourcesManager {
         am.load("overworld.png", Texture.class);
         am.load("forest_tiles.png", Texture.class);
         am.load("power_mushroom.png", Texture.class);
+        am.load("bottle.png", Texture.class);
         am.load("mushroom.png", Texture.class);
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/exit_speech", I18NBundle.class);
@@ -48,6 +49,7 @@ public class ResourcesManager {
         }
 
         Texture powerMushroom = am.get("power_mushroom.png");
+        Texture mushroom = am.get("mushroom.png");
         regions.put("pm_0", new TextureRegion(powerMushroom, 0, 0, 96, 96));
         regions.put("pm1", new TextureRegion(powerMushroom, 0, 96, 96, 96));
 
