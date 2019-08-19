@@ -4,18 +4,20 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Speech {
 
+    public static long LIFETIME = 1000;
+
     private float x;
     private float y;
-    private float startTime;
+    private long startTime;
     private SpeechProducer speechProducer;
     private String speech;
 
-    public Speech(SpeechProducer speechProducer, float startTime, String speech) {
+    public Speech(SpeechProducer speechProducer, String speech) {
         Vector2 position = speechProducer.getSpeechPosition(speech);
         this.x = position.x;
         this.y = position.y;
         this.speechProducer = speechProducer;
-        this.startTime = startTime;
+        this.startTime = System.currentTimeMillis();
         this.speech = speech;
     }
 
@@ -35,12 +37,8 @@ public class Speech {
         this.y = y;
     }
 
-    public float getStartTime() {
+    public long getStartTime() {
         return startTime;
-    }
-
-    public void setStartTime(float startTime) {
-        this.startTime = startTime;
     }
 
     public String getSpeech() {

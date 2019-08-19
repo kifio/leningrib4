@@ -24,8 +24,17 @@ public class Player extends MovableActor {
     }
 
     public void onEffectiveMushroomTake(Mushroom mushroom) {
-        effectiveMushroomTakeTime = System.nanoTime();
+        effectiveMushroomTakeTime = System.currentTimeMillis();
         effect = mushroom.getEffect();
+    }
+
+    public boolean updateEffectState() {
+        if (System.currentTimeMillis() - effectiveMushroomTakeTime >= effect.getEffectTime()) {
+            effect = null;
+            effectiveMushroomTakeTime = 0L;
+            return false;
+        }
+        return true;
     }
 
     public String getMushroomsCount() {

@@ -32,12 +32,15 @@ public class ExitsManager {
         }
     }
 
-    void updateExits(float stateTime) {
+    void updateExits() {
+
+        long currentTime = System.currentTimeMillis();
+
         // Удаляем просроченные реплики
         Iterator<Speech> speechIterator = exitsSpeeches.iterator();
         while (speechIterator.hasNext()) {
             Speech sp = speechIterator.next();
-            if (stateTime - sp.getStartTime() > 1) {
+            if (currentTime - sp.getStartTime() > Speech.LIFETIME) {
                 sp.dispose();
                 speechIterator.remove();
             }
@@ -49,8 +52,8 @@ public class ExitsManager {
             }
 
             if (random.nextInt(128) / 8 == 0) {
-                exitsSpeeches.add(new Speech(exit, stateTime,
-                        SpeechManager.getInstance().getRandomExitSpeech(Gdx.graphics.getDensity())));
+                String speech = SpeechManager.getInstance().getRandomExitSpeech(Gdx.graphics.getDensity());
+                exitsSpeeches.add(new Speech(exit, speech));
             }
         }
     }

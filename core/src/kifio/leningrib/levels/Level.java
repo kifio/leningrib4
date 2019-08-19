@@ -244,10 +244,10 @@ public class Level {
         }
     }
 
-    public void update(float delta, float gameTime) {
+    public void update(float delta) {
         updateForesters(delta);
-        mushroomsManager.updateMushrooms(gameTime, gameScreen.player);
-        exitsManager.updateExits(gameTime);
+        mushroomsManager.updateMushrooms(gameScreen.player);
+        exitsManager.updateExits();
     }
 
     private void updateForesters(float delta) {

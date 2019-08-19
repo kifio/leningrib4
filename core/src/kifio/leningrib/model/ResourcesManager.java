@@ -20,12 +20,12 @@ public class ResourcesManager {
         am.load("forest_tiles.png", Texture.class);
         am.load("power_mushroom.png", Texture.class);
         am.load("bottle.png", Texture.class);
-        am.load("mushroom.png", Texture.class);
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/exit_speech", I18NBundle.class);
         am.finishLoading();
 
         Texture overworld = am.get("overworld.png");
+        Texture forestTiles = am.get("forest_tiles.png");
 
         regions.put("tree_0", new TextureRegion(overworld, 80, 256, 16, 16));
         regions.put("tree_1", new TextureRegion(overworld, 80, 272, 16, 16));
@@ -40,18 +40,10 @@ public class ResourcesManager {
         regions.put("stone_3", new TextureRegion(overworld, 16 * 9, 16 * 5, 16, 16));
         regions.put("stone_4", new TextureRegion(overworld, 16 * 10, 16 * 5, 16, 16));
 
-        Texture forestTiles = am.get("forest_tiles.png");
-        regions.put("m_0", new TextureRegion(forestTiles, 416, 0, 32, 32));
-
-        for (int i = 0, k = 0; i < 15; i++) {
+        for (int i = 0; i < 15; i++) {
             int row = i / 5, col = i % 5;
             regions.put("grass_" + i, new TextureRegion(forestTiles, row * 32, col * 32, 32, 32));
         }
-
-        Texture powerMushroom = am.get("power_mushroom.png");
-        Texture mushroom = am.get("mushroom.png");
-        regions.put("pm_0", new TextureRegion(powerMushroom, 0, 0, 96, 96));
-        regions.put("pm1", new TextureRegion(powerMushroom, 0, 96, 96, 96));
 
         mushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);
         exitsSpeechBumdle = am.get("i18n/exit_speech", I18NBundle.class);

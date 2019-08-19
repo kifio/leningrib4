@@ -1,6 +1,5 @@
 package kifio.leningrib.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
@@ -28,12 +27,11 @@ public class GameScreen extends InputAdapter implements Screen {
     private static int cameraWidth;
     private static int cameraHeight;
     public boolean gameOver;
-    public boolean win;
+    private boolean win;
     private int nextLevelX = 0;
     private int nextLevelY = 0;
 
     private float gameOverTime;
-    private float gameTime;
 
     public WorldMap worldMap;
     public Player player;
@@ -104,17 +102,14 @@ public class GameScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         if (isGameOver() && gameOverTime < 1f) {
             gameOverTime += delta;
-            gameTime = 0f;
-            worldController.update(delta, gameOverTime);
+            worldController.update(delta);
             worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
             setLevel(getNextLevel(nextLevelX, nextLevelY));
             gameOverTime = 0f;
-            gameTime = 0f;
             win = false;
         } else if (!gameOver) {
-            gameTime += delta;
-            worldController.update(delta, gameTime);
+            worldController.update(delta);
             worldRenderer.render();
         }
     }

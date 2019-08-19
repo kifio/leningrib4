@@ -21,7 +21,7 @@ public class WorldController {
         level.resetPlayerPath(x, y);
     }
 
-    public void update(float delta, float gameTime) {
+    public void update(float delta) {
         if (!gameScreen.isGameOver() && level.getPlayer().getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
             gameScreen.onGoUp();
             gameScreen.onLevelPassed();
@@ -32,7 +32,7 @@ public class WorldController {
             return;
         }
 
-        level.update(delta, gameTime);
+        level.update(delta);
     }
 
     public void dispose() {

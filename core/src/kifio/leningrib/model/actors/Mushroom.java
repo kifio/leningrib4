@@ -9,8 +9,24 @@ import kifio.leningrib.screens.GameScreen;
 
 public class Mushroom extends MovableActor implements Speech.SpeechProducer {
 
+    private static long DEFAULT_EFFECT_TIME = 5000; // milliseconds
+
     public enum Effect {
-        POWER, SPEED, INVISIBLE, DEXTERITY
+
+        POWER(DEFAULT_EFFECT_TIME),
+        SPEED(DEFAULT_EFFECT_TIME),
+        INVISIBLE(DEFAULT_EFFECT_TIME),
+        DEXTERITY(DEFAULT_EFFECT_TIME);
+
+        private long effectTime;
+
+        Effect(long effectTime) {
+            this.effectTime = effectTime;
+        }
+
+        public long getEffectTime() {
+            return effectTime;
+        }
     }
 
     private Effect effect;

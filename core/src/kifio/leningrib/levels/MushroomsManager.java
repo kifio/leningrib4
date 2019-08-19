@@ -10,11 +10,12 @@ import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
-import model.Room;
 
 class MushroomsManager {
 
     private static final String POWER_MUSHROOM = "power_mushroom.txt";
+    private static final String SPEED_MUSHROOM = "speed_mushroom.txt";
+    private static final String MUSHROOM = "mushroom.txt";
     private static final String ZERO = "0";
 
     private Random random;
@@ -33,18 +34,18 @@ class MushroomsManager {
             Rectangle room = rooms[i];
             int mushroomsCount = counters[i];
             for (int j = 0; j < mushroomsCount; j++) {
-                int x = pickRandomPointBetween(rand, room.x, (room.x + 1) + (room.width - 2));
-                int y = pickRandomPointBetween(rand, room.y, room.y + (room.height - 1));
+                int x = pickRandomPointBetween(rand, (int) 1, (int) (room.width - 2));
+                int y = pickRandomPointBetween(rand, (int) room.y + 1, (int) (room.y + (room.height - 1)));
+                if (x == 0 || x == room.width - 1 || y == room.y || y == room.height) {
+                    Gdx.app.log("kifio", "Wrong!");
+                }
                 mushrooms.add(new Mushroom(x, y, POWER_MUSHROOM, random));
             }
         }
     }
 
-    private int pickRandomPointBetween(Random rand, float p1, float p2) {
-        if (p1 == p2) return MathUtils.round(p1);
-        float delta = p2 - p1;
-        float offset = rand.nextFloat() * delta;
-        return MathUtils.round(p1 + offset);
+    private int pickRandomPointBetween(Random rand, int p1, int p2) {
+        return rand.nextInt(p2) + p1;
     }
 
     private int[] getMushroomsCounts(Rectangle[] rooms) {
@@ -55,13 +56,15 @@ class MushroomsManager {
         return counters;
     }
 
-    void updateMushrooms(float stateTime, Player player) {
+    void updateMushrooms(Player player) {
+
+        long currentTime = System.currentTimeMillis();
 
         // Удаляем просроченные реплики
         Iterator<Speech> speechIterator = mushroomsSpeeches.iterator();
         while (speechIterator.hasNext()) {
             Speech sp = speechIterator.next();
-            if (stateTime - sp.getStartTime() > 1) {
+            if (currentTime - sp.getStartTime() > Speech.LIFETIME) {
                 sp.dispose();
                 speechIterator.remove();
             }
@@ -78,12 +81,12 @@ class MushroomsManager {
                 player.increaseMushroomCount();
             } else if (!player.getMushroomsCount().equals(ZERO)) {
                 if (mushroomsSpeeches.size() > 0) return;
-                addMushroomSpeech(m, stateTime);
+                addMushroomSpeech(m);
             }
         }
     }
 
-    private void addMushroomSpeech(Speech.SpeechProducer m, float stateTime) {
+    private void addMushroomSpeech(Speech.SpeechProducer m) {
 
         for (Speech speech : mushroomsSpeeches) {
             if (speech.getSpeechProducer().equals(m)) return;
@@ -91,8 +94,8 @@ class MushroomsManager {
 
         // С некоторой вероятностью добавляем новую речь
         if (random.nextInt(128) / 8 == 0) {
-            mushroomsSpeeches.add(new Speech(m, stateTime,
-                    SpeechManager.getInstance().getRandomMushroomSpeech(Gdx.graphics.getDensity())));
+            String speech = SpeechManager.getInstance().getRandomMushroomSpeech(Gdx.graphics.getDensity());
+            mushroomsSpeeches.add(new Speech(m, speech));
         }
     }
 
