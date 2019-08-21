@@ -52,7 +52,7 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
     }
 
     @Override
-    protected float getFrameDuration() {
+    public float getFrameDuration() {
         return 1 / 2f;
     }
 

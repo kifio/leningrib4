@@ -34,7 +34,7 @@ import model.Segment;
 
 public class Level {
 
-    public List<Forester> foresters;
+    public List<Forester> foresters = new ArrayList<>();
 
     public int mapWidth;
     public int mapHeight;
@@ -71,7 +71,7 @@ public class Level {
                 gameScreen.constantsConfig);
         Rectangle[] roomRectangles = getRoomsRectangles(levelMap);
         mushroomsManager.initMushrooms(roomRectangles);
-        initForester(x, y, roomRectangles);
+//        initForester(x, y, roomRectangles);
         exitsManager.init(levelMap.getExits(Side.RIGHT));
     }
 
@@ -208,7 +208,6 @@ public class Level {
     }
 
     private void initForester(int levelX, int levelY, Rectangle[] roomsRectangles) {
-        this.foresters = new ArrayList<>();
         Vector2 playerPosition;
 
         if (levelX == 0 && levelY == 0) {
@@ -244,9 +243,9 @@ public class Level {
         }
     }
 
-    public void update(float delta) {
-        updateForesters(delta);
-        mushroomsManager.updateMushrooms(gameScreen.player);
+    public void update(float delta, float cameraY) {
+//        updateForesters(delta);
+        mushroomsManager.updateMushrooms(gameScreen.player, cameraY);
         exitsManager.updateExits();
     }
 

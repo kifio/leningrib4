@@ -83,7 +83,7 @@ public class GameScreen extends InputAdapter implements Screen {
 
     public void setLevel(Level level) {
         if (player == null) {
-            player = new Player(0f, GameScreen.tileSize, "player.txt");
+            player = new Player(0f, GameScreen.tileSize, "player_idle.txt");
         } else if (player.getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
             player.setY(0);
         } else if (player.getX() >= (level.mapWidth - 1) * GameScreen.tileSize) {
@@ -102,14 +102,14 @@ public class GameScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         if (isGameOver() && gameOverTime < 1f) {
             gameOverTime += delta;
-            worldController.update(delta);
+            worldController.update(delta, camera.position.y);
             worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
             setLevel(getNextLevel(nextLevelX, nextLevelY));
             gameOverTime = 0f;
             win = false;
         } else if (!gameOver) {
-            worldController.update(delta);
+            worldController.update(delta, camera.position.y);
             worldRenderer.render();
         }
     }

@@ -191,7 +191,7 @@ public class Forester extends MovableActor {
     }
 
     @Override
-    protected float getFrameDuration() {
+    public float getFrameDuration() {
         return 1 / 15f;
     }
 }

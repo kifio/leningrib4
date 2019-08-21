@@ -47,7 +47,7 @@ public class Player extends MovableActor {
     }
 
     @Override
-    protected float getFrameDuration() {
-        return 1 / 15f;
+    public float getFrameDuration() {
+        return 0.1f;
     }
 }

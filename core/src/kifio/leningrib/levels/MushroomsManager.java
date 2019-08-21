@@ -56,9 +56,10 @@ class MushroomsManager {
         return counters;
     }
 
-    void updateMushrooms(Player player) {
+    void updateMushrooms(Player player, float cameraPositionY) {
 
         long currentTime = System.currentTimeMillis();
+        int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
         // Удаляем просроченные реплики
         Iterator<Speech> speechIterator = mushroomsSpeeches.iterator();
@@ -74,14 +75,20 @@ class MushroomsManager {
         Iterator<Mushroom> iterator = mushrooms.iterator();
         while (iterator.hasNext()) {
             Mushroom m = iterator.next();
-            if (m.bounds.overlaps(player.bounds)) {
-                m.remove();
-                iterator.remove();
-                if (m.getEffect() != null) player.onEffectiveMushroomTake(m);
-                player.increaseMushroomCount();
-            } else if (!player.getMushroomsCount().equals(ZERO)) {
-                if (mushroomsSpeeches.size() > 0) return;
-                addMushroomSpeech(m);
+            
+            if (m.getY() >= cameraPositionY - halfScreenHeight
+                && m.getY() <= cameraPositionY + halfScreenHeight) {
+                if (m.bounds.overlaps(player.bounds)) {
+                    m.remove();
+                    iterator.remove();
+                    if (m.getEffect() != null)
+                        player.onEffectiveMushroomTake(m);
+                    player.increaseMushroomCount();
+                } else if (!player.getMushroomsCount().equals(ZERO)) {
+                    if (mushroomsSpeeches.size() > 0)
+                        return;
+                    addMushroomSpeech(m);
+                }
             }
         }
     }

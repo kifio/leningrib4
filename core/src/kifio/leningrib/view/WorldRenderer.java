@@ -92,8 +92,7 @@ public class WorldRenderer {
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
-        drawSpeeches();
-        drawMushroomCount(level.getPlayer().getMushroomsCount());
+        drawTexts();
     }
 
     private void updateCamera() {
@@ -195,7 +194,7 @@ public class WorldRenderer {
         batch.end();
     }
 
-    private void drawSpeeches() {
+    private void drawTexts() {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
@@ -215,6 +214,11 @@ public class WorldRenderer {
             speech.decreaseX(0.5f);
         }
 
+        SpeechManager.getInstance().getBitmapFont().draw(batch,
+            level.getPlayer().getMushroomsCount(),
+            Gdx.graphics.getWidth() - 64,
+            camera.position.y + (Gdx.graphics.getHeight() / 2) - 64);
+
         batch.end();
     }
 
@@ -222,13 +226,7 @@ public class WorldRenderer {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        Gdx.app.log("kifio", "height: " + Gdx.graphics.getHeight());
-        Gdx.app.log("kifio", "camera postition: " + camera.position.y);
 
-        SpeechManager.getInstance().getBitmapFont().draw(batch,
-            mushroomsCount,
-            Gdx.graphics.getWidth() - 64,
-            camera.position.y + (Gdx.graphics.getHeight() / 2) - 64);
 
         batch.end();
     }
