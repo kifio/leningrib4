@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
@@ -60,8 +61,8 @@ public class WorldRenderer {
         stage.clear();
         for (Actor mushroom : level.getMushrooms()) stage.addActor(mushroom);
         stage.addActor(level.getPlayer());
-        for (Forester forester : level.foresters) stage.addActor(forester);
-        for (Actor tree : level.trees) stage.addActor(tree);
+        for (Forester forester : level.getForesters()) stage.addActor(forester);
+        for (Actor tree : level.getTrees()) stage.addActor(tree);
     }
 
     public void renderBlackScreen(boolean levelPassed, float gameOverTime, float gameOverAnimationTime) {
@@ -88,7 +89,7 @@ public class WorldRenderer {
 
         updateCamera();
         drawGrass();
-        drawDebug();
+//        drawDebug();
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
@@ -99,7 +100,7 @@ public class WorldRenderer {
         camera.update();
         float playerY = level.getPlayer().getY();
         float bottomTreshold = Gdx.graphics.getHeight() / 2f;
-        float topTreshold = level.mapHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
+        float topTreshold = level.getLevelHeight() * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
         if (playerY < bottomTreshold) {
             camera.position.y = bottomTreshold;
         } else if (playerY > topTreshold) {
@@ -123,6 +124,8 @@ public class WorldRenderer {
         // Прямоугольник, на котором находится игрок
 //        drawCharacterDebug();
 
+//        drawMushroomsBounds();
+
         // Прямоугольник, на котором находится лесник
 //        drawForesterDebug();
 
@@ -141,20 +144,6 @@ public class WorldRenderer {
                     GameScreen.tileSize,
                     GameScreen.tileSize);
         }
-    }
-
-    private void drawCharacterDebug() {
-        renderer.setColor(playerDebugColor);
-        Rectangle bounds = level.getPlayer().bounds;
-        renderer.rect(bounds.x,
-                bounds.y,
-                bounds.width,
-                bounds.height);
-    }
-
-    private void drawForesterDebug() {
-        renderer.setColor(foresterDebugColor);
-        for (Forester forester : level.foresters) drawForesterPath(forester);
     }
 
     private void drawExitRect() {

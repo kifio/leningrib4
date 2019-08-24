@@ -86,5 +86,6 @@ public class ExitsManager {
         exits.clear();
         exitsSpeeches = null;
         exits = null;
+        random = null;
     }
 }

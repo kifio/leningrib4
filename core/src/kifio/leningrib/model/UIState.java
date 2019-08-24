@@ -2,18 +2,16 @@ package kifio.leningrib.model;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import kifio.leningrib.model.actors.MovableActor;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class UIState {
 
 	private static Set<UIState> pool = new HashSet<>();
 
-	public static UIState retainUIState(String packFile, MovableActor actor) {
+	public static UIState obtainUIState(String packFile, MovableActor actor) {
 		for (UIState state : pool) {
 			if (state.packFile.equals(packFile)) { return state; }
 		}

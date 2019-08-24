@@ -18,15 +18,15 @@ public class WorldController {
     }
 
     public void movePlayerTo(float x, float y) {
-        level.resetPlayerPath(x, y);
+        level.movePlayerTo(x, y);
     }
 
     public void update(float delta, float cameraPositionY) {
-        if (!gameScreen.isGameOver() && level.getPlayer().getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
+        if (!gameScreen.isGameOver() && level.getPlayer().getY() >= (level.getLevelHeight() - 1) * GameScreen.tileSize) {
             gameScreen.onGoUp();
             gameScreen.onLevelPassed();
             return;
-        } else if (!gameScreen.isGameOver() && level.getPlayer().getX() >= (level.mapWidth - 1) * GameScreen.tileSize) {
+        } else if (!gameScreen.isGameOver() && level.getPlayer().getX() >= (level.getLevelHeight() - 1) * GameScreen.tileSize) {
             gameScreen.onGoRight();
             gameScreen.onLevelPassed();
             return;

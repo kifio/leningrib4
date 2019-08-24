@@ -83,10 +83,10 @@ public class GameScreen extends InputAdapter implements Screen {
 
     public void setLevel(Level level) {
         if (player == null) {
-            player = new Player(0f, GameScreen.tileSize, "player_idle.txt");
-        } else if (player.getY() >= (level.mapHeight - 1) * GameScreen.tileSize) {
+            player = new Player(0f, GameScreen.tileSize);
+        } else if (player.getY() >= (level.getLevelHeight() - 1) * GameScreen.tileSize) {
             player.setY(0);
-        } else if (player.getX() >= (level.mapWidth - 1) * GameScreen.tileSize) {
+        } else if (player.getX() >= (level.getLevelWidth() - 1) * GameScreen.tileSize) {
             player.setX(0);
         }
         this.worldController.reset(level);

@@ -1,8 +1,10 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.Random;
+import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
@@ -10,6 +12,9 @@ import kifio.leningrib.screens.GameScreen;
 public class Mushroom extends MovableActor implements Speech.SpeechProducer {
 
     private static long DEFAULT_EFFECT_TIME = 5000; // milliseconds
+    private static final String POWER_MUSHROOM = "power_mushroom.txt";
+    private static final String SPEED_MUSHROOM = "speed_mushroom.txt";
+    private static final String MUSHROOM = "mushroom.txt";
 
     public enum Effect {
 
@@ -31,8 +36,8 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
 
     private Effect effect;
 
-    public Mushroom(int x, int y, String packFile, Random random) {
-        super(new Vector2(GameScreen.tileSize * x, GameScreen.tileSize * y), packFile);
+    public Mushroom(int x, int y, Random random) {
+        super(new Vector2(GameScreen.tileSize * x, GameScreen.tileSize * y));
         Effect[] effects = Effect.values();
         effect = random.nextInt() / 4 == 0 ? effects[random.nextInt()] : null;
     }
@@ -49,6 +54,22 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
     @Override
     protected float getDelayTime() {
         return 0;
+    }
+
+    @Override protected String getIdlingState() {
+        return POWER_MUSHROOM;
+    }
+
+    @Override protected String getRunningState() {
+        return POWER_MUSHROOM;
+    }
+
+    protected float getDrawingWidth() {
+        return GameScreen.tileSize;
+    }
+
+    protected float getDrawingHeight() {
+        return GameScreen.tileSize;
     }
 
     @Override

@@ -1,14 +1,13 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import java.util.ArrayList;
@@ -23,26 +22,31 @@ public abstract class MovableActor extends Actor {
 	private float elapsedTime = 0;
 
 	private UIState current = null;
+	private float drawingWidth = GameScreen.tileSize / 1.5f;
+	private float drawingHeight = GameScreen.tileSize;
+	private Runnable updateState = new Runnable() {
+		@Override public void run() {
+			updateUIState();
+		}
+	};
 
 	// TODO: Исправить размеры регионов в атласе
-	private static final String IDLE = "player_idle.txt";
-	private static final String RUNING = "player_run.txt";
 
 	public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при
     // отрисовке фрейма размер пересчитывается
 
-	public MovableActor(Vector2 xy, String packFile) {
+	public MovableActor(Vector2 xy) {
 		this.bounds = new Rectangle();
 		updateUIState();
 		setX(xy.x);
 		setY(xy.y);
 	}
 
-	public void updateUIState() {
-		if (current == null || current.getPackFile().equals(RUNING)) {
-			current = UIState.retainUIState(IDLE, this);
-		} else if (current.getPackFile().equals(IDLE)) {
-			current = UIState.retainUIState(RUNING, this);
+	private void updateUIState() {
+		if (current == null || current.getPackFile().equals(getRunningState())) {
+			current = UIState.obtainUIState(getIdlingState(), this);
+		} else if (current.getPackFile().equals(getIdlingState())) {
+			current = UIState.obtainUIState(getRunningState(), this);
 		}
 	}
 
@@ -52,12 +56,9 @@ public abstract class MovableActor extends Actor {
 	}
 
 	@Override public void draw(Batch batch, float alpha) {
-		drawOnTile(batch, (TextureRegion) current.getAnimation().getKeyFrame(elapsedTime, true));
-	}
-
-	private void drawOnTile(Batch batch, TextureRegion texture) {
+		TextureRegion region = (TextureRegion) current.getAnimation().getKeyFrame(elapsedTime, true);
 		bounds.set(getX(), getY(), GameScreen.tileSize, GameScreen.tileSize);
-		batch.draw(texture, getX(), getY(), GameScreen.tileSize, GameScreen.tileSize);
+		batch.draw(region, getX(), getY(), getDrawingWidth(), getDrawingHeight());
 	}
 
 	protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY, float velocity) {
@@ -75,6 +76,18 @@ public abstract class MovableActor extends Actor {
 
 	protected abstract float getDelayTime();
 
+	protected abstract String getIdlingState();
+
+	protected abstract String getRunningState();
+
+	protected float getDrawingWidth() {
+		return drawingWidth;
+	}
+
+	protected float getDrawingHeight() {
+		return drawingHeight;
+	}
+
 	public abstract float getFrameDuration();
 
 	public void stop() {
@@ -86,28 +99,20 @@ public abstract class MovableActor extends Actor {
 		SequenceAction seq = new SequenceAction();
 		float fromX = getX();
 		float fromY = getY();
+
+		seq.addAction(Actions.run(updateState));
+		seq.addAction(getDelayAction(getDelayTime()));
+
 		for (int i = 0; i < path.size(); i++) {
 			Vector2 vec = path.get(i);
-
-			seq.addAction(Actions.run(new Runnable() {
-				@Override public void run() {
-					updateUIState();
-				}
-			}));
-
 			seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y, getVelocity()));
 			seq.addAction(getDelayAction(getDelayTime()));
-
-			seq.addAction(Actions.run(new Runnable() {
-				@Override public void run() {
-					updateUIState();
-				}
-			}));
 
 			fromX = vec.x;
 			fromY = vec.y;
 		}
 
+		seq.addAction(Actions.run(updateState));
 		return seq;
 	}
 }

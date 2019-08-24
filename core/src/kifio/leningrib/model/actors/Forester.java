@@ -13,6 +13,8 @@ import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
 
+    private static final String RUNNING = "enemy.txt";
+
     private enum MovingState {
         FORWARD, BACK, PURSUE, STOP
     }
@@ -27,15 +29,15 @@ public class Forester extends MovableActor {
     private float stoppingTime = 0f;
 
     // Лесники начинают с патрулирования леса, поэтому у них две координаты
-    public Forester(Vector2 from, Vector2 to, String packFile) {
-        super(from, packFile);
+    public Forester(Vector2 from, Vector2 to) {
+        super(from);
         this.from = from;
         this.to = to;
         setPatrolRoute(from, to);
     }
 
-    public Forester(Array<Vector2> routePoints, String packFile) {
-        super(routePoints.get(0), packFile);
+    public Forester(Array<Vector2> routePoints) {
+        super(routePoints.get(0));
         this.patrolRectangle = routePoints;
         routePointFrom = 0;
         routePointTo = 1;
@@ -188,6 +190,14 @@ public class Forester extends MovableActor {
     @Override
     protected float getDelayTime() {
         return 0.2f;
+    }
+
+    @Override protected String getIdlingState() {
+        return RUNNING;
+    }
+
+    @Override protected String getRunningState() {
+        return RUNNING;
     }
 
     @Override

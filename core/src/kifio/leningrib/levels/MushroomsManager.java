@@ -5,26 +5,22 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 
-class MushroomsManager {
+class MushroomsManager extends ObjectsManager<Mushroom> {
 
-    private static final String POWER_MUSHROOM = "power_mushroom.txt";
-    private static final String SPEED_MUSHROOM = "speed_mushroom.txt";
-    private static final String MUSHROOM = "mushroom.txt";
     private static final String ZERO = "0";
-
-    private Random random;
 
     MushroomsManager(Random random) {
         this.random = random;
+        gameObjects = new ArrayList<>();
     }
 
-    ArrayList<Mushroom> mushrooms = new ArrayList<>();
     ArrayList<Speech> mushroomsSpeeches = new ArrayList<>(8);
 
     void initMushrooms(Rectangle[] rooms) {
@@ -39,7 +35,7 @@ class MushroomsManager {
                 if (x == 0 || x == room.width - 1 || y == room.y || y == room.height) {
                     Gdx.app.log("kifio", "Wrong!");
                 }
-                mushrooms.add(new Mushroom(x, y, POWER_MUSHROOM, random));
+                gameObjects.add(new Mushroom(x, y, random));
             }
         }
     }
@@ -72,10 +68,10 @@ class MushroomsManager {
         }
 
         // Удаляем съеденные грибы, несъеденным добавляем реплики
-        Iterator<Mushroom> iterator = mushrooms.iterator();
+        // TODO: заменить на for (0..length)
+        Iterator<Mushroom> iterator = gameObjects.iterator();
         while (iterator.hasNext()) {
             Mushroom m = iterator.next();
-            
             if (m.getY() >= cameraPositionY - halfScreenHeight
                 && m.getY() <= cameraPositionY + halfScreenHeight) {
                 if (m.bounds.overlaps(player.bounds)) {
@@ -106,16 +102,20 @@ class MushroomsManager {
         }
     }
 
+    public List<Mushroom> getMushrooms() {
+        return gameObjects;
+    }
 
-    void dispose() {
+    @Override
+    public void dispose() {
+
         Iterator<Speech> speechIterator = mushroomsSpeeches.iterator();
         while (speechIterator.hasNext()) {
             speechIterator.next().dispose();
             speechIterator.remove();
         }
-        mushrooms.clear();
-        mushroomsSpeeches = null;
-        mushrooms = null;
-    }
 
+        mushroomsSpeeches = null;
+        super.dispose();
+    }
 }
