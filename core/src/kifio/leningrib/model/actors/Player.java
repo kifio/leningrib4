@@ -1,6 +1,8 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import kifio.leningrib.Utils;
@@ -51,12 +53,12 @@ public class Player extends MovableActor {
 
     @Override
     protected float getDelayTime() {
-        return 0.0f;
+        return 0.1f;
     }
 
     @Override
     public float getFrameDuration() {
-        return 0.4f;
+        return 0.1f;
     }
 
     @Override
@@ -70,21 +72,28 @@ public class Player extends MovableActor {
     }
 
     public void resetPlayerPath(float x, float y, ForestGraph forestGraph, GameScreen gameScreen) {
-        GraphPath<Vector2> path = forestGraph.getPath(
-            Utils.mapCoordinate(gameScreen.player.getX()),
-            Utils.mapCoordinate(gameScreen.player.getY()),
-            Utils.mapCoordinate(x),
-            Utils.mapCoordinate(y));
 
-        gameScreen.player.stop();
+        float fromX = Utils.mapCoordinate(gameScreen.player.getX());
+        float fromY = Utils.mapCoordinate(gameScreen.player.getY());
+        float toX = Utils.mapCoordinate(x);
+        float toY = Utils.mapCoordinate(y);
 
-        // Первая точка пути совпадает с координатами игрока,
-        // чтобы игрок не стоял на месте лишнее время ее из пути удаляем.
-        for (int i = 1; i < path.getCount(); i++) {
-            gameScreen.player.path.add(new Vector2(path.get(i)));
+        if (MathUtils.isEqual(fromX, toX) && MathUtils.isEqual(fromY, toY)) return;
+
+        GraphPath<Vector2> path = forestGraph.getPath(fromX, fromY, toX, toY);
+
+        if (path.getCount() > 0) {
+
+            gameScreen.player.stop();
+
+            // Первая точка пути совпадает с координатами игрока,
+            // чтобы игрок не стоял на месте лишнее время ее из пути удаляем.
+            for (int i = 1; i < path.getCount(); i++) {
+                gameScreen.player.path.add(new Vector2(path.get(i)));
+            }
+
+            SequenceAction playerActionsSequence = gameScreen.player.getMoveActionsSequence();
+            gameScreen.player.addAction(playerActionsSequence);
         }
-
-        SequenceAction playerActionsSequence = gameScreen.player.getMoveActionsSequence();
-        gameScreen.player.addAction(playerActionsSequence);
     }
 }

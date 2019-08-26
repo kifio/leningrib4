@@ -3,6 +3,7 @@ package kifio.leningrib.levels;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,7 @@ import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
+import kifio.leningrib.screens.GameScreen;
 
 class MushroomsManager extends ObjectsManager<Mushroom> {
 
@@ -23,25 +25,31 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
 
     ArrayList<Speech> mushroomsSpeeches = new ArrayList<>(8);
 
-    void initMushrooms(Rectangle[] rooms) {
-        Random rand = new Random();
+    void initMushrooms(Rectangle[] rooms, List<Actor> actors) {
         int[] counters = getMushroomsCounts(rooms);
         for (int i = 0; i < rooms.length; i++) {
             Rectangle room = rooms[i];
             int mushroomsCount = counters[i];
+
             for (int j = 0; j < mushroomsCount; j++) {
-                int x = pickRandomPointBetween(rand, (int) 1, (int) (room.width - 2));
-                int y = pickRandomPointBetween(rand, (int) room.y + 1, (int) (room.y + (room.height - 1)));
-                if (x == 0 || x == room.width - 1 || y == room.y || y == room.height) {
-                    Gdx.app.log("kifio", "Wrong!");
+                int x = GameScreen.tileSize * (random.nextInt((int) room.width - 1));
+                int y = GameScreen.tileSize * ((int) room.y + random.nextInt((int) (room.height - 1)));
+
+                if (!isOverlapsWithActor(actors, x, y)) {
+                    gameObjects.add(new Mushroom(x, y, random));
                 }
-                gameObjects.add(new Mushroom(x, y, random));
             }
         }
     }
 
-    private int pickRandomPointBetween(Random rand, int p1, int p2) {
-        return rand.nextInt(p2) + p1;
+    private boolean isOverlapsWithActor(List<Actor> actors, int x, int y) {
+        for (int k = 0; k < actors.size(); k++) {
+            Actor a = actors.get(k);
+            if ((int) a.getX() == x && (int) a.getY() == y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int[] getMushroomsCounts(Rectangle[] rooms) {

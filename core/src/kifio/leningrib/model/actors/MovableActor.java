@@ -1,7 +1,10 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -10,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
+import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,33 +25,22 @@ public abstract class MovableActor extends Actor {
 	public List<Vector2> path = new ArrayList<>();
 	private float elapsedTime = 0;
 
-	private UIState current = null;
-	private float drawingWidth = GameScreen.tileSize / 1.5f;
+	private UIState current =  UIState.obtainUIState(getIdlingState(), this);
+	private float drawingWidth = GameScreen.tileSize / 1.5f; // FIXME
 	private float drawingHeight = GameScreen.tileSize;
 	private Runnable updateState = new Runnable() {
 		@Override public void run() {
-			updateUIState();
+
 		}
 	};
-
-	// TODO: Исправить размеры регионов в атласе
 
 	public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при
     // отрисовке фрейма размер пересчитывается
 
 	public MovableActor(Vector2 xy) {
 		this.bounds = new Rectangle();
-		updateUIState();
 		setX(xy.x);
 		setY(xy.y);
-	}
-
-	private void updateUIState() {
-		if (current == null || current.getPackFile().equals(getRunningState())) {
-			current = UIState.obtainUIState(getIdlingState(), this);
-		} else if (current.getPackFile().equals(getIdlingState())) {
-			current = UIState.obtainUIState(getRunningState(), this);
-		}
 	}
 
 	@Override public void act(float delta) {
@@ -65,7 +58,9 @@ public abstract class MovableActor extends Actor {
 		double dx = (double) (targetX - fromX);
 		double dy = (double) (targetY - fromY);
 		float length = (float) Math.sqrt(dx * dx + dy * dy);
-		return Actions.moveTo(targetX, targetY, length / velocity);
+		float calculatedDuration = length / velocity;
+		Gdx.app.log("kifio", "calculatedDuration: " + calculatedDuration);
+		return Actions.moveTo(targetX, targetY, 0.133f);
 	}
 
 	protected Action getDelayAction(float duration) {
@@ -100,8 +95,14 @@ public abstract class MovableActor extends Actor {
 		float fromX = getX();
 		float fromY = getY();
 
-		seq.addAction(Actions.run(updateState));
-		seq.addAction(getDelayAction(getDelayTime()));
+		if (!current.getPackFile().equals(getRunningState())) {
+			seq.addAction(Actions.run(new Runnable() {
+				@Override public void run() {
+					current = UIState.obtainUIState(getRunningState(), MovableActor.this);
+				}
+			}));
+			seq.addAction(getDelayAction(getDelayTime()));
+		}
 
 		for (int i = 0; i < path.size(); i++) {
 			Vector2 vec = path.get(i);
@@ -112,7 +113,12 @@ public abstract class MovableActor extends Actor {
 			fromY = vec.y;
 		}
 
-		seq.addAction(Actions.run(updateState));
+		seq.addAction(Actions.run(new Runnable() {
+			@Override public void run() {
+				current = UIState.obtainUIState(getIdlingState(), MovableActor.this);
+			}
+		}));
+		seq.addAction(getDelayAction(getDelayTime()));
 		return seq;
 	}
 }

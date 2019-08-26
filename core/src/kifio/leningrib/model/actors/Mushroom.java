@@ -37,7 +37,7 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
     private Effect effect;
 
     public Mushroom(int x, int y, Random random) {
-        super(new Vector2(GameScreen.tileSize * x, GameScreen.tileSize * y));
+        super(new Vector2(x, y));
         Effect[] effects = Effect.values();
         effect = random.nextInt() / 4 == 0 ? effects[random.nextInt()] : null;
     }

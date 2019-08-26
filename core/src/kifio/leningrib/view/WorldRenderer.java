@@ -89,7 +89,7 @@ public class WorldRenderer {
 
         updateCamera();
         drawGrass();
-//        drawDebug();
+        drawDebug();
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
@@ -122,7 +122,7 @@ public class WorldRenderer {
 //        drawPlayerPath();
 
         // Прямоугольник, на котором находится игрок
-//        drawCharacterDebug();
+        drawCharacterDebug();
 
 //        drawMushroomsBounds();
 
@@ -144,6 +144,30 @@ public class WorldRenderer {
                     GameScreen.tileSize,
                     GameScreen.tileSize);
         }
+    }
+
+    private void drawMushroomsBounds() {
+        renderer.setColor(playerPathDebugColor);
+        for (Mushroom m: level.getMushrooms()) {
+            renderer.rect(m.bounds.x,
+                m.bounds.y,
+                m.bounds.width,
+                m.bounds.height);
+        }
+    }
+
+    private void drawCharacterDebug() {
+        renderer.setColor(playerDebugColor);
+        Rectangle bounds = level.getPlayer().bounds;
+        renderer.rect(bounds.x,
+                bounds.y,
+                bounds.width,
+                bounds.height);
+    }
+
+    private void drawForesterDebug() {
+        renderer.setColor(foresterDebugColor);
+        for (Forester forester : level.getForesters()) drawForesterPath(forester);
     }
 
     private void drawExitRect() {
