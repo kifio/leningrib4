@@ -73,7 +73,7 @@ public class MapBuilder {
 		return false;
 	}
 
-	private Actor getActorFromCell(int value, int x, int y, ConstantsConfig constantsConfig) {
+	static Actor getActorFromCell(int value, int x, int y, ConstantsConfig constantsConfig) {
 		if (value == constantsConfig.getTreeTopLeft()) {
 			return getObstacle("tree", 0, x, y);
 		} else if (value == constantsConfig.getTreeTopRight()) {
@@ -89,7 +89,7 @@ public class MapBuilder {
 		}
 	}
 
-	private Actor getObstacle(String name, int value, int x, int y) {
+	private static Actor getObstacle(String name, int value, int x, int y) {
 		return new TreePart(ResourcesManager.get(String.format(Locale.getDefault(), "%s_%d", name, value)), x, y,
 			GameScreen.tileSize, GameScreen.tileSize);
 	}

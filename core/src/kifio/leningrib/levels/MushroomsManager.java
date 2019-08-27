@@ -83,6 +83,7 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
             if (m.getY() >= cameraPositionY - halfScreenHeight
                 && m.getY() <= cameraPositionY + halfScreenHeight) {
                 if (m.bounds.overlaps(player.bounds)) {
+                    m.setEaten();
                     m.remove();
                     iterator.remove();
                     if (m.getEffect() != null)

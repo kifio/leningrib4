@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
@@ -61,6 +62,7 @@ public class WorldRenderer {
         stage.clear();
         for (Actor mushroom : level.getMushrooms()) stage.addActor(mushroom);
         stage.addActor(level.getPlayer());
+        if (level.getGrandma() != null) stage.addActor(level.getGrandma());
         for (Forester forester : level.getForesters()) stage.addActor(forester);
         for (Actor tree : level.getTrees()) stage.addActor(tree);
     }
@@ -89,7 +91,7 @@ public class WorldRenderer {
 
         updateCamera();
         drawGrass();
-        drawDebug();
+//        drawDebug();
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
@@ -122,7 +124,7 @@ public class WorldRenderer {
 //        drawPlayerPath();
 
         // Прямоугольник, на котором находится игрок
-        drawCharacterDebug();
+//        drawCharacterDebug();
 
 //        drawMushroomsBounds();
 

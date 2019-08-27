@@ -1,6 +1,7 @@
 package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.Random;
@@ -35,11 +36,16 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
     }
 
     private Effect effect;
+    private boolean isEaten = false;
 
     public Mushroom(int x, int y, Random random) {
         super(new Vector2(x, y));
         Effect[] effects = Effect.values();
         effect = random.nextInt() / 4 == 0 ? effects[random.nextInt()] : null;
+    }
+
+    @Override public void draw(Batch batch, float alpha) {
+        if (!isEaten) super.draw(batch, alpha);
     }
 
     public Effect getEffect() {
@@ -83,5 +89,9 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
                 getX() + (bounds.getWidth() / 2) - (SpeechManager.getInstance().getTextWidth(speech) / 2),
                 getY() + bounds.getHeight()
         );
+    }
+
+    public void setEaten() {
+        this.isEaten = true;
     }
 }

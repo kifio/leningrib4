@@ -32,6 +32,7 @@ public class GameScreen extends InputAdapter implements Screen {
     private int nextLevelY = 0;
 
     private float gameOverTime;
+    public boolean isFirstLaunch = true;
 
     public WorldMap worldMap;
     public Player player;

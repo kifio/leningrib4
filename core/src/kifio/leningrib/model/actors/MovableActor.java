@@ -26,8 +26,8 @@ public abstract class MovableActor extends Actor {
 	private float elapsedTime = 0;
 
 	private UIState current =  UIState.obtainUIState(getIdlingState(), this);
-	private float drawingWidth = GameScreen.tileSize / 1.5f; // FIXME
-	private float drawingHeight = GameScreen.tileSize;
+	private float drawingWidth = GameScreen.tileSize;
+	private float drawingHeight = GameScreen.tileSize * 1.5f;
 	private Runnable updateState = new Runnable() {
 		@Override public void run() {
 
@@ -49,9 +49,8 @@ public abstract class MovableActor extends Actor {
 	}
 
 	@Override public void draw(Batch batch, float alpha) {
-		TextureRegion region = (TextureRegion) current.getAnimation().getKeyFrame(elapsedTime, true);
 		bounds.set(getX(), getY(), GameScreen.tileSize, GameScreen.tileSize);
-		batch.draw(region, getX(), getY(), getDrawingWidth(), getDrawingHeight());
+		batch.draw(getTexturRegion(), getX(), getY(), getDrawingWidth(), getDrawingHeight());
 	}
 
 	protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY, float velocity) {
@@ -88,6 +87,10 @@ public abstract class MovableActor extends Actor {
 	public void stop() {
 		clear();
 		path.clear();
+	}
+
+	protected TextureRegion getTexturRegion() {
+		return (TextureRegion) current.getAnimation().getKeyFrame(elapsedTime, true);
 	}
 
 	public SequenceAction getMoveActionsSequence() {

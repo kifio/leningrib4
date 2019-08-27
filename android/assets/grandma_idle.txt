@@ -1,4 +1,4 @@
-player_idle.png
+grandma_idle.png
 size: 64, 24
 format: RGBA8888
 filter: Nearest,Nearest

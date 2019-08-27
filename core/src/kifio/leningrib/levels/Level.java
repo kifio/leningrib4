@@ -6,6 +6,7 @@ import generator.Side;
 import java.util.List;
 import java.util.Random;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
@@ -25,6 +26,7 @@ public class Level {
     private ExitsManager exitsManager = new ExitsManager(random);
     private ForestersManager forestersManager;
     private MapBuilder mapBuilder = new MapBuilder();
+    private Grandma grandma = null;
 
     private boolean isDisposed = false;
 
@@ -37,16 +39,27 @@ public class Level {
             gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.constantsConfig);
         }
 
-        LevelMap levelMap = mapBuilder.initMap(gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig),
+        LevelMap levelMap;
+
+        if (gameScreen.isFirstLaunch) {
+            gameScreen.isFirstLaunch = false;
+            grandma = new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize);
+            levelMap = FirstLevel.getFirstLevel(gameScreen.constantsConfig);
+            // Возвращает результат помещения урвоня в пустой хэшмап (null).
+            gameScreen.worldMap.addLevel(x, y, levelMap);
+            levelMap = mapBuilder.initMap(levelMap,
+				gameScreen.constantsConfig, forestGraph);
+        } else {
+            levelMap = mapBuilder.initMap(gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig),
                 gameScreen.constantsConfig, forestGraph);
+        }
+
         Rectangle[] roomRectangles = mapBuilder.getRoomsRectangles(levelMap);
 
         mushroomsManager.initMushrooms(roomRectangles, mapBuilder.getTrees());
 //        forestersManager.initForester(x, y, roomRectangles, gameScreen, random);
         exitsManager.init(levelMap.getExits(Side.RIGHT));
     }
-
-
 
     public void dispose() {
         if (isDisposed) return;
@@ -100,5 +113,9 @@ public class Level {
 
     public int getLevelHeight() {
         return mapBuilder.mapHeight;
+    }
+
+    public Actor getGrandma() {
+        return grandma;
     }
 }
