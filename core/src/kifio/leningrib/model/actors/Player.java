@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import kifio.leningrib.Utils;
+import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.actors.Mushroom.Effect;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
@@ -95,5 +97,38 @@ public class Player extends MovableActor {
             SequenceAction playerActionsSequence = gameScreen.player.getMoveActionsSequence();
             gameScreen.player.addAction(playerActionsSequence);
         }
+    }
+
+    @Override
+    public SequenceAction getMoveActionsSequence() {
+        SequenceAction seq = new SequenceAction();
+        float fromX = getX();
+        float fromY = getY();
+
+        if (!current.getPackFile().equals(getRunningState())) {
+            seq.addAction(Actions.run(new Runnable() {
+                @Override public void run() {
+                    current = UIState.obtainUIState(getRunningState(), Player.this);
+                }
+            }));
+            seq.addAction(getDelayAction(getDelayTime()));
+        }
+
+        for (int i = 0; i < path.size(); i++) {
+            Vector2 vec = path.get(i);
+            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y, getVelocity()));
+            seq.addAction(getDelayAction(getDelayTime()));
+
+            fromX = vec.x;
+            fromY = vec.y;
+        }
+
+        seq.addAction(Actions.run(new Runnable() {
+            @Override public void run() {
+                current = UIState.obtainUIState(getIdlingState(), Player.this);
+            }
+        }));
+        seq.addAction(getDelayAction(getDelayTime()));
+        return seq;
     }
 }

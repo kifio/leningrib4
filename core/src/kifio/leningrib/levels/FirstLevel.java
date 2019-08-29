@@ -1,10 +1,15 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.math.Vector2;
 import generator.ConstantsConfig;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.screens.GameScreen;
 import model.Exit;
 import model.LevelMap;
 import model.Room;
@@ -70,10 +75,10 @@ public class FirstLevel {
 
 		List<Room> rooms = new ArrayList<>(4);
 
-		rooms.add(new Room(1, 7));
-		rooms.add(new Room(7, 7));
-		rooms.add(new Room(14, 6));
-		rooms.add(new Room(20, 8));
+		rooms.add(new Room(1, 8));
+		rooms.add(new Room(9, 7));
+		rooms.add(new Room(16, 7));
+		rooms.add(new Room(23, 6));
 
 		for (int i = 0; i < 3; i++) {
 			Room r = rooms.get(i);
@@ -93,5 +98,16 @@ public class FirstLevel {
 		arr.add(new Segment(x, y + 1, constantsConfig.getTreeTopLeft()));
 		arr.add(new Segment(x + 1, y + 1, constantsConfig.getTreeTopRight()));
 		return arr;
+	}
+
+	static List<Mushroom> getMushrooms(Random random) {
+		List<Mushroom> mushrooms = new ArrayList<>();
+		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 13, random));
+		return mushrooms;
+	}
+
+	static Forester getForester() {
+		return new Forester(new Vector2(GameScreen.tileSize, GameScreen.tileSize * 10),
+			new Vector2(GameScreen.tileSize * 5, GameScreen.tileSize * 10), 1);
 	}
 }

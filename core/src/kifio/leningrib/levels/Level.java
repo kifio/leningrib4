@@ -43,22 +43,23 @@ public class Level {
 
         if (gameScreen.isFirstLaunch) {
             gameScreen.isFirstLaunch = false;
-            grandma = new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize);
+//            grandma = new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize * 10);
             levelMap = FirstLevel.getFirstLevel(gameScreen.constantsConfig);
             // Возвращает результат помещения урвоня в пустой хэшмап (null).
             gameScreen.worldMap.addLevel(x, y, levelMap);
-            levelMap = mapBuilder.initMap(levelMap,
+            mapBuilder.initMap(levelMap,
 				gameScreen.constantsConfig, forestGraph);
+            mushroomsManager.initMushrooms(FirstLevel.getMushrooms(random));
+//            forestersManager.initDebugForester(FirstLevel.getForester());
         } else {
             levelMap = mapBuilder.initMap(gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig),
                 gameScreen.constantsConfig, forestGraph);
+
+            Rectangle[] roomRectangles = mapBuilder.getRoomsRectangles(levelMap);
+            mushroomsManager.initMushrooms(roomRectangles, mapBuilder.getTrees());
+            exitsManager.init(levelMap.getExits(Side.RIGHT));
+            forestersManager.initForester(x, y, roomRectangles, random);
         }
-
-        Rectangle[] roomRectangles = mapBuilder.getRoomsRectangles(levelMap);
-
-        mushroomsManager.initMushrooms(roomRectangles, mapBuilder.getTrees());
-//        forestersManager.initForester(x, y, roomRectangles, gameScreen, random);
-        exitsManager.init(levelMap.getExits(Side.RIGHT));
     }
 
     public void dispose() {
@@ -78,7 +79,7 @@ public class Level {
     }
 
     public void update(float delta, float cameraY) {
-//        updateForesters(delta);
+        forestersManager.updateForesters(delta);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY);
         exitsManager.updateExits();
     }
@@ -115,7 +116,7 @@ public class Level {
         return mapBuilder.mapHeight;
     }
 
-    public Actor getGrandma() {
+    public Grandma getGrandma() {
         return grandma;
     }
 }

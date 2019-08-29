@@ -1,6 +1,7 @@
 package kifio.leningrib.controller;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.screens.GameScreen;
 
@@ -26,6 +27,20 @@ public class WorldController {
     }
 
     public void update(float delta, float cameraPositionY) {
+
+        if (level.getGrandma() == null || !level.getGrandma().isDialogActive()) {
+            updateWorld(delta, cameraPositionY);
+        } else if (level.getGrandma() != null) {
+            if (level.getGrandma().isReadyForDialog(level.getPlayer())) {
+                // TODO: Start dialog
+            } else {
+                // TODO: Update controller with grandma state
+                updateWorld(delta, cameraPositionY);
+            }
+        }
+    }
+
+    private void updateWorld(float delta, float cameraPositionY) {
         if (!gameScreen.isGameOver() && level.getPlayer().getY() >= yLimit) {
             gameScreen.onGoUp();
             gameScreen.onLevelPassed();

@@ -25,7 +25,7 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
 
     ArrayList<Speech> mushroomsSpeeches = new ArrayList<>(8);
 
-    void initMushrooms(Rectangle[] rooms, List<Actor> actors) {
+    void initMushrooms(Rectangle[] rooms, List<Actor> trees) {
         int[] counters = getMushroomsCounts(rooms);
         for (int i = 0; i < rooms.length; i++) {
             Rectangle room = rooms[i];
@@ -35,11 +35,15 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
                 int x = GameScreen.tileSize * (random.nextInt((int) room.width - 1));
                 int y = GameScreen.tileSize * ((int) room.y + random.nextInt((int) (room.height - 1)));
 
-                if (!isOverlapsWithActor(actors, x, y)) {
+                if (!isOverlapsWithActor(trees, x, y)) {
                     gameObjects.add(new Mushroom(x, y, random));
                 }
             }
         }
+    }
+
+    void initMushrooms(List<Mushroom> mushrooms) {
+        this.gameObjects.addAll(mushrooms);
     }
 
     private boolean isOverlapsWithActor(List<Actor> actors, int x, int y) {

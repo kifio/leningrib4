@@ -9,11 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import com.badlogic.gdx.utils.Array;
+import java.util.Locale;
 import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
 
-    private static final String RUNNING = "enemy.txt";
+    private final String running;
+    private final String idle;
 
     private enum MovingState {
         FORWARD, BACK, PURSUE, STOP
@@ -29,20 +31,22 @@ public class Forester extends MovableActor {
     private float stoppingTime = 0f;
 
     // Лесники начинают с патрулирования леса, поэтому у них две координаты
-    public Forester(Vector2 from, Vector2 to) {
+    public Forester(Vector2 from, Vector2 to, int index) {
         super(from);
         this.from = from;
         this.to = to;
         setPatrolRoute(from, to);
+        running = String.format(Locale.getDefault(), "enemy_%d_run.txt", index);
+        idle = String.format(Locale.getDefault(),"enemy_%d_idle.txt", index);
     }
 
-    public Forester(Array<Vector2> routePoints) {
-        super(routePoints.get(0));
-        this.patrolRectangle = routePoints;
-        routePointFrom = 0;
-        routePointTo = 1;
-        setPatrolRoute(routePoints.get(routePointFrom), routePoints.get(routePointTo));
-    }
+//    public Forester(Array<Vector2> routePoints) {
+//        super(routePoints.get(0));
+//        this.patrolRectangle = routePoints;
+//        routePointFrom = 0;
+//        routePointTo = 1;
+//        setPatrolRoute(routePoints.get(routePointFrom), routePoints.get(routePointTo));
+//    }
 
     private void resetPatrolRoute() {
         stop();
@@ -189,19 +193,19 @@ public class Forester extends MovableActor {
 
     @Override
     protected float getDelayTime() {
-        return 0.2f;
+        return 0.1f;
     }
 
     @Override protected String getIdlingState() {
-        return RUNNING;
+        return running;
     }
 
     @Override protected String getRunningState() {
-        return RUNNING;
+        return idle;
     }
 
     @Override
     public float getFrameDuration() {
-        return 1 / 15f;
+        return 0.1f;
     }
 }

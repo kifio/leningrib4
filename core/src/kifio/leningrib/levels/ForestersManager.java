@@ -42,34 +42,38 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		for (Rectangle rectangle : roomsRectangles) {
 			if (!rectangle.contains(playerPosition) && rectangle.height > 1) {
 				boolean generateDifficultWay = false;
-				if (rectangle.height > 3) generateDifficultWay = random.nextBoolean();
+//				if (rectangle.height > 3) generateDifficultWay = random.nextBoolean();
 
-				if (generateDifficultWay) {
-					Array<Vector2> points = new Array<>();
-					float y0 = rectangle.y + (rectangle.height - 1);
-					float y1 = rectangle.y + 1;
-
-					points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y0));
-					points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y0));
-					points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y1));
-					points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y1));
-
-					gameObjects.add(new Forester(points));
-				} else {
+//				if (generateDifficultWay) {
+//					Array<Vector2> points = new Array<>();
+//					float y0 = rectangle.y + (rectangle.height - 1);
+//					float y1 = rectangle.y + 1;
+//
+//					points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y0));
+//					points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y0));
+//					points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y1));
+//					points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y1));
+//
+//					gameObjects.add(new Forester(points));
+//				} else {
 					float y = GameScreen.tileSize * MathUtils.random(rectangle.y, rectangle.y + (rectangle.height - 2));
 					gameObjects.add(new Forester(
 						new Vector2(GameScreen.tileSize * (rectangle.x + 1), y),
-						new Vector2(GameScreen.tileSize * (rectangle.width - 2), y)));
-				}
+						new Vector2(GameScreen.tileSize * (rectangle.width - 2), y), 1));
+//				}
 			}
 		}
+	}
+
+	void initDebugForester(Forester forester) {
+		gameObjects.add(forester);
 	}
 
 	public List<Forester> getForesters() {
 		return gameObjects;
 	}
 
-	private void updateForesters(float delta) {
+	void updateForesters(float delta) {
 		for (Forester forester : gameObjects) {
 			result.set(0f, 0f, 0f, 0f);
 			if (isPlayerCaught(forester.bounds, gameScreen.player.bounds)) {

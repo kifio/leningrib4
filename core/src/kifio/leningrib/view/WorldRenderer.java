@@ -91,7 +91,7 @@ public class WorldRenderer {
 
         updateCamera();
         drawGrass();
-//        drawDebug();
+        drawDebug();
 
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
@@ -129,7 +129,7 @@ public class WorldRenderer {
 //        drawMushroomsBounds();
 
         // Прямоугольник, на котором находится лесник
-//        drawForesterDebug();
+        drawForesterDebug();
 
 //        drawExitRect();
 
