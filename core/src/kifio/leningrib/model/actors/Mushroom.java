@@ -2,6 +2,7 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.Random;
@@ -45,7 +46,12 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
     }
 
     @Override public void draw(Batch batch, float alpha) {
-        if (!isEaten) super.draw(batch, alpha);
+        if (isEaten) return;
+        bounds.set(getX(), getY(), GameScreen.tileSize, GameScreen.tileSize);
+        TextureRegion region = getTextureRegion();
+        batch.draw(region, getX() + (GameScreen.tileSize - region.getRegionWidth()) / 2f,
+            getY() + (GameScreen.tileSize - region.getRegionHeight()) / 2f,
+            getDrawingWidth(), getDrawingHeight());
     }
 
     public Effect getEffect() {
@@ -86,8 +92,8 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
     @Override
     public Vector2 getSpeechPosition(String speech) {
         return new Vector2(
-                getX() + (bounds.getWidth() / 2) - (SpeechManager.getInstance().getTextWidth(speech) / 2),
-                getY() + bounds.getHeight()
+                getX() - GameScreen.tileSize / 2f,
+                getY() + GameScreen.tileSize / 2f
         );
     }
 

@@ -52,7 +52,7 @@ public class ExitsManager {
             }
 
             if (random.nextInt(128) / 8 == 0) {
-                String speech = SpeechManager.getInstance().getRandomExitSpeech(Gdx.graphics.getDensity());
+                String speech = SpeechManager.getInstance().getRandomExitSpeech();
                 exitsSpeeches.add(new Speech(exit, speech));
             }
         }

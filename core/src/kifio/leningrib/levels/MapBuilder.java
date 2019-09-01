@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Set;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.TreePart;
+import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
@@ -28,7 +29,7 @@ public class MapBuilder {
 	private List<Vector2> neighbours = new ArrayList<>(INITIAL_NEIGHBORS_CAPACITY);
 	private ArrayList<Actor> trees = new ArrayList<>();
 
-	LevelMap initMap(LevelMap levelMap, ConstantsConfig constantsConfig, ForestGraph forestGraph) {
+	LevelMap initMap(LevelMap levelMap, ConstantsConfig constantsConfig, Grandma grandma, ForestGraph forestGraph) {
 
 		this.mapWidth = constantsConfig.getLevelWidth();
 		this.mapHeight= constantsConfig.getLevelHeight();
@@ -47,14 +48,13 @@ public class MapBuilder {
 
 		for (int i = 0; i < mapWidth; i++) {
 			for (int j = 0; j < mapHeight; j++) {
-				if (!isSegment(i, j, treesSegments)) {
+				if (!isSegment(i, j, treesSegments) && !isGrandma(i, j, grandma)) {
 					nodes.add(new Vector2(i , j));
 					forestGraph.addNode(GameScreen.tileSize * i, GameScreen.tileSize * j);
 				}
 			}
 		}
 
-		// TODO: Тоже возможно больше не нужно
 		for (Vector2 node : nodes) {
 			if (isTileAvailable(node, treesSegments)) {
 				addNeighbours(node, forestGraph);
@@ -62,6 +62,12 @@ public class MapBuilder {
 		}
 
 		return levelMap;
+	}
+
+	private boolean isGrandma(int x, int y, Grandma grandma) {
+		if (grandma == null) return false;
+		return (int) (grandma.getX() / GameScreen.tileSize) == x &&
+			(int) (grandma.getY() / GameScreen.tileSize) == y;
 	}
 
 	private boolean isSegment(int x, int y, Set<Segment> treesSegments) {
@@ -73,7 +79,7 @@ public class MapBuilder {
 		return false;
 	}
 
-	static Actor getActorFromCell(int value, int x, int y, ConstantsConfig constantsConfig) {
+	private static Actor getActorFromCell(int value, int x, int y, ConstantsConfig constantsConfig) {
 		if (value == constantsConfig.getTreeTopLeft()) {
 			return getObstacle("tree", 0, x, y);
 		} else if (value == constantsConfig.getTreeTopRight()) {

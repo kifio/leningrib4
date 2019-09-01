@@ -2,7 +2,9 @@ package kifio.leningrib.levels;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import generator.Side;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import kifio.leningrib.model.actors.Forester;
@@ -27,6 +29,7 @@ public class Level {
     private ForestersManager forestersManager;
     private MapBuilder mapBuilder = new MapBuilder();
     private Grandma grandma = null;
+    private List<Label> tutorialLabels = null;
 
     private boolean isDisposed = false;
 
@@ -43,17 +46,18 @@ public class Level {
 
         if (gameScreen.isFirstLaunch) {
             gameScreen.isFirstLaunch = false;
-//            grandma = new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize * 10);
+            grandma = new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize * 19);
             levelMap = FirstLevel.getFirstLevel(gameScreen.constantsConfig);
             // Возвращает результат помещения урвоня в пустой хэшмап (null).
             gameScreen.worldMap.addLevel(x, y, levelMap);
             mapBuilder.initMap(levelMap,
-				gameScreen.constantsConfig, forestGraph);
+				gameScreen.constantsConfig, grandma, forestGraph);
             mushroomsManager.initMushrooms(FirstLevel.getMushrooms(random));
 //            forestersManager.initDebugForester(FirstLevel.getForester());
+            tutorialLabels = FirstLevel.getTutorialLabels();
         } else {
             levelMap = mapBuilder.initMap(gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig),
-                gameScreen.constantsConfig, forestGraph);
+                gameScreen.constantsConfig, null, forestGraph);
 
             Rectangle[] roomRectangles = mapBuilder.getRoomsRectangles(levelMap);
             mushroomsManager.initMushrooms(roomRectangles, mapBuilder.getTrees());
@@ -118,5 +122,9 @@ public class Level {
 
     public Grandma getGrandma() {
         return grandma;
+    }
+
+    public List<Label> getTutorialLabels() {
+        return tutorialLabels;
     }
 }

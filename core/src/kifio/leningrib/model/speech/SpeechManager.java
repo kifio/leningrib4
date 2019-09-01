@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.utils.Align;
 import kifio.leningrib.model.ResourcesManager;
 
 import static com.badlogic.gdx.math.MathUtils.random;
@@ -17,6 +20,7 @@ public class SpeechManager {
 
     private BitmapFont bitmapFont;
     private GlyphLayout glyphLayout;
+    Label.LabelStyle labelStyle = new Label.LabelStyle();
 
     private static SpeechManager speechManager;
 
@@ -30,10 +34,12 @@ public class SpeechManager {
     private SpeechManager() {
         bitmapFont = generateFont();
         glyphLayout = new GlyphLayout();
+        labelStyle.font = bitmapFont;
+        labelStyle.fontColor = Color.WHITE;
     }
 
     private BitmapFont generateFont() {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/dejavu.ttf"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
         BitmapFont font = generator.generateFont(getFontParameter());
         generator.dispose();
         return font;
@@ -61,15 +67,28 @@ public class SpeechManager {
         return bitmapFont;
     }
 
-    public String getRandomMushroomSpeech(float scale) {
-        bitmapFont.getData().setScale(scale);
+    public String getRandomMushroomSpeech() {
         String speechId = String.valueOf(random(1, 71));
         return ResourcesManager.getMushroomSpeechBundle().get(speechId);
     }
 
-    public String getRandomExitSpeech(float scale) {
-        bitmapFont.getData().setScale(scale);
+    public String getRandomExitSpeech() {
         String speechId = String.valueOf(random(1, 5));
         return ResourcesManager.getExitSpeechBundle().get(speechId);
+    }
+
+    private LabelStyle getLabelStyle() {
+        return labelStyle;
+    }
+
+    public Label getLabel(String text, float x, float y, float targetWidth) {
+        Label label = new Label(text, labelStyle);
+        label.setWrap(true);
+        label.setFontScale(2f, 2f);
+        label.setWidth(targetWidth);
+        label.setPosition(x, y);
+        label.setAlignment(Align.center, Align.center);
+
+        return label;
     }
 }

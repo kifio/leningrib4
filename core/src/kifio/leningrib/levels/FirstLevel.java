@@ -1,6 +1,11 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.utils.Align;
 import generator.ConstantsConfig;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,6 +14,8 @@ import java.util.Random;
 import java.util.Set;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.model.speech.Speech;
+import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 import model.Exit;
 import model.LevelMap;
@@ -26,13 +33,15 @@ public class FirstLevel {
 		int secondExit = 20;
 
 		// Добавляем нижнюю границу
-		for (int i = 0; i < constantsConfig.getLevelWidth(); i++) {
+		segmentList.add(new Segment(0, 0,
+			constantsConfig.getTreeTopRight()));
+		for (int i = 3; i < constantsConfig.getLevelWidth(); i++) {
 			segmentList.add(new Segment(i, 0,
 				i % 2 == 0 ? constantsConfig.getTreeTopRight() : constantsConfig.getTreeTopLeft()));
 		}
 
 		// Добавляем леву/ границу
-		for (int i = 3; i < constantsConfig.getLevelHeight() - 1; i++) {
+		for (int i = 1; i < constantsConfig.getLevelHeight() - 1; i++) {
 			segmentList.add(new Segment(0, i,
 				i % 2 != 0 ? constantsConfig.getTreeBottomRight() : constantsConfig.getTreeTopRight()));
 		}
@@ -102,12 +111,30 @@ public class FirstLevel {
 
 	static List<Mushroom> getMushrooms(Random random) {
 		List<Mushroom> mushrooms = new ArrayList<>();
-		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 13, random));
+		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 7, random));
+		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 14, random));
+//		mushrooms.add(new Mushroom(GameScreen.tileSize * 1, GameScreen.tileSize * 2, random));
+//		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 1, random));
 		return mushrooms;
 	}
 
 	static Forester getForester() {
 		return new Forester(new Vector2(GameScreen.tileSize, GameScreen.tileSize * 10),
 			new Vector2(GameScreen.tileSize * 5, GameScreen.tileSize * 10), 1);
+	}
+
+	private static float labelWidth =  Gdx.graphics.getWidth() - 2 * GameScreen.tileSize;
+
+	static List<Label> getTutorialLabels() {
+
+		List<Label> list = new ArrayList<>();
+		list.add(SpeechManager.getInstance().getLabel("Нажимай на экран, чтобы перемещать персонажа",
+			(Gdx.graphics.getWidth() - labelWidth) / 2,GameScreen.tileSize * 4, GameScreen.tileSize * 4));
+
+		list.add(SpeechManager.getInstance().getLabel("Ты всегда можешь покинуть уровень через выход справа или сверху",
+			(Gdx.graphics.getWidth() - labelWidth) / 2 + GameScreen.tileSize,
+			GameScreen.tileSize * 11 + GameScreen.tileSize / 2, GameScreen.tileSize * 4));
+
+		return list;
 	}
 }

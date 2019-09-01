@@ -93,7 +93,8 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
                     if (m.getEffect() != null)
                         player.onEffectiveMushroomTake(m);
                     player.increaseMushroomCount();
-                } else if (!player.getMushroomsCount().equals(ZERO)) {
+//                } else if (!player.getMushroomsCount().equals(ZERO)) {
+                } else if (true) {
                     if (mushroomsSpeeches.size() > 0)
                         return;
                     addMushroomSpeech(m);
@@ -110,7 +111,7 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
 
         // С некоторой вероятностью добавляем новую речь
         if (random.nextInt(128) / 8 == 0) {
-            String speech = SpeechManager.getInstance().getRandomMushroomSpeech(Gdx.graphics.getDensity());
+            String speech = SpeechManager.getInstance().getRandomMushroomSpeech();
             mushroomsSpeeches.add(new Speech(m, speech));
         }
     }

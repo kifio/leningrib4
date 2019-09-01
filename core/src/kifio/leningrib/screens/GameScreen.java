@@ -5,6 +5,9 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import generator.ConstantsConfig;
 
 import kifio.leningrib.LGCGame;
@@ -30,6 +33,8 @@ public class GameScreen extends InputAdapter implements Screen {
     private boolean win;
     private int nextLevelX = 0;
     private int nextLevelY = 0;
+    private Stage stage;
+    private SpriteBatch batch;
 
     private float gameOverTime;
     public boolean isFirstLaunch = true;
@@ -53,8 +58,10 @@ public class GameScreen extends InputAdapter implements Screen {
         initScreenSize();
         initCamera();
         this.game = game;
+        this.batch = new SpriteBatch();
+        this.stage = new Stage(new ScreenViewport(camera), batch);
         this.worldController = new WorldController(this);
-        this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight);
+        this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch);
         this.worldMap = new WorldMap();
         setLevel(getNextLevel(nextLevelX, nextLevelY));
     }
@@ -84,7 +91,7 @@ public class GameScreen extends InputAdapter implements Screen {
 
     public void setLevel(Level level) {
         if (player == null) {
-            player = new Player(0f, GameScreen.tileSize);
+            player = new Player(2 * GameScreen.tileSize, 0f);
         } else if (player.getY() >= (level.getLevelHeight() - 1) * GameScreen.tileSize) {
             player.setY(0);
         } else if (player.getX() >= (level.getLevelWidth() - 1) * GameScreen.tileSize) {
@@ -103,14 +110,14 @@ public class GameScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         if (isGameOver() && gameOverTime < 1f) {
             gameOverTime += delta;
-            worldController.update(delta, camera.position.y);
+            worldController.update(delta, camera.position.y, stage);
             worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
             setLevel(getNextLevel(nextLevelX, nextLevelY));
             gameOverTime = 0f;
             win = false;
         } else if (!gameOver) {
-            worldController.update(delta, camera.position.y);
+            worldController.update(delta, camera.position.y, stage);
             worldRenderer.render();
         }
     }
