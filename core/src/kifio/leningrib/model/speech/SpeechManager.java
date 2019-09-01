@@ -77,14 +77,10 @@ public class SpeechManager {
         return ResourcesManager.getExitSpeechBundle().get(speechId);
     }
 
-    private LabelStyle getLabelStyle() {
-        return labelStyle;
-    }
-
     public Label getLabel(String text, float x, float y, float targetWidth) {
         Label label = new Label(text, labelStyle);
         label.setWrap(true);
-        label.setFontScale(2f, 2f);
+        label.setFontScale(1.2f, 1.2f);
         label.setWidth(targetWidth);
         label.setPosition(x, y);
         label.setAlignment(Align.center, Align.center);

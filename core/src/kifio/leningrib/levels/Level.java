@@ -92,8 +92,8 @@ public class Level {
         return mushroomsManager.getMushrooms();
     }
 
-    public List<Speech> getMushroomsSpeeches() {
-        return mushroomsManager.mushroomsSpeeches;
+    public Label[] getMushroomsSpeeches() {
+        return mushroomsManager.getSpeeches();
     }
 
     public List<Speech> getExitsSpeeches() {

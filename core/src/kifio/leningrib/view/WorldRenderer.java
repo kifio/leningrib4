@@ -99,7 +99,7 @@ public class WorldRenderer {
 
 		updateCamera();
 		drawGrass();
-//		drawDebug();
+		drawDebug();
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
@@ -132,8 +132,8 @@ public class WorldRenderer {
 //        drawPlayerPath();
 
 		// Прямоугольник, на котором находится игрок
-		drawCharacterDebug();
-		drawGrandmaDebug();
+//		drawCharacterDebug();
+//		drawGrandmaDebug();
 
 //        drawMushroomsBounds();
 
@@ -145,13 +145,9 @@ public class WorldRenderer {
 //        renderer.setColor(playerDebugColor);
 //
 //
-//        for (Speech speech : level.getMushroomsSpeeches())  {
-//            float w = SpeechManager.getInstance().getTextWidth(speech.getSpeech());
-//            float h = SpeechManager.getInstance().getTextHeight(speech.getSpeech());
-//            renderer.rect(speech.getX(), speech.getY(), w, h);
-//        }
+
 //
-//        Gdx.gl.glDisable(GL20.GL_BLEND);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 		renderer.end();
 
 	}

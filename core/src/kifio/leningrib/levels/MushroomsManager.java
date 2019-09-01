@@ -1,29 +1,32 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
-import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
 class MushroomsManager extends ObjectsManager<Mushroom> {
 
-    private static final String ZERO = "0";
+    private static final String ZERO = "3";
+    private int index = 0;
 
     MushroomsManager(Random random) {
         this.random = random;
         gameObjects = new ArrayList<>();
     }
 
-    ArrayList<Speech> mushroomsSpeeches = new ArrayList<>(8);
+    private Label[] mushroomsSpeeches;
 
     void initMushrooms(Rectangle[] rooms, List<Actor> trees) {
         int[] counters = getMushroomsCounts(rooms);
@@ -40,6 +43,8 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
                 }
             }
         }
+
+        mushroomsSpeeches = new Label[gameObjects.size()];
     }
 
     void initMushrooms(List<Mushroom> mushrooms) {
@@ -66,21 +71,10 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
 
     void updateMushrooms(Player player, float cameraPositionY) {
 
-        long currentTime = System.currentTimeMillis();
         int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
-        // Удаляем просроченные реплики
-        Iterator<Speech> speechIterator = mushroomsSpeeches.iterator();
-        while (speechIterator.hasNext()) {
-            Speech sp = speechIterator.next();
-            if (currentTime - sp.getStartTime() > Speech.LIFETIME) {
-                sp.dispose();
-                speechIterator.remove();
-            }
-        }
-
         // Удаляем съеденные грибы, несъеденным добавляем реплики
-        // TODO: заменить на for (0..length)
+        index = 0;
         Iterator<Mushroom> iterator = gameObjects.iterator();
         while (iterator.hasNext()) {
             Mushroom m = iterator.next();
@@ -90,29 +84,32 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
                     m.setEaten();
                     m.remove();
                     iterator.remove();
+                    if (mushroomsSpeeches[index] != null) {
+                        mushroomsSpeeches[index].remove();
+                        mushroomsSpeeches[index] = null;
+                    }
                     if (m.getEffect() != null)
                         player.onEffectiveMushroomTake(m);
                     player.increaseMushroomCount();
-//                } else if (!player.getMushroomsCount().equals(ZERO)) {
-                } else if (true) {
-                    if (mushroomsSpeeches.size() > 0)
-                        return;
+                } else if (!player.getMushroomsCount().equals(ZERO)) {
                     addMushroomSpeech(m);
                 }
             }
+            index++;
         }
     }
 
-    private void addMushroomSpeech(Speech.SpeechProducer m) {
-
-        for (Speech speech : mushroomsSpeeches) {
-            if (speech.getSpeechProducer().equals(m)) return;
-        }
+    private void addMushroomSpeech(Mushroom m) {
 
         // С некоторой вероятностью добавляем новую речь
-        if (random.nextInt(128) / 8 == 0) {
+        if (random.nextInt(128) / 8 == 0 && mushroomsSpeeches[index] == null) {
             String speech = SpeechManager.getInstance().getRandomMushroomSpeech();
-            mushroomsSpeeches.add(new Speech(m, speech));
+            Vector2 pos = new Vector2(
+                m.getX() - GameScreen.tileSize / 2f,
+                m.getY() + GameScreen.tileSize / 2f
+            );
+            mushroomsSpeeches[index] = SpeechManager.getInstance().getLabel(speech, pos.x, pos.y, GameScreen.tileSize * 2);
+            mushroomsSpeeches[index].addAction(getSpeechAction(1f));
         }
     }
 
@@ -120,16 +117,33 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
         return gameObjects;
     }
 
+    public Label[] getSpeeches() {
+        return mushroomsSpeeches;
+    }
+
+    private SequenceAction getSpeechAction(float duration) {
+        final int i = index;
+        SequenceAction seq = new SequenceAction();
+        seq.addAction(Actions.delay(duration));
+        seq.addAction(Actions.run(new Runnable() {
+            @Override public void run() {
+                mushroomsSpeeches[i] = null;
+            }
+        }));
+        seq.addAction(Actions.removeActor());
+        return seq;
+    }
+
     @Override
     public void dispose() {
 
-        Iterator<Speech> speechIterator = mushroomsSpeeches.iterator();
-        while (speechIterator.hasNext()) {
-            speechIterator.next().dispose();
-            speechIterator.remove();
+        for (int i = 0; i < mushroomsSpeeches.length; i++) {
+            if (mushroomsSpeeches[i] != null) {
+                mushroomsSpeeches[i].remove();
+                mushroomsSpeeches[i] = null;
+            }
         }
 
-        mushroomsSpeeches = null;
         super.dispose();
     }
 }

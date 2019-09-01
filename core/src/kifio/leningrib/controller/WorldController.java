@@ -39,6 +39,13 @@ public class WorldController {
 			}
 		}
 
+		Label[] mushroomSpeeches = level.getMushroomsSpeeches();
+		for (int i = 0; i < mushroomSpeeches.length; i++) {
+			if (mushroomSpeeches[i] != null && mushroomSpeeches[i].getStage() == null) {
+				stage.addActor(mushroomSpeeches[i]);
+			}
+		}
+
 		updateWorld(delta, cameraPositionY);
 	}
 

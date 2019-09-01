@@ -1,17 +1,13 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-
 import java.util.Random;
-import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.speech.Speech;
-import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
-public class Mushroom extends MovableActor implements Speech.SpeechProducer {
+public class Mushroom extends MovableActor {
 
     private static long DEFAULT_EFFECT_TIME = 5000; // milliseconds
     private static final String POWER_MUSHROOM = "power_mushroom.txt";
@@ -87,14 +83,6 @@ public class Mushroom extends MovableActor implements Speech.SpeechProducer {
     @Override
     public float getFrameDuration() {
         return 1 / 2f;
-    }
-
-    @Override
-    public Vector2 getSpeechPosition(String speech) {
-        return new Vector2(
-                getX() - GameScreen.tileSize / 2f,
-                getY() + GameScreen.tileSize / 2f
-        );
     }
 
     public void setEaten() {

@@ -59,8 +59,8 @@ public abstract class MovableActor extends Actor {
 		double dx = (double) (targetX - fromX);
 		double dy = (double) (targetY - fromY);
 		float length = (float) Math.sqrt(dx * dx + dy * dy);
-//		float calculatedDuration = length / velocity;
-		return Actions.moveTo(targetX, targetY, 0.133f);
+		float calculatedDuration = length / velocity;
+		return Actions.moveTo(targetX, targetY, calculatedDuration);
 	}
 
 	protected Action getDelayAction(float duration) {

@@ -37,7 +37,7 @@ public class GameScreen extends InputAdapter implements Screen {
     private SpriteBatch batch;
 
     private float gameOverTime;
-    public boolean isFirstLaunch = true;
+    public boolean isFirstLaunch = false;
 
     public WorldMap worldMap;
     public Player player;
@@ -91,7 +91,11 @@ public class GameScreen extends InputAdapter implements Screen {
 
     public void setLevel(Level level) {
         if (player == null) {
-            player = new Player(2 * GameScreen.tileSize, 0f);
+            if (isFirstLaunch) {
+                player = new Player(2 * GameScreen.tileSize, 0f);
+            } else  {
+                player = new Player(0f, 2 * GameScreen.tileSize);
+            }
         } else if (player.getY() >= (level.getLevelHeight() - 1) * GameScreen.tileSize) {
             player.setY(0);
         } else if (player.getX() >= (level.getLevelWidth() - 1) * GameScreen.tileSize) {
