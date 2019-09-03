@@ -97,6 +97,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	}
 
 	private void updateForestersPath(Forester forester, float delta) {
+		forester.updateArea();
 		forester.updateMoving(gameScreen.player, delta);
 		if (forester.isPursuePlayer()) {
 			setForesterPath(forester, gameScreen.player.bounds.x, gameScreen.player.bounds.y);

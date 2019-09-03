@@ -17,7 +17,7 @@ public class Player extends MovableActor {
     private static final String IDLE = "player_idle.txt";
     private static final String RUNING = "player_run.txt";
 
-    private String mushroomsCount = "0";
+    private int mushroomsCount = 0;
     private long effectiveMushroomTakeTime = 0L;
     private Effect effect;
 
@@ -30,9 +30,7 @@ public class Player extends MovableActor {
     }
 
     public void increaseMushroomCount() {
-        int mushroomsCount = Integer.parseInt(this.mushroomsCount);
-        mushroomsCount++;
-        this.mushroomsCount = Integer.toString(mushroomsCount);
+        this.mushroomsCount++;
     }
 
     public void onEffectiveMushroomTake(Mushroom mushroom) {
@@ -49,7 +47,7 @@ public class Player extends MovableActor {
         return true;
     }
 
-    public String getMushroomsCount() {
+    public int getMushroomsCount() {
         return mushroomsCount;
     }
 

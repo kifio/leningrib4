@@ -11,10 +11,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import java.util.List;
+import java.util.Locale;
+import kifio.leningrib.Utils;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
@@ -39,11 +39,10 @@ public class WorldRenderer {
 	private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
 	private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
 
-	private static final String GAME_OVER_TEXT = "ЕБАНИ МЕНЯ ПАЛЬЦЕМ ЧТОБЫ НАЧАТЬ СНАЧАЛА";
-	private static final String TEST_OVER_TEXT = "ЭТО САМАЯ ЧТО НИ НА ЕСТЬ ПОБЕДА!\nТЕПЕРЬ\n" + GAME_OVER_TEXT;
+	private static final String GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s ГРИБОВ";
 
-	public WorldRenderer(OrthographicCamera camera, int cameraWidth, int cameraHeight,
-		Stage stage, SpriteBatch batch) {
+	public WorldRenderer(OrthographicCamera camera, int cameraWidth, int cameraHeight, Stage stage,
+		SpriteBatch batch) {
 		this.camera = camera;
 		this.cameraWidth = cameraWidth;
 		this.cameraHeight = cameraHeight;
@@ -90,7 +89,17 @@ public class WorldRenderer {
 			camera.position.y - Gdx.graphics.getHeight() / 2f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		renderer.end();
 
-		if (!levelPassed) { drawGameOverText(GAME_OVER_TEXT); }
+		if (!levelPassed) { drawGameOverText(); }
+	}
+
+	private void drawGameOverText() {
+		batch.begin();
+		String text = String.format(Locale.getDefault(), GAME_OVER_TEXT, level.getPlayer().getMushroomsCount());
+		SpeechManager speechManager = SpeechManager.getInstance();
+		float x = (Gdx.graphics.getWidth() / 2f) - (speechManager.getTextWidth(text) / 2);
+		float y = camera.position.y - (speechManager.getTextHeight(text) / 2);
+		speechManager.getBitmapFont().draw(batch, text, x, y);
+		batch.end();
 	}
 
 	public void render() {
@@ -103,7 +112,6 @@ public class WorldRenderer {
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
-		drawTexts();
 	}
 
 	private void updateCamera() {
@@ -130,24 +138,12 @@ public class WorldRenderer {
 		renderer.begin(ShapeRenderer.ShapeType.Filled);
 
 //        drawPlayerPath();
-
-		// Прямоугольник, на котором находится игрок
-//		drawCharacterDebug();
-//		drawGrandmaDebug();
-
+//		  drawCharacterDebug();
+//		  drawGrandmaDebug();
 //        drawMushroomsBounds();
+		  drawForesterDebug();
 
-		// Прямоугольник, на котором находится лесник
-		drawForesterDebug();
-
-//        drawExitRect();
-
-//        renderer.setColor(playerDebugColor);
-//
-//
-
-//
-        Gdx.gl.glDisable(GL20.GL_BLEND);
+		Gdx.gl.glDisable(GL20.GL_BLEND);
 		renderer.end();
 
 	}
@@ -173,7 +169,7 @@ public class WorldRenderer {
 	}
 
 	private void drawGrandmaDebug() {
-		if (level.getGrandma() == null) return;
+		if (level.getGrandma() == null) { return; }
 		renderer.setColor(playerDebugColor);
 		Rectangle bounds = level.getGrandma().bounds;
 		renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -181,7 +177,8 @@ public class WorldRenderer {
 
 	private void drawForesterDebug() {
 		renderer.setColor(foresterDebugColor);
-		for (Forester forester : level.getForesters()) { drawForesterPath(forester); }
+//		for (Forester forester : level.getForesters()) { drawForesterPath(forester); }
+		for (Forester forester : level.getForesters()) { drawForesterArea(forester); }
 	}
 
 	private void drawExitRect() {
@@ -195,6 +192,15 @@ public class WorldRenderer {
 	private void drawForesterPath(Forester forester) {
 		for (Vector2 vec : forester.path) {
 			renderer.rect(vec.x, vec.y, GameScreen.tileSize, GameScreen.tileSize);
+		}
+	}
+
+	private void drawForesterArea(Forester forester) {
+		List<Actor> trees = level.getTrees();
+		for (Vector2 vec : forester.getArea()) {
+			if (!Utils.isOverlapsWithActor(trees, (int) vec.x, (int)vec.y)) {
+				renderer.rect(vec.x, vec.y, GameScreen.tileSize, GameScreen.tileSize);
+			}
 		}
 	}
 
@@ -216,23 +222,10 @@ public class WorldRenderer {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
-//        for (Speech speech : level.getMushroomsSpeeches())  {
-//            SpeechManager.getInstance().getBitmapFont().draw(batch,
-//                    speech.getSpeech(),
-//                    speech.getX(),
-//                    speech.getY(),
-//                (Gdx.graphics.getWidth() - speech.getX()),
-//                Align.center, false);
-//            speech.increaseY(0.5f);
-//        }
-
 		for (Speech speech : level.getExitsSpeeches()) {
 			SpeechManager.getInstance().getBitmapFont().draw(batch, speech.getSpeech(), speech.getX(), speech.getY());
 			speech.decreaseX(0.5f);
 		}
-
-		SpeechManager.getInstance().getBitmapFont().draw(batch, level.getPlayer().getMushroomsCount(),
-			Gdx.graphics.getWidth() - 64, camera.position.y + (Gdx.graphics.getHeight() / 2) - 64);
 
 		batch.end();
 	}
@@ -242,15 +235,6 @@ public class WorldRenderer {
 		int dc = 0;
 		if (dy > 0) { dc = (int) (dy / GameScreen.tileSize); }
 		return dc;
-	}
-
-	private void drawGameOverText(String text) {
-		batch.begin();
-		SpeechManager speechManager = SpeechManager.getInstance();
-		float x = (Gdx.graphics.getWidth() / 2f) - (speechManager.getTextWidth(text) / 2);
-		float y = camera.position.y - (speechManager.getTextHeight(text) / 2);
-		speechManager.getBitmapFont().draw(batch, text, x, y);
-		batch.end();
 	}
 
 	public void dispose() {

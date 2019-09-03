@@ -13,13 +13,16 @@ import generator.ConstantsConfig;
 import kifio.leningrib.LGCGame;
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.Level;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import kifio.leningrib.model.actors.Player;
+import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.view.WorldRenderer;
 import model.WorldMap;
 
 public class GameScreen extends InputAdapter implements Screen {
 
     private static final float GAME_OVER_ANIMATION_TIME = 1f;
+    public static final int SPEECH_SEED = 5120;
 
     private LGCGame game;
     private WorldRenderer worldRenderer;
@@ -35,6 +38,7 @@ public class GameScreen extends InputAdapter implements Screen {
     private int nextLevelY = 0;
     private Stage stage;
     private SpriteBatch batch;
+    public Label gameOverLabel;
 
     private float gameOverTime;
     public boolean isFirstLaunch = false;
@@ -57,9 +61,14 @@ public class GameScreen extends InputAdapter implements Screen {
         Gdx.input.setInputProcessor(this);
         initScreenSize();
         initCamera();
+
+        float x = Gdx.graphics.getWidth() / 2f;
+        float y = Gdx.graphics.getHeight() / 2f;
+
         this.game = game;
         this.batch = new SpriteBatch();
         this.stage = new Stage(new ScreenViewport(camera), batch);
+        this.gameOverLabel = SpeechManager.getInstance().getLabel("", x, y, Gdx.graphics.getWidth());
         this.worldController = new WorldController(this);
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch);
         this.worldMap = new WorldMap();

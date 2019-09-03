@@ -34,6 +34,7 @@ public class SpeechManager {
     private SpeechManager() {
         bitmapFont = generateFont();
         glyphLayout = new GlyphLayout();
+        bitmapFont.getData().setScale(Gdx.graphics.getDensity());
         labelStyle.font = bitmapFont;
         labelStyle.fontColor = Color.WHITE;
     }
@@ -80,11 +81,10 @@ public class SpeechManager {
     public Label getLabel(String text, float x, float y, float targetWidth) {
         Label label = new Label(text, labelStyle);
         label.setWrap(true);
-        label.setFontScale(1.2f, 1.2f);
+        label.setFontScale(Gdx.graphics.getDensity(), Gdx.graphics.getDensity());
         label.setWidth(targetWidth);
         label.setPosition(x, y);
         label.setAlignment(Align.center, Align.center);
-
         return label;
     }
 }

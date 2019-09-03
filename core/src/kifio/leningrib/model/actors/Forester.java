@@ -9,20 +9,51 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import com.badlogic.gdx.utils.Array;
+import java.util.Arrays;
 import java.util.Locale;
+import kifio.leningrib.Utils;
 import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
 
+    private static final int AREA_SIDE = 5;
+
     private final String running;
     private final String idle;
+    private final Vector2[] area = new Vector2[AREA_SIDE * AREA_SIDE];
+
+    public void updateArea() {
+        int x = (int) Utils.mapCoordinate(getX());
+        int y = (int) Utils.mapCoordinate(getY());
+
+        x /= GameScreen.tileSize;
+        y /= GameScreen.tileSize;
+
+        x -= 2;
+        y -= 3;
+
+        for (int i = 0; i < area.length; i++) {
+            area[i].x = x * GameScreen.tileSize;
+            area[i].y = y * GameScreen.tileSize;
+
+            x++;
+            if ((i + 1) >= (AREA_SIDE - 1) && (i + 1) % AREA_SIDE == 0) {
+                y++;
+                x -= AREA_SIDE;
+            }
+        }
+    }
+
+    public Vector2[] getArea() {
+        return area;
+    }
 
     private enum MovingState {
         FORWARD, BACK, PURSUE, STOP
     }
 
     // Количество клеток на расстоянии которых лесник замечает игрока
-    private static final float DISTANCE_COEFFICIENT = 2f;
+    private static final float DISTANCE_COEFFICIENT = 4f;
 
     private Vector2 from, to;
     private Array<Vector2> patrolRectangle = null;
@@ -38,6 +69,7 @@ public class Forester extends MovableActor {
         setPatrolRoute(from, to);
         running = String.format(Locale.getDefault(), "enemy_%d_run.txt", index);
         idle = String.format(Locale.getDefault(),"enemy_%d_idle.txt", index);
+        for (int i = 0; i < area.length; i++) area[i] = new Vector2();
     }
 
 //    public Forester(Array<Vector2> routePoints) {
@@ -135,14 +167,13 @@ public class Forester extends MovableActor {
 
     public void updateMoving(Player player, float delta) {
 
-        float px = player.getX() + (GameScreen.tileSize / 2f);
-        float py = player.getY() - (GameScreen.tileSize / 2f);
+        float px = player.getX();
+        float py = player.getY();
 
         float fx = getX() + (GameScreen.tileSize / 2f);
         float fy = getY() - (GameScreen.tileSize / 2f);
 
-        if (Math.abs(fx - px) <= (DISTANCE_COEFFICIENT * GameScreen.tileSize)
-                && Math.abs(fy - py) <= (DISTANCE_COEFFICIENT * GameScreen.tileSize)) {
+        if (Utils.isOverlapsWithVector(area, (int) px, (int) py)) {
             setPlayerNoticed();
         } else if (movingState == MovingState.PURSUE) {
             stopPursuing();
@@ -171,17 +202,15 @@ public class Forester extends MovableActor {
         setPatrolRoute(from, to);
     }
 
-    private Color foresterFoundLeninColor = new Color(.5f, 1f, .5f, 1f);
-    private Color commonColor = new Color(1f, 1f, 1f, 1f);
+//    private Color commonColor = new Color(1f, 1f, 1f, 1f);
 
-    @Override
-    public void draw(Batch batch, float alpha) {
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        if (movingState == MovingState.PURSUE) batch.setColor(foresterFoundLeninColor);
-        super.draw(batch, alpha);
-        batch.setColor(commonColor);
-    }
+//    @Override
+//    public void draw(Batch batch, float alpha) {
+//        Gdx.gl.glEnable(GL20.GL_BLEND);
+//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+//        super.draw(batch, alpha);
+//        batch.setColor(commonColor);
+//    }
 
     public boolean isPursuePlayer() {
         return movingState == MovingState.PURSUE;

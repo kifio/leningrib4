@@ -1,16 +1,17 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import generator.ConstantsConfig;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.SpeechManager;
@@ -19,7 +20,7 @@ import kifio.leningrib.screens.GameScreen;
 class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private static final String ZERO = "3";
-    private int index = 0;
+    private Set<Mushroom> removedMushrooms = new HashSet<>();
 
     MushroomsManager(Random random) {
         this.random = random;
@@ -28,17 +29,16 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private Label[] mushroomsSpeeches;
 
-    void initMushrooms(Rectangle[] rooms, List<Actor> trees) {
-        int[] counters = getMushroomsCounts(rooms);
-        for (int i = 0; i < rooms.length; i++) {
-            Rectangle room = rooms[i];
-            int mushroomsCount = counters[i];
+    void initMushrooms(ConstantsConfig config, List<Actor> trees) {
+        int levelHeight = config.getLevelHeight();
+        int levelWidth = config.getLevelWidth();
 
-            for (int j = 0; j < mushroomsCount; j++) {
-                int x = GameScreen.tileSize * (random.nextInt((int) room.width - 1));
-                int y = GameScreen.tileSize * ((int) room.y + random.nextInt((int) (room.height - 1)));
-
-                if (!isOverlapsWithActor(trees, x, y)) {
+        for (int i = 1; i < levelHeight; i++) {
+            boolean b = true;
+            if (b) {
+                int x = GameScreen.tileSize * (1 + random.nextInt(levelWidth - 2));
+                int y = GameScreen.tileSize * i;
+                if (!Utils.isOverlapsWithActor(trees, x, y)) {
                     gameObjects.add(new Mushroom(x, y, random));
                 }
             }
@@ -51,65 +51,61 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
         this.gameObjects.addAll(mushrooms);
     }
 
-    private boolean isOverlapsWithActor(List<Actor> actors, int x, int y) {
-        for (int k = 0; k < actors.size(); k++) {
-            Actor a = actors.get(k);
-            if ((int) a.getX() == x && (int) a.getY() == y) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int[] getMushroomsCounts(Rectangle[] rooms) {
-        int[] counters = new int[rooms.length];
-        for (int i = 0; i < rooms.length; i++) {
-            counters[i] = random.nextInt((int) rooms[i].height);
-        }
-        return counters;
-    }
-
-    void updateMushrooms(Player player, float cameraPositionY) {
+    void updateMushrooms(Player p, float cameraPositionY) {
 
         int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
         // Удаляем съеденные грибы, несъеденным добавляем реплики
-        index = 0;
-        Iterator<Mushroom> iterator = gameObjects.iterator();
-        while (iterator.hasNext()) {
-            Mushroom m = iterator.next();
+        for (int index = 0; index < gameObjects.size(); index++) {
+            Mushroom m = gameObjects.get(index);
+
             if (m.getY() >= cameraPositionY - halfScreenHeight
                 && m.getY() <= cameraPositionY + halfScreenHeight) {
-                if (m.bounds.overlaps(player.bounds)) {
+
+                if (m.bounds.overlaps(p.bounds)) {
                     m.setEaten();
+                    m.clear();
                     m.remove();
-                    iterator.remove();
+
+                    removedMushrooms.add(m);
+
                     if (mushroomsSpeeches[index] != null) {
                         mushroomsSpeeches[index].remove();
                         mushroomsSpeeches[index] = null;
                     }
-                    if (m.getEffect() != null)
-                        player.onEffectiveMushroomTake(m);
-                    player.increaseMushroomCount();
-                } else if (!player.getMushroomsCount().equals(ZERO)) {
-                    addMushroomSpeech(m);
+
+                    if (m.getEffect() != null) {
+                        p.onEffectiveMushroomTake(m);
+                    }
+
+                    p.increaseMushroomCount();
+                } else {
+                    addMushroomSpeech(p, m, index);
                 }
             }
-            index++;
+        }
+
+        gameObjects.removeAll(removedMushrooms);
+        removedMushrooms.clear();
+    }
+
+    private void addMushroomSpeech(Player player, Mushroom m, int index) {
+        // С некоторой вероятностью добавляем новую речь
+        if (shouldAddSpeech(player) && mushroomsSpeeches[index] == null) {
+            String speech = SpeechManager.getInstance().getRandomMushroomSpeech();
+            float x = m.getX() - GameScreen.tileSize / 2f;
+            float y = m.getY() + GameScreen.tileSize * 1.5f;
+            mushroomsSpeeches[index] = SpeechManager.getInstance().getLabel(speech, x, y, GameScreen.tileSize * 2);
+            mushroomsSpeeches[index].addAction(getSpeechAction(random.nextFloat() + 1f, index));
         }
     }
 
-    private void addMushroomSpeech(Mushroom m) {
-
-        // С некоторой вероятностью добавляем новую речь
-        if (random.nextInt(128) / 8 == 0 && mushroomsSpeeches[index] == null) {
-            String speech = SpeechManager.getInstance().getRandomMushroomSpeech();
-            Vector2 pos = new Vector2(
-                m.getX() - GameScreen.tileSize / 2f,
-                m.getY() + GameScreen.tileSize / 2f
-            );
-            mushroomsSpeeches[index] = SpeechManager.getInstance().getLabel(speech, pos.x, pos.y, GameScreen.tileSize * 2);
-            mushroomsSpeeches[index].addAction(getSpeechAction(1f));
+    private boolean shouldAddSpeech(Player player) {
+        int var1 = player.getMushroomsCount() / 5;
+        if (var1 == 0) {
+            return false;
+        } else {
+            return random.nextInt(Math.max(256, GameScreen.SPEECH_SEED / var1)) / 8 == 0;
         }
     }
 
@@ -121,8 +117,7 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
         return mushroomsSpeeches;
     }
 
-    private SequenceAction getSpeechAction(float duration) {
-        final int i = index;
+    private SequenceAction getSpeechAction(float duration, final int i) {
         SequenceAction seq = new SequenceAction();
         seq.addAction(Actions.delay(duration));
         seq.addAction(Actions.run(new Runnable() {

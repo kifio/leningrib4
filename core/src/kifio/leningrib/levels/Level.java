@@ -60,7 +60,7 @@ public class Level {
                 gameScreen.constantsConfig, null, forestGraph);
 
             Rectangle[] roomRectangles = mapBuilder.getRoomsRectangles(levelMap);
-            mushroomsManager.initMushrooms(roomRectangles, mapBuilder.getTrees());
+            mushroomsManager.initMushrooms(gameScreen.constantsConfig, mapBuilder.getTrees());
             exitsManager.init(levelMap.getExits(Side.RIGHT));
             forestersManager.initForester(x, y, roomRectangles, random);
         }
