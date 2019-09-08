@@ -3,16 +3,16 @@ package kifio.leningrib.levels;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Array;
 import generator.Side;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
-import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
 
@@ -24,8 +24,7 @@ public class Level {
     private GameScreen gameScreen;
     private Random random = new Random();
 
-    private MushroomsManager mushroomsManager = new MushroomsManager(random);
-    private ExitsManager exitsManager = new ExitsManager(random);
+    private MushroomsManager mushroomsManager = new MushroomsManager();
     private ForestersManager forestersManager;
     private MapBuilder mapBuilder = new MapBuilder();
     private Grandma grandma = null;
@@ -35,7 +34,7 @@ public class Level {
 
     public Level(int x, int y, GameScreen gameScreen) {
         this.gameScreen = gameScreen;
-        forestersManager = new ForestersManager(random, gameScreen, forestGraph);
+        forestersManager = new ForestersManager(gameScreen, forestGraph);
 
         // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
         if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
@@ -61,15 +60,13 @@ public class Level {
 
             Rectangle[] roomRectangles = mapBuilder.getRoomsRectangles(levelMap);
             mushroomsManager.initMushrooms(gameScreen.constantsConfig, mapBuilder.getTrees());
-            exitsManager.init(levelMap.getExits(Side.RIGHT));
-            forestersManager.initForester(x, y, roomRectangles, exitsManager.getExits(), random);
+            forestersManager.initForester(x, y, roomRectangles);
         }
     }
 
     public void dispose() {
         if (isDisposed) return;
         mushroomsManager.dispose();
-        exitsManager.dispose();
         forestersManager.dispose();
         mapBuilder.dispose();
         mapBuilder = null;
@@ -85,26 +82,17 @@ public class Level {
     public void update(float delta, float cameraY) {
         forestersManager.updateForesters(delta);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY);
-        exitsManager.updateExits();
     }
 
-    public List<Mushroom> getMushrooms() {
+    public Array<Mushroom> getMushrooms() {
         return mushroomsManager.getMushrooms();
-    }
-
-    public Label[] getMushroomsSpeeches() {
-        return mushroomsManager.getSpeeches();
-    }
-
-    public List<Speech> getExitsSpeeches() {
-        return exitsManager.exitsSpeeches;
     }
 
     public void movePlayerTo(float x, float y) {
         getPlayer().resetPlayerPath(x, y, forestGraph, gameScreen);
     }
 
-    public List<Forester> getForesters() {
+    public Array<Forester> getForesters() {
         return forestersManager.getForesters();
     }
 
@@ -126,5 +114,13 @@ public class Level {
 
     public List<Label> getTutorialLabels() {
         return tutorialLabels;
+    }
+
+    public Label[] getForestersSpeeches() {
+        return forestersManager.speeches;
+    }
+
+    public Label[] getMushroomsSpeeches() {
+        return mushroomsManager.getSpeeches();
     }
 }

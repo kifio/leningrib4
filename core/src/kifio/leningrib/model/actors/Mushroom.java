@@ -2,9 +2,8 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import java.util.Random;
-import kifio.leningrib.model.speech.Speech;
+import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.screens.GameScreen;
 
 public class Mushroom extends MovableActor {
@@ -35,10 +34,10 @@ public class Mushroom extends MovableActor {
     private Effect effect;
     private boolean isEaten = false;
 
-    public Mushroom(int x, int y, Random random) {
+    public Mushroom(int x, int y) {
         super(x, y);
         Effect[] effects = Effect.values();
-        effect = random.nextInt() / 4 == 0 ? effects[random.nextInt()] : null;
+        effect = ThreadLocalRandom.current().nextInt() / 4 == 0 ? effects[ThreadLocalRandom.current().nextInt()] : null;
     }
 
     @Override public void draw(Batch batch, float alpha) {

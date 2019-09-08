@@ -9,9 +9,13 @@ import java.util.HashMap;
 
 public class ResourcesManager {
 
-    private static HashMap<String, TextureRegion> regions = new HashMap<>();
-    private static I18NBundle mushroomsSpeechBundle;
-    private static I18NBundle exitsSpeechBumdle;
+    public static HashMap<String, TextureRegion> regions = new HashMap<>();
+    public static I18NBundle mushroomsSpeechBundle;
+    public static I18NBundle forestersSpeechesNoticingBundle;
+    public static I18NBundle forestersSpeechesPatrolingBundle;
+    public static I18NBundle forestersSpeechesPlayerInRoomBundle;
+    public static I18NBundle forestersSpeechesPursuitBundle;
+    public static I18NBundle forestersSpeechesStopBundle;
 
     public static void init() {
 
@@ -21,7 +25,11 @@ public class ResourcesManager {
         am.load("power_mushroom.png", Texture.class);
         am.load("bottle.png", Texture.class);
         am.load("i18n/mushroom_speech", I18NBundle.class);
-        am.load("i18n/exit_speech", I18NBundle.class);
+        am.load("i18n/foresters_speeches_noticing", I18NBundle.class);
+        am.load("i18n/foresters_speeches_patroling", I18NBundle.class);
+        am.load("i18n/foresters_speeches_player_in_room", I18NBundle.class);
+        am.load("i18n/foresters_speeches_pursuit", I18NBundle.class);
+        am.load("i18n/foresters_speeches_stop", I18NBundle.class);
         am.finishLoading();
 
         Texture overworld = am.get("overworld.png");
@@ -46,18 +54,14 @@ public class ResourcesManager {
         }
 
         mushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);
-        exitsSpeechBumdle = am.get("i18n/exit_speech", I18NBundle.class);
+        forestersSpeechesNoticingBundle = am.get("i18n/foresters_speeches_noticing", I18NBundle.class);
+        forestersSpeechesPatrolingBundle = am.get("i18n/foresters_speeches_patroling", I18NBundle.class);
+        forestersSpeechesPlayerInRoomBundle = am.get("i18n/foresters_speeches_player_in_room", I18NBundle.class);
+        forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
+        forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
     }
 
     public static TextureRegion get(String name) {
         return regions.get(name);
-    }
-
-    public static I18NBundle getMushroomSpeechBundle() {
-        return mushroomsSpeechBundle;
-    }
-
-    public static I18NBundle getExitSpeechBundle() {
-        return exitsSpeechBumdle;
     }
 }

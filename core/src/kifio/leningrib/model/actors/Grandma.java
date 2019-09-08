@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import java.util.ArrayList;
 import java.util.List;
-import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
@@ -21,7 +20,6 @@ public class Grandma extends MovableActor {
     public enum DialogState {
         BEFORE_DIALOG, DIALOG_ACTIVE, HAS_POSITIVE_RESPONSE, HAS_NEGATIVE_RESPONSE;
     }
-    
 
     private DialogState dialogState = DialogState.BEFORE_DIALOG;
 

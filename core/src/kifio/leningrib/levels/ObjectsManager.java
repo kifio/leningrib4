@@ -1,14 +1,15 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Array;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 public class ObjectsManager<T extends Actor> {
 
-	protected List<T> gameObjects;
-	protected Random random;
+	public Array<T> gameObjects;
+	public Label[] speeches;
 
 	public void dispose() {
 		if (gameObjects != null) {
@@ -20,6 +21,14 @@ public class ObjectsManager<T extends Actor> {
 		 	gameObjects = null;
 		}
 
-		random = null;
+		if (speeches != null) {
+			for (int i = 0; i < speeches.length; i++) {
+				if (speeches[i] != null) {
+					speeches[i].remove();
+					speeches[i] = null;
+				}
+			}
+			speeches = null;
+		}
 	}
 }

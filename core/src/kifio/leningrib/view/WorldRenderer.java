@@ -14,12 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import java.util.List;
 import java.util.Locale;
-import kifio.leningrib.Utils;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
-import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
@@ -70,7 +68,10 @@ public class WorldRenderer {
 		for (Actor mushroom : level.getMushrooms()) { stage.addActor(mushroom); }
 		stage.addActor(level.getPlayer());
 		if (level.getGrandma() != null) { stage.addActor(level.getGrandma()); }
-		for (Forester forester : level.getForesters()) { stage.addActor(forester); }
+		for (int i = 0; i < level.getForesters().size; i++) {
+			stage.addActor(level.getForesters().get(i));
+			stage.addActor(level.getForestersSpeeches()[i]);
+		}
 		for (Actor tree : level.getTrees()) { stage.addActor(tree); }
 	}
 
@@ -108,7 +109,7 @@ public class WorldRenderer {
 
 		updateCamera();
 		drawGrass();
-		drawDebug();
+//		drawDebug();
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
@@ -141,7 +142,7 @@ public class WorldRenderer {
 //		  drawCharacterDebug();
 //		  drawGrandmaDebug();
 //        drawMushroomsBounds();
-		  drawForesterDebug();
+//		drawForesterDebug();
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 		renderer.end();
@@ -176,7 +177,6 @@ public class WorldRenderer {
 	}
 
 	private void drawForesterDebug() {
-		renderer.setColor(foresterDebugColor);
 //		for (Forester forester : level.getForesters()) { drawForesterPath(forester); }
 		for (Forester forester : level.getForesters()) { drawForesterArea(forester); }
 	}
@@ -196,12 +196,14 @@ public class WorldRenderer {
 	}
 
 	private void drawForesterArea(Forester forester) {
-		List<Actor> trees = level.getTrees();
-		for (Vector2 vec : forester.getArea()) {
-			if (!Utils.isOverlapsWithActor(trees, (int) vec.x, (int)vec.y)) {
-				renderer.rect(vec.x, vec.y, GameScreen.tileSize, GameScreen.tileSize);
-			}
-		}
+
+		Rectangle r = forester.getPursueArea();
+		renderer.setColor(foresterDebugColor);
+		renderer.rect(r.x, r.y, r.width, r.height);
+
+		r = forester.getNoticeArea();
+		renderer.setColor(playerDebugColor);
+		renderer.rect(r.x, r.y, r.width, r.height);
 	}
 
 	private void drawGrass() {
@@ -215,18 +217,6 @@ public class WorldRenderer {
 				batch.draw(grass, x, y, GameScreen.tileSize, GameScreen.tileSize);
 			}
 		}
-		batch.end();
-	}
-
-	private void drawTexts() {
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-
-		for (Speech speech : level.getExitsSpeeches()) {
-			SpeechManager.getInstance().getBitmapFont().draw(batch, speech.getSpeech(), speech.getX(), speech.getY());
-			speech.decreaseX(0.5f);
-		}
-
 		batch.end();
 	}
 

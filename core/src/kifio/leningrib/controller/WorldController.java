@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Array;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.screens.GameScreen;
 
@@ -41,9 +43,11 @@ public class WorldController {
 
 		Label[] mushroomSpeeches = level.getMushroomsSpeeches();
 		for (int i = 0; i < mushroomSpeeches.length; i++) {
-			if (mushroomSpeeches[i] != null && mushroomSpeeches[i].getStage() == null) {
-				stage.addActor(mushroomSpeeches[i]);
+			Label speech =        mushroomSpeeches[i];
+			if (speech != null && speech.getStage() == null) {
+				stage.addActor(speech);
 			}
+//			ThreadLocalRandom.current()
 		}
 
 		updateWorld(delta, cameraPositionY);

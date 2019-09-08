@@ -1,20 +1,15 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import generator.ConstantsConfig;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
-import kifio.leningrib.model.speech.Speech;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 import model.Exit;
@@ -109,10 +104,10 @@ public class FirstLevel {
 		return arr;
 	}
 
-	static List<Mushroom> getMushrooms(Random random) {
-		List<Mushroom> mushrooms = new ArrayList<>();
-		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 7, random));
-		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 14, random));
+	static Array<Mushroom> getMushrooms(Random random) {
+		Array<Mushroom> mushrooms = new Array<>();
+		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 7));
+		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 14));
 //		mushrooms.add(new Mushroom(GameScreen.tileSize * 1, GameScreen.tileSize * 2, random));
 //		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 1, random));
 		return mushrooms;

@@ -3,14 +3,13 @@ package kifio.leningrib.levels;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Array;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
-import kifio.leningrib.levels.ExitsManager.ExitWrapper;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.pathfinding.ForestGraph;
+import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class ForestersManager extends ObjectsManager<Forester> {
@@ -20,36 +19,42 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	private Rectangle result = new Rectangle();
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
-	ForestersManager(Random random, GameScreen gameScreen, ForestGraph forestGraph) {
-		this.random = random;
+	ForestersManager(GameScreen gameScreen, ForestGraph forestGraph) {
 		this.gameScreen = gameScreen;
 		this.forestGraph = forestGraph;
-		gameObjects = new ArrayList<>();
 	}
 
-	void initForester(int levelX, int levelY, Rectangle[] roomsRectangles, List<ExitWrapper> exits, Random random) {
+	void initForester(int levelX, int levelY, Rectangle[] roomsRectangles) {
+		speeches = new Label[roomsRectangles.length];
+		gameObjects = new Array<>(roomsRectangles.length - 1);
 
-		for (Rectangle rectangle : roomsRectangles) {
-			if (!Utils.isInRoom(rectangle,
-				gameScreen.player.getX() / GameScreen.tileSize,
-				gameScreen.player.getY() / GameScreen.tileSize)) {
+		int k = 0;
+		for (int i = 0; i < roomsRectangles.length; i++) {
+			if (!Utils.isInRoom(roomsRectangles[i],
+				gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {
 
-				int left = (int) (rectangle.x + 1);
-				int top = (int) (rectangle.y + rectangle.height);
-				int right = (int) (rectangle.width - 2);
-				int bottom = (int) rectangle.y;
+				int left = (int) (roomsRectangles[i].x + 1);
+				int top = (int) (roomsRectangles[i].y + roomsRectangles[i].height);
+				int right = (int) (roomsRectangles[i].width - 2);
+				int bottom = (int) roomsRectangles[i].y;
 
 				int originalFromY = ThreadLocalRandom.current().nextInt(bottom, top);
 				int originalToY = ThreadLocalRandom.current().nextInt(bottom, top);
 
-				gameObjects.add(new Forester(
+				Forester f = new Forester(
 					GameScreen.tileSize * left,
 					GameScreen.tileSize * originalFromY,
-					GameScreen.tileSize * right, GameScreen.tileSize * originalToY,
-					1,
-					forestGraph,
-					bottom, top));
-				return;
+					GameScreen.tileSize * right, GameScreen.tileSize * originalToY, 1, forestGraph, bottom, top);
+
+				float x = getNewSpeechX(f);
+				float y = getNewSpeechY(f);
+
+				speeches[i - k] = SpeechManager.getInstance().getLabel(SpeechManager.getInstance().getForesterPatrolSpeech(), x, y,
+					GameScreen.tileSize * 2);
+
+				gameObjects.add(f);
+			} else {
+				k++;
 			}
 		}
 	}
@@ -58,12 +63,13 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		gameObjects.add(forester);
 	}
 
-	public List<Forester> getForesters() {
+	public Array<Forester> getForesters() {
 		return gameObjects;
 	}
 
 	void updateForesters(float delta) {
-		for (Forester forester : gameObjects) {
+		for (int i = 0; i < gameObjects.size; i++) {
+			Forester forester = gameObjects.get(i);
 			result.set(0f, 0f, 0f, 0f);
 			if (isPlayerCaught(forester.bounds, gameScreen.player.bounds)) {
 				gameScreen.gameOver = true;
@@ -76,6 +82,9 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			} else {
 				updateForestersPath(forester, delta);
 			}
+
+			speeches[i].setX(getNewSpeechX(forester));
+			speeches[i].setY(getNewSpeechY(forester));
 		}
 	}
 
@@ -95,5 +104,13 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		forestGraph = null;
 		result = null;
 		super.dispose();
+	}
+
+	private float getNewSpeechX(Forester m) {
+		return m.getX() - GameScreen.tileSize / 2f;
+	}
+
+	private float getNewSpeechY(Forester m) {
+		return m.getY() + GameScreen.tileSize * 1.5f;
 	}
 }

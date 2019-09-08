@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
 import kifio.leningrib.model.ResourcesManager;
 
@@ -69,13 +68,11 @@ public class SpeechManager {
     }
 
     public String getRandomMushroomSpeech() {
-        String speechId = String.valueOf(random(1, 71));
-        return ResourcesManager.getMushroomSpeechBundle().get(speechId);
+        return ResourcesManager.mushroomsSpeechBundle.get(String.valueOf(random(1, 84)));
     }
 
-    public String getRandomExitSpeech() {
-        String speechId = String.valueOf(random(1, 5));
-        return ResourcesManager.getExitSpeechBundle().get(speechId);
+    public String getForesterPatrolSpeech() {
+        return ResourcesManager.forestersSpeechesPatrolingBundle.get(String.valueOf(random(1, 11)));
     }
 
     public Label getLabel(String text, float x, float y, float targetWidth) {
