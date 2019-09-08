@@ -36,7 +36,7 @@ public class Mushroom extends MovableActor {
     private boolean isEaten = false;
 
     public Mushroom(int x, int y, Random random) {
-        super(new Vector2(x, y));
+        super(x, y);
         Effect[] effects = Effect.values();
         effect = random.nextInt() / 4 == 0 ? effects[random.nextInt()] : null;
     }

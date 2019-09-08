@@ -1,5 +1,7 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
+import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -8,32 +10,30 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.screens.GameScreen;
 
 public abstract class MovableActor extends Actor {
 
-	public List<Vector2> path = new ArrayList<>();
+	// Путь в который будет записываться найденный путь
+	protected GraphPath<Vector2> path = new DefaultGraphPath<>();
+
 	private float elapsedTime = 0;
 	private float previousX = -1;
 	private boolean goLeft = false;
 
 	protected UIState current = null;
+
 	private float drawingWidth = GameScreen.tileSize;
 	private float drawingHeight = GameScreen.tileSize * 1.5f;
 
 	public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при
     // отрисовке фрейма размер пересчитывается
 
-	public MovableActor(Vector2 xy) {
+	public MovableActor(float x, float y) {
 		this.bounds = new Rectangle();
-		setX(xy.x);
-		setY(xy.y);
+		setX(x);
+		setY(y);
 	}
 
 	@Override public void act(float delta) {
@@ -55,11 +55,11 @@ public abstract class MovableActor extends Actor {
 		}
 	}
 
-	protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY, float velocity) {
+	protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY) {
 		double dx = (double) (targetX - fromX);
 		double dy = (double) (targetY - fromY);
 		float length = (float) Math.sqrt(dx * dx + dy * dy);
-		float calculatedDuration = length / velocity;
+		float calculatedDuration = length / getVelocity();
 		return Actions.moveTo(targetX, targetY, calculatedDuration);
 	}
 
@@ -95,18 +95,7 @@ public abstract class MovableActor extends Actor {
 		return (TextureRegion) current.getAnimation().getKeyFrame(elapsedTime, true);
 	}
 
-	public SequenceAction getMoveActionsSequence() {
-		SequenceAction seq = new SequenceAction();
-		float fromX = getX();
-		float fromY = getY();
-		for (int i = 0; i < path.size(); i++) {
-			Vector2 vec = path.get(i);
-			seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y, getVelocity()));
-			seq.addAction(getDelayAction(getDelayTime()));
-			fromX = vec.x;
-			fromY = vec.y;
-		}
-
-		return seq;
+	public GraphPath<Vector2> getPath() {
+		return path;
 	}
 }

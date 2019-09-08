@@ -150,7 +150,7 @@ public class WorldRenderer {
 
 	private void drawPlayerPath() {
 		renderer.setColor(playerPathDebugColor);
-		for (Vector2 vec : level.getPlayer().path) {
+		for (Vector2 vec : level.getPlayer().getPath()) {
 			renderer.rect(vec.x, vec.y, GameScreen.tileSize, GameScreen.tileSize);
 		}
 	}
@@ -190,7 +190,7 @@ public class WorldRenderer {
 	}
 
 	private void drawForesterPath(Forester forester) {
-		for (Vector2 vec : forester.path) {
+		for (Vector2 vec : forester.getPath()) {
 			renderer.rect(vec.x, vec.y, GameScreen.tileSize, GameScreen.tileSize);
 		}
 	}

@@ -1,16 +1,14 @@
 package kifio.leningrib.levels;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
+import kifio.leningrib.levels.ExitsManager.ExitWrapper;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
@@ -29,38 +27,29 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		gameObjects = new ArrayList<>();
 	}
 
-	void initForester(int levelX, int levelY, Rectangle[] roomsRectangles, Random random) {
-		Vector2 playerPosition;
-
-		if (levelX == 0 && levelY == 0) {
-			playerPosition = new Vector2(0, 1);
-		} else {
-			playerPosition = new Vector2(gameScreen.player.getX() / GameScreen.tileSize,
-				gameScreen.player.getY() / GameScreen.tileSize);
-		}
+	void initForester(int levelX, int levelY, Rectangle[] roomsRectangles, List<ExitWrapper> exits, Random random) {
 
 		for (Rectangle rectangle : roomsRectangles) {
-			if (!rectangle.contains(playerPosition) && rectangle.height > 1) {
-				boolean generateDifficultWay = false;
-//				if (rectangle.height > 3) generateDifficultWay = random.nextBoolean();
+			if (!Utils.isInRoom(rectangle,
+				gameScreen.player.getX() / GameScreen.tileSize,
+				gameScreen.player.getY() / GameScreen.tileSize)) {
 
-//				if (generateDifficultWay) {
-//					Array<Vector2> points = new Array<>();
-//					float y0 = rectangle.y + (rectangle.height - 1);
-//					float y1 = rectangle.y + 1;
-//
-//					points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y0));
-//					points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y0));
-//					points.add(new Vector2(GameScreen.tileSize * (rectangle.width - 2), GameScreen.tileSize * y1));
-//					points.add(new Vector2(GameScreen.tileSize * (rectangle.x + 1), GameScreen.tileSize * y1));
-//
-//					gameObjects.add(new Forester(points));
-//				} else {
-					float y = GameScreen.tileSize * MathUtils.random(rectangle.y, rectangle.y + (rectangle.height - 2));
-					gameObjects.add(new Forester(
-						new Vector2(GameScreen.tileSize * (rectangle.x + 1), y),
-						new Vector2(GameScreen.tileSize * (rectangle.width - 2), y), 1));
-//				}
+				int left = (int) (rectangle.x + 1);
+				int top = (int) (rectangle.y + rectangle.height);
+				int right = (int) (rectangle.width - 2);
+				int bottom = (int) rectangle.y;
+
+				int originalFromY = ThreadLocalRandom.current().nextInt(bottom, top);
+				int originalToY = ThreadLocalRandom.current().nextInt(bottom, top);
+
+				gameObjects.add(new Forester(
+					GameScreen.tileSize * left,
+					GameScreen.tileSize * originalFromY,
+					GameScreen.tileSize * right, GameScreen.tileSize * originalToY,
+					1,
+					forestGraph,
+					bottom, top));
+				return;
 			}
 		}
 	}
@@ -80,8 +69,8 @@ public class ForestersManager extends ObjectsManager<Forester> {
 				gameScreen.gameOver = true;
 				gameScreen.player.stop();
 				forester.stop();
-				forester.path.add(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
-				forester.addAction(forester.getMoveActionsSequence());
+				forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
+				forester.addAction(forester.getMoveActionsSequence(forestGraph));
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
 			} else {
@@ -98,33 +87,10 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 	private void updateForestersPath(Forester forester, float delta) {
 		forester.updateArea();
-		forester.updateMoving(gameScreen.player, delta);
-		if (forester.isPursuePlayer()) {
-			setForesterPath(forester, gameScreen.player.bounds.x, gameScreen.player.bounds.y);
-		}
+		forester.updateMovementState(gameScreen.player, delta, forestGraph);
 	}
 
-	private void setForesterPath(Forester forester, float tx, float ty) {
-		GraphPath<Vector2> path = forestGraph.getPath(
-			Utils.mapCoordinate(forester.getX()),
-			Utils.mapCoordinate(forester.getY()),
-			Utils.mapCoordinate(tx),
-			Utils.mapCoordinate(ty));
-
-		forester.stop();
-
-		// Первая точка пути совпадает с координатами игрока,
-		// чтобы лесник не стоял на месте лишнее время ее из пути удаляем.
-		int start = path.getCount() > 1 ? 1 : 0;
-		for (int i = start; i < path.getCount(); i++) {
-			forester.path.add(new Vector2(path.get(i)));
-		}
-
-		forester.addAction(forester.getMoveActionsSequence());
-	}
-
-	@Override
-	public void dispose() {
+	@Override public void dispose() {
 		gameScreen = null;
 		forestGraph = null;
 		result = null;

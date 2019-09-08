@@ -72,10 +72,10 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         connections.add(new PointsConnection(from, to));
     }
 
-    public GraphPath<Vector2> getPath(float fromX, float fromY, float toX, float toY) {
+    public GraphPath<Vector2> updatePath(float fromX, float fromY, float toX, float toY, GraphPath<Vector2> path) {
+        path.clear();
         Vector2 f = getVector2(fromX, fromY);
         Vector2 t = getVector2(toX, toY);
-        GraphPath<Vector2> path = new DefaultGraphPath<>();
         if (f != null && t != null) {
             IndexedAStarPathFinder<Vector2> pathFinder = new IndexedAStarPathFinder<>(this);
             pathFinder.searchNodePath(f, t, heuristic, path);

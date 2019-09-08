@@ -1,5 +1,6 @@
 package kifio.leningrib;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.List;
@@ -30,5 +31,15 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    public static boolean isInRoom(Rectangle room, float x, float y) {
+
+        int left = 0;
+        int top = (int) (room.y + (room.height - 1));
+        int right = (int) room.width;
+        int bottom = (int) room.y - 1;
+
+        return x >= left && x <= right && y >= bottom && y <= top;
     }
 }

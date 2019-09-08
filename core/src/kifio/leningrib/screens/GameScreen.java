@@ -72,6 +72,7 @@ public class GameScreen extends InputAdapter implements Screen {
         this.worldController = new WorldController(this);
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch);
         this.worldMap = new WorldMap();
+        this.player = new Player(0f, 2 * GameScreen.tileSize);
         setLevel(getNextLevel(nextLevelX, nextLevelY));
     }
 
@@ -99,17 +100,6 @@ public class GameScreen extends InputAdapter implements Screen {
     }
 
     public void setLevel(Level level) {
-        if (player == null) {
-            if (isFirstLaunch) {
-                player = new Player(2 * GameScreen.tileSize, 0f);
-            } else  {
-                player = new Player(0f, 2 * GameScreen.tileSize);
-            }
-        } else if (player.getY() >= (level.getLevelHeight() - 1) * GameScreen.tileSize) {
-            player.setY(0);
-        } else if (player.getX() >= (level.getLevelWidth() - 1) * GameScreen.tileSize) {
-            player.setX(0);
-        }
         this.worldController.reset(level);
         this.worldRenderer.reset(level);
     }
@@ -126,7 +116,15 @@ public class GameScreen extends InputAdapter implements Screen {
             worldController.update(delta, camera.position.y, stage);
             worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
+
+            if (player.getY() >= (constantsConfig.getLevelHeight() - 1) * GameScreen.tileSize) {
+                player.setY(0);
+            } else if (player.getX() >= (constantsConfig.getLevelWidth() - 1) * GameScreen.tileSize) {
+                player.setX(0);
+            }
+
             setLevel(getNextLevel(nextLevelX, nextLevelY));
+
             gameOverTime = 0f;
             win = false;
         } else if (!gameOver) {

@@ -58,12 +58,21 @@ public class ExitsManager {
         }
     }
 
+    List<ExitWrapper> getExits() {
+        return exits;
+    }
+
     static class ExitWrapper implements Speech.SpeechProducer {
 
         private Exit exit;
 
         ExitWrapper(Exit exit) {
             this.exit = exit;
+        }
+
+        public Vector2 getPosition() {
+            return new Vector2(GameScreen.tileSize * exit.getX(),
+                GameScreen.tileSize * exit.getY());
         }
 
         @Override

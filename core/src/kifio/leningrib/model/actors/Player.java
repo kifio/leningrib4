@@ -1,6 +1,5 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -22,7 +21,7 @@ public class Player extends MovableActor {
     private Effect effect;
 
     public Player(float x, float y) {
-        super(new Vector2(x, y));
+        super(x, y);
     }
 
     public float getVelocity() {
@@ -80,25 +79,24 @@ public class Player extends MovableActor {
 
         if (MathUtils.isEqual(fromX, toX) && MathUtils.isEqual(fromY, toY)) return;
 
-        GraphPath<Vector2> path = forestGraph.getPath(fromX, fromY, toX, toY);
+        gameScreen.player.stop();
+        forestGraph.updatePath(fromX, fromY, toX, toY, path);
 
         if (path.getCount() > 0) {
 
-            gameScreen.player.stop();
 
             // Первая точка пути совпадает с координатами игрока,
             // чтобы игрок не стоял на месте лишнее время ее из пути удаляем.
-            for (int i = 1; i < path.getCount(); i++) {
-                gameScreen.player.path.add(new Vector2(path.get(i)));
-            }
+//            for (int i = 1; i < path.getCount(); i++) {
+//                gameScreen.player.path.add(path.get(i));
+//            }
 
             SequenceAction playerActionsSequence = gameScreen.player.getMoveActionsSequence();
             gameScreen.player.addAction(playerActionsSequence);
         }
     }
 
-    @Override
-    public SequenceAction getMoveActionsSequence() {
+    private SequenceAction getMoveActionsSequence() {
         SequenceAction seq = new SequenceAction();
         float fromX = getX();
         float fromY = getY();
@@ -112,9 +110,12 @@ public class Player extends MovableActor {
             seq.addAction(getDelayAction(getDelayTime()));
         }
 
-        for (int i = 0; i < path.size(); i++) {
+        int count = path.getCount();
+        int i = count > 1 ? 1 : 0;
+
+        for (; i < count; i++) {
             Vector2 vec = path.get(i);
-            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y, getVelocity()));
+            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y));
             seq.addAction(getDelayAction(getDelayTime()));
 
             fromX = vec.x;

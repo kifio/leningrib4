@@ -118,10 +118,10 @@ public class FirstLevel {
 		return mushrooms;
 	}
 
-	static Forester getForester() {
-		return new Forester(new Vector2(GameScreen.tileSize, GameScreen.tileSize * 10),
-			new Vector2(GameScreen.tileSize * 5, GameScreen.tileSize * 10), 1);
-	}
+//	static Forester getForester() {
+//		return new Forester(new Vector2(GameScreen.tileSize, GameScreen.tileSize * 10),
+//			new Vector2(GameScreen.tileSize * 5, GameScreen.tileSize * 10), 1);
+//	}
 
 	private static float labelWidth =  Gdx.graphics.getWidth() - 2 * GameScreen.tileSize;
 

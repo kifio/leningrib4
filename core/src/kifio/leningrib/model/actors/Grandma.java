@@ -30,7 +30,7 @@ public class Grandma extends MovableActor {
     private List<Label> negativeReaction= new ArrayList<>(MONOLOG_LENGTH);
 
     public Grandma(float x, float y) {
-        super(new Vector2(x, y));
+        super(x, y);
         
         float speechX = x - GameScreen.tileSize / 2f;
 
