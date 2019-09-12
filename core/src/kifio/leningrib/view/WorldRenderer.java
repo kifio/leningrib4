@@ -58,6 +58,8 @@ public class WorldRenderer {
 	private void resetStage(Level level) {
 		stage.clear();
 
+		for (Actor tree : level.getTrees()) { stage.addActor(tree); }
+
 		List<Label> tutorialLabels = level.getTutorialLabels();
 		if (tutorialLabels != null) {
 			for (Label l : tutorialLabels) {
@@ -72,7 +74,6 @@ public class WorldRenderer {
 			stage.addActor(level.getForesters().get(i));
 			stage.addActor(level.getForestersSpeeches()[i]);
 		}
-		for (Actor tree : level.getTrees()) { stage.addActor(tree); }
 	}
 
 	public void renderBlackScreen(boolean levelPassed, float gameOverTime, float gameOverAnimationTime) {

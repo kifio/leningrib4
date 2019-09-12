@@ -104,7 +104,7 @@ public class FirstLevel {
 		return arr;
 	}
 
-	static Array<Mushroom> getMushrooms(Random random) {
+	static Array<Mushroom> getMushrooms() {
 		Array<Mushroom> mushrooms = new Array<>();
 		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 7));
 		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 14));

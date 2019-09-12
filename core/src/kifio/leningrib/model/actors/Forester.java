@@ -37,6 +37,9 @@ public class Forester extends MovableActor {
 		pursueArea.setY(y - (4 * GameScreen.tileSize));
 	}
 
+	public float speechDuration = 0f;
+	private float pursueTime = 0f;	// TODO: Нужно определять время погони, чтобы менять реплики леснику.
+
 	public Rectangle getNoticeArea() {
 		return noticeArea;
 	}
@@ -54,27 +57,33 @@ public class Forester extends MovableActor {
 		PATROL, PURSUE, STOP
 	}
 
-	private float originalFromX, originalToX;
+	private float originalFromX, originalToX, originalToY;
 	private int originalBottomLimit, originalTopLimit;
 	private MovingState movingState = MovingState.PATROL;
 	private float stoppingTime = 0f;
 
 	// Лесники начинают с патрулирования леса, поэтому у них две координаты
 	public Forester(float originalFromX, float originalFromY, float originalToX, float originalToY, int index,
-		ForestGraph forestGraph, int originalBottomLimit, int originalTopLimit) {
+		int originalBottomLimit, int originalTopLimit) {
 		super(originalFromX, originalFromY);
 		this.originalFromX = originalFromX;
 		this.originalToX = originalToX;
+		this.originalToY = originalToY;
 		this.originalBottomLimit = originalBottomLimit;
 		this.originalTopLimit = originalTopLimit;
 
 		running = String.format(Locale.getDefault(), "enemy_%d_run.txt", index);
 		idle = String.format(Locale.getDefault(), "enemy_%d_idle.txt", index);
+		setPath(originalToX, originalToY, null);
+	}
+
+	public void initPath(ForestGraph forestGraph) {
 		setPath(originalToX, originalToY, forestGraph);
 	}
 
 	// Вычисляет путь лесника от a, до b.
-	public void setPath(float tx, float ty, ForestGraph forestGraph) {
+	private void setPath(float tx, float ty, ForestGraph forestGraph) {
+		if (forestGraph == null) return;
 		stop();
 
 		forestGraph.updatePath(Utils.mapCoordinate(getX()), Utils.mapCoordinate(getY()),

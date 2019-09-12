@@ -22,7 +22,7 @@ public class WorldController {
 	}
 
 	public void reset(Level level) {
-		yLimit = (level.getLevelHeight() - 1) * GameScreen.tileSize;
+		yLimit = Gdx.graphics.getHeight() - GameScreen.tileSize;
 		if (this.level != null) { this.level.dispose(); }
 		this.level = level;
 	}
@@ -47,7 +47,6 @@ public class WorldController {
 			if (speech != null && speech.getStage() == null) {
 				stage.addActor(speech);
 			}
-//			ThreadLocalRandom.current()
 		}
 
 		updateWorld(delta, cameraPositionY);

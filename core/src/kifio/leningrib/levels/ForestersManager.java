@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
@@ -15,16 +16,14 @@ import kifio.leningrib.screens.GameScreen;
 public class ForestersManager extends ObjectsManager<Forester> {
 
 	private GameScreen gameScreen;
-	private ForestGraph forestGraph;
 	private Rectangle result = new Rectangle();
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
-	ForestersManager(GameScreen gameScreen, ForestGraph forestGraph) {
+	ForestersManager(GameScreen gameScreen) {
 		this.gameScreen = gameScreen;
-		this.forestGraph = forestGraph;
 	}
 
-	void initForester(int levelX, int levelY, Rectangle[] roomsRectangles) {
+	void initForester(Rectangle[] roomsRectangles) {
 		speeches = new Label[roomsRectangles.length];
 		gameObjects = new Array<>(roomsRectangles.length - 1);
 
@@ -44,7 +43,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 				Forester f = new Forester(
 					GameScreen.tileSize * left,
 					GameScreen.tileSize * originalFromY,
-					GameScreen.tileSize * right, GameScreen.tileSize * originalToY, 1, forestGraph, bottom, top);
+					GameScreen.tileSize * right, GameScreen.tileSize * originalToY, 1, bottom, top);
 
 				float x = getNewSpeechX(f);
 				float y = getNewSpeechY(f);
@@ -67,7 +66,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return gameObjects;
 	}
 
-	void updateForesters(float delta) {
+	void updateForesters(float delta, ForestGraph forestGraph) {
 		for (int i = 0; i < gameObjects.size; i++) {
 			Forester forester = gameObjects.get(i);
 			result.set(0f, 0f, 0f, 0f);
@@ -80,11 +79,21 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
 			} else {
-				updateForestersPath(forester, delta);
+				updateForestersPath(forester, delta, forestGraph);
+			}
+
+			if (forester.isPursuePlayer())
+
+			if (forester.speechDuration > 3f && shouldChangeSpeech()) {
+				speeches[i].setText(ThreadLocalRandom.current().nextBoolean()
+					? SpeechManager.getInstance().getForesterPatrolSpeech()
+					: "");
+				forester.speechDuration = 0f;
 			}
 
 			speeches[i].setX(getNewSpeechX(forester));
 			speeches[i].setY(getNewSpeechY(forester));
+			forester.speechDuration += delta;
 		}
 	}
 
@@ -94,14 +103,17 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return resultArea >= caughtArea;
 	}
 
-	private void updateForestersPath(Forester forester, float delta) {
+	private void updateForestersPath(Forester forester, float delta, ForestGraph forestGraph) {
 		forester.updateArea();
 		forester.updateMovementState(gameScreen.player, delta, forestGraph);
 	}
 
+	private boolean shouldChangeSpeech() {
+		return ThreadLocalRandom.current().nextInt(256) / 8 == 0;
+	}
+
 	@Override public void dispose() {
 		gameScreen = null;
-		forestGraph = null;
 		result = null;
 		super.dispose();
 	}

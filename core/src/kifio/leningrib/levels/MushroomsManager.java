@@ -24,7 +24,7 @@ class MushroomsManager extends ObjectsManager<Mushroom> {
         gameObjects = new Array<>();
     }
     
-    void initMushrooms(ConstantsConfig config, List<Actor> trees) {
+    void initMushrooms(ConstantsConfig config, Array<Actor> trees) {
         int levelHeight = config.getLevelHeight();
         int levelWidth = config.getLevelWidth();
 
