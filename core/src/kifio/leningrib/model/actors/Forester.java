@@ -121,17 +121,20 @@ public class Forester extends MovableActor {
 			setPath(player.bounds.x, player.bounds.y, forestGraph);
 		} else {
 			if (speechDuration > 3f && shouldChangeSpeech()) {
-				label.setText(ThreadLocalRandom.current().nextBoolean()
-					? SpeechManager.getInstance().getForesterPatrolSpeech()
-					: "");
-				speechDuration = 0f;
+				label.setText("");
+				if (speechDuration > 3.5f) {
+					label.setText(ThreadLocalRandom.current().nextBoolean()
+						? SpeechManager.getInstance().getForesterPatrolSpeech()
+						: "");
+					speechDuration = 0f;
+				}
 			}
 			speechDuration += delta;
 		}
 	}
 
 	private boolean shouldChangeSpeech() {
-		return ThreadLocalRandom.current().nextInt(256) / 8 == 0;
+		return ThreadLocalRandom.current().nextInt(256) % 8 == 0;
 	}
 
 	private void updatePursuitText(Label label, float delta) {

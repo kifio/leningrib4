@@ -22,7 +22,7 @@ public class WorldController {
 	}
 
 	public void reset(Level level) {
-		yLimit = Gdx.graphics.getHeight() - GameScreen.tileSize;
+		yLimit = (gameScreen.constantsConfig.getLevelHeight() - 1) * GameScreen.tileSize;
 		if (this.level != null) { this.level.dispose(); }
 		this.level = level;
 	}
@@ -43,7 +43,7 @@ public class WorldController {
 
 		Label[] mushroomSpeeches = level.getMushroomsSpeeches();
 		for (int i = 0; i < mushroomSpeeches.length; i++) {
-			Label speech =        mushroomSpeeches[i];
+			Label speech = mushroomSpeeches[i];
 			if (speech != null && speech.getStage() == null) {
 				stage.addActor(speech);
 			}

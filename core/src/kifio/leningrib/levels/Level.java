@@ -53,7 +53,7 @@ public class Level {
             gameScreen.worldMap.addLevel(x, y, levelMap);
             treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
             mushroomsManager.initMushrooms(FirstLevel.getMushrooms());
-//            forestersManager.initDebugForester(FirstLevel.getForester());
+            forestersManager.initDebugForester(FirstLevel.getForester());
             tutorialLabels = FirstLevel.getTutorialLabels();
         } else {
             levelMap = gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig);

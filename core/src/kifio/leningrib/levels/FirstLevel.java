@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
@@ -113,10 +114,11 @@ public class FirstLevel {
 		return mushrooms;
 	}
 
-//	static Forester getForester() {
-//		return new Forester(new Vector2(GameScreen.tileSize, GameScreen.tileSize * 10),
-//			new Vector2(GameScreen.tileSize * 5, GameScreen.tileSize * 10), 1);
-//	}
+	static Forester getForester() {
+		return new Forester(GameScreen.tileSize, GameScreen.tileSize * 27,
+			GameScreen.tileSize * 6, GameScreen.tileSize * 27, 1,
+			GameScreen.tileSize * 23, GameScreen.tileSize * 29);
+	}
 
 	private static float labelWidth =  Gdx.graphics.getWidth() - 2 * GameScreen.tileSize;
 

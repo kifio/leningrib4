@@ -33,6 +33,7 @@ public class WorldRenderer {
 	private int cameraWidth;
 	private int cameraHeight;
 
+	private Vector2 drawGridVector = new Vector2();
 	private Color playerDebugColor = new Color(0f, 0f, 1f, 0.5f);
 	private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
 	private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
@@ -110,7 +111,7 @@ public class WorldRenderer {
 
 		updateCamera();
 		drawGrass();
-//		drawDebug();
+		drawDebug();
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
@@ -139,16 +140,27 @@ public class WorldRenderer {
 		renderer.setProjectionMatrix(camera.combined);
 		renderer.begin(ShapeRenderer.ShapeType.Filled);
 
-//        drawPlayerPath();
+        drawPlayerPath();
+//        drawGrid();
 //		  drawCharacterDebug();
 //		  drawGrandmaDebug();
 //        drawMushroomsBounds();
-//		drawForesterDebug();
+		drawForesterDebug();
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 		renderer.end();
 
 	}
+
+//	private void drawGrid() {
+//		for (int i = 0; i < Gdx.graphics.getWidth(); i+=GameScreen.tileSize) {
+//			renderer.line(i, 0f, i, Gdx.graphics.getHeight());
+//		}
+//
+//		for (int i = 0; i < Gdx.graphics.getHeight(); i+=GameScreen.tileSize) {
+//			renderer.line(0, i, Gdx.graphics.getWidth(), i);
+//		}
+//	}
 
 	private void drawPlayerPath() {
 		renderer.setColor(playerPathDebugColor);
@@ -178,8 +190,8 @@ public class WorldRenderer {
 	}
 
 	private void drawForesterDebug() {
-//		for (Forester forester : level.getForesters()) { drawForesterPath(forester); }
-		for (Forester forester : level.getForesters()) { drawForesterArea(forester); }
+		for (Forester forester : level.getForesters()) { drawForesterPath(forester); }
+//		for (Forester forester : level.getForesters()) { drawForesterArea(forester); }
 	}
 
 	private void drawExitRect() {
@@ -191,6 +203,7 @@ public class WorldRenderer {
 	}
 
 	private void drawForesterPath(Forester forester) {
+		renderer.setColor(foresterDebugColor);
 		for (Vector2 vec : forester.getPath()) {
 			renderer.rect(vec.x, vec.y, GameScreen.tileSize, GameScreen.tileSize);
 		}

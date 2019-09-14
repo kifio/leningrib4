@@ -25,7 +25,7 @@ public class Player extends MovableActor {
     }
 
     public float getVelocity() {
-        return 1000f;
+        return 1200f;
     }
 
     public void increaseMushroomCount() {
@@ -77,20 +77,13 @@ public class Player extends MovableActor {
         float toX = Utils.mapCoordinate(x);
         float toY = Utils.mapCoordinate(y);
 
+        if (!forestGraph.isNodeExists(toX, toY)) return;
         if (MathUtils.isEqual(fromX, toX) && MathUtils.isEqual(fromY, toY)) return;
 
         gameScreen.player.stop();
         forestGraph.updatePath(fromX, fromY, toX, toY, path);
 
         if (path.getCount() > 0) {
-
-
-            // Первая точка пути совпадает с координатами игрока,
-            // чтобы игрок не стоял на месте лишнее время ее из пути удаляем.
-//            for (int i = 1; i < path.getCount(); i++) {
-//                gameScreen.player.path.add(path.get(i));
-//            }
-
             SequenceAction playerActionsSequence = gameScreen.player.getMoveActionsSequence();
             gameScreen.player.addAction(playerActionsSequence);
         }

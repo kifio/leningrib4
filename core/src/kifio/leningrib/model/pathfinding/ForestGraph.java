@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import generator.ConstantsConfig;
 import java.util.HashMap;
 import java.util.Locale;
+import javax.rmi.CORBA.Util;
 import kifio.leningrib.Utils;
 import kifio.leningrib.levels.ForestersManager;
 import kifio.leningrib.levels.TreesManager;
@@ -23,10 +24,12 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
 	private Array<Connection<Vector2>> empty = new Array<>();
 	private ForestersManager forestersManager;
-	private Grandma grandma;
 
 	private int mapWidth;
 	private int mapHeight;
+
+	// Ссылки на всех актеров на сцене
+	private Array<Actor> actors;
 
 	// Массив позиций лесников, чтобы не перестраивать граф, когда ничего не сдвинулся с места.
 	private Vector2[] currentActorsPositions;
@@ -52,19 +55,22 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 		// На первом уровне будут бабка и лесник.
 		// На остальных пока только лесники.
 		if (grandma != null) {
+			actors = new Array<>(2);
+			actors.add(grandma);
+			actors.add(forestersManager.getForesters().get(0));
 			currentActorsPositions = new Vector2[2];
-			currentActorsPositions[0] = new Vector2(grandma.getX(), grandma.getY());
-			currentActorsPositions[1] = new Vector2(GameScreen.tileSize * 3, GameScreen.tileSize * 27);
+			currentActorsPositions[0] = new Vector2(actors.get(0).getX(), actors.get(0).getY());
+			currentActorsPositions[1] = new Vector2(actors.get(1).getX(), actors.get(1).getY());
 		} else {
 			int size = forestersManager.gameObjects.size;
+			actors = new Array<>(size);
 			currentActorsPositions = new Vector2[size];
 			for (int i = 0; i < size; i++) {
-				Actor actor = forestersManager.gameObjects.get(i);
-				currentActorsPositions[i] = new Vector2(actor.getX(), actor.getY());
+				actors.add(forestersManager.gameObjects.get(i));
+				currentActorsPositions[i] = new Vector2(actors.get(i).getX(), actors.get(i).getY());
 			}
 		}
 
-		this.grandma = grandma;
 		this.forestersManager = forestersManager;
 		this.mapWidth = constantsConfig.getLevelWidth() * GameScreen.tileSize;
 		this.mapHeight = constantsConfig.getLevelHeight() * GameScreen.tileSize;
@@ -75,7 +81,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 			for (int j = 0; j < constantsConfig.getLevelHeight(); j++) {
 				x = GameScreen.tileSize * i;
 				y = GameScreen.tileSize * j;
-				if (!isObstacle(x, y, treesManager.trees) && !isActor(i, j, grandma)) {
+				if (!isActor(x, y, treesManager.trees)) {
 					nodes.add(new Vector2(x, y));
 				}
 			}
@@ -103,38 +109,29 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	}
 
 	public void updateForestGraph(float cameraPositionY) {
-
 		if (!isGraphChanged(cameraPositionY)) return;
-
-		long start = System.currentTimeMillis();
-
 		for (int i = 0; i < nodes.size; i++) {
 			addNeighbours(nodes.get(i));
 		}
-
-//		Gdx.app.log("kifio", "updateForestGraph: " + (System.currentTimeMillis() - start) / 1000);
 	}
 
 	private boolean isGraphChanged(float cameraPositionY) {
 		boolean isChanged = false;
 		int size = currentActorsPositions.length;
-		if (grandma != null) {
 
-		} else {
-			for (int i = 0; i < size; i++) {
-				Actor actor = forestersManager.gameObjects.get(i);
-				int oldX = (int) currentActorsPositions[i].x;
-				int oldY = (int) currentActorsPositions[i].y;
-				int newX = (int) Utils.mapCoordinate(actor.getX());
-				int newY = (int) Utils.mapCoordinate(actor.getY());
+		for (int i = 0; i < size; i++) {
+			Actor actor = forestersManager.gameObjects.get(i);
+			int oldX = (int) currentActorsPositions[i].x;
+			int oldY = (int) currentActorsPositions[i].y;
+			int newX = (int) Utils.mapCoordinate(actor.getX());
+			int newY = (int) Utils.mapCoordinate(actor.getY());
 
-				if (isActorOnScreen(actor, cameraPositionY) && (oldX != newX || oldY != newY)) {
-					isChanged = true;
-					Gdx.app.log("kifio", String.format(Locale.getDefault(),
-						"oldx:%d; newx:%d; oldy:%d; newy:%d", oldX, newX, oldY, newY));
-					currentActorsPositions[i].x = newX;
-					currentActorsPositions[i].y = newY;
-				}
+			if (isActorOnScreen(actor, cameraPositionY) && (oldX != newX || oldY != newY)) {
+				isChanged = true;
+				Gdx.app.log("kifio", String.format(Locale.getDefault(),
+					"oldx:%d; newx:%d; oldy:%d; newy:%d", oldX, newX, oldY, newY));
+				currentActorsPositions[i].x = newX;
+				currentActorsPositions[i].y = newY;
 			}
 		}
 
@@ -168,10 +165,9 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	// Добавление пути между двумя нодами
 	private void addConnection(Vector2 from, float toX, float toY) {
 
-//		Vector2 from = getVector2(fromX, fromY);
 		Vector2 to = getVector2(toX, toY);
 
-		if (to == null) { return; }
+		if (to == null || isActor((int) toX, (int) toY, actors)) { return; }
 
 		int fromIndex = nodes.indexOf(from, true);
 
@@ -208,17 +204,22 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 		return null;
 	}
 
-	// Если на ноде находится другой персонаж, мы не строим маршрут через нее
-	private boolean isActor(int x, int y, Actor actor) {
-		if (actor == null) { return false; }
-		return (int) actor.getX() == x && (int) actor.getY() == y;
+	// Нодой может быть только клетка, на которой нет актера
+	private boolean isActor(int x, int y, Array<Actor> actor) {
+		for (int i = 0; i < actor.size; i++) {
+			Actor segment = actor.get(i);
+			if (segment != null && Utils.mapCoordinate(segment.getX()) == x && Utils.mapCoordinate(segment.getY()) == y) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	// Нодой может быть только клетка, на которой нет дерева
-	private boolean isObstacle(int x, int y, Array<Actor> treesSegments) {
-		for (int i = 0; i < treesSegments.size; i++) {
-			Actor segment = treesSegments.get(i);
-			if (segment.getX() == x && segment.getY() == y) {
+	// Проверяем cуществует ли нода с такими координатами
+	public boolean isNodeExists(float x, float y) {
+		for (int i = 0; i < nodes.size; i++) {
+			Vector2 node = nodes.get(i);
+			if (node.x == x && node.y == y) {
 				return true;
 			}
 		}
@@ -226,7 +227,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	}
 
 	public void dispose() {
-		this.grandma = null;
 		this.forestersManager = null;
 		this.connections.clear();
 		this.nodes.clear();
