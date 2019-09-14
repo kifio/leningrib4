@@ -11,8 +11,8 @@ public class ResourcesManager {
 
     public static HashMap<String, TextureRegion> regions = new HashMap<>();
     public static I18NBundle mushroomsSpeechBundle;
-    public static I18NBundle forestersSpeechesNoticingBundle;
-    public static I18NBundle forestersSpeechesPatrolingBundle;
+    public static I18NBundle forestersSpeechesPatrolBundle;
+    public static I18NBundle forestersSpeechesPlayerNoticesBundle;
     public static I18NBundle forestersSpeechesPlayerInRoomBundle;
     public static I18NBundle forestersSpeechesPursuitBundle;
     public static I18NBundle forestersSpeechesStopBundle;
@@ -26,7 +26,7 @@ public class ResourcesManager {
         am.load("bottle.png", Texture.class);
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/foresters_speeches_noticing", I18NBundle.class);
-        am.load("i18n/foresters_speeches_patroling", I18NBundle.class);
+        am.load("i18n/foresters_speeches_patrol", I18NBundle.class);
         am.load("i18n/foresters_speeches_player_in_room", I18NBundle.class);
         am.load("i18n/foresters_speeches_pursuit", I18NBundle.class);
         am.load("i18n/foresters_speeches_stop", I18NBundle.class);
@@ -54,8 +54,8 @@ public class ResourcesManager {
         }
 
         mushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);
-        forestersSpeechesNoticingBundle = am.get("i18n/foresters_speeches_noticing", I18NBundle.class);
-        forestersSpeechesPatrolingBundle = am.get("i18n/foresters_speeches_patroling", I18NBundle.class);
+        forestersSpeechesPlayerNoticesBundle = am.get("i18n/foresters_speeches_noticing", I18NBundle.class);
+        forestersSpeechesPatrolBundle = am.get("i18n/foresters_speeches_patrol", I18NBundle.class);
         forestersSpeechesPlayerInRoomBundle = am.get("i18n/foresters_speeches_player_in_room", I18NBundle.class);
         forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
         forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);

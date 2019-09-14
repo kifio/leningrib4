@@ -79,21 +79,10 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
 			} else {
-				updateForestersPath(forester, delta, forestGraph);
+				updateForestersPath(forester, speeches[i], delta, forestGraph);
 			}
-
-			if (forester.isPursuePlayer())
-
-			if (forester.speechDuration > 3f && shouldChangeSpeech()) {
-				speeches[i].setText(ThreadLocalRandom.current().nextBoolean()
-					? SpeechManager.getInstance().getForesterPatrolSpeech()
-					: "");
-				forester.speechDuration = 0f;
-			}
-
 			speeches[i].setX(getNewSpeechX(forester));
 			speeches[i].setY(getNewSpeechY(forester));
-			forester.speechDuration += delta;
 		}
 	}
 
@@ -103,13 +92,9 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return resultArea >= caughtArea;
 	}
 
-	private void updateForestersPath(Forester forester, float delta, ForestGraph forestGraph) {
+	private void updateForestersPath(Forester forester, Label label, float delta, ForestGraph forestGraph) {
 		forester.updateArea();
-		forester.updateMovementState(gameScreen.player, delta, forestGraph);
-	}
-
-	private boolean shouldChangeSpeech() {
-		return ThreadLocalRandom.current().nextInt(256) / 8 == 0;
+		forester.updateMovementState(gameScreen.player, label, delta, forestGraph);
 	}
 
 	@Override public void dispose() {

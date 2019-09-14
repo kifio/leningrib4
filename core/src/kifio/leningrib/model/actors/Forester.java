@@ -4,10 +4,12 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.pathfinding.ForestGraph;
+import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
@@ -24,7 +26,6 @@ public class Forester extends MovableActor {
 	private final Rectangle pursueArea = new Rectangle(0, 0,
 		PURSUE_AREA_SIDE * GameScreen.tileSize,
 		PURSUE_AREA_SIDE * GameScreen.tileSize);
-
 
 	public void updateArea() {
 		int x = (int) Utils.mapCoordinate(getX());
@@ -92,27 +93,56 @@ public class Forester extends MovableActor {
 		addAction(getMoveActionsSequence(forestGraph));
 	}
 
-	public void updateMovementState(Player player, float delta, ForestGraph forestGraph) {
+	public void updateMovementState(Player player, Label label, float delta, ForestGraph forestGraph) {
 
 		float px = player.getX();
 		float py = player.getY();
 
-		if (noticeArea.contains(px, py)) {
+		if (noticeArea.contains(px, py) && !isPursuePlayer()) {
+			label.setText(SpeechManager.getInstance().getForesterPlayerNoticedSpeech());
 			setPlayerNoticed();
 		} else if (!pursueArea.contains(px, py) && movingState == MovingState.PURSUE) {
+			label.setText(SpeechManager.getInstance().getForesterStopSpeech());
 			stopPursuing();
 		} else if (movingState == MovingState.STOP) {
 			if (stoppingTime < 2f) {
 				stoppingTime += delta;
 			} else {
 				stoppingTime = 0f;
-				startPatroling();
+				speechDuration = 0f;
+				startPatrol();
 				setNewPath(forestGraph);
+				label.setText(SpeechManager.getInstance().getForesterPatrolSpeech());
 			}
 		}
 
 		if (isPursuePlayer()) {
+			updatePursuitText(label, delta);
 			setPath(player.bounds.x, player.bounds.y, forestGraph);
+		} else {
+			if (speechDuration > 3f && shouldChangeSpeech()) {
+				label.setText(ThreadLocalRandom.current().nextBoolean()
+					? SpeechManager.getInstance().getForesterPatrolSpeech()
+					: "");
+				speechDuration = 0f;
+			}
+			speechDuration += delta;
+		}
+	}
+
+	private boolean shouldChangeSpeech() {
+		return ThreadLocalRandom.current().nextInt(256) / 8 == 0;
+	}
+
+	private void updatePursuitText(Label label, float delta) {
+		speechDuration = 0f;
+		if (pursueTime > 2.5f) {
+			label.setText("");
+		} else if (pursueTime > 3f) {
+			label.setText(SpeechManager.getInstance().getForesterPursuitSpeech());
+			pursueTime = 0f;
+		} else {
+			pursueTime += delta;
 		}
 	}
 
@@ -126,7 +156,7 @@ public class Forester extends MovableActor {
 		movingState = MovingState.STOP;
 	}
 
-	private void startPatroling() {
+	private void startPatrol() {
 		stop();
 		movingState = MovingState.PATROL;
 	}
@@ -171,7 +201,7 @@ public class Forester extends MovableActor {
 	}
 
 	public float getVelocity() {
-		return 700f;
+		return 600f;
 	}
 
 	@Override protected float getDelayTime() {
