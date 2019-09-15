@@ -120,7 +120,7 @@ public class Forester extends MovableActor {
 			updatePursuitText(label, delta);
 			setPath(player.bounds.x, player.bounds.y, forestGraph);
 		} else {
-			if (speechDuration > 3f && shouldChangeSpeech()) {
+			if (speechDuration > 3f) {
 				label.setText("");
 				if (speechDuration > 3.5f) {
 					label.setText(ThreadLocalRandom.current().nextBoolean()
@@ -204,7 +204,7 @@ public class Forester extends MovableActor {
 	}
 
 	public float getVelocity() {
-		return 600f;
+		return 500f;
 	}
 
 	@Override protected float getDelayTime() {

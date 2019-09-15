@@ -94,7 +94,7 @@ public class SpeechManager {
 	public Label getLabel(String text, float x, float y, float targetWidth) {
 		Label label = new Label(text, labelStyle);
 		label.setWrap(true);
-		label.setFontScale(Gdx.graphics.getDensity(), Gdx.graphics.getDensity());
+		label.setFontScale(Gdx.graphics.getDensity() * 0.9f, Gdx.graphics.getDensity() * 0.9f);
 		label.setWidth(targetWidth);
 		label.setPosition(x, y);
 		label.setAlignment(Align.center, Align.center);

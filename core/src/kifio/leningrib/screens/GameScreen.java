@@ -21,7 +21,7 @@ import model.WorldMap;
 
 public class GameScreen extends InputAdapter implements Screen {
 
-    private static final float GAME_OVER_ANIMATION_TIME = 1f;
+    private static final float GAME_OVER_ANIMATION_TIME = 0.5f;
     public static final int SPEECH_SEED = 5120;
 
     private LGCGame game;
@@ -48,7 +48,7 @@ public class GameScreen extends InputAdapter implements Screen {
 
     public ConstantsConfig constantsConfig = new ConstantsConfig(
             7,
-            30,
+            36,
             2,
             0,
             1,
@@ -111,7 +111,7 @@ public class GameScreen extends InputAdapter implements Screen {
     */
     @Override
     public void render(float delta) {
-        if (isGameOver() && gameOverTime < 1f) {
+        if (isGameOver() && gameOverTime < GAME_OVER_ANIMATION_TIME) {
             gameOverTime += delta;
             worldController.update(delta, camera.position.y, stage);
             worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);

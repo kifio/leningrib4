@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Forester;
@@ -40,10 +41,12 @@ public class ForestersManager extends ObjectsManager<Forester> {
 				int originalFromY = ThreadLocalRandom.current().nextInt(bottom, top);
 				int originalToY = ThreadLocalRandom.current().nextInt(bottom, top);
 
+				boolean ltr = ThreadLocalRandom.current().nextBoolean();
+
 				Forester f = new Forester(
-					GameScreen.tileSize * left,
+					GameScreen.tileSize * (ltr ? left : right),
 					GameScreen.tileSize * originalFromY,
-					GameScreen.tileSize * right, GameScreen.tileSize * originalToY, 1, bottom, top);
+					GameScreen.tileSize * (ltr ? right : left), GameScreen.tileSize * originalToY, 1, bottom, top);
 
 				float x = getNewSpeechX(f);
 				float y = getNewSpeechY(f);
