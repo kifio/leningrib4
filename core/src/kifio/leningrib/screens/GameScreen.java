@@ -12,8 +12,9 @@ import generator.ConstantsConfig;
 
 import kifio.leningrib.LGCGame;
 import kifio.leningrib.controller.WorldController;
-import kifio.leningrib.levels.Level;
+import kifio.leningrib.levels.CommonLevel;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.view.WorldRenderer;
@@ -41,7 +42,7 @@ public class GameScreen extends InputAdapter implements Screen {
     public Label gameOverLabel;
 
     private float gameOverTime;
-    public boolean isFirstLaunch = false;
+    public boolean isFirstLevelPassed = false;
 
     public WorldMap worldMap;
     public Player player;
@@ -70,9 +71,9 @@ public class GameScreen extends InputAdapter implements Screen {
         this.stage = new Stage(new ScreenViewport(camera), batch);
         this.gameOverLabel = SpeechManager.getInstance().getLabel("", x, y, Gdx.graphics.getWidth());
         this.worldController = new WorldController(this);
-        this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch);
+        this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch, constantsConfig);
         this.worldMap = new WorldMap();
-        this.player = new Player(0f, 2 * GameScreen.tileSize);
+        this.player = new Player(0f, 2 * GameScreen.tileSize, worldRenderer);
         setLevel(getNextLevel(nextLevelX, nextLevelY));
     }
 
@@ -96,7 +97,7 @@ public class GameScreen extends InputAdapter implements Screen {
     }
 
     private Level getNextLevel(int x, int y) {
-        return new Level(x, y, this);
+        return new CommonLevel(x, y, this);
     }
 
     public void setLevel(Level level) {
@@ -135,12 +136,11 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void dispose() {
-        Gdx.app.log("kifio", "GameScreen.dispose");
+
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
         }
-
 
         if (worldController != null) {
             worldController.dispose();

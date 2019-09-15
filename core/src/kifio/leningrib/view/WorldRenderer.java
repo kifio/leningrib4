@@ -7,13 +7,16 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import generator.ConstantsConfig;
 import java.util.List;
 import java.util.Locale;
+import kifio.leningrib.levels.CommonLevel;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
@@ -30,6 +33,7 @@ public class WorldRenderer {
 	private SpriteBatch batch;
 	private ShapeRenderer renderer;
 	private OrthographicCamera camera;
+	private ConstantsConfig constantsConfig;
 	private int cameraWidth;
 	private int cameraHeight;
 
@@ -41,12 +45,13 @@ public class WorldRenderer {
 	private static final String GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s ГРИБОВ";
 
 	public WorldRenderer(OrthographicCamera camera, int cameraWidth, int cameraHeight, Stage stage,
-		SpriteBatch batch) {
+		SpriteBatch batch, ConstantsConfig constantsConfig) {
 		this.camera = camera;
 		this.cameraWidth = cameraWidth;
 		this.cameraHeight = cameraHeight;
 		this.stage = stage;
 		this.batch = batch;
+		this.constantsConfig = constantsConfig;
 		this.grass = new TextureRegion(ResourcesManager.get("grass_0"));
 		this.renderer = new ShapeRenderer();
 	}
@@ -121,7 +126,7 @@ public class WorldRenderer {
 		camera.update();
 		float playerY = level.getPlayer().getY();
 		float bottomTreshold = Gdx.graphics.getHeight() / 2f;
-		float topTreshold = level.getLevelHeight() * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
+		float topTreshold = constantsConfig.getLevelHeight() * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
 		if (playerY < bottomTreshold) {
 			camera.position.y = bottomTreshold;
 		} else if (playerY > topTreshold) {
@@ -249,5 +254,9 @@ public class WorldRenderer {
 			stage = null;
 		}
 		camera = null;
+	}
+
+	public Matrix4 getMatrix() {
+		return camera.combined;
 	}
 }

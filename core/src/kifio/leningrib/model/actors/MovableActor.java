@@ -5,6 +5,7 @@ import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -27,6 +28,10 @@ public abstract class MovableActor extends Actor {
 
 	private float drawingWidth = GameScreen.tileSize;
 	private float drawingHeight = GameScreen.tileSize * 1.5f;
+
+	protected String vertexShader;
+	protected String fragmentShader;
+	protected ShaderProgram shaderProgram;
 
 	public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при
     // отрисовке фрейма размер пересчитывается

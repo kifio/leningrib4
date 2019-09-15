@@ -1,4 +1,4 @@
-package kifio.leningrib.levels;
+package kifio.leningrib.levels.helpers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
@@ -14,7 +14,7 @@ public class TreesManager {
 
 	public Array<Actor> trees = new Array<>();
 
-	void buildTrees(LevelMap levelMap, ConstantsConfig constantsConfig) {
+	public void buildTrees(LevelMap levelMap, ConstantsConfig constantsConfig) {
 		for (Segment s : levelMap.getSegments()) {
 			Actor tree = getActorFromCell(s.getValue(),
 				s.getX() * GameScreen.tileSize, s.getY() * GameScreen.tileSize, constantsConfig);

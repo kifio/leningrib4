@@ -1,12 +1,15 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import generator.ConstantsConfig;
 import java.util.List;
-import java.util.Random;
+import kifio.leningrib.levels.helpers.ForestersManager;
+import kifio.leningrib.levels.helpers.MushroomsManager;
+import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
@@ -16,78 +19,55 @@ import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
 import model.Room;
 
-public class Level {
-
-    // Граф поиска пути
-    private ForestGraph forestGraph;
+public abstract class Level {
 
     private GameScreen gameScreen;
-//    private Random random = new Random();
-
-    private MushroomsManager mushroomsManager = new MushroomsManager();
-    private ForestersManager forestersManager;
-    private TreesManager treesManager = new TreesManager();
-    private Grandma grandma = null;
-    private List<Label> tutorialLabels = null;
-
+    private ForestGraph forestGraph;
+    MushroomsManager mushroomsManager;
+    ForestersManager forestersManager;
+    TreesManager treesManager;
+    protected Array<Actor> actors;
     private boolean isDisposed = false;
 
-    private int levelHeight;
-
-    public Level(int x, int y, GameScreen gameScreen) {
+    Level(int x, int y, GameScreen gameScreen) {
         this.gameScreen = gameScreen;
-        forestersManager = new ForestersManager(gameScreen);
+        LevelMap levelMap = getLevelMap(gameScreen, x, y);
+
+        forestersManager = new ForestersManager(gameScreen, initForesters(levelMap, gameScreen));
+        treesManager = new TreesManager();
+        mushroomsManager = new MushroomsManager();
+
+        treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
+        mushroomsManager.initMushrooms(initMushrooms(gameScreen.constantsConfig, treesManager.trees));
+
+        forestGraph = new ForestGraph(gameScreen.constantsConfig, treesManager, getActors());
 
         // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
         if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
             gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.constantsConfig);
         }
 
-        LevelMap levelMap;
-
-        if (gameScreen.isFirstLaunch) {
-            gameScreen.isFirstLaunch = false;
-            grandma = new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize * 19);
-            levelMap = FirstLevel.getFirstLevel(gameScreen.constantsConfig);
-            // Возвращает результат помещения урвоня в пустой хэшмап (null).
-            gameScreen.worldMap.addLevel(x, y, levelMap);
-            treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
-            mushroomsManager.initMushrooms(FirstLevel.getMushrooms());
-            forestersManager.initDebugForester(FirstLevel.getForester());
-            tutorialLabels = FirstLevel.getTutorialLabels();
-        } else {
-            levelMap = gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig);
-            Rectangle[] roomRectangles = getRoomsRectangles(levelMap, gameScreen.constantsConfig);
-            treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
-            mushroomsManager.initMushrooms(gameScreen.constantsConfig, treesManager.trees);
-            forestersManager.initForester(roomRectangles);
-        }
-
-        this.forestGraph = new ForestGraph(gameScreen.constantsConfig, treesManager, forestersManager, grandma);
         for (Forester f: forestersManager.getForesters()) {
             f.initPath(forestGraph);
         }
-
-        levelHeight = gameScreen.constantsConfig.getLevelHeight();
     }
 
-    public void dispose() {
-        if (isDisposed) return;
-        mushroomsManager.dispose();
-        forestersManager.dispose();
-        forestGraph = null;
-        gameScreen = null;
-        isDisposed = true;
-    }
+    protected abstract Array<Actor> getActors();
 
-    public Player getPlayer() {
-        return gameScreen.player;
-    }
+    protected abstract LevelMap getLevelMap(GameScreen gameScreen, int x, int y);
+
+    protected abstract Array<Mushroom> initMushrooms(ConstantsConfig config, Array<Actor> trees);
+
+    protected abstract Array<Forester> initForesters(LevelMap levelMap, GameScreen gameScreen);
 
     public void update(float delta, float cameraY) {
         forestGraph.updateForestGraph(cameraY);
         forestersManager.updateForesters(delta, forestGraph);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY);
+    }
+
+    public Player getPlayer() {
+        return gameScreen.player;
     }
 
     public Array<Mushroom> getMushrooms() {
@@ -107,11 +87,11 @@ public class Level {
     }
 
     public Grandma getGrandma() {
-        return grandma;
+        return this instanceof FirstLevel ? (Grandma) getActors().get(0) : null;
     }
 
     public List<Label> getTutorialLabels() {
-        return tutorialLabels;
+        return this instanceof FirstLevel ? ((FirstLevel) this).tutorialLabels : null;
     }
 
     public Label[] getForestersSpeeches() {
@@ -122,19 +102,14 @@ public class Level {
         return mushroomsManager.getSpeeches();
     }
 
-    private Rectangle[] getRoomsRectangles(LevelMap levelMap, ConstantsConfig config) {
-        List<Room> rooms = levelMap.getRooms();
-        int size = rooms.size();
-        Rectangle[] rectangles = new Rectangle[size];
-
-        for (int i = 0; i < size; i++) {
-            Room room = rooms.get(i);
-            rectangles[i] = new Rectangle(0, room.getY(), config.getLevelWidth(), room.getHeight() - 2);
-        }
-        return rectangles;
-    }
-
-    public float getLevelHeight() {
-        return levelHeight;
+    public void dispose() {
+        if (isDisposed) return;
+        actors.clear();
+        mushroomsManager.dispose();
+        forestersManager.dispose();
+        actors = null;
+        forestGraph = null;
+        gameScreen = null;
+        isDisposed = true;
     }
 }

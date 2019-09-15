@@ -13,17 +13,16 @@ import com.badlogic.gdx.utils.Array;
 import generator.ConstantsConfig;
 import java.util.HashMap;
 import java.util.Locale;
-import javax.rmi.CORBA.Util;
 import kifio.leningrib.Utils;
-import kifio.leningrib.levels.ForestersManager;
-import kifio.leningrib.levels.TreesManager;
+import kifio.leningrib.levels.helpers.ForestersManager;
+import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.screens.GameScreen;
 
 public class ForestGraph implements IndexedGraph<Vector2> {
 
 	private Array<Connection<Vector2>> empty = new Array<>();
-	private ForestersManager forestersManager;
+//	private ForestersManager forestersManager;
 
 	private int mapWidth;
 	private int mapHeight;
@@ -49,29 +48,15 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	// Инициализирует ноды, которые могут использоваться для поиска маршрута
 	public ForestGraph(ConstantsConfig constantsConfig,
 		TreesManager treesManager,
-		ForestersManager forestersManager,
-		Grandma grandma) {
+		Array<Actor> actors) {
 
-		// На первом уровне будут бабка и лесник.
-		// На остальных пока только лесники.
-		if (grandma != null) {
-			actors = new Array<>(2);
-			actors.add(grandma);
-			actors.add(forestersManager.getForesters().get(0));
-			currentActorsPositions = new Vector2[2];
-			currentActorsPositions[0] = new Vector2(actors.get(0).getX(), actors.get(0).getY());
-			currentActorsPositions[1] = new Vector2(actors.get(1).getX(), actors.get(1).getY());
-		} else {
-			int size = forestersManager.gameObjects.size;
-			actors = new Array<>(size);
-			currentActorsPositions = new Vector2[size];
-			for (int i = 0; i < size; i++) {
-				actors.add(forestersManager.gameObjects.get(i));
-				currentActorsPositions[i] = new Vector2(actors.get(i).getX(), actors.get(i).getY());
-			}
+		this.actors = actors;
+		currentActorsPositions = new Vector2[actors.size];
+
+		for (int i = 0; i < actors.size; i++) {
+			currentActorsPositions[i] = new Vector2(actors.get(i).getX(), actors.get(i).getY());
 		}
 
-		this.forestersManager = forestersManager;
 		this.mapWidth = constantsConfig.getLevelWidth() * GameScreen.tileSize;
 		this.mapHeight = constantsConfig.getLevelHeight() * GameScreen.tileSize;
 
@@ -120,7 +105,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 		int size = currentActorsPositions.length;
 
 		for (int i = 0; i < size; i++) {
-			Actor actor = forestersManager.gameObjects.get(i);
+			Actor actor = actors.get(i);
 			int oldX = (int) currentActorsPositions[i].x;
 			int oldY = (int) currentActorsPositions[i].y;
 			int newX = (int) Utils.mapCoordinate(actor.getX());
@@ -227,7 +212,8 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	}
 
 	public void dispose() {
-		this.forestersManager = null;
+		this.actors.clear();
+		this.actors = null;
 		this.connections.clear();
 		this.nodes.clear();
 		this.connections = null;

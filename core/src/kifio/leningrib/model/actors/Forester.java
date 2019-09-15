@@ -207,6 +207,14 @@ public class Forester extends MovableActor {
 		return 500f;
 	}
 
+	public float getNewSpeechX() {
+		return getX() - GameScreen.tileSize / 2f;
+	}
+
+	public float getNewSpeechY() {
+		return getY() + GameScreen.tileSize * 1.5f;
+	}
+
 	@Override protected float getDelayTime() {
 		return 0.1f;
 	}

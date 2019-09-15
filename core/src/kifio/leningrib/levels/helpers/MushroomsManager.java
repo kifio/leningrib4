@@ -1,4 +1,4 @@
-package kifio.leningrib.levels;
+package kifio.leningrib.levels.helpers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -7,8 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import generator.ConstantsConfig;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Mushroom;
@@ -16,34 +14,20 @@ import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
-class MushroomsManager extends ObjectsManager<Mushroom> {
+public class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private Array<Mushroom> removedMushrooms = new Array<>(4);
 
-    MushroomsManager() {
+    public MushroomsManager() {
         gameObjects = new Array<>();
     }
-    
-    void initMushrooms(ConstantsConfig config, Array<Actor> trees) {
-        int levelHeight = config.getLevelHeight();
-        int levelWidth = config.getLevelWidth();
 
-        for (int i = 1; i < levelHeight; i++) {
-            int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
-            int y = GameScreen.tileSize * i;
-            if (!Utils.isOverlapsWithActor(trees, x, y)) {
-                gameObjects.add(new Mushroom(x, y));
-            }
-        }
-
+    public void initMushrooms(Array<Mushroom> mushrooms) {
+        gameObjects.addAll(mushrooms);
         speeches = new Label[gameObjects.size];
     }
 
-    void initMushrooms(Array<Mushroom> mushrooms) {
-        this.gameObjects.addAll(mushrooms);
-    }
-
-    void updateMushrooms(Player p, float cameraPositionY) {
+    public void updateMushrooms(Player p, float cameraPositionY) {
 
         int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
