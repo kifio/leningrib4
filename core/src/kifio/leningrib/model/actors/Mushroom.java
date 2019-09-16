@@ -9,21 +9,28 @@ import kifio.leningrib.screens.GameScreen;
 public class Mushroom extends MovableActor {
 
     private static long DEFAULT_EFFECT_TIME = 5000; // milliseconds
-    private static final String POWER_MUSHROOM = "power_mushroom.txt";
-    private static final String SPEED_MUSHROOM = "speed_mushroom.txt";
+    private static final String POWER_MUSHROOM = "power.txt";
+    private static final String SPEED_MUSHROOM = "speed.txt";
+    private static final String DEXTERITY_MUSHROOM = "dexterity.txt";
     private static final String MUSHROOM = "mushroom.txt";
 
     public enum Effect {
 
-        POWER(DEFAULT_EFFECT_TIME),
-        SPEED(DEFAULT_EFFECT_TIME),
-        INVISIBLE(DEFAULT_EFFECT_TIME),
-        DEXTERITY(DEFAULT_EFFECT_TIME);
+        POWER(POWER_MUSHROOM, DEFAULT_EFFECT_TIME),
+        SPEED(SPEED_MUSHROOM, DEFAULT_EFFECT_TIME),
+//        INVISIBLE(DEFAULT_EFFECT_TIME, DEFAULT_EFFECT_TIME),
+        DEXTERITY(DEXTERITY_MUSHROOM, DEFAULT_EFFECT_TIME);
 
+        private String effectName;
         private long effectTime;
 
-        Effect(long effectTime) {
+        Effect(String effectName, long effectTime) {
+            this.effectName = effectName;
             this.effectTime = effectTime;
+        }
+
+        public String getEffectName() {
+            return effectName;
         }
 
         public long getEffectTime() {
@@ -37,7 +44,8 @@ public class Mushroom extends MovableActor {
     public Mushroom(int x, int y) {
         super(x, y);
         Effect[] effects = Effect.values();
-        effect = ThreadLocalRandom.current().nextInt() / 4 == 0 ? effects[ThreadLocalRandom.current().nextInt()] : null;
+        int index = ThreadLocalRandom.current().nextInt(3);
+            effect = effects[index];
     }
 
     @Override public void draw(Batch batch, float alpha) {
@@ -64,19 +72,19 @@ public class Mushroom extends MovableActor {
     }
 
     @Override protected String getIdlingState() {
-        return POWER_MUSHROOM;
+        return effect.getEffectName();
     }
 
     @Override protected String getRunningState() {
-        return POWER_MUSHROOM;
+        return effect.getEffectName();
     }
 
     protected float getDrawingWidth() {
-        return GameScreen.tileSize;
+        return GameScreen.tileSize / 2;
     }
 
     protected float getDrawingHeight() {
-        return GameScreen.tileSize;
+        return GameScreen.tileSize / 2;
     }
 
     @Override

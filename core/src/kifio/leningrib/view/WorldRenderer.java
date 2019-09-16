@@ -37,7 +37,7 @@ public class WorldRenderer {
 	private int cameraWidth;
 	private int cameraHeight;
 
-	private Vector2 drawGridVector = new Vector2();
+	private Color demoGrass = Color.valueOf("#8f6f0b");
 	private Color playerDebugColor = new Color(0f, 0f, 1f, 0.5f);
 	private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
 	private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
@@ -116,7 +116,7 @@ public class WorldRenderer {
 
 		updateCamera();
 		drawGrass();
-		drawDebug();
+//		drawDebug();
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();

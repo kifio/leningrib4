@@ -1,0 +1,12 @@
+power.png
+size: 98, 98
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+mushroom-0
+  rotate: false
+  xy: 0, 0
+  size: 98, 98
+  orig: 98, 98
+  offset: 0, 0
+  index: -1
