@@ -17,13 +17,17 @@ public class ResourcesManager {
     public static I18NBundle forestersSpeechesPursuitBundle;
     public static I18NBundle forestersSpeechesStopBundle;
 
+    private static AssetManager am;
+
     public static void init() {
 
-        AssetManager am = new AssetManager();
+        am = new AssetManager();
         am.load("overworld.png", Texture.class);
         am.load("forest_tiles.png", Texture.class);
         am.load("power_mushroom.png", Texture.class);
         am.load("bottle.png", Texture.class);
+        am.load("player_run.png", Texture.class);
+        am.load("player_idle.png", Texture.class);
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/foresters_speeches_noticing", I18NBundle.class);
         am.load("i18n/foresters_speeches_patrol", I18NBundle.class);
@@ -61,7 +65,11 @@ public class ResourcesManager {
         forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
     }
 
-    public static TextureRegion get(String name) {
+    public static TextureRegion getRegion(String name) {
         return regions.get(name);
+    }
+
+    public static Texture getTexture(String name) {
+        return am.get(name.concat(".png"));
     }
 }

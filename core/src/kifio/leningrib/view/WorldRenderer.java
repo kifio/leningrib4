@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import generator.ConstantsConfig;
 import java.util.List;
 import java.util.Locale;
-import kifio.leningrib.levels.CommonLevel;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
@@ -52,7 +51,7 @@ public class WorldRenderer {
 		this.stage = stage;
 		this.batch = batch;
 		this.constantsConfig = constantsConfig;
-		this.grass = new TextureRegion(ResourcesManager.get("grass_0"));
+		this.grass = new TextureRegion(ResourcesManager.getRegion("grass_0"));
 		this.renderer = new ShapeRenderer();
 	}
 

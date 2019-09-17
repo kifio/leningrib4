@@ -14,7 +14,7 @@ import kifio.leningrib.screens.GameScreen;
 public class Grandma extends MovableActor {
 
     private static final int MONOLOG_LENGTH = 1;
-    private static final String IDLE = "grandma_idle.txt";
+    private static final String IDLE = "grandma_idle";
     private static final float dialogThreshold = (GameScreen.tileSize * GameScreen.tileSize) * 2;
 
     public enum DialogState {
@@ -52,7 +52,7 @@ public class Grandma extends MovableActor {
 
         for (int i = 0; i < MONOLOG_LENGTH; i++) {
             greetings.get(i).addAction(getSpeechAction(i, 2f));
-//            greetings.get(i).addAction(getSpeechAction(i, 4f));
+//            greetings.getRegion(i).addAction(getSpeechAction(i, 4f));
         }
 
     }

@@ -9,10 +9,10 @@ import kifio.leningrib.screens.GameScreen;
 public class Mushroom extends MovableActor {
 
     private static long DEFAULT_EFFECT_TIME = 5000; // milliseconds
-    private static final String POWER_MUSHROOM = "power.txt";
-    private static final String SPEED_MUSHROOM = "speed.txt";
-    private static final String DEXTERITY_MUSHROOM = "dexterity.txt";
-    private static final String MUSHROOM = "mushroom.txt";
+    private static final String POWER_MUSHROOM = "power";
+    private static final String SPEED_MUSHROOM = "speed";
+    private static final String DEXTERITY_MUSHROOM = "dexterity";
+    private static final String MUSHROOM = "mushroom";
 
     public enum Effect {
 

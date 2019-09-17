@@ -73,8 +73,8 @@ public class Forester extends MovableActor {
 		this.originalBottomLimit = originalBottomLimit;
 		this.originalTopLimit = originalTopLimit;
 
-		running = String.format(Locale.getDefault(), "enemy_%d_run.txt", index);
-		idle = String.format(Locale.getDefault(), "enemy_%d_idle.txt", index);
+		running = String.format(Locale.getDefault(), "enemy_%d_run", index);
+		idle = String.format(Locale.getDefault(), "enemy_%d_idle", index);
 		setPath(originalToX, originalToY, null);
 	}
 

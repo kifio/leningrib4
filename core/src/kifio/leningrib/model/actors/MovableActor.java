@@ -29,10 +29,6 @@ public abstract class MovableActor extends Actor {
 	private float drawingWidth = GameScreen.tileSize;
 	private float drawingHeight = GameScreen.tileSize * 1.5f;
 
-	protected String vertexShader;
-	protected String fragmentShader;
-	protected ShaderProgram shaderProgram;
-
 	public Rectangle bounds;    // квадрат вокруг текстрки. т.к. текстурки в анимации могут быть разного размера, при
     // отрисовке фрейма размер пересчитывается
 

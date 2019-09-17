@@ -40,7 +40,7 @@ public class TreesManager {
 	}
 
 	private static Actor getObstacle(String name, int value, int x, int y) {
-		return new TreePart(ResourcesManager.get(String.format(Locale.getDefault(), "%s_%d", name, value)), x, y,
+		return new TreePart(ResourcesManager.getRegion(String.format(Locale.getDefault(), "%s_%d", name, value)), x, y,
 			GameScreen.tileSize, GameScreen.tileSize);
 	}
 }

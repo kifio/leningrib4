@@ -17,8 +17,8 @@ import kifio.leningrib.view.WorldRenderer;
 
 public class Player extends MovableActor {
 
-    private static final String IDLE = "player_idle.txt";
-    private static final String RUNING = "player_run.txt";
+    private static final String IDLE = "player_idle";
+    private static final String RUNING = "player_run";
     private static final Color CLOTHES_COLOR = Color.valueOf("#FDA010");
 
 	private int mushroomsCount = 0;
@@ -27,14 +27,22 @@ public class Player extends MovableActor {
 
 	public Player(float x, float y, WorldRenderer worldRenderer) {
 		super(x, y);
-		vertexShader = Gdx.files.internal("common_vertex.glsl").readString();
-		fragmentShader = Gdx.files.internal("player_fragment.glsl").readString();
-		shaderProgram = new ShaderProgram(vertexShader,fragmentShader);
-//		shaderProgram.setUniformMatrix("u_projTrans", worldRenderer.getMatrix());
+	}
+
+	private float stateTime = 0f;
+
+	@Override public void act(float delta) {
+		super.act(delta);
+		stateTime += delta;
+		if (this.mushroomsCount > 0 && stateTime > 0.5f) {
+			UIState.obtainUIState(getIdlingState(), this).setPlayerColorizedAnimation(Color.rgba8888(CLOTHES_COLOR));
+			UIState.obtainUIState(getRunningState(), this).setPlayerColorizedAnimation(Color.rgba8888(CLOTHES_COLOR));
+			stateTime = 0f;
+		}
+		stateTime += delta;
 	}
 
 	@Override public void draw(Batch batch, float alpha) {
-//		batch.setShader(shaderProgram);
 		super.draw(batch, alpha);
 	}
 
