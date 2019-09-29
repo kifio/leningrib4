@@ -1,13 +1,12 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import generator.ConstantsConfig;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.actors.Mushroom.Effect;
@@ -19,14 +18,18 @@ public class Player extends MovableActor {
 
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
-    private static final Color CLOTHES_COLOR = Color.valueOf("#FDA010");
+	private final Color clothesColor = Color.valueOf("#FDA010");
+	private Color newColor = Color.valueOf("#FDA010");
+    private float[] clothesHSV = new float[3];
 
 	private int mushroomsCount = 0;
 	private long effectiveMushroomTakeTime = 0L;
 	private Effect effect;
+	private int passedLevelsCount;
 
-	public Player(float x, float y, WorldRenderer worldRenderer) {
+	public Player(float x, float y) {
 		super(x, y);
+		clothesHSV = clothesColor.toHsv(clothesHSV);
 	}
 
 	private float stateTime = 0f;
@@ -34,12 +37,22 @@ public class Player extends MovableActor {
 	@Override public void act(float delta) {
 		super.act(delta);
 		stateTime += delta;
-		if (this.mushroomsCount > 0 && stateTime > 0.5f) {
-			UIState.obtainUIState(getIdlingState(), this).setPlayerColorizedAnimation(Color.rgba8888(CLOTHES_COLOR));
-			UIState.obtainUIState(getRunningState(), this).setPlayerColorizedAnimation(Color.rgba8888(CLOTHES_COLOR));
-			stateTime = 0f;
-		}
+//		if (this.mushroomsCount > 0 && this.passedLevelsCount > 1 && stateTime > 1 - passedLevelsCount * 0.1f) {
+//			updateClothesColor();
+//			UIState.obtainUIState(getIdlingState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
+//			UIState.obtainUIState(getRunningState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
+//			stateTime = 0f;
+//		}
 		stateTime += delta;
+	}
+
+	private void updateClothesColor() {
+		if (clothesHSV[0] >= 360) {
+			clothesHSV[0] = 0;
+		} else {
+			clothesHSV[0] += 10;
+		}
+		newColor.fromHsv(clothesHSV);
 	}
 
 	@Override public void draw(Batch batch, float alpha) {
@@ -92,20 +105,19 @@ public class Player extends MovableActor {
 
 	public void resetPlayerPath(float x, float y, ForestGraph forestGraph, GameScreen gameScreen) {
 
-		float fromX = Utils.mapCoordinate(gameScreen.player.getX());
-		float fromY = Utils.mapCoordinate(gameScreen.player.getY());
+		float fromX = Utils.mapCoordinate(getX());
+		float fromY = Utils.mapCoordinate(getY());
 		float toX = Utils.mapCoordinate(x);
 		float toY = Utils.mapCoordinate(y);
 
 		if (!forestGraph.isNodeExists(toX, toY)) { return; }
 		if (MathUtils.isEqual(fromX, toX) && MathUtils.isEqual(fromY, toY)) { return; }
 
-		gameScreen.player.stop();
+		stop();
 		forestGraph.updatePath(fromX, fromY, toX, toY, path);
 
 		if (path.getCount() > 0) {
-			SequenceAction playerActionsSequence = gameScreen.player.getMoveActionsSequence();
-			gameScreen.player.addAction(playerActionsSequence);
+			addAction(getMoveActionsSequence());
 		}
 	}
 
@@ -142,5 +154,14 @@ public class Player extends MovableActor {
 		}));
 		seq.addAction(getDelayAction(getDelayTime()));
 		return seq;
+	}
+
+	public void resetPosition(ConstantsConfig constantsConfig) {
+		if (getY() >= (constantsConfig.getLevelHeight() - 1) * GameScreen.tileSize) {
+			setY(0);
+		} else if (getX() >= (constantsConfig.getLevelWidth() - 1) * GameScreen.tileSize) {
+			setX(0);
+		}
+		passedLevelsCount++;
 	}
 }

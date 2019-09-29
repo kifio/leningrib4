@@ -122,15 +122,16 @@ public class FirstLevelBuilder {
 
 	private static float labelWidth =  Gdx.graphics.getWidth() - 2 * GameScreen.tileSize;
 
-	static List<Label> getTutorialLabels() {
+	static Label[] getTutorialLabels() {
 
-		List<Label> list = new ArrayList<>();
-		list.add(SpeechManager.getInstance().getLabel("Нажимай на экран, чтобы перемещать персонажа",
+		Label[] list = new Label[2];
+
+		list[0] = (SpeechManager.getInstance().getLabel("Нажимай на экран, чтобы перемещать персонажа",
 			(Gdx.graphics.getWidth() - labelWidth) / 2,GameScreen.tileSize * 4, GameScreen.tileSize * 4));
 
-		list.add(SpeechManager.getInstance().getLabel("Ты всегда можешь покинуть уровень через выход справа или сверху",
+		list[1] = (SpeechManager.getInstance().getLabel("Ты всегда можешь покинуть уровень через выход справа или сверху",
 			(Gdx.graphics.getWidth() - labelWidth) / 2 + GameScreen.tileSize,
-			GameScreen.tileSize * 11 + GameScreen.tileSize / 2, GameScreen.tileSize * 4));
+			GameScreen.tileSize * 12 + GameScreen.tileSize / 2, GameScreen.tileSize * 4));
 
 		return list;
 	}

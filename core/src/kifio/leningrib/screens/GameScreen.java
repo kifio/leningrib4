@@ -15,6 +15,7 @@ import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.CommonLevel;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import kifio.leningrib.levels.Level;
+import kifio.leningrib.levels.LevelFabric;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.view.WorldRenderer;
@@ -38,17 +39,15 @@ public class GameScreen extends InputAdapter implements Screen {
     private int nextLevelX = 0;
     private int nextLevelY = 0;
     private Stage stage;
-    private SpriteBatch batch;
-    public Label gameOverLabel;
 
     private float gameOverTime;
-    public boolean isFirstLevelPassed = false;
+    public boolean isFirstLevelPassed = true;
 
     public WorldMap worldMap;
     public Player player;
 
     public ConstantsConfig constantsConfig = new ConstantsConfig(
-            7,
+            9,
             36,
             2,
             0,
@@ -67,13 +66,17 @@ public class GameScreen extends InputAdapter implements Screen {
         float y = Gdx.graphics.getHeight() / 2f;
 
         this.game = game;
-        this.batch = new SpriteBatch();
+        SpriteBatch batch = new SpriteBatch();
         this.stage = new Stage(new ScreenViewport(camera), batch);
-        this.gameOverLabel = SpeechManager.getInstance().getLabel("", x, y, Gdx.graphics.getWidth());
+        Label gameOverLabel = SpeechManager.getInstance().getLabel("", x, y, Gdx.graphics.getWidth());
         this.worldController = new WorldController(this);
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch, constantsConfig);
         this.worldMap = new WorldMap();
-        this.player = new Player(0f, 2 * GameScreen.tileSize, worldRenderer);
+        if (isFirstLevelPassed) {
+            this.player = new Player(0f, 2f * GameScreen.tileSize);
+        } else {
+            this.player = new Player(2f * GameScreen.tileSize, 0f);
+        }
         setLevel(getNextLevel(nextLevelX, nextLevelY));
     }
 
@@ -97,7 +100,7 @@ public class GameScreen extends InputAdapter implements Screen {
     }
 
     private Level getNextLevel(int x, int y) {
-        return new CommonLevel(x, y, this);
+        return LevelFabric.getNextLevel(x, y, this);
     }
 
     public void setLevel(Level level) {
@@ -117,12 +120,8 @@ public class GameScreen extends InputAdapter implements Screen {
             worldController.update(delta, camera.position.y, stage);
             worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
-
-            if (player.getY() >= (constantsConfig.getLevelHeight() - 1) * GameScreen.tileSize) {
-                player.setY(0);
-            } else if (player.getX() >= (constantsConfig.getLevelWidth() - 1) * GameScreen.tileSize) {
-                player.setX(0);
-            }
+//            isFirstLevelPassed = true;
+            player.resetPosition(constantsConfig);
 
             setLevel(getNextLevel(nextLevelX, nextLevelY));
 

@@ -31,7 +31,6 @@ public class UIState {
 	private TextureAtlas playerAtlas;
 	private @NotNull String packFile;
 	private float frameDuration;
-	private UIStateColor stateColor = new UIStateColor();
 
 	private UIState(@NotNull String packFile, float frameDuration) {
 		this.packFile = packFile;
@@ -40,7 +39,7 @@ public class UIState {
 		this.actorAnimation = new Animation<>(frameDuration, playerAtlas.getRegions());
 	}
 
-	public void setPlayerColorizedAnimation(int pixelColor) {
+	public void setPlayerColorizedAnimation(int pixelColor, Color newColor) {
 		int count = playerAtlas.getRegions().size;
 
 		Pixmap pixmap;
@@ -50,7 +49,7 @@ public class UIState {
 
 		textureData.prepare();
 		pixmap = textureData.consumePixmap();
-		pixmap.setColor(stateColor.getNext());
+		pixmap.setColor(newColor);
 		updatePixmap(pixmap, pixelColor);
 
 		int x = 16;
@@ -94,23 +93,5 @@ public class UIState {
 
 	public @NotNull Animation getAnimation() {
 		return actorAnimation;
-	}
-
-	private static class UIStateColor {
-
-		private int current = 0;
-
-		Color[] colors = new Color[]{Color.valueOf("#FD9F10"), Color.valueOf("#FFC56B"), Color.valueOf("#FFB442"),
-			Color.valueOf("#CB7B00"), Color.valueOf("#A06100"), Color.valueOf("#FDC810"), Color.valueOf("#FFDE6B"),
-			Color.valueOf("#FFD542"), Color.valueOf("#CB9E00"), Color.valueOf("#A07C00"), Color.valueOf("#2E22B0"),
-			Color.valueOf("#6D64C8"), Color.valueOf("#4C42B7"), Color.valueOf("#1E138D"), Color.valueOf("#150C6F"),
-			Color.valueOf("#175AA5"), Color.valueOf("#5A8AC1"), Color.valueOf("#376FAD"), Color.valueOf("#0A4485"),
-			Color.valueOf("#073568")};
-
-		Color getNext() {
-			Color c = colors[current];
-			current = (current == colors.length - 1 ? 0 : current + 1);
-			return c;
-		}
 	}
 }

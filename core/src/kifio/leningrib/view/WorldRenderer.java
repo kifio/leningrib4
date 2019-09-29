@@ -20,6 +20,7 @@ import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.model.actors.Space;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
@@ -41,7 +42,7 @@ public class WorldRenderer {
 	private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
 	private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
 
-	private static final String GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s ГРИБОВ";
+	private static final String GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s МОНЕТ";
 
 	public WorldRenderer(OrthographicCamera camera, int cameraWidth, int cameraHeight, Stage stage,
 		SpriteBatch batch, ConstantsConfig constantsConfig) {
@@ -65,9 +66,8 @@ public class WorldRenderer {
 
 		for (Actor tree : level.getTrees()) { stage.addActor(tree); }
 
-		List<Label> tutorialLabels = level.getTutorialLabels();
-		if (tutorialLabels != null) {
-			for (Label l : tutorialLabels) {
+		if (level.getTutorialLabels() != null) {
+			for (Label l : level.getTutorialLabels()) {
 				stage.addActor(l);
 			}
 		}
@@ -75,9 +75,18 @@ public class WorldRenderer {
 		for (Actor mushroom : level.getMushrooms()) { stage.addActor(mushroom); }
 		stage.addActor(level.getPlayer());
 		if (level.getGrandma() != null) { stage.addActor(level.getGrandma()); }
+
 		for (int i = 0; i < level.getForesters().size; i++) {
 			stage.addActor(level.getForesters().get(i));
 			stage.addActor(level.getForestersSpeeches()[i]);
+		}
+
+		if (level.getGrandma() != null) {
+			stage.addActor(level.getGrandma().getGrandmaLabel());
+		}
+
+		for (Space s : level.getSpaces()) {
+			stage.addActor(s);
 		}
 	}
 

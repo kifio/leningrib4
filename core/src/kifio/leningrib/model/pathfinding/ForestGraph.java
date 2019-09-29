@@ -28,7 +28,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	private int mapHeight;
 
 	// Ссылки на всех актеров на сцене
-	private Array<Actor> actors;
+	private Array<? extends Actor> actors;
 
 	// Массив позиций лесников, чтобы не перестраивать граф, когда ничего не сдвинулся с места.
 	private Vector2[] currentActorsPositions;
@@ -47,8 +47,9 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
 	// Инициализирует ноды, которые могут использоваться для поиска маршрута
 	public ForestGraph(ConstantsConfig constantsConfig,
-		TreesManager treesManager,
-		Array<Actor> actors) {
+		Array<? extends Actor> trees,
+		Array<? extends Actor> actors,
+		Array<? extends Actor> spaces) {
 
 		this.actors = actors;
 		currentActorsPositions = new Vector2[actors.size];
@@ -66,7 +67,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 			for (int j = 0; j < constantsConfig.getLevelHeight(); j++) {
 				x = GameScreen.tileSize * i;
 				y = GameScreen.tileSize * j;
-				if (!isActor(x, y, treesManager.trees)) {
+				if (!isActor(x, y, trees) && !isActor(x, y, spaces)) {
 					nodes.add(new Vector2(x, y));
 				}
 			}
@@ -190,7 +191,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	}
 
 	// Нодой может быть только клетка, на которой нет актера
-	private boolean isActor(int x, int y, Array<Actor> actor) {
+	private boolean isActor(int x, int y, Array<? extends Actor> actor) {
 		for (int i = 0; i < actor.size; i++) {
 			Actor segment = actor.get(i);
 			if (segment != null && Utils.mapCoordinate(segment.getX()) == x && Utils.mapCoordinate(segment.getY()) == y) {

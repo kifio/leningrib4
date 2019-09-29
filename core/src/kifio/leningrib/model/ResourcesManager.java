@@ -16,6 +16,7 @@ public class ResourcesManager {
     public static I18NBundle forestersSpeechesPlayerInRoomBundle;
     public static I18NBundle forestersSpeechesPursuitBundle;
     public static I18NBundle forestersSpeechesStopBundle;
+    public static I18NBundle grandmaSpeechesBundle;
 
     private static AssetManager am;
 
@@ -34,6 +35,7 @@ public class ResourcesManager {
         am.load("i18n/foresters_speeches_player_in_room", I18NBundle.class);
         am.load("i18n/foresters_speeches_pursuit", I18NBundle.class);
         am.load("i18n/foresters_speeches_stop", I18NBundle.class);
+        am.load("i18n/grandma_speeches", I18NBundle.class);
         am.finishLoading();
 
         Texture overworld = am.get("overworld.png");
@@ -63,6 +65,7 @@ public class ResourcesManager {
         forestersSpeechesPlayerInRoomBundle = am.get("i18n/foresters_speeches_player_in_room", I18NBundle.class);
         forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
         forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
+        grandmaSpeechesBundle = am.get("i18n/grandma_speeches", I18NBundle.class);
     }
 
     public static TextureRegion getRegion(String name) {

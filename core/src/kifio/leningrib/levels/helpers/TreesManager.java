@@ -12,7 +12,7 @@ import model.Segment;
 
 public class TreesManager {
 
-	public Array<Actor> trees = new Array<>();
+	private Array<Actor> trees = new Array<>();
 
 	public void buildTrees(LevelMap levelMap, ConstantsConfig constantsConfig) {
 		for (Segment s : levelMap.getSegments()) {
@@ -42,5 +42,9 @@ public class TreesManager {
 	private static Actor getObstacle(String name, int value, int x, int y) {
 		return new TreePart(ResourcesManager.getRegion(String.format(Locale.getDefault(), "%s_%d", name, value)), x, y,
 			GameScreen.tileSize, GameScreen.tileSize);
+	}
+
+	public Array<? extends Actor> getTrees() {
+		return trees;
 	}
 }

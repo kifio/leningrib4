@@ -2,7 +2,6 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.screens.GameScreen;
 
@@ -13,6 +12,7 @@ public class Mushroom extends MovableActor {
     private static final String SPEED_MUSHROOM = "speed";
     private static final String DEXTERITY_MUSHROOM = "dexterity";
     private static final String MUSHROOM = "mushroom";
+    private static final String COIN = "coins";
 
     public enum Effect {
 
@@ -72,11 +72,11 @@ public class Mushroom extends MovableActor {
     }
 
     @Override protected String getIdlingState() {
-        return effect.getEffectName();
+        return COIN;//effect.getEffectName();
     }
 
     @Override protected String getRunningState() {
-        return effect.getEffectName();
+        return COIN;//effect.getEffectName();
     }
 
     protected float getDrawingWidth() {

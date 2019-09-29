@@ -91,6 +91,10 @@ public class SpeechManager {
 		return ResourcesManager.forestersSpeechesStopBundle.get(String.valueOf(random(1, 2)));
 	}
 
+	public String getGrandmaSpeech(int i) {
+		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
+	}
+
 	public Label getLabel(String text, float x, float y, float targetWidth) {
 		Label label = new Label(text, labelStyle);
 		label.setWrap(true);

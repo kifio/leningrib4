@@ -34,8 +34,7 @@ public class WorldController {
 		if (level.getGrandma() != null) {
 			if (level.getGrandma().isReadyForDialog(level.getPlayer())) {
 				level.getGrandma().startDialog();
-				List<Label> greetings = level.getGrandma().getGreetings();
-				for (int i = 0; i < greetings.size(); i++) { stage.addActor(greetings.get(i)); }
+				stage.addActor(level.getGrandma().getGrandmaLabel());
 			}
 		}
 

@@ -22,38 +22,38 @@ public class Grandma extends MovableActor {
     }
 
     private DialogState dialogState = DialogState.BEFORE_DIALOG;
+//    private List<Label> positiveReaction = new ArrayList<>(MONOLOG_LENGTH);
+//    private List<Label> negativeReaction= new ArrayList<>(MONOLOG_LENGTH);
 
-    private List<Label> greetings = new ArrayList<>(MONOLOG_LENGTH);
-    private List<Label> positiveReaction = new ArrayList<>(MONOLOG_LENGTH);
-    private List<Label> negativeReaction= new ArrayList<>(MONOLOG_LENGTH);
+    private float speechX, speechY;
+
+    private Label grandmaLabel;
 
     public Grandma(float x, float y) {
         super(x, y);
-        
-        float speechX = x - GameScreen.tileSize / 2f;
 
-        greetings.add(SpeechManager.getInstance().getLabel("Ты гляди, че делает!", speechX,
-            y + GameScreen.tileSize, GameScreen.tileSize * 3));
+        speechX = x - GameScreen.tileSize / 2f;
+        speechY = y;
+
+        grandmaLabel = SpeechManager.getInstance().getLabel("Ты гляди, че делает!", speechX,
+            y + GameScreen.tileSize, GameScreen.tileSize * 3);
 
 //        greetings.add(SpeechManager.getInstance().getLabel("Немытые грибы с земли срывает да ест!", speechX,
 //            y + GameScreen.tileSize, GameScreen.tileSize * 3));
 
-        positiveReaction.add(SpeechManager.getInstance().getLabel("Ох, милок! На, хоть водочкой рот хоть пополощи.", speechX,
-            y + GameScreen.tileSize, GameScreen.tileSize * 3));
+//        positiveReaction.add(SpeechManager.getInstance().getLabel("Ох, милок! На, хоть водочкой рот хоть пополощи.", speechX,
+//            y + GameScreen.tileSize, GameScreen.tileSize * 3));
+//
+//        positiveReaction.add(SpeechManager.getInstance().getLabel("Только тутошним лесникам не ее не предлагай! Они от ней совсем ум теряют", speechX,
+//            y + GameScreen.tileSize, GameScreen.tileSize * 3));
+//
+//        negativeReaction.add(SpeechManager.getInstance().getLabel("От грубиян, окаянный!!", speechX,
+//            y + GameScreen.tileSize, GameScreen.tileSize * 3));
+//
+//        negativeReaction.add(SpeechManager.getInstance().getLabel("Помогите! Наркоман смерти моей хочет!", speechX,
+//            y + GameScreen.tileSize, GameScreen.tileSize * 3));
 
-        positiveReaction.add(SpeechManager.getInstance().getLabel("Только тутошним лесникам не ее не предлагай! Они от ней совсем ум теряют", speechX,
-            y + GameScreen.tileSize, GameScreen.tileSize * 3));
-
-        negativeReaction.add(SpeechManager.getInstance().getLabel("От грубиян, окаянный!!", speechX,
-            y + GameScreen.tileSize, GameScreen.tileSize * 3));
-
-        negativeReaction.add(SpeechManager.getInstance().getLabel("Помогите! Наркоман смерти моей хочет!", speechX,
-            y + GameScreen.tileSize, GameScreen.tileSize * 3));
-
-        for (int i = 0; i < MONOLOG_LENGTH; i++) {
-            greetings.get(i).addAction(getSpeechAction(i, 2f));
-//            greetings.getRegion(i).addAction(getSpeechAction(i, 4f));
-        }
+        grandmaLabel.addAction(getSpeechAction(new int[]{1, 2}, 4f));
 
     }
 
@@ -106,21 +106,28 @@ public class Grandma extends MovableActor {
         dialogState = DialogState.DIALOG_ACTIVE;
     }
 
-    public List<Label> getGreetings() {
-        return greetings;
+    public Label getGrandmaLabel() {
+        return grandmaLabel;
     }
 
-    private SequenceAction getSpeechAction(int i, float duration) {
+    private SequenceAction getSpeechAction(int[] arr, float duration) {
         SequenceAction seq = new SequenceAction();
-        if (i > 0) seq.addAction(Actions.hide());
-        seq.addAction(Actions.delay(duration));
-        seq.addAction(Actions.run(new Runnable() {
-            @Override public void run() {
-                greetings.get(0).setText("Немытые грибы с земли срывает да ест!");
-            }
-        }));
-        seq.addAction(Actions.delay(duration));
-        seq.addAction(Actions.removeActor());
+        for (int i = 0; i < arr.length; i++) {
+            final int index = arr[i];
+            seq.addAction(Actions.hide());
+            seq.addAction(Actions.delay(duration));
+            seq.addAction(Actions.run(new Runnable() {
+                @Override public void run() {
+                    grandmaLabel = SpeechManager.getInstance().getLabel(
+                        SpeechManager.getInstance().getGrandmaSpeech(index), speechX,
+                        speechY + GameScreen.tileSize, GameScreen.tileSize * 3);
+
+//                    grandmaLabel.setText(SpeechManager.getInstance().getGrandmaSpeech(index));
+                }
+            }));
+            seq.addAction(Actions.delay(duration));
+            seq.addAction(Actions.removeActor());
+        }
         return seq;
     }
 }
