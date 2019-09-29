@@ -50,7 +50,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
                         speeches[index] = null;
                     }
 
-                    if (m.getEffect() != null) {
+                    if (m.getEffect() != 0) {
                         p.onEffectiveMushroomTake(m);
                     }
 

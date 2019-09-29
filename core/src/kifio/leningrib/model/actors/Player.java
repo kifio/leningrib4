@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import generator.ConstantsConfig;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
-import kifio.leningrib.model.actors.Mushroom.Effect;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
 import kifio.leningrib.view.WorldRenderer;
@@ -24,7 +23,7 @@ public class Player extends MovableActor {
 
 	private int mushroomsCount = 0;
 	private long effectiveMushroomTakeTime = 0L;
-	private Effect effect;
+	private int effect;
 	private int passedLevelsCount;
 
 	public Player(float x, float y) {
@@ -37,12 +36,12 @@ public class Player extends MovableActor {
 	@Override public void act(float delta) {
 		super.act(delta);
 		stateTime += delta;
-//		if (this.mushroomsCount > 0 && this.passedLevelsCount > 1 && stateTime > 1 - passedLevelsCount * 0.1f) {
-//			updateClothesColor();
-//			UIState.obtainUIState(getIdlingState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
-//			UIState.obtainUIState(getRunningState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
-//			stateTime = 0f;
-//		}
+		if (this.mushroomsCount > 0 && this.passedLevelsCount > 1 && stateTime > 1 - passedLevelsCount * 0.1f) {
+			updateClothesColor();
+			UIState.obtainUIState(getIdlingState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
+			UIState.obtainUIState(getRunningState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
+			stateTime = 0f;
+		}
 		stateTime += delta;
 	}
 
@@ -73,11 +72,11 @@ public class Player extends MovableActor {
 	}
 
 	public boolean updateEffectState() {
-		if (System.currentTimeMillis() - effectiveMushroomTakeTime >= effect.getEffectTime()) {
-			effect = null;
-			effectiveMushroomTakeTime = 0L;
-			return false;
-		}
+//		if (System.currentTimeMillis() - effectiveMushroomTakeTime >= effect.getEffectTime()) {
+//			effect = null;
+//			effectiveMushroomTakeTime = 0L;
+//			return false;
+//		}
 		return true;
 	}
 
