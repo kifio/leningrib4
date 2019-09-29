@@ -1,4 +1,4 @@
-player_run.png
+player_run_alt.png
 size: 64, 24
 format: RGBA8888
 filter: Nearest,Nearest

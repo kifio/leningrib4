@@ -1,4 +1,4 @@
-player_idle.png
+player_idle_alt.png
 size: 64, 24
 format: RGBA8888
 filter: Nearest,Nearest
