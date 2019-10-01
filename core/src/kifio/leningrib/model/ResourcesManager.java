@@ -59,7 +59,6 @@ public class ResourcesManager {
 
 		Texture overworld = am.get("overworld.png");
 		Texture forestTiles = am.get("forest_tiles.png");
-//        Texture medievalRTSSpriteSheet = am.get("medieval_rts_spritesheet.png");
 
 		Texture grass0Texture = am.get("medieval_grass_0.png");
 		Texture grass1Texture = am.get("medieval_grass_1.png");
@@ -118,8 +117,6 @@ public class ResourcesManager {
 		Pixmap regionPixmap = region.getTexture().getTextureData().consumePixmap();
 		Pixmap resultPixmap = new Pixmap(width, height, Format.RGBA8888);
 
-//		resultPixmap.setBlending(Blending.None);
-
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j <= height; j++) {
 				if (regionPixmap.getPixel(i, j) != Color.rgba8888(Color.CLEAR)) {
@@ -133,10 +130,8 @@ public class ResourcesManager {
 			}
 		}
 
-
-//		resultPixmap.setBlending(Blending.SourceOver);
 		TextureRegion resultRegion = new TextureRegion(new Texture(resultPixmap));
-		                       
+
 		regionPixmap.dispose();
 		resultPixmap.dispose();
 		return resultRegion;

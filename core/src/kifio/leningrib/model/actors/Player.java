@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -11,13 +12,12 @@ import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
-import kifio.leningrib.view.WorldRenderer;
 
 public class Player extends MovableActor {
 
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
-	private final Color clothesColor = Color.valueOf("#FDA010");
+	private final Color clothesColor = Color.valueOf("#DF6C43");
 	private Color newColor = Color.valueOf("#FDA010");
     private float[] clothesHSV = new float[3];
 
@@ -36,10 +36,10 @@ public class Player extends MovableActor {
 	@Override public void act(float delta) {
 		super.act(delta);
 		stateTime += delta;
-		if (this.mushroomsCount > 0 && this.passedLevelsCount > 1 && stateTime > 1 - passedLevelsCount * 0.1f) {
+		if (stateTime > 1 - passedLevelsCount * 0.1f) {
 			updateClothesColor();
-			UIState.obtainUIState(getIdlingState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
-			UIState.obtainUIState(getRunningState(), this).setPlayerColorizedAnimation(Color.rgba8888(clothesColor), newColor);
+			replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), Color.rgba8888(clothesColor), newColor);
+			replaceColorInTexture(UIState.obtainUIState(getRunningState(), this), Color.rgba8888(clothesColor), newColor);
 			stateTime = 0f;
 		}
 		stateTime += delta;

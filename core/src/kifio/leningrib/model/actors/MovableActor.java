@@ -1,11 +1,13 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -14,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.screens.GameScreen;
+import kifio.leningrib.model.ResourcesManager;
 
 public abstract class MovableActor extends Actor {
 
@@ -23,6 +26,12 @@ public abstract class MovableActor extends Actor {
 	private float elapsedTime = 0;
 	private float previousX = -1;
 	private boolean goLeft = false;
+
+	// TextureRegion sizes
+	private int x = 16;
+	private int y = 0;
+	private int w = 16;
+	private int h = 24;
 
 	protected UIState current = null;
 
@@ -76,6 +85,38 @@ public abstract class MovableActor extends Actor {
 	protected abstract String getIdlingState();
 
 	protected abstract String getRunningState();
+
+	protected void replaceColorInTexture(UIState uiState, int pixelColor, Color newColor) {
+		if (current == null) return;
+
+		Pixmap pixmap;
+		TextureData textureData = current.getTexture().getTextureData();
+		TextureRegion[] regions = new TextureRegion[current.getRegionsCount()];
+
+		textureData.prepare();
+		pixmap = textureData.consumePixmap();
+		pixmap.setColor(newColor);
+		updatePixmap(pixmap, pixelColor);
+
+		Texture texture = new Texture(pixmap);
+
+		for (int i = 0; i < current.getRegionsCount(); i++) {
+			regions[i] = new TextureRegion(texture, x * i, y, w, h);
+		}
+
+		texture.dispose();
+		pixmap.dispose();
+	}
+	// Color for replacement already setled in Pixmap
+	protected void updatePixmap(Pixmap pixmap, int pixelColor) {
+		for (int i = 0; i < pixmap.getWidth(); i++) {
+			for (int j = 0; j < pixmap.getHeight(); j++) {
+				if (pixmap.getPixel(i, j) == pixelColor) {
+					pixmap.drawPixel(i, j);
+				}
+			}
+		}
+	}
 
 	protected float getDrawingWidth() {
 		return drawingWidth;

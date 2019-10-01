@@ -1,11 +1,7 @@
 package kifio.leningrib.model;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.HashSet;
@@ -28,53 +24,30 @@ public class UIState {
 	}
 
 	private Animation<? extends TextureRegion> actorAnimation;
-	private TextureAtlas playerAtlas;
+	private Texture texture;
 	private @NotNull String packFile;
 	private float frameDuration;
+	private int regionsCount;
 
 	private UIState(@NotNull String packFile, float frameDuration) {
 		this.packFile = packFile;
 		this.frameDuration = frameDuration;
-		this.playerAtlas = new TextureAtlas(packFile.concat(".txt"));
+		this.texture = ResourcesManager.getTexture(packFile);
+		TextureAtlas playerAtlas = new TextureAtlas(packFile.concat(".txt"));
+		regionsCount = playerAtlas.getRegions().size;
 		this.actorAnimation = new Animation<>(frameDuration, playerAtlas.getRegions());
 	}
 
-	public void setPlayerColorizedAnimation(int pixelColor, Color newColor) {
-		int count = playerAtlas.getRegions().size;
-
-		Pixmap pixmap;
-		Texture texture = ResourcesManager.getTexture(packFile);
-		TextureData textureData = texture.getTextureData();
-		TextureRegion[] regions = new TextureRegion[count];
-
-		textureData.prepare();
-		pixmap = textureData.consumePixmap();
-		pixmap.setColor(newColor);
-		updatePixmap(pixmap, pixelColor);
-
-		int x = 16;
-		int y = 0;
-		int w = 16;
-		int h = 24;
-
-		texture = new Texture(pixmap);
-
-		for (int i = 0; i < count; i++) {
-			regions[i] = new TextureRegion(texture, x * i, y, w, h);
-		}
-
-		pixmap.dispose();
+	public void setTextureRegions(TextureRegion[] regions) {
 		actorAnimation = new Animation<>(frameDuration, regions);
 	}
 
-	private void updatePixmap(Pixmap pixmap, int pixelColor) {
-		for (int i = 0; i < pixmap.getWidth(); i++) {
-			for (int j = 0; j < pixmap.getHeight(); j++) {
-				if (pixmap.getPixel(i, j) == pixelColor) {
-					pixmap.drawPixel(i, j);
-				}
-			}
-		}
+	public int getRegionsCount() {
+		return regionsCount;
+	}
+
+	public Texture getTexture() {
+		return texture;
 	}
 
 	@Override public boolean equals(Object o) {
@@ -91,7 +64,7 @@ public class UIState {
 		return packFile;
 	}
 
-	public @NotNull Animation getAnimation() {
+	public @NotNull Animation<? extends TextureRegion> getAnimation() {
 		return actorAnimation;
 	}
 }

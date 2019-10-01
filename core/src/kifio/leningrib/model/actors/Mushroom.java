@@ -38,7 +38,6 @@ public class Mushroom extends MovableActor {
 
         int effectIndex = ThreadLocalRandom.current().nextInt(effects.length);
         boolean hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0;
-//        boolean hasEffect = ThreadLocalRandom.current().nextBoolean();
         String textureName = MUSHROOM + effectIndex;
 
         if (hasEffect) {
