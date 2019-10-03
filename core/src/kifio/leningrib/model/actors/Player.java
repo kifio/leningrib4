@@ -17,33 +17,41 @@ public class Player extends MovableActor {
 
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
-	private final Color clothesColor = Color.valueOf("#DF6C43");
-	private Color newColor = Color.valueOf("#FDA010");
+	private int newColor;
+    private Color tmpColor = Color.valueOf("#FDA010");
     private float[] clothesHSV = new float[3];
 
 	private int mushroomsCount = 0;
-	private long effectiveMushroomTakeTime = 0L;
-	private int effect;
+	private float effectTime = 0L;
+    private Mushroom mushroom;
 	private int passedLevelsCount;
 
 	public Player(float x, float y) {
 		super(x, y);
-		clothesHSV = clothesColor.toHsv(clothesHSV);
+		clothesHSV = tmpColor.toHsv(clothesHSV);
 	}
 
 	private float stateTime = 0f;
 
 	@Override public void act(float delta) {
 		super.act(delta);
-		stateTime += delta;
-		if (stateTime > 1 - passedLevelsCount * 0.1f) {
+
+        if (this.mushroom == null) {
+            updateClothesColor(delta);
+        }
+
+        updateEffectState(delta);
+	}
+
+    private void updateClothesColor(float delta) {
+        if (stateTime > 0 && this.passedLevelsCount > 1 && stateTime > 1 - passedLevelsCount * 0.1f) {
 			updateClothesColor();
-			replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), Color.rgba8888(clothesColor), newColor);
-			replaceColorInTexture(UIState.obtainUIState(getRunningState(), this), Color.rgba8888(clothesColor), newColor);
+			replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), 0xFDA010FF, newColor);
+			replaceColorInTexture(UIState.obtainUIState(getRunningState(), this), 0xFDA010FF, newColor);
 			stateTime = 0f;
 		}
 		stateTime += delta;
-	}
+    }
 
 	private void updateClothesColor() {
 		if (clothesHSV[0] >= 360) {
@@ -51,7 +59,7 @@ public class Player extends MovableActor {
 		} else {
 			clothesHSV[0] += 10;
 		}
-		newColor.fromHsv(clothesHSV);
+		newColor = Color.argb8888(tmpColor.fromHsv(clothesHSV));
 	}
 
 	@Override public void draw(Batch batch, float alpha) {
@@ -59,7 +67,7 @@ public class Player extends MovableActor {
 	}
 
 	public float getVelocity() {
-		return 1200f;
+		return 1200f * getVelocityCoeff();
 	}
 
 	public void increaseMushroomCount() {
@@ -67,18 +75,35 @@ public class Player extends MovableActor {
 	}
 
 	public void onEffectiveMushroomTake(Mushroom mushroom) {
-		effectiveMushroomTakeTime = System.currentTimeMillis();
-		effect = mushroom.getEffect();
+		effectTime = 0f;
+		this.mushroom = mushroom;
+
+        if (mushroom.isInisibilityMushroom()) {
+            replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), -1, 0xFFFFFF20);
+        }
 	}
 
-	public boolean updateEffectState() {
-//		if (System.currentTimeMillis() - effectiveMushroomTakeTime >= effect.getEffectTime()) {
-//			effect = null;
-//			effectiveMushroomTakeTime = 0L;
-//			return false;
-//		}
-		return true;
+	private boolean updateEffectState(float delta) {
+
+        if (this.mushroom == null) return false;
+
+		if (effectTime >= this.mushroom.getEffectTime()) {
+            Gdx.app.log("kifio", "Mushroom effect ended in " + effectTime + " sec");
+            effectTime = 0f;
+			this.mushroom = null;
+			return false;
+		} else {
+            Gdx.app.log("kifio", "Have mushroom effect: " + this.mushroom.getEffect());
+            effectTime += delta;
+            return true;
+        }
 	}
+
+    //  If player have took speed mushroom
+    private float getVelocityCoeff() {
+        if (this.mushroom == null) return 1f;
+        else return this.mushroom.getSpeedModificator();
+    }
 
     public int getMushroomsCount() {
         return mushroomsCount;

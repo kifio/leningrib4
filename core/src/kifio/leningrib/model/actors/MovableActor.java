@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -71,6 +72,7 @@ public abstract class MovableActor extends Actor {
 		double dy = (double) (targetY - fromY);
 		float length = (float) Math.sqrt(dx * dx + dy * dy);
 		float calculatedDuration = length / getVelocity();
+		Gdx.app.log("kifio", "Velocity: " + getVelocity());
 		return Actions.moveTo(targetX, targetY, calculatedDuration);
 	}
 
@@ -86,7 +88,9 @@ public abstract class MovableActor extends Actor {
 
 	protected abstract String getRunningState();
 
-	protected void replaceColorInTexture(UIState uiState, int pixelColor, Color newColor) {
+	// pixelColor - color to change. if pixelColor == -1, apply to all pixels.
+	// newColor - changing color.
+	protected void replaceColorInTexture(UIState uiState, int pixelColor, int newColor) {
 		if (current == null) return;
 
 		Pixmap pixmap;
@@ -95,8 +99,7 @@ public abstract class MovableActor extends Actor {
 
 		textureData.prepare();
 		pixmap = textureData.consumePixmap();
-		pixmap.setColor(newColor);
-		updatePixmap(pixmap, pixelColor);
+		updatePixmap(pixmap, pixelColor, newColor);
 
 		Texture texture = new Texture(pixmap);
 
@@ -104,15 +107,19 @@ public abstract class MovableActor extends Actor {
 			regions[i] = new TextureRegion(texture, x * i, y, w, h);
 		}
 
-		texture.dispose();
+		current.setTextureRegions(regions);
+
+		// texture.dispose();
 		pixmap.dispose();
 	}
 	// Color for replacement already setled in Pixmap
-	protected void updatePixmap(Pixmap pixmap, int pixelColor) {
+	protected void updatePixmap(Pixmap pixmap, int pixelColor, int newColor) {
 		for (int i = 0; i < pixmap.getWidth(); i++) {
 			for (int j = 0; j < pixmap.getHeight(); j++) {
-				if (pixmap.getPixel(i, j) == pixelColor) {
-					pixmap.drawPixel(i, j);
+				if (pixelColor != -1 || pixmap.getPixel(i, j) == pixelColor) {
+					pixmap.drawPixel(i, j, newColor);
+				} else {
+					pixmap.drawPixel(i, j, pixmap.getPixel(i, j) & newColor);
 				}
 			}
 		}

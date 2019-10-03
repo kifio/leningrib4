@@ -12,7 +12,7 @@ import kifio.leningrib.screens.GameScreen;
 
 public class Mushroom extends MovableActor {
 
-    private static final long DEFAULT_EFFECT_TIME = 5000; // milliseconds
+    private static final float DEFAULT_EFFECT_TIME = 5f; // nanoseconds
     private static final float SCALE_ANIMATION_TIME = 0.5f; // milliseconds
     private static final String MUSHROOM = "mushroom_";
     private static final String COIN = "coins";
@@ -82,6 +82,20 @@ public class Mushroom extends MovableActor {
 
     public int getEffect() {
         return effect;
+    }
+
+    public float getEffectTime() {
+        if (effect != 0) return DEFAULT_EFFECT_TIME;
+        else return 0;
+    }
+
+    public float getSpeedModificator() {
+        if (effect == SPEED) return 1.5f;
+        else return 1f;
+    }
+
+    public boolean isInisibilityMushroom() {
+        return true;//effect == INVISIBILITY;
     }
 
     @Override
