@@ -15,7 +15,10 @@ public class ObjectsManager<T extends Actor> {
 		if (gameObjects != null) {
 			Iterator<T> iterator = gameObjects.iterator();
 		 	while (iterator.hasNext()) {
-		 		iterator.next().remove();
+				T next = iterator.next();
+				if (next != null) {
+		 			next.remove();
+				}
 		 		iterator.remove();
 			}
 		 	gameObjects = null;

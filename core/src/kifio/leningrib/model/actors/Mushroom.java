@@ -18,10 +18,11 @@ public class Mushroom extends MovableActor {
     private static final String COIN = "coins";
 
     // COLORS in rgba!! not argb.
-    private static final int POWER = 0x780C0280;
-    private static final int SPEED = 0x245EFF80;
-    private static final int DEXTERITY = 0x2BBF6A80;
-    private static final int INVISIBILITY = 0x0FFFFFF20;
+    private static final int POWER = 0xD8390FFF;
+    private static final int SPEED = 0x106189FF;
+    private static final int DEXTERITY = 0xF49C37FF;
+    private static final int INVISIBILITY = 0xFFFFFF20;
+    private static final int NO_EFFECT = 0xFFFFFFFF;
 
     public int[] effects = new int[]{
         POWER, DEXTERITY, INVISIBILITY, SPEED
@@ -42,11 +43,13 @@ public class Mushroom extends MovableActor {
 
         if (hasEffect) {
             effect = effects[effectIndex];
-            region = ResourcesManager.getRegionWithTint(textureName, effect, effect == INVISIBILITY);
+        }
+
+        if (effect == INVISIBILITY) {
+            region = ResourcesManager.getRegionWithTint(textureName, effect, true);
         } else {
             region = ResourcesManager.getRegion(textureName);
         }
-
     }
 
     private boolean b = ThreadLocalRandom.current().nextBoolean();
@@ -57,7 +60,7 @@ public class Mushroom extends MovableActor {
         scalingTime += delta;
 
         if (scalingTime >= SCALE_ANIMATION_TIME) {
-            scale = b ? 1f : 0.8f;
+            scale = b ? 1.0f : 0.8f;
             b = !b;
             scalingTime = 0f;
         }
@@ -81,7 +84,7 @@ public class Mushroom extends MovableActor {
     }
 
     public int getEffect() {
-        return effect;
+        return effect != 0 ? effect : NO_EFFECT;
     }
 
     public float getEffectTime() {

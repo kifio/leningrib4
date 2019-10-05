@@ -44,7 +44,7 @@ public class Player extends MovableActor {
 	}
 
     private void updateClothesColor(float delta) {
-        if (stateTime > 0 && this.passedLevelsCount > 1 && stateTime > 1 - passedLevelsCount * 0.1f) {
+        if (stateTime > 0 && this.passedLevelsCount == 0 && stateTime > 1 - passedLevelsCount * 0.1f) {
 			updateClothesColor();
 			replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), 0xFDA010FF, newColor);
 			replaceColorInTexture(UIState.obtainUIState(getRunningState(), this), 0xFDA010FF, newColor);
@@ -59,6 +59,7 @@ public class Player extends MovableActor {
 		} else {
 			clothesHSV[0] += 10;
 		}
+        Gdx.app.log("kifio", "newColor: " + newColor);
 		newColor = Color.argb8888(tmpColor.fromHsv(clothesHSV));
 	}
 

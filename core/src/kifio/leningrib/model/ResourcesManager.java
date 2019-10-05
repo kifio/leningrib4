@@ -42,6 +42,7 @@ public class ResourcesManager {
 		am.load("medieval_rts_spritesheet.png", Texture.class);
 		am.load("medieval_grass_0.png", Texture.class);
 		am.load("medieval_grass_1.png", Texture.class);
+		am.load("autumn_grass.png", Texture.class);
 		am.load("pine.png", Texture.class);
 		am.load("leafed.png", Texture.class);
 		am.load("i18n/mushroom_speech", I18NBundle.class);
@@ -55,11 +56,13 @@ public class ResourcesManager {
 		am.load("mushroom_1.png", Texture.class);
 		am.load("mushroom_2.png", Texture.class);
 		am.load("mushroom_3.png", Texture.class);
+		am.load("autumn_mushroom.png", Texture.class);
 		am.finishLoading();
 
 		Texture overworld = am.get("overworld.png");
 		Texture forestTiles = am.get("forest_tiles.png");
 
+		Texture autumnGrass = am.get("autumn_grass.png");
 		Texture grass0Texture = am.get("medieval_grass_0.png");
 		Texture grass1Texture = am.get("medieval_grass_1.png");
 		Texture pineTexture = am.get("pine.png");
@@ -68,6 +71,7 @@ public class ResourcesManager {
 		Texture mushroom1 = am.get("mushroom_1.png");
 		Texture mushroom2 = am.get("mushroom_2.png");
 		Texture mushroom3 = am.get("mushroom_3.png");
+		Texture mushroom4 = am.get("autumn_mushroom.png");
 
 		regions.put("tree_0", new TextureRegion(pineTexture, 0, 0, 64, 64));
 		regions.put("tree_1", new TextureRegion(pineTexture, 0, 64, 64, 64));
@@ -87,6 +91,7 @@ public class ResourcesManager {
 		regions.put("mushroom_1", new TextureRegion(mushroom1, 0, 0, 64, 64));
 		regions.put("mushroom_2", new TextureRegion(mushroom2, 0, 0, 64, 64));
 		regions.put("mushroom_3", new TextureRegion(mushroom3, 0, 0, 64, 64));
+		regions.put("mushroom_4", new TextureRegion(mushroom4, 0, 0, 152, 152));
 		regions.put("mushroom_1_dexterity", new TextureRegion(mushroom3, 0, 0, 64, 64));
 
 		mushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);

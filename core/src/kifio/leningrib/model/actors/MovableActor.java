@@ -116,10 +116,12 @@ public abstract class MovableActor extends Actor {
 	protected void updatePixmap(Pixmap pixmap, int pixelColor, int newColor) {
 		for (int i = 0; i < pixmap.getWidth(); i++) {
 			for (int j = 0; j < pixmap.getHeight(); j++) {
-				if (pixelColor != -1 || pixmap.getPixel(i, j) == pixelColor) {
+				if (pixmap.getPixel(i, j) == pixelColor) {
 					pixmap.drawPixel(i, j, newColor);
-				} else {
+				} else if (pixelColor == -1 && pixmap.getPixel(i, j) != 0x00000000) {
 					pixmap.drawPixel(i, j, pixmap.getPixel(i, j) & newColor);
+				} else {
+					pixmap.drawPixel(i, j);
 				}
 			}
 		}

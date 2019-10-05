@@ -132,7 +132,7 @@ public class WorldRenderer {
 
 		updateCamera();
 		drawGrass();
-//		drawDebug();
+		// drawDebug();
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
@@ -161,12 +161,12 @@ public class WorldRenderer {
 		renderer.setProjectionMatrix(camera.combined);
 		renderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        drawPlayerPath();
+        // drawPlayerPath();
 //        drawGrid();
 //		  drawCharacterDebug();
 //		  drawGrandmaDebug();
-//        drawMushroomsBounds();
-		drawForesterDebug();
+        drawMushroomsBounds();
+		// drawForesterDebug();
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 		renderer.end();

@@ -95,9 +95,18 @@ public class SpeechManager {
 		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
 	}
 
+	public Label getLabel(float x, float y, float targetWidth) {
+		return getLabel("", x, y, targetWidth, 0xFFFFFFFF);
+	}
+
 	public Label getLabel(String text, float x, float y, float targetWidth) {
+		return getLabel(text, x, y, targetWidth, 0xFFFFFFFF);
+	}
+
+	public Label getLabel(String text, float x, float y, float targetWidth, int effectColor) {
 		Label label = new Label(text, labelStyle);
 		label.setWrap(true);
+		label.setColor(new Color(effectColor));
 		label.setFontScale(Gdx.graphics.getDensity() * 0.9f, Gdx.graphics.getDensity() * 0.9f);
 		label.setWidth(targetWidth);
 		label.setPosition(x, y);
