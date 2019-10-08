@@ -18,11 +18,11 @@ public class Mushroom extends MovableActor {
     private static final String COIN = "coins";
 
     // COLORS in rgba!! not argb.
-    private static final int POWER = 0xD8390FFF;
-    private static final int SPEED = 0x106189FF;
-    private static final int DEXTERITY = 0xF49C37FF;
-    private static final int INVISIBILITY = 0xFFFFFF20;
-    private static final int NO_EFFECT = 0xFFFFFFFF;
+    public static final int POWER = 0xD8390FFF;
+    public static final int SPEED = 0x106189FF;
+    public static final int DEXTERITY = 0xF49C37FF;
+    public static final int INVISIBILITY = 0xFFFFFF20;
+    public static final int NO_EFFECT = 0xFFFFFFFF;
 
     public int[] effects = new int[]{
         POWER, DEXTERITY, INVISIBILITY, SPEED

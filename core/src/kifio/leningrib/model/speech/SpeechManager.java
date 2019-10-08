@@ -68,7 +68,23 @@ public class SpeechManager {
 	}
 
 	public String getRandomMushroomSpeech() {
-		return ResourcesManager.mushroomsSpeechBundle.get(String.valueOf(random(1, 84)));
+		return ResourcesManager.commonMushroomsSpeechBundle.get(String.valueOf(random(1, 111)));
+	}
+
+	public String getPowerMushroomSpeech() {
+		return ResourcesManager.powerMushroomsSpeechBundle.get(String.valueOf(random(1, 21)));
+	}
+
+	public String getSpeedMushroomSpeech() {
+		return ResourcesManager.speedMushroomsSpeechBundle.get(String.valueOf(random(1, 15)));
+	}
+
+	public String getInvisibilityMushroomSpeech() {
+		return ResourcesManager.invisibilityMushroomsSpeechBundle.get(String.valueOf(random(1, 12)));
+	}
+
+	public String getDexterityMushroomSpeech() {
+		return ResourcesManager.dexterityMushroomsSpeechBundle.get(String.valueOf(random(1, 15)));
 	}
 
 	public String getForesterPatrolSpeech() {

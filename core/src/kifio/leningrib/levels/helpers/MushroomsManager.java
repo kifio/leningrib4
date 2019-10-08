@@ -6,8 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
+
 import generator.ConstantsConfig;
+
 import java.util.concurrent.ThreadLocalRandom;
+
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
@@ -37,7 +40,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
 
             if (m != null) {
                 if (m.getY() >= cameraPositionY - halfScreenHeight
-                    && m.getY() <= cameraPositionY + halfScreenHeight) {
+                        && m.getY() <= cameraPositionY + halfScreenHeight) {
 
                     if (m.bounds.overlaps(p.bounds)) {
                         m.setEaten();
@@ -79,9 +82,24 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         }
 
         if (shouldAddSpeech(player) && speeches[index].textEquals("")) {
-            String speech = SpeechManager.getInstance().getRandomMushroomSpeech();
+            String speech = getSpeech(m.getEffect());
             speeches[index].setText(speech);
             speeches[index].addAction(getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index));
+        }
+    }
+
+    private String getSpeech(int effect) {
+        switch (effect) {
+            case Mushroom.POWER:
+                return SpeechManager.getInstance().getPowerMushroomSpeech();
+            case Mushroom.SPEED:
+                return SpeechManager.getInstance().getSpeedMushroomSpeech();
+            case Mushroom.DEXTERITY:
+                return SpeechManager.getInstance().getDexterityMushroomSpeech();
+            case Mushroom.INVISIBILITY:
+                return SpeechManager.getInstance().getInvisibilityMushroomSpeech();
+            default:
+                return SpeechManager.getInstance().getRandomMushroomSpeech();
         }
     }
 
@@ -107,7 +125,8 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         SequenceAction seq = new SequenceAction();
         seq.addAction(Actions.delay(duration));
         seq.addAction(Actions.run(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 speeches[i].setText(null);
             }
         }));
