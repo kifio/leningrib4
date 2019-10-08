@@ -40,6 +40,10 @@ public class ResourcesManager {
 		am.load("bottle.png", Texture.class);
 		am.load("player_run.png", Texture.class);
 		am.load("player_idle.png", Texture.class);
+		am.load("enemy_1_run.png", Texture.class);
+		am.load("enemy_1_idle.png", Texture.class);
+		am.load("enemy_2_run.png", Texture.class);
+		am.load("enemy_2_idle.png", Texture.class);
 		am.load("medieval_rts_spritesheet.png", Texture.class);
 		am.load("medieval_grass_0.png", Texture.class);
 		am.load("medieval_grass_1.png", Texture.class);

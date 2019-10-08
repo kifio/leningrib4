@@ -23,7 +23,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	public ForestersManager(GameScreen gameScreen, Array<Forester> foresters) {
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
-//		gameObjects.addAll(foresters);
+		gameObjects.addAll(foresters);
 		speeches = new Label[foresters.size];
 
 		for (int i = 0; i < foresters.size; i++) {

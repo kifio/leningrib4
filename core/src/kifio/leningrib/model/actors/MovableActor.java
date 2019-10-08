@@ -91,11 +91,10 @@ public abstract class MovableActor extends Actor {
 	// pixelColor - color to change. if pixelColor == -1, apply to all pixels.
 	// newColor - changing color.
 	protected void replaceColorInTexture(UIState uiState, int pixelColor, int newColor) {
-		if (current == null) return;
 
 		Pixmap pixmap;
-		TextureData textureData = current.getTexture().getTextureData();
-		TextureRegion[] regions = new TextureRegion[current.getRegionsCount()];
+		TextureData textureData = uiState.getTexture().getTextureData();
+		TextureRegion[] regions = new TextureRegion[uiState.getRegionsCount()];
 
 		textureData.prepare();
 		pixmap = textureData.consumePixmap();
@@ -103,11 +102,11 @@ public abstract class MovableActor extends Actor {
 
 		Texture texture = new Texture(pixmap);
 
-		for (int i = 0; i < current.getRegionsCount(); i++) {
+		for (int i = 0; i < uiState.getRegionsCount(); i++) {
 			regions[i] = new TextureRegion(texture, x * i, y, w, h);
 		}
 
-		current.setTextureRegions(regions);
+		uiState.setTextureRegions(regions);
 
 		// texture.dispose();
 		pixmap.dispose();

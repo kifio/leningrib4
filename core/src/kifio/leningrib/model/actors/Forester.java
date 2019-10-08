@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -72,7 +73,7 @@ public class Forester extends MovableActor {
 		this.originalToY = originalToY;
 		this.originalBottomLimit = originalBottomLimit;
 		this.originalTopLimit = originalTopLimit;
-
+		Gdx.app.log("kifio", "enemy_" + index);
 		running = String.format(Locale.getDefault(), "enemy_%d_run", index);
 		idle = String.format(Locale.getDefault(), "enemy_%d_idle", index);
 		setPath(originalToX, originalToY, null);

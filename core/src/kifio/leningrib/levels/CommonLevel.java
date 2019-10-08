@@ -63,7 +63,8 @@ public class CommonLevel extends Level {
 				Forester f = new Forester(
 					GameScreen.tileSize * (ltr ? left : right),
 					GameScreen.tileSize * originalFromY,
-					GameScreen.tileSize * (ltr ? right : left), GameScreen.tileSize * originalToY, 1, bottom, top);
+					GameScreen.tileSize * (ltr ? right : left), GameScreen.tileSize * originalToY,
+						ThreadLocalRandom.current().nextInt(1, 3), bottom, top);
 
 				gameObjects.add(f);
 			}

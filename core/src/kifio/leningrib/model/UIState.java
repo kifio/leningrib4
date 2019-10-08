@@ -24,7 +24,6 @@ public class UIState {
 	}
 
 	private Animation<? extends TextureRegion> actorAnimation;
-	private Texture texture;
 	private @NotNull String packFile;
 	private float frameDuration;
 	private int regionsCount;
@@ -32,7 +31,6 @@ public class UIState {
 	private UIState(@NotNull String packFile, float frameDuration) {
 		this.packFile = packFile;
 		this.frameDuration = frameDuration;
-		this.texture = ResourcesManager.getTexture(packFile);
 		TextureAtlas playerAtlas = new TextureAtlas(packFile.concat(".txt"));
 		regionsCount = playerAtlas.getRegions().size;
 		this.actorAnimation = new Animation<>(frameDuration, playerAtlas.getRegions());
@@ -47,7 +45,7 @@ public class UIState {
 	}
 
 	public Texture getTexture() {
-		return texture;
+		return ResourcesManager.getTexture(packFile);
 	}
 
 	@Override public boolean equals(Object o) {
