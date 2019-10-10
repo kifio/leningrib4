@@ -106,6 +106,10 @@ public class Player extends MovableActor {
         else return this.mushroom.getSpeedModificator();
     }
 
+    public int getPassedLevelsCount() {
+		return passedLevelsCount;
+	}
+
     public int getMushroomsCount() {
         return mushroomsCount;
     }

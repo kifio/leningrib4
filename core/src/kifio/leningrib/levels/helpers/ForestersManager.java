@@ -32,9 +32,10 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			float x = f.getNewSpeechX();
 			float y = f.getNewSpeechY();
 
-			speeches[i] = SpeechManager.getInstance().getLabel(SpeechManager.getInstance().getForesterPatrolSpeech(), x, y,
-				GameScreen.tileSize * 2);
+			String speech = SpeechManager.getInstance().getForesterPatrolSpeech();
 
+			speeches[i] = SpeechManager.getInstance().getLabel(speech, x, y,
+					GameScreen.tileSize * 2, 0x549A03FF);
 		}
 	}
 

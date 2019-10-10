@@ -50,6 +50,8 @@ public class SpeechManager {
 		parameter.characters =
 			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}";
 		parameter.color = Color.WHITE;
+		parameter.shadowOffsetX = 1;
+		parameter.shadowOffsetY = 1;
 		return parameter;
 	}
 
@@ -119,10 +121,10 @@ public class SpeechManager {
 		return getLabel(text, x, y, targetWidth, 0xFFFFFFFF);
 	}
 
-	public Label getLabel(String text, float x, float y, float targetWidth, int effectColor) {
+	public Label getLabel(String text, float x, float y, float targetWidth, int color) {
 		Label label = new Label(text, labelStyle);
 		label.setWrap(true);
-		label.setColor(new Color(effectColor));
+		label.setColor(new Color(color));
 		label.setFontScale(Gdx.graphics.getDensity() * 0.9f, Gdx.graphics.getDensity() * 0.9f);
 		label.setWidth(targetWidth);
 		label.setPosition(x, y);

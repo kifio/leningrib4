@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -17,6 +18,9 @@ import model.Room;
 
 public class CommonLevel extends Level {
 
+	private static final int MIN_STEP = 1;
+	private static final int MAX_STEP = 4;
+
 	CommonLevel(int x, int y, GameScreen gameScreen) {
 		super(x, y, gameScreen);
 	}
@@ -31,9 +35,15 @@ public class CommonLevel extends Level {
 		int levelHeight = config.getLevelHeight();
 		int levelWidth = config.getLevelWidth();
 
-		for (int i = 1; i < levelHeight; i++) {
+		int mushroomsCount = getPlayer().getMushroomsCount();
+		int step = Math.max(MIN_STEP, MAX_STEP - (mushroomsCount / 10));
+
+		Gdx.app.log("kifio", "step: " + step);
+
+		for (int i = 1; i < levelHeight; i += step) {
 			int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
 			int y = GameScreen.tileSize * i;
+
 			if (!Utils.isOverlapsWithActors(trees, x, y)) {
 				mushrooms.add(new Mushroom(x, y));
 			}
