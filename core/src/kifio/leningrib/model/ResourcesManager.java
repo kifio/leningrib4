@@ -124,6 +124,8 @@ public class ResourcesManager {
 		return am.get(name.concat(".png"));
 	}
 
+	private static final int CLEAR = Color.rgba8888(Color.CLEAR);
+
 	// Color can be mixed or overlayed
 	public static TextureRegion getRegionWithTint(String name, int effect, boolean mix) {
 		TextureRegion region = regions.get(name);
@@ -137,7 +139,7 @@ public class ResourcesManager {
 
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j <= height; j++) {
-				if (regionPixmap.getPixel(i, j) != Color.rgba8888(Color.CLEAR)) {
+				if (regionPixmap.getPixel(i, j) != CLEAR) {
 					if (mix) {
 						resultPixmap.drawPixel(i, j, regionPixmap.getPixel(i, j) & effect);
 					} else {

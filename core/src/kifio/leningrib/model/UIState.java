@@ -29,8 +29,12 @@ public class UIState {
 	private int regionsCount;
 
 	private UIState(@NotNull String packFile, float frameDuration) {
-		this.packFile = packFile;
 		this.frameDuration = frameDuration;
+		setPackFile(packFile);
+	}
+
+	public void setPackFile(@NotNull String packFile) {
+		this.packFile = packFile;
 		TextureAtlas playerAtlas = new TextureAtlas(packFile.concat(".txt"));
 		regionsCount = playerAtlas.getRegions().size;
 		this.actorAnimation = new Animation<>(frameDuration, playerAtlas.getRegions());

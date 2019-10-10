@@ -54,9 +54,9 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
                             speeches[index] = null;
                         }
 
-                        if (m.getEffect() != 0) {
+//                        if (m.getEffect() != 0) {
                             p.onEffectiveMushroomTake(m);
-                        }
+//                        }
 
                         p.increaseMushroomCount();
                     } else {

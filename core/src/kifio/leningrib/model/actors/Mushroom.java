@@ -88,7 +88,7 @@ public class Mushroom extends MovableActor {
     }
 
     public float getEffectTime() {
-        if (effect != 0) return DEFAULT_EFFECT_TIME;
+        if (effect != NO_EFFECT) return DEFAULT_EFFECT_TIME;
         else return 0;
     }
 
@@ -97,8 +97,8 @@ public class Mushroom extends MovableActor {
         else return 1f;
     }
 
-    public boolean isInisibilityMushroom() {
-        return true;//effect == INVISIBILITY;
+    public boolean isInvisibilityMushroom() {
+        return effect == INVISIBILITY;
     }
 
     @Override

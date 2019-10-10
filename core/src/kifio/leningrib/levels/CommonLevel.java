@@ -50,7 +50,6 @@ public class CommonLevel extends Level {
 		}
 
 		return mushrooms;
-
 	}
 
 	@Override protected Array<Forester> initForesters(LevelMap levelMap) {

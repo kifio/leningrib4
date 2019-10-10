@@ -100,9 +100,12 @@ public class Forester extends MovableActor {
 		float py = player.getY();
 
 		if (noticeArea.contains(px, py) && !isPursuePlayer()) {
-			label.setText(SpeechManager.getInstance().getForesterPlayerNoticedSpeech());
-			setPlayerNoticed();
-		} else if (!pursueArea.contains(px, py) && movingState == MovingState.PURSUE) {
+			if (!player.isInvisible()) {
+				label.setText(SpeechManager.getInstance().getForesterPlayerNoticedSpeech());
+				setPlayerNoticed();
+			}
+		} else if (movingState == MovingState.PURSUE && (!pursueArea.contains(px, py) || player.isInvisible())) {
+			// TODO: Добавить тексты для невидимости
 			label.setText(SpeechManager.getInstance().getForesterStopSpeech());
 			stopPursuing();
 		} else if (movingState == MovingState.STOP) {

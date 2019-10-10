@@ -72,7 +72,6 @@ public abstract class MovableActor extends Actor {
 		double dy = (double) (targetY - fromY);
 		float length = (float) Math.sqrt(dx * dx + dy * dy);
 		float calculatedDuration = length / getVelocity();
-		Gdx.app.log("kifio", "Velocity: " + getVelocity());
 		return Actions.moveTo(targetX, targetY, calculatedDuration);
 	}
 
@@ -117,10 +116,6 @@ public abstract class MovableActor extends Actor {
 			for (int j = 0; j < pixmap.getHeight(); j++) {
 				if (pixmap.getPixel(i, j) == pixelColor) {
 					pixmap.drawPixel(i, j, newColor);
-				} else if (pixelColor == -1 && pixmap.getPixel(i, j) != 0x00000000) {
-					pixmap.drawPixel(i, j, pixmap.getPixel(i, j) & newColor);
-				} else {
-					pixmap.drawPixel(i, j);
 				}
 			}
 		}
