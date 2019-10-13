@@ -1,12 +1,14 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
+
 import generator.ConstantsConfig;
+
 import java.util.List;
+
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.SpaceManager;
@@ -25,6 +27,7 @@ public abstract class Level {
 
     protected GameScreen gameScreen;
     private ForestGraph forestGraph;
+    private ForestGraph dexterityForestGraph;  // Граф, с которым можно ходить за деревьями
     protected MushroomsManager mushroomsManager;
     protected ForestersManager forestersManager;
     protected TreesManager treesManager;
@@ -39,26 +42,32 @@ public abstract class Level {
         forestersManager = new ForestersManager(gameScreen, initForesters(levelMap));
         treesManager = new TreesManager();
         mushroomsManager = new MushroomsManager();
-		spaceManager = new SpaceManager();
+        spaceManager = new SpaceManager();
 
         treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
         mushroomsManager.initMushrooms(initMushrooms(gameScreen.constantsConfig, treesManager.getTrees()));
         spaceManager.buildSpaces(getPlayer(),
-            gameScreen.constantsConfig,
-            treesManager.getTrees(),
-            mushroomsManager.getMushrooms(),
-            getRoomsRectangles(levelMap, gameScreen.constantsConfig));
+                gameScreen.constantsConfig,
+                treesManager.getTrees(),
+                mushroomsManager.getMushrooms(),
+                getRoomsRectangles(levelMap, gameScreen.constantsConfig));
+
         forestGraph = new ForestGraph(gameScreen.constantsConfig,
-            treesManager.getTrees(),
-            forestersManager.getForesters(),
-            spaceManager.getSpaces());
+                treesManager.getTrees(),
+                forestersManager.getForesters(),
+                spaceManager.getSpaces());
+
+        dexterityForestGraph = new ForestGraph(gameScreen.constantsConfig,
+                treesManager.getOuterBordersTrees(),
+                forestersManager.getForesters(),
+                spaceManager.getSpaces());
 
         // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
         if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
             gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.constantsConfig);
         }
 
-        for (Forester f: forestersManager.getForesters()) {
+        for (Forester f : forestersManager.getForesters()) {
             f.initPath(forestGraph);
         }
     }
@@ -84,7 +93,12 @@ public abstract class Level {
     }
 
     public void movePlayerTo(float x, float y) {
-        getPlayer().resetPlayerPath(x, y, forestGraph, gameScreen);
+        Player player = getPlayer();
+        if (player.isDexterous()) {
+            player.resetPlayerPath(x, y, dexterityForestGraph, gameScreen);
+        } else {
+            player.resetPlayerPath(x, y, forestGraph, gameScreen);
+        }
     }
 
     public Array<Forester> getForesters() {

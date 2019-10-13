@@ -1,9 +1,5 @@
 package kifio.leningrib.model.actors;
 
-import static com.badlogic.gdx.graphics.g3d.particles.ParticleChannels.Color;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,14 +14,14 @@ public class Mushroom extends MovableActor {
     private static final String COIN = "coins";
 
     // COLORS in rgba!! not argb.
-    public static final int POWER = 0xD8390FFF;
+    public static final int STRENGTH = 0xD8390FFF;
     public static final int SPEED = 0x106189FF;
     public static final int DEXTERITY = 0xF49C37FF;
     public static final int INVISIBILITY = 0xFFFFFF20;
     public static final int NO_EFFECT = 0xFFFFFFFF;
 
     public int[] effects = new int[]{
-        POWER, DEXTERITY, INVISIBILITY, SPEED
+            STRENGTH, DEXTERITY, INVISIBILITY, SPEED
     };
 
     private int effect = 0;
@@ -99,6 +95,14 @@ public class Mushroom extends MovableActor {
 
     public boolean isInvisibilityMushroom() {
         return effect == INVISIBILITY;
+    }
+
+    public boolean isStrengthMushroom() {
+        return effect == STRENGTH;
+    }
+
+    public boolean isDexterityMushroom() {
+        return effect == DEXTERITY;
     }
 
     @Override

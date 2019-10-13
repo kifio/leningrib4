@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
@@ -47,7 +48,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		for (int i = 0; i < gameObjects.size; i++) {
 			Forester forester = gameObjects.get(i);
 			result.set(0f, 0f, 0f, 0f);
-			if (isPlayerCaught(forester.bounds, gameScreen.player.bounds)) {
+			if (isPlayerCaught(forester, gameScreen.player)) {
 				gameScreen.gameOver = true;
 				gameScreen.player.stop();
 				forester.stop();
@@ -63,10 +64,12 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		}
 	}
 
-	private boolean isPlayerCaught(Rectangle f, Rectangle p) {
+	private boolean isPlayerCaught(Forester forester, Player player) {
+		Rectangle f = forester.bounds;
+		Rectangle p = player.bounds;
 		Intersector.intersectRectangles(f, p, result);
 		float resultArea = result.area();
-		return resultArea >= caughtArea;
+		return resultArea >= caughtArea && !player.isInvisible();
 	}
 
 	private void updateForestersPath(Forester forester, Label label, float delta, ForestGraph forestGraph) {

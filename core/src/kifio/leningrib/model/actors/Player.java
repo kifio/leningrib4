@@ -83,7 +83,7 @@ public class Player extends MovableActor {
         effectTime = 0f;
         this.mushroom = mushroom;
 
-        if (!current.getPackFile().contains(INVISIBLE)) {
+        if (mushroom.isInvisibilityMushroom() && !current.getPackFile().contains(INVISIBLE)) {
             current.setPackFile(current.getPackFile() + INVISIBLE);
         }
     }
@@ -221,5 +221,13 @@ public class Player extends MovableActor {
 
     public boolean isInvisible() {
         return mushroom != null && mushroom.isInvisibilityMushroom();
+    }
+
+    public boolean isStrong() {
+        return mushroom != null && mushroom.isStrengthMushroom();
+    }
+
+    public boolean isDexterous() {
+        return mushroom != null && mushroom.isDexterityMushroom();
     }
 }

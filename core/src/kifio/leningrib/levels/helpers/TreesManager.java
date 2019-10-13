@@ -13,12 +13,21 @@ import model.Segment;
 public class TreesManager {
 
 	private Array<Actor> trees = new Array<>();
+	private Array<Actor> outerTrees = new Array<>();
 
 	public void buildTrees(LevelMap levelMap, ConstantsConfig constantsConfig) {
 		for (Segment s : levelMap.getSegments()) {
 			Actor tree = getActorFromCell(s.getValue(),
 				s.getX() * GameScreen.tileSize, s.getY() * GameScreen.tileSize, constantsConfig);
-			if (tree != null) { trees.add(tree); }
+			if (tree != null) {
+				trees.add(tree);
+				if (s.getX() == 0
+						|| s.getY() == 0
+						|| s.getX() == (constantsConfig.getLevelWidth() - 1)
+						|| s.getY() == (constantsConfig.getLevelHeight() - 1)) {
+					outerTrees.add(tree);
+				}
+			}
 		}
 	}
 
@@ -46,5 +55,9 @@ public class TreesManager {
 
 	public Array<? extends Actor> getTrees() {
 		return trees;
+	}
+
+	public Array<? extends Actor> getOuterBordersTrees() {
+		return outerTrees;
 	}
 }

@@ -1,17 +1,13 @@
 package kifio.leningrib.levels.helpers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
-import generator.ConstantsConfig;
-
 import java.util.concurrent.ThreadLocalRandom;
 
-import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.speech.SpeechManager;
@@ -90,7 +86,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private String getSpeech(int effect) {
         switch (effect) {
-            case Mushroom.POWER:
+            case Mushroom.STRENGTH:
                 return SpeechManager.getInstance().getPowerMushroomSpeech();
             case Mushroom.SPEED:
                 return SpeechManager.getInstance().getSpeedMushroomSpeech();
