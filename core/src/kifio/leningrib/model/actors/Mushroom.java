@@ -8,7 +8,7 @@ import kifio.leningrib.screens.GameScreen;
 
 public class Mushroom extends MovableActor {
 
-    private static final float DEFAULT_EFFECT_TIME = 5f; // nanoseconds
+    private static final float DEFAULT_EFFECT_TIME = 10f; // nanoseconds
     private static final float SCALE_ANIMATION_TIME = 0.5f; // milliseconds
     private static final String MUSHROOM = "mushroom_";
     private static final String COIN = "coins";

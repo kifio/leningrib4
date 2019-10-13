@@ -38,8 +38,6 @@ public class CommonLevel extends Level {
 		int mushroomsCount = getPlayer().getMushroomsCount();
 		int step = Math.max(MIN_STEP, MAX_STEP - (mushroomsCount / 10));
 
-		Gdx.app.log("kifio", "step: " + step);
-
 		for (int i = 1; i < levelHeight; i += step) {
 			int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
 			int y = GameScreen.tileSize * i;
@@ -72,8 +70,12 @@ public class CommonLevel extends Level {
 				Forester f = new Forester(
 					GameScreen.tileSize * (ltr ? left : right),
 					GameScreen.tileSize * originalFromY,
-					GameScreen.tileSize * (ltr ? right : left), GameScreen.tileSize * originalToY,
-						ThreadLocalRandom.current().nextInt(1, 3), bottom, top);
+					GameScreen.tileSize * (ltr ? right : left),
+						GameScreen.tileSize * originalToY,
+						ThreadLocalRandom.current().nextInt(1, 3),
+						GameScreen.tileSize * bottom,
+						GameScreen.tileSize * top,
+						GameScreen.tileSize, GameScreen.tileSize * 7);
 
 				gameObjects.add(f);
 			}

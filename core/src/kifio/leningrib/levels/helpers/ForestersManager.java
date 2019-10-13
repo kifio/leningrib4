@@ -21,6 +21,9 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	private Rectangle result = new Rectangle();
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
+	// Не обновляем путь для лесника, если позиция персонажа не изменилась
+	private int lastKnownPlayerX, lastKnownPlayerY;
+
 	public ForestersManager(GameScreen gameScreen, Array<Forester> foresters) {
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
@@ -74,7 +77,18 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 	private void updateForestersPath(Forester forester, Label label, float delta, ForestGraph forestGraph) {
 		forester.updateArea();
-		forester.updateMovementState(gameScreen.player, label, delta, forestGraph);
+
+		Player player = gameScreen.player;
+
+		int px = (int) Utils.mapCoordinate(player.bounds.x);
+		int py = (int) Utils.mapCoordinate(player.bounds.y);
+
+		if (lastKnownPlayerX != px || lastKnownPlayerY != py) {
+			forester.updateMovementState(player, px, py, label, delta, forestGraph);
+		}
+
+		lastKnownPlayerX = px;
+		lastKnownPlayerY = py;
 	}
 
 	@Override public void dispose() {

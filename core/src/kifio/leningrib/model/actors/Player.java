@@ -62,7 +62,6 @@ public class Player extends MovableActor {
         } else {
             clothesHSV[0] += 10;
         }
-        Gdx.app.log("kifio", "newColor: " + newColor);
         newColor = Color.argb8888(tmpColor.fromHsv(clothesHSV));
     }
 
@@ -93,7 +92,6 @@ public class Player extends MovableActor {
         if (this.mushroom == null) return;
 
         if (effectTime >= this.mushroom.getEffectTime()) {
-            Gdx.app.log("kifio", "Mushroom effect ended in " + effectTime + " sec");
 
             if (current.getPackFile().contains(INVISIBLE)) {
                 current.setPackFile(current.getPackFile().replace(INVISIBLE, ""));
@@ -102,7 +100,6 @@ public class Player extends MovableActor {
             effectTime = 0f;
             this.mushroom = null;
         } else {
-            Gdx.app.log("kifio", "Have mushroom effect: " + this.mushroom.getEffect());
             effectTime += delta;
         }
     }
@@ -224,7 +221,7 @@ public class Player extends MovableActor {
     }
 
     public boolean isStrong() {
-        return mushroom != null && mushroom.isStrengthMushroom();
+        return true; //mushroom != null && mushroom.isStrengthMushroom();
     }
 
     public boolean isDexterous() {

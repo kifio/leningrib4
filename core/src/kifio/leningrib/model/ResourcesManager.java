@@ -24,6 +24,7 @@ public class ResourcesManager {
 	public static I18NBundle speedMushroomsSpeechBundle;
 	public static I18NBundle forestersSpeechesPatrolBundle;
 	public static I18NBundle forestersSpeechesPlayerNoticesBundle;
+	public static I18NBundle forestersSpeechesFearBundle;
 	public static I18NBundle forestersSpeechesPlayerInRoomBundle;
 	public static I18NBundle forestersSpeechesPursuitBundle;
 	public static I18NBundle forestersSpeechesStopBundle;
@@ -56,6 +57,7 @@ public class ResourcesManager {
 		am.load("i18n/mushroom_speed_speech", I18NBundle.class);
 		am.load("i18n/mushroom_dexterity_speech", I18NBundle.class);
 		am.load("i18n/foresters_speeches_noticing", I18NBundle.class);
+		am.load("i18n/foresters_speeches_fear", I18NBundle.class);
 		am.load("i18n/foresters_speeches_patrol", I18NBundle.class);
 		am.load("i18n/foresters_speeches_player_in_room", I18NBundle.class);
 		am.load("i18n/foresters_speeches_pursuit", I18NBundle.class);
@@ -109,6 +111,7 @@ public class ResourcesManager {
 		invisibilityMushroomsSpeechBundle = am.get("i18n/mushroom_invisibility_speech", I18NBundle.class);
 		speedMushroomsSpeechBundle = am.get("i18n/mushroom_speed_speech", I18NBundle.class);
 		forestersSpeechesPlayerNoticesBundle = am.get("i18n/foresters_speeches_noticing", I18NBundle.class);
+		forestersSpeechesFearBundle = am.get("i18n/foresters_speeches_fear", I18NBundle.class);
 		forestersSpeechesPatrolBundle = am.get("i18n/foresters_speeches_patrol", I18NBundle.class);
 		forestersSpeechesPlayerInRoomBundle = am.get("i18n/foresters_speeches_player_in_room", I18NBundle.class);
 		forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);

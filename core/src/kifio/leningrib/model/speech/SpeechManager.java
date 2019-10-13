@@ -97,6 +97,10 @@ public class SpeechManager {
 		return ResourcesManager.forestersSpeechesPlayerNoticesBundle.get(String.valueOf(random(1, 5)));
 	}
 
+	public String getForesterFearSpeech() {
+		return ResourcesManager.forestersSpeechesPlayerNoticesBundle.get(String.valueOf(random(1, 4)));
+	}
+
 	public String getForesterPlayerInRoomSpeech() {
 		return ResourcesManager.forestersSpeechesPlayerInRoomBundle.get(String.valueOf(random(1, 11)));
 	}

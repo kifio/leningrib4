@@ -79,6 +79,7 @@ public abstract class Level {
     protected abstract Array<Forester> initForesters(LevelMap levelMap);
 
     public void update(float delta, float cameraY) {
+        // TODO: Обновлять граф, когда игрок получает действие гриба силы, чтобы он мог гоняться за лесниками
         forestGraph.updateForestGraph(cameraY);
         forestersManager.updateForesters(delta, forestGraph);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY);
