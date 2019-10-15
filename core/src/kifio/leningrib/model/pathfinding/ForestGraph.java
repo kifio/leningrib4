@@ -114,8 +114,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
 			if (isActorOnScreen(actor, cameraPositionY) && (oldX != newX || oldY != newY)) {
 				isChanged = true;
-//				Gdx.app.log("kifio", String.format(Locale.getDefault(),
-//					"oldx:%d; newx:%d; oldy:%d; newy:%d", oldX, newX, oldY, newY));
 				currentActorsPositions[i].x = newX;
 				currentActorsPositions[i].y = newY;
 			}

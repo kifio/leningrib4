@@ -3,11 +3,9 @@ package kifio.leningrib.levels.helpers;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
-import java.util.concurrent.ThreadLocalRandom;
+
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Player;
@@ -52,11 +50,16 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			Forester forester = gameObjects.get(i);
 			result.set(0f, 0f, 0f, 0f);
 			if (isPlayerCaught(forester, gameScreen.player)) {
-				gameScreen.gameOver = true;
-				gameScreen.player.stop();
-				forester.stop();
-				forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
-				forester.addAction(forester.getMoveActionsSequence(forestGraph));
+				if (gameScreen.player.isStrong()) {
+					forester.disable(speeches[i]);
+					// TODO: Добавить анимацию драки
+				} else {
+					gameScreen.gameOver = true;
+					gameScreen.player.stop();
+					forester.stop();
+					forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
+					forester.addAction(forester.getMoveActionsSequence(forestGraph));
+				}
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
 			} else {
@@ -83,7 +86,8 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		int px = (int) Utils.mapCoordinate(player.bounds.x);
 		int py = (int) Utils.mapCoordinate(player.bounds.y);
 
-		if (lastKnownPlayerX != px || lastKnownPlayerY != py) {
+		if (lastKnownPlayerX != px || lastKnownPlayerY != py
+				|| forester.isDisabled() || forester.isScared()) {
 			forester.updateMovementState(player, px, py, label, delta, forestGraph);
 		}
 

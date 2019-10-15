@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.Array;
 
 import generator.ConstantsConfig;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import kifio.leningrib.levels.helpers.ForestersManager;
@@ -27,6 +29,7 @@ public abstract class Level {
 
     protected GameScreen gameScreen;
     private ForestGraph forestGraph;
+    private ForestGraph strengthForestGraph;    // Гра, с которым можно гоняться за лесниками
     private ForestGraph dexterityForestGraph;  // Граф, с которым можно ходить за деревьями
     protected MushroomsManager mushroomsManager;
     protected ForestersManager forestersManager;
@@ -62,6 +65,11 @@ public abstract class Level {
                 forestersManager.getForesters(),
                 spaceManager.getSpaces());
 
+        strengthForestGraph = new ForestGraph(gameScreen.constantsConfig,
+                treesManager.getTrees(),
+                new Array<Actor>(),
+                spaceManager.getSpaces());
+
         // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
         if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
             gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.constantsConfig);
@@ -79,7 +87,7 @@ public abstract class Level {
     protected abstract Array<Forester> initForesters(LevelMap levelMap);
 
     public void update(float delta, float cameraY) {
-        // TODO: Обновлять граф, когда игрок получает действие гриба силы, чтобы он мог гоняться за лесниками
+        strengthForestGraph.updateForestGraph(cameraY);
         forestGraph.updateForestGraph(cameraY);
         forestersManager.updateForesters(delta, forestGraph);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY);
@@ -97,6 +105,8 @@ public abstract class Level {
         Player player = getPlayer();
         if (player.isDexterous()) {
             player.resetPlayerPath(x, y, dexterityForestGraph, gameScreen);
+        } else if (player.isStrong()) {
+            player.resetPlayerPath(x, y, strengthForestGraph, gameScreen);
         } else {
             player.resetPlayerPath(x, y, forestGraph, gameScreen);
         }
