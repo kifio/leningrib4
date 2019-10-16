@@ -98,7 +98,7 @@ public class Mushroom extends MovableActor {
     }
 
     public boolean isStrengthMushroom() {
-        return true; // effect == STRENGTH;
+        return effect == STRENGTH;
     }
 
     public boolean isDexterityMushroom() {

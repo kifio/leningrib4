@@ -105,70 +105,19 @@ public class Forester extends MovableActor {
                                     float delta,
                                     ForestGraph forestGraph) {
 
-        // TODO: Refactoring
-        if (movingState == MovingState.DISABLED) {
-            Gdx.app.log("kifio", "Delta: " + disablingTime);
-            if (disablingTime > MAXIMUM_DISABLING_TIME) {
-                stoppingTime = disablingTime;
-                disablingTime = 0f;
-                movingState = MovingState.STOP;
-            } else {
-                disablingTime += delta;
-                return;
+        if (speechDuration > 3f) {
+            label.setText("");
+            if (speechDuration > 3.5f) {
+                label.setText(ThreadLocalRandom.current().nextBoolean()
+                        ? SpeechManager.getInstance().getForesterPatrolSpeech()
+                        : "");
+                speechDuration = 0f;
             }
         }
-
-        if (movingState == MovingState.FEAR && !pursueArea.contains(px, py)) {
-            restartPatrol(forestGraph, label);
-            return;
-        }
-
-        if (movingState != MovingState.PURSUE && noticeArea.contains(px, py)) {
-            if (player.isStrong()) {
-                Gdx.app.log("kifio", "fear");
-                label.setText(SpeechManager.getInstance().getForesterFearSpeech());
-                setFearRoute(px, py, forestGraph);
-            } else {
-                movingState = MovingState.PATROL;
-                if (!player.isInvisible()) {
-                    Gdx.app.log("kifio", "notice");
-                    label.setText(SpeechManager.getInstance().getForesterPlayerNoticedSpeech());
-                    setPlayerNoticed();
-                }
-            }
-        } else if (movingState == MovingState.PURSUE && (!pursueArea.contains(px, py) || player.isInvisible())) {
-            // TODO: Добавить тексты для невидимости
-            label.setText(SpeechManager.getInstance().getForesterStopSpeech());
-            stopPursuing();
-        } else if (movingState == MovingState.STOP) {
-            Gdx.app.log("kifio", "stop");
-            if (stoppingTime < 2f) {
-                stoppingTime += delta;
-            } else {
-                stoppingTime = 0f;
-                restartPatrol(forestGraph, label);
-            }
-        }
-
-        if (movingState == MovingState.PURSUE) {
-            updatePursuitText(label, delta);
-            setPath(player.bounds.x, player.bounds.y, forestGraph);
-        } else {
-            if (speechDuration > 3f) {
-                label.setText("");
-                if (speechDuration > 3.5f) {
-                    label.setText(ThreadLocalRandom.current().nextBoolean()
-                            ? SpeechManager.getInstance().getForesterPatrolSpeech()
-                            : "");
-                    speechDuration = 0f;
-                }
-            }
-            speechDuration += delta;
-        }
+        speechDuration += delta;
     }
 
-    private void setFearRoute(int px, int py, ForestGraph forestGraph) {
-        movingState = MovingState.FEAR;
+    private void setScaredRoute(int px, int py, ForestGraph forestGraph) {
 
         if (!pursueArea.contains(px, py)) return;
 
@@ -188,7 +137,7 @@ public class Forester extends MovableActor {
         } else if (px > x) {
             if (x > originalLeftLimit) {
                 setPath(originalLeftLimit, y, forestGraph);
-            } else if (px - x == GameScreen.tileSize){
+            } else if (px - x == GameScreen.tileSize) {
                 if (y - originalBottomLimit >= originalTopLimit - y) {
                     setPath(x, originalBottomLimit, forestGraph);
                 } else {
@@ -229,6 +178,10 @@ public class Forester extends MovableActor {
         } else {
             pursueTime += delta;
         }
+    }
+
+    private void setScared() {
+        movingState = MovingState.FEAR;
     }
 
     private void setPlayerNoticed() {

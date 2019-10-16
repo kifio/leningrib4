@@ -25,6 +25,7 @@ public class ResourcesManager {
 	public static I18NBundle forestersSpeechesPatrolBundle;
 	public static I18NBundle forestersSpeechesPlayerNoticesBundle;
 	public static I18NBundle forestersSpeechesFearBundle;
+	public static I18NBundle forestersSpeechesInvisiblePlayerBundle;
 	public static I18NBundle forestersSpeechesPlayerInRoomBundle;
 	public static I18NBundle forestersSpeechesPursuitBundle;
 	public static I18NBundle forestersSpeechesStopBundle;
@@ -62,6 +63,7 @@ public class ResourcesManager {
 		am.load("i18n/foresters_speeches_player_in_room", I18NBundle.class);
 		am.load("i18n/foresters_speeches_pursuit", I18NBundle.class);
 		am.load("i18n/foresters_speeches_stop", I18NBundle.class);
+		am.load("i18n/foresters_speeches_invisible_player", I18NBundle.class);
 		am.load("i18n/grandma_speeches", I18NBundle.class);
 		am.load("mushroom_0.png", Texture.class);
 		am.load("mushroom_1.png", Texture.class);
@@ -117,6 +119,7 @@ public class ResourcesManager {
 		forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
 		forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
 		grandmaSpeechesBundle = am.get("i18n/grandma_speeches", I18NBundle.class);
+		forestersSpeechesInvisiblePlayerBundle = am.get("i18n/foresters_speeches_invisible_player", I18NBundle.class);
 	}
 
 	public static TextureRegion getRegion(String name) {
