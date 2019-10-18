@@ -93,24 +93,20 @@ public class SpeechManager {
 		return ResourcesManager.forestersSpeechesPatrolBundle.get(String.valueOf(random(1, 11)));
 	}
 
-	public String getForesterPlayerNoticedSpeech() {
-		return ResourcesManager.forestersSpeechesPlayerNoticesBundle.get(String.valueOf(random(1, 5)));
+	public String getForesterAlarmSpeech() {
+		return ResourcesManager.forestersSpeechesAlarmBundle.get(String.valueOf(random(1, 8)));
 	}
 
 	public String getForesterInvisiblePlayerSpeech() {
-		return ResourcesManager.forestersSpeechesPlayerNoticesBundle.get(String.valueOf(1));
+		return ResourcesManager.forestersSpeechesAlarmBundle.get(String.valueOf(random(1, 3)));
 	}
 
-	public String getForesterFearSpeech() {
+	public String getForesterScaredSpeech() {
 		return ResourcesManager.forestersSpeechesFearBundle.get(String.valueOf(random(1, 4)));
 	}
 
-	public String getForesterPlayerInRoomSpeech() {
-		return ResourcesManager.forestersSpeechesPlayerInRoomBundle.get(String.valueOf(random(1, 11)));
-	}
-
 	public String getForesterPursuitSpeech() {
-		return ResourcesManager.forestersSpeechesPursuitBundle.get(String.valueOf(random(1, 14)));
+		return ResourcesManager.forestersSpeechesPursuitBundle.get(String.valueOf(random(1, 19)));
 	}
 
 	public String getForesterStopSpeech() {

@@ -30,6 +30,9 @@ public class Forester extends MovableActor {
             PURSUE_AREA_SIDE * GameScreen.tileSize,
             PURSUE_AREA_SIDE * GameScreen.tileSize);
 
+    // Не обновляем путь для лесника, если позиция персонажа не изменилась
+    private int lastKnownPlayerX, lastKnownPlayerY;
+
     public void updateArea() {
         int x = (int) Utils.mapCoordinate(getX());
         int y = (int) Utils.mapCoordinate(getY());
@@ -87,41 +90,105 @@ public class Forester extends MovableActor {
         setPath(originalToX, originalToY, forestGraph);
     }
 
-    // Вычисляет путь лесника от a, до b.
-    private void setPath(float tx, float ty, ForestGraph forestGraph) {
-        if (forestGraph == null) return;
-        stop();
-
-        forestGraph.updatePath(Utils.mapCoordinate(getX()), Utils.mapCoordinate(getY()),
-                Utils.mapCoordinate(tx), Utils.mapCoordinate(ty), this.path);
-
-        addAction(getMoveActionsSequence(forestGraph));
-    }
-
     public void updateMovementState(Player player,
-                                    int px, int py,
                                     Label label,
                                     float delta,
                                     ForestGraph forestGraph) {
+        String speech = "";
+        int px = player.getOnLevelMapX();
+        int py = player.getOnLevelMapY();
+
         switch (movingState) {
             case PATROL:
+                if (noticeArea.contains(px, py)) {
+                    if (player.isInvisible()) {
+                        speech = SpeechManager.getInstance().getForesterInvisiblePlayerSpeech();
+                    } else if (player.isStrong()) {
+                        speech = SpeechManager.getInstance().getForesterScaredSpeech();
+                        setScared(px, py, forestGraph);
+                    } else {
+                        speech = SpeechManager.getInstance().getForesterAlarmSpeech();
+                        setPlayerNoticed();
+                        setPathToPlayer(px, py, forestGraph);
+                    }
+                    speechDuration = 0f;
+                } else {
+                    speech = getPatrolSpeech();
+                }
                 break;
             case PURSUE:
+                if (player.isStrong()) {
+                    speech = SpeechManager.getInstance().getForesterScaredSpeech();
+                    setScared(px, py, forestGraph);
+                    speechDuration = 0f;
+                } else if (player.isInvisible() || !pursueArea.contains(px, py)) {
+                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                    stopPursuing();
+                    speechDuration = 0f;
+                } else {
+                    speech = SpeechManager.getInstance().getForesterPursuitSpeech();
+                    setPathToPlayer(px, py, forestGraph);
+                }
                 break;
             case STOP:
+                if (noticeArea.contains(px, py) && player.isStrong()) {
+                    speech = SpeechManager.getInstance().getForesterScaredSpeech();
+                    setScared(px, py, forestGraph);
+                    speechDuration = 0f;
+                } else {
+                    if (stoppingTime < 2f) {
+                        stoppingTime += delta;
+                    } else {
+                        stoppingTime = 0f;
+                        speechDuration = 0f;
+                        startPatrol();
+                        setNewPath(forestGraph);
+                        speech = SpeechManager.getInstance().getForesterPatrolSpeech();
+                    }
+                }
                 break;
             case SCARED:
+                if (player.isInvisible() || !pursueArea.contains(px, py)) {
+                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                    stopPursuing();
+                    speechDuration = 0f;
+                } else if (!player.isStrong()) {
+                    speech = SpeechManager.getInstance().getForesterPursuitSpeech();
+                    setPlayerNoticed();
+                    speechDuration = 0f;
+                } else {
+                    speech = SpeechManager.getInstance().getForesterScaredSpeech();
+                    setScared(px, py, forestGraph);
+                }
                 break;
             case DISABLED:
+                speech = "...";
+                if (disablingTime > MAXIMUM_DISABLING_TIME) {
+                    stoppingTime = disablingTime;
+                    disablingTime = 0f;
+                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                    movingState = MovingState.STOP;
+                    speechDuration = 0f;
+                } else {
+                    disablingTime += delta;
+                }
                 break;
         }
+
+        if (isShouldRemoveSpeech()) {
+            label.setText(null);
+        } else if (isShouldResetSpeech()) {
+            label.setText(speech);
+        }
+
+        updateSpeechDuration(delta);
     }
 
     private boolean isShouldResetSpeech() {
         return Float.compare(speechDuration, 0) == 0;
     }
 
-    private boolean isShouldRemoveSpeech(float speechDuration) {
+    private boolean isShouldRemoveSpeech() {
         return speechDuration > 3f;
     }
 
@@ -190,19 +257,8 @@ public class Forester extends MovableActor {
 
     }
 
-    private void updatePursuitText(Label label, float delta) {
-        speechDuration = 0f;
-        if (pursueTime > 2.5f) {
-            label.setText("");
-        } else if (pursueTime > 3f) {
-            label.setText(SpeechManager.getInstance().getForesterPursuitSpeech());
-            pursueTime = 0f;
-        } else {
-            pursueTime += delta;
-        }
-    }
-
-    private void setScared() {
+    private void setScared(int px, int py, ForestGraph forestGraph) {
+        setScaredRoute(px, py, forestGraph);
         movingState = MovingState.SCARED;
     }
 
@@ -227,13 +283,6 @@ public class Forester extends MovableActor {
 
     public boolean isScared() {
         return movingState == MovingState.SCARED;
-    }
-
-    private void restartPatrol(ForestGraph forestGraph, Label label) {
-        speechDuration = 0f;
-        startPatrol();
-        setNewPath(forestGraph);
-        label.setText(SpeechManager.getInstance().getForesterPatrolSpeech());
     }
 
     public void disable(Label label) {
@@ -277,6 +326,32 @@ public class Forester extends MovableActor {
         int toX = bounds.x == (int) originalToX ? (int) originalFromX : (int) originalToX;
         int toY = ThreadLocalRandom.current().nextInt(originalBottomLimit, originalTopLimit);
         setPath(toX, toY, forestGraph);
+    }
+
+    // Вычисляет путь лесника от a, до b.
+    private void setPath(float tx, float ty, ForestGraph forestGraph) {
+        if (forestGraph == null) return;
+        stop();
+
+        forestGraph.updatePath(Utils.mapCoordinate(getX()), Utils.mapCoordinate(getY()),
+                Utils.mapCoordinate(tx), Utils.mapCoordinate(ty), this.path);
+
+        addAction(getMoveActionsSequence(forestGraph));
+    }
+
+    private void setPathToPlayer(int px, int py, ForestGraph forestGraph) {
+        if (forestGraph == null) return;
+        stop();
+
+        if (lastKnownPlayerX != px || lastKnownPlayerY != py) {
+            forestGraph.updatePath(
+                    Utils.mapCoordinate(getX()),
+                    Utils.mapCoordinate(getY()),
+                    px, py,
+                    this.path);
+        }
+
+        addAction(getMoveActionsSequence(forestGraph));
     }
 
     public float getVelocity() {

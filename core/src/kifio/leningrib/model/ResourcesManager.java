@@ -1,8 +1,6 @@
 package kifio.leningrib.model;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -23,11 +21,10 @@ public class ResourcesManager {
 	public static I18NBundle invisibilityMushroomsSpeechBundle;
 	public static I18NBundle speedMushroomsSpeechBundle;
 	public static I18NBundle forestersSpeechesPatrolBundle;
-	public static I18NBundle forestersSpeechesPlayerNoticesBundle;
+	public static I18NBundle forestersSpeechesPursuitBundle;
+	public static I18NBundle forestersSpeechesAlarmBundle;
 	public static I18NBundle forestersSpeechesFearBundle;
 	public static I18NBundle forestersSpeechesInvisiblePlayerBundle;
-	public static I18NBundle forestersSpeechesPlayerInRoomBundle;
-	public static I18NBundle forestersSpeechesPursuitBundle;
 	public static I18NBundle forestersSpeechesStopBundle;
 	public static I18NBundle grandmaSpeechesBundle;
 
@@ -57,10 +54,9 @@ public class ResourcesManager {
 		am.load("i18n/mushroom_invisibility_speech", I18NBundle.class);
 		am.load("i18n/mushroom_speed_speech", I18NBundle.class);
 		am.load("i18n/mushroom_dexterity_speech", I18NBundle.class);
-		am.load("i18n/foresters_speeches_noticing", I18NBundle.class);
+		am.load("i18n/foresters_speeches_alarm", I18NBundle.class);
 		am.load("i18n/foresters_speeches_fear", I18NBundle.class);
 		am.load("i18n/foresters_speeches_patrol", I18NBundle.class);
-		am.load("i18n/foresters_speeches_player_in_room", I18NBundle.class);
 		am.load("i18n/foresters_speeches_pursuit", I18NBundle.class);
 		am.load("i18n/foresters_speeches_stop", I18NBundle.class);
 		am.load("i18n/foresters_speeches_invisible_player", I18NBundle.class);
@@ -112,11 +108,10 @@ public class ResourcesManager {
 		dexterityMushroomsSpeechBundle = am.get("i18n/mushroom_dexterity_speech", I18NBundle.class);
 		invisibilityMushroomsSpeechBundle = am.get("i18n/mushroom_invisibility_speech", I18NBundle.class);
 		speedMushroomsSpeechBundle = am.get("i18n/mushroom_speed_speech", I18NBundle.class);
-		forestersSpeechesPlayerNoticesBundle = am.get("i18n/foresters_speeches_noticing", I18NBundle.class);
+		forestersSpeechesAlarmBundle = am.get("i18n/foresters_speeches_alarm", I18NBundle.class);
+		forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
 		forestersSpeechesFearBundle = am.get("i18n/foresters_speeches_fear", I18NBundle.class);
 		forestersSpeechesPatrolBundle = am.get("i18n/foresters_speeches_patrol", I18NBundle.class);
-		forestersSpeechesPlayerInRoomBundle = am.get("i18n/foresters_speeches_player_in_room", I18NBundle.class);
-		forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
 		forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
 		grandmaSpeechesBundle = am.get("i18n/grandma_speeches", I18NBundle.class);
 		forestersSpeechesInvisiblePlayerBundle = am.get("i18n/foresters_speeches_invisible_player", I18NBundle.class);

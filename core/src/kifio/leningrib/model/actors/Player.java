@@ -227,4 +227,12 @@ public class Player extends MovableActor {
     public boolean isDexterous() {
         return mushroom != null && mushroom.isDexterityMushroom();
     }
+
+    public int getOnLevelMapX() {
+        return (int) Utils.mapCoordinate(bounds.x);
+    }
+
+    public int getOnLevelMapY() {
+        return (int) Utils.mapCoordinate(bounds.y);
+    }
 }
