@@ -72,7 +72,7 @@ public class CommonLevel extends Level {
 					GameScreen.tileSize * originalFromY,
 					GameScreen.tileSize * (ltr ? right : left),
 						GameScreen.tileSize * originalToY,
-						ThreadLocalRandom.current().nextInt(1, 3),
+						ThreadLocalRandom.current().nextInt(1, 4),
 						GameScreen.tileSize * bottom,
 						GameScreen.tileSize * top,
 						GameScreen.tileSize, GameScreen.tileSize * 7);

@@ -1,6 +1,5 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -60,7 +59,7 @@ public class Forester extends MovableActor {
     }
 
     private enum MovingState {
-        PATROL, PURSUE, STOP, FEAR, DISABLED
+        PATROL, PURSUE, STOP, SCARED, DISABLED
     }
 
     private float originalFromX, originalToX, originalToY;
@@ -104,17 +103,40 @@ public class Forester extends MovableActor {
                                     Label label,
                                     float delta,
                                     ForestGraph forestGraph) {
+        switch (movingState) {
+            case PATROL:
+                break;
+            case PURSUE:
+                break;
+            case STOP:
+                break;
+            case SCARED:
+                break;
+            case DISABLED:
+                break;
+        }
+    }
 
-        if (speechDuration > 3f) {
-            label.setText("");
-            if (speechDuration > 3.5f) {
-                label.setText(ThreadLocalRandom.current().nextBoolean()
-                        ? SpeechManager.getInstance().getForesterPatrolSpeech()
-                        : "");
-                speechDuration = 0f;
-            }
+    private boolean isShouldResetSpeech() {
+        return Float.compare(speechDuration, 0) == 0;
+    }
+
+    private boolean isShouldRemoveSpeech(float speechDuration) {
+        return speechDuration > 3f;
+    }
+
+    private void updateSpeechDuration(float delta) {
+        if (speechDuration > 3.5f) {
+            speechDuration = 0f;
+            return;
         }
         speechDuration += delta;
+    }
+
+    private String getPatrolSpeech() {
+        return ThreadLocalRandom.current().nextBoolean()
+                ? SpeechManager.getInstance().getForesterPatrolSpeech()
+                : "";
     }
 
     private void setScaredRoute(int px, int py, ForestGraph forestGraph) {
@@ -181,7 +203,7 @@ public class Forester extends MovableActor {
     }
 
     private void setScared() {
-        movingState = MovingState.FEAR;
+        movingState = MovingState.SCARED;
     }
 
     private void setPlayerNoticed() {
@@ -204,7 +226,7 @@ public class Forester extends MovableActor {
     }
 
     public boolean isScared() {
-        return movingState == MovingState.FEAR;
+        return movingState == MovingState.SCARED;
     }
 
     private void restartPatrol(ForestGraph forestGraph, Label label) {
@@ -258,7 +280,7 @@ public class Forester extends MovableActor {
     }
 
     public float getVelocity() {
-        return 800f;
+        return 500f;
     }
 
     public float getNewSpeechX() {
