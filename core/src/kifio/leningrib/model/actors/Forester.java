@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -19,6 +20,8 @@ public class Forester extends MovableActor {
     private static final int NOTICE_AREA_SIDE = 5;
     private static final int PURSUE_AREA_SIDE = 9;
     private static final float MAXIMUM_DISABLING_TIME = 3f;
+    private static final String IDLE = "idle";
+    private static final String RUN = "run";
 
     private final String running;
     private final String idle;
@@ -105,7 +108,7 @@ public class Forester extends MovableActor {
                         speech = SpeechManager.getInstance().getForesterInvisiblePlayerSpeech();
                     } else if (player.isStrong()) {
                         speech = SpeechManager.getInstance().getForesterScaredSpeech();
-                        setScared(px, py, forestGraph);
+                        setScared(px, py, forestGraph, true);
                     } else {
                         speech = SpeechManager.getInstance().getForesterAlarmSpeech();
                         setPlayerNoticed();
@@ -119,7 +122,7 @@ public class Forester extends MovableActor {
             case PURSUE:
                 if (player.isStrong()) {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
-                    setScared(px, py, forestGraph);
+                    setScared(px, py, forestGraph, false);
                     speechDuration = 0f;
                 } else if (player.isInvisible() || !pursueArea.contains(px, py)) {
                     speech = SpeechManager.getInstance().getForesterStopSpeech();
@@ -131,9 +134,12 @@ public class Forester extends MovableActor {
                 }
                 break;
             case STOP:
+                if (current.getPackFile().contains(RUN)) {
+                    current.setPackFile(current.getPackFile().replace(RUN, IDLE));
+                }
                 if (noticeArea.contains(px, py) && player.isStrong()) {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
-                    setScared(px, py, forestGraph);
+                    setScared(px, py, forestGraph, true);
                     speechDuration = 0f;
                 } else {
                     if (stoppingTime < 2f) {
@@ -144,6 +150,9 @@ public class Forester extends MovableActor {
                         startPatrol();
                         setNewPath(forestGraph);
                         speech = SpeechManager.getInstance().getForesterPatrolSpeech();
+                        if (current.getPackFile().contains(IDLE)) {
+                            current.setPackFile(current.getPackFile().replace(IDLE, RUN));
+                        }
                     }
                 }
                 break;
@@ -158,11 +167,14 @@ public class Forester extends MovableActor {
                     speechDuration = 0f;
                 } else {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
-                    setScared(px, py, forestGraph);
+                    setScared(px, py, forestGraph, false);
                 }
                 break;
             case DISABLED:
                 speech = "...";
+                if (current.getPackFile().contains(RUN)) {
+                    current.setPackFile(current.getPackFile().replace(RUN, IDLE));
+                }
                 if (disablingTime > MAXIMUM_DISABLING_TIME) {
                     stoppingTime = disablingTime;
                     disablingTime = 0f;
@@ -182,6 +194,8 @@ public class Forester extends MovableActor {
         }
 
         updateSpeechDuration(delta);
+        lastKnownPlayerX = px;
+        lastKnownPlayerY = py;
     }
 
     private boolean isShouldResetSpeech() {
@@ -257,8 +271,12 @@ public class Forester extends MovableActor {
 
     }
 
-    private void setScared(int px, int py, ForestGraph forestGraph) {
-        setScaredRoute(px, py, forestGraph);
+    // forceUpdate нужен на случай, если игрок за пределами видимости лесника и его координаты не меняются.
+    // В таком случае маршрут побега должен быть перестроен
+    private void setScared(int px, int py, ForestGraph forestGraph, boolean forceUpdate) {
+        if (forceUpdate || (lastKnownPlayerX != px || lastKnownPlayerY != py)) {
+            setScaredRoute(px, py, forestGraph);
+        }
         movingState = MovingState.SCARED;
     }
 
@@ -335,6 +353,10 @@ public class Forester extends MovableActor {
 
         forestGraph.updatePath(Utils.mapCoordinate(getX()), Utils.mapCoordinate(getY()),
                 Utils.mapCoordinate(tx), Utils.mapCoordinate(ty), this.path);
+
+        if (this.path.getCount() == 0) {
+            Gdx.app.log("kifio", "path is empty");
+        }
 
         addAction(getMoveActionsSequence(forestGraph));
     }
