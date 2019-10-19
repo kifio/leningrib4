@@ -221,8 +221,8 @@ public class Player extends MovableActor {
     }
 
     public boolean isStrong() {
-        return true;
-//        return mushroom != null && mushroom.isStrengthMushroom();
+//        return true;
+        return mushroom != null && mushroom.isStrengthMushroom();
     }
 
     public boolean isDexterous() {

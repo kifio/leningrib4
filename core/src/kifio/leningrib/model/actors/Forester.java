@@ -33,6 +33,8 @@ public class Forester extends MovableActor {
             PURSUE_AREA_SIDE * GameScreen.tileSize,
             PURSUE_AREA_SIDE * GameScreen.tileSize);
 
+    private Rectangle scaredArea = new Rectangle(0, 0, 0, 0);
+
     // Не обновляем путь для лесника, если позиция персонажа не изменилась
     private int lastKnownPlayerX, lastKnownPlayerY;
 
@@ -75,7 +77,8 @@ public class Forester extends MovableActor {
 
     // Лесники начинают с патрулирования леса, поэтому у них две координаты
     public Forester(float originalFromX, float originalFromY, float originalToX, float originalToY, int index,
-                    int originalBottomLimit, int originalTopLimit, int originalLeftLimit, int originalRightLimit) {
+                    int originalBottomLimit, int originalTopLimit, int originalLeftLimit, int originalRightLimit,
+                    Rectangle scaredArea) {
         super(originalFromX, originalFromY);
         this.originalFromX = originalFromX;
         this.originalToX = originalToX;
@@ -84,6 +87,12 @@ public class Forester extends MovableActor {
         this.originalTopLimit = originalTopLimit;
         this.originalLeftLimit = originalLeftLimit;
         this.originalRightLimit = originalRightLimit;
+        this.scaredArea.set(
+                scaredArea.x * GameScreen.tileSize,
+                scaredArea.y * GameScreen.tileSize,
+                scaredArea.width * GameScreen.tileSize,
+                scaredArea.height * GameScreen.tileSize
+        );
         running = String.format(Locale.getDefault(), "enemy_%d_run", index);
         idle = String.format(Locale.getDefault(), "enemy_%d_idle", index);
         setPath(originalToX, originalToY, null);
@@ -103,12 +112,13 @@ public class Forester extends MovableActor {
 
         switch (movingState) {
             case PATROL:
-                if (noticeArea.contains(px, py)) {
+
+                if (scaredArea.contains(px, py) && player.isStrong()) {
+                    speech = SpeechManager.getInstance().getForesterScaredSpeech();
+                    setScared(px, py, forestGraph, true);
+                } else if (noticeArea.contains(px, py)) {
                     if (player.isInvisible()) {
                         speech = SpeechManager.getInstance().getForesterInvisiblePlayerSpeech();
-                    } else if (player.isStrong()) {
-                        speech = SpeechManager.getInstance().getForesterScaredSpeech();
-                        setScared(px, py, forestGraph, true);
                     } else {
                         speech = SpeechManager.getInstance().getForesterAlarmSpeech();
                         setPlayerNoticed();
@@ -137,7 +147,7 @@ public class Forester extends MovableActor {
                 if (current.getPackFile().contains(RUN)) {
                     current.setPackFile(current.getPackFile().replace(RUN, IDLE));
                 }
-                if (noticeArea.contains(px, py) && player.isStrong()) {
+                if (scaredArea.contains(px, py) && player.isStrong()) {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
                     setScared(px, py, forestGraph, true);
                     speechDuration = 0f;
@@ -157,17 +167,20 @@ public class Forester extends MovableActor {
                 }
                 break;
             case SCARED:
-                if (player.isInvisible() || !pursueArea.contains(px, py)) {
-                    speech = SpeechManager.getInstance().getForesterStopSpeech();
-                    stopPursuing();
-                    speechDuration = 0f;
-                } else if (!player.isStrong()) {
-                    speech = SpeechManager.getInstance().getForesterPursuitSpeech();
-                    setPlayerNoticed();
-                    speechDuration = 0f;
-                } else {
+                // FIXME: Лесники все еще шароебятся по комнате будучи напуганными
+                if (player.isStrong() && scaredArea.contains(px, py)) {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
                     setScared(px, py, forestGraph, false);
+                } else {
+                    if (player.isInvisible() || !scaredArea.contains(px, py)) {
+                        speech = SpeechManager.getInstance().getForesterStopSpeech();
+                        stopPursuing();
+                        speechDuration = 0f;
+                    } else if (!player.isStrong() && pursueArea.contains(px, py)) {
+                        speech = SpeechManager.getInstance().getForesterPursuitSpeech();
+                        setPlayerNoticed();
+                        speechDuration = 0f;
+                    }
                 }
                 break;
             case DISABLED:
@@ -196,6 +209,7 @@ public class Forester extends MovableActor {
         updateSpeechDuration(delta);
         lastKnownPlayerX = px;
         lastKnownPlayerY = py;
+        Gdx.app.log("kifio", movingState.name());
     }
 
     private boolean isShouldResetSpeech() {
@@ -222,7 +236,7 @@ public class Forester extends MovableActor {
 
     private void setScaredRoute(int px, int py, ForestGraph forestGraph) {
 
-        if (!pursueArea.contains(px, py)) return;
+        if (!scaredArea.contains(px, py)) return;
 
         int x = (int) Utils.mapCoordinate(bounds.x);
         int y = (int) Utils.mapCoordinate(bounds.y);
@@ -236,6 +250,8 @@ public class Forester extends MovableActor {
                 } else {
                     setPath(x, originalTopLimit - GameScreen.tileSize, forestGraph);
                 }
+            } else {
+//                Gdx.app.log("kifio", "Stay on the right");
             }
         } else if (px > x) {
             if (x > originalLeftLimit) {
@@ -246,6 +262,8 @@ public class Forester extends MovableActor {
                 } else {
                     setPath(x, originalTopLimit - GameScreen.tileSize, forestGraph);
                 }
+            } else {
+//                Gdx.app.log("kifio", "Stay on the left");
             }
         } else if (py < y) {
             if (y < originalTopLimit - GameScreen.tileSize) {
@@ -256,6 +274,8 @@ public class Forester extends MovableActor {
                 } else {
                     setPath(originalRightLimit, y, forestGraph);
                 }
+            } else {
+//                Gdx.app.log("kifio", "Stay on the top");
             }
         } else if (py > y) {
             if (y > originalBottomLimit) {
@@ -266,6 +286,8 @@ public class Forester extends MovableActor {
                 } else {
                     setPath(originalRightLimit, y, forestGraph);
                 }
+            } else {
+//                Gdx.app.log("kifio", "Stay on the bottom");
             }
         }
 
@@ -328,14 +350,19 @@ public class Forester extends MovableActor {
         }
 
         seq.addAction(getDelayAction(getDelayTime()));
-        if (movingState.equals(MovingState.PATROL)) {
-            seq.addAction(Actions.run(new Runnable() {
-                @Override
-                public void run() {
+
+        seq.addAction(Actions.run(new Runnable() {
+            @Override
+            public void run() {
+                if (movingState.equals(MovingState.PATROL)) {
                     setNewPath(forestGraph);
+                } else if (movingState.equals(MovingState.SCARED)) {
+                    if (current.getPackFile().contains(RUN)) {
+                        current.setPackFile(current.getPackFile().replace(RUN, IDLE));
+                    }
                 }
-            }));
-        }
+            }
+        }));
 
         return seq;
     }
@@ -354,10 +381,6 @@ public class Forester extends MovableActor {
         forestGraph.updatePath(Utils.mapCoordinate(getX()), Utils.mapCoordinate(getY()),
                 Utils.mapCoordinate(tx), Utils.mapCoordinate(ty), this.path);
 
-        if (this.path.getCount() == 0) {
-            Gdx.app.log("kifio", "path is empty");
-        }
-
         addAction(getMoveActionsSequence(forestGraph));
     }
 
@@ -365,13 +388,13 @@ public class Forester extends MovableActor {
         if (forestGraph == null) return;
         stop();
 
-        if (lastKnownPlayerX != px || lastKnownPlayerY != py) {
+//        if (lastKnownPlayerX != px || lastKnownPlayerY != py) {
             forestGraph.updatePath(
                     Utils.mapCoordinate(getX()),
                     Utils.mapCoordinate(getY()),
                     px, py,
                     this.path);
-        }
+//        }
 
         addAction(getMoveActionsSequence(forestGraph));
     }
