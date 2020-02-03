@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.screens.GameScreen;
+import kifio.leningrib.screens.MenuScreen;
 
 public class LGCGame extends Game {
 
@@ -13,7 +14,7 @@ public class LGCGame extends Game {
     @Override
 	public void create () {
 		ResourcesManager.init();
-		showGameScreen();
+		showMenuScreen();
 	}
 
     @Override
@@ -32,6 +33,7 @@ public class LGCGame extends Game {
 	}
 
 	public void showMenuScreen() {
-
+		currentScreen = new MenuScreen(this);
+		setScreen(currentScreen);
 	}
 }
