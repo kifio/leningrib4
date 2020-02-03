@@ -9,74 +9,44 @@ import kifio.leningrib.screens.GameScreen;
 public class Mushroom extends MovableActor {
 
     private static final float DEFAULT_EFFECT_TIME = 10f; // nanoseconds
-    private static final float SCALE_ANIMATION_TIME = 0.5f; // milliseconds
-    private static final String MUSHROOM = "mushroom_";
-    private static final String COIN = "coins";
 
     // COLORS in rgba!! not argb.
-    public static final int STRENGTH = 0xD8390FFF;
+    public static final int POWER = 0xD8390FFF;
     public static final int SPEED = 0x106189FF;
     public static final int DEXTERITY = 0xF49C37FF;
     public static final int INVISIBILITY = 0xFFFFFF20;
     public static final int NO_EFFECT = 0xFFFFFFFF;
 
     public int[] effects = new int[]{
-            STRENGTH, DEXTERITY, INVISIBILITY, SPEED
+            POWER, DEXTERITY, INVISIBILITY, SPEED
     };
 
     private int effect = 0;
-    private float scale = 1f;
     private boolean isEaten = false;
-    private TextureRegion region;
-
 
     public Mushroom(int x, int y) {
         super(x, y);
 
         int effectIndex = ThreadLocalRandom.current().nextInt(effects.length);
         boolean hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0;
-        String textureName = MUSHROOM + effectIndex;
 
         if (hasEffect) {
             effect = effects[effectIndex];
         }
-
-        if (effect == INVISIBILITY) {
-            region = ResourcesManager.getRegionWithTint(textureName, effect, true);
-        } else {
-            region = ResourcesManager.getRegion(textureName);
-        }
     }
 
     private boolean b = ThreadLocalRandom.current().nextBoolean();
-    private float scalingTime = SCALE_ANIMATION_TIME;
 
     @Override public void act(float delta) {
         super.act(delta);
-        scalingTime += delta;
-
-        if (scalingTime >= SCALE_ANIMATION_TIME) {
-            scale = b ? 1.0f : 0.8f;
-            b = !b;
-            scalingTime = 0f;
-        }
     }
 
     @Override public void draw(Batch batch, float alpha) {
         if (isEaten) return;
         float x = getX();
         float y = getY();
-
         bounds.set(x, y, GameScreen.tileSize, GameScreen.tileSize);
-
-        float scaleOffset = (1 - scale) / 2;
-        float offsetX = getDrawingWidth() * scaleOffset;
-        float offsetY = getDrawingHeight() * scaleOffset;
-
-        float drawingWidth = getDrawingWidth() - (2 * offsetX);
-        float drawingHeight = getDrawingWidth() - (2 * offsetX);
-
-        batch.draw(region, x + offsetX, y + offsetY, drawingWidth, drawingHeight);
+        batch.draw(getTextureRegion(), x, y, getDrawingWidth(), getDrawingHeight());
     }
 
     public int getEffect() {
@@ -98,7 +68,7 @@ public class Mushroom extends MovableActor {
     }
 
     public boolean isStrengthMushroom() {
-        return effect == STRENGTH;
+        return effect == POWER;
     }
 
     public boolean isDexterityMushroom() {
@@ -116,11 +86,19 @@ public class Mushroom extends MovableActor {
     }
 
     @Override protected String getIdlingState() {
-        return COIN;//effect.getEffectName();
+        return getStateName();//effect.getEffectName();
     }
 
     @Override protected String getRunningState() {
-        return COIN;//effect.getEffectName();
+        return getStateName();//effect.getEffectName();
+    }
+
+    private String getStateName() {
+        switch (effect) {
+            case SPEED: return "speed_mushroom";
+            case DEXTERITY: return "dexterity_mushroom";
+            default: return "power_mushroom";
+        }
     }
 
     protected float getDrawingWidth() {
