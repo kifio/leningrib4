@@ -14,10 +14,10 @@ public class TreePart extends Actor {
 
 	private TextureRegion treeTexture;
 
-	public TreePart(TextureRegion textureRegion, int x, int y, int width, int heigh) {
+	public TreePart(TextureRegion textureRegion, float x, float y, int width, int height) {
 		treeTexture = textureRegion;
 		setX(x); setY(y);
-		setWidth(width); setHeight(heigh);
+		setWidth(width); setHeight(height);
 	}
 
 	@Override

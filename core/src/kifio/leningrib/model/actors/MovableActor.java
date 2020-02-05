@@ -110,7 +110,7 @@ public abstract class MovableActor extends Actor {
 		// texture.dispose();
 		pixmap.dispose();
 	}
-	// Color for replacement already setled in Pixmap
+	// Color for replacement already settled in Pixmap
 	protected void updatePixmap(Pixmap pixmap, int pixelColor, int newColor) {
 		for (int i = 0; i < pixmap.getWidth(); i++) {
 			for (int j = 0; j < pixmap.getHeight(); j++) {

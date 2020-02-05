@@ -86,7 +86,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private String getSpeech(int effect) {
         switch (effect) {
-            case Mushroom.STRENGTH:
+            case Mushroom.POWER:
                 return SpeechManager.getInstance().getPowerMushroomSpeech();
             case Mushroom.SPEED:
                 return SpeechManager.getInstance().getSpeedMushroomSpeech();

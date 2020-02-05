@@ -1,30 +1,30 @@
-power_mushroom.png
+speed_mushroom.png
 size: 64, 208
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-power-mushroom-0
+speed-mushroom-0
   rotate: false
   xy: 0, 0
   size: 64, 52
   orig: 64, 52
   offset: 0, 0
   index: -1
-power-mushroom-1
+speed-mushroom-1
   rotate: false
   xy: 0, 52
   size: 64, 52
   orig: 64, 52
   offset: 0, 0
   index: -1
-power-mushroom-2
+speed-mushroom-2
   rotate: false
   xy: 0, 104
-  size: 64, 52
-  orig: 64, 52
+   size: 64, 52
+   orig: 64, 52
   offset: 0, 0
   index: -1
-power-mushroom-3
+speed-mushroom-3
   rotate: false
   xy: 0, 156
   size: 64, 52

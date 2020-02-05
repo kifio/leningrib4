@@ -141,12 +141,12 @@ public class WorldRenderer {
 	private void updateCamera() {
 		camera.update();
 		float playerY = level.getPlayer().getY();
-		float bottomTreshold = Gdx.graphics.getHeight() / 2f;
-		float topTreshold = constantsConfig.getLevelHeight() * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
-		if (playerY < bottomTreshold) {
-			camera.position.y = bottomTreshold;
-		} else if (playerY > topTreshold) {
-			camera.position.y = topTreshold;
+		float bottomThreshold = Gdx.graphics.getHeight() / 2f;
+		float topThreshold = constantsConfig.getLevelHeight() * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
+		if (playerY < bottomThreshold) {
+			camera.position.y = bottomThreshold;
+		} else if (playerY > topThreshold) {
+			camera.position.y = topThreshold;
 		} else {
 			camera.position.y = playerY;
 		}
