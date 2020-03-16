@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -46,7 +47,7 @@ public class GameScreen extends InputAdapter implements Screen {
     public WorldMap worldMap;
     public Player player;
 
-    public Config constantsConfig = new Config(12, 36);
+    public Config constantsConfig = new Config(10, 46);
 
     public GameScreen(LGCGame game) {
         Gdx.input.setInputProcessor(this);
@@ -64,7 +65,7 @@ public class GameScreen extends InputAdapter implements Screen {
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch, constantsConfig);
         this.worldMap = new WorldMap();
         if (isFirstLevelPassed) {
-            this.player = new Player(0f, 2f * GameScreen.tileSize);
+            this.player = new Player(2f * GameScreen.tileSize, 2f * GameScreen.tileSize);
         } else {
             this.player = new Player(2f * GameScreen.tileSize, 0f);
         }

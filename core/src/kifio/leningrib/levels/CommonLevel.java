@@ -57,9 +57,9 @@ public class CommonLevel extends Level {
 				gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {
 
 				int left = (int) (roomsRectangles[i].x + 1);
-				int top = (int) (roomsRectangles[i].y + roomsRectangles[i].height);
+				int top = (int) (roomsRectangles[i].y + roomsRectangles[i].height - 1);
 				int right = (int) (roomsRectangles[i].width - 2);
-				int bottom = (int) roomsRectangles[i].y;
+				int bottom = (int) roomsRectangles[i].y + 1;
 
 				int originalFromY = ThreadLocalRandom.current().nextInt(bottom, top);
 				int originalToY = ThreadLocalRandom.current().nextInt(bottom, top);

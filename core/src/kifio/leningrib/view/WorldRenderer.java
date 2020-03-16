@@ -250,7 +250,7 @@ public class WorldRenderer {
 			int x = GameScreen.tileSize * (i % cameraWidth);
 			int y = GameScreen.tileSize * (i / cameraWidth);
 			batch.draw(
-				ResourcesManager.getRegion(grass[i] ? ResourcesManager.GRASS_0 : ResourcesManager.GRASS_1),
+				ResourcesManager.getRegion(grass[i] ? ResourcesManager.GRASS_0 : ResourcesManager.GRASS_0),
 				x, y, GameScreen.tileSize, GameScreen.tileSize);
 		}
 		batch.end();
@@ -264,37 +264,5 @@ public class WorldRenderer {
 			stage = null;
 		}
 		camera = null;
-	}
-
-	private Texture getBackgroundTexture() {
-
-		TextureRegion g0 = ResourcesManager.getRegion(ResourcesManager.GRASS_0);
-		TextureRegion g1 = ResourcesManager.getRegion(ResourcesManager.GRASS_1);
-
-		g0.getTexture().getTextureData().prepare();
-		g1.getTexture().getTextureData().prepare();
-
-		Pixmap g0Pixmap = g0.getTexture().getTextureData().consumePixmap(); // Strange name, but gives the pixmap of the texture. Remember to dispose this also
-		Pixmap g1Pixmap = g1.getTexture().getTextureData().consumePixmap(); // Strange name, but gives the pixmap of the texture. Remember to dispose this also
-
-		Pixmap pixmap = new Pixmap(cameraWidth * GameScreen.tileSize, cameraHeight * GameScreen.tileSize, Format.RGBA8888);
-
-
-		for (int i = 0; i < cameraWidth; i++) {
-			for (int j = 0; j <= cameraHeight; j++) {
-				int x = GameScreen.tileSize * i;
-				int y = GameScreen.tileSize * j;
-				pixmap.drawPixmap(g1Pixmap, x, y);
-			}
-		}
-
-
-		Texture texture = new Texture(pixmap); // Not sure if needed, but may be needed to get disposed as well when it's no longer needed
-// These are not needed anymore
-		pixmap.dispose();
-		g0Pixmap.dispose();
-		g1Pixmap.dispose();
-
-		return texture;
 	}
 }

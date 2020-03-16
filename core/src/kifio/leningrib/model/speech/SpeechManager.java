@@ -39,7 +39,7 @@ public class SpeechManager {
 	}
 
 	private BitmapFont generateFont() {
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Ubuntu-Medium.ttf"));
 		BitmapFont font = generator.generateFont(getFontParameter());
 		generator.dispose();
 		return font;
@@ -50,8 +50,8 @@ public class SpeechManager {
 		parameter.characters =
 			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}";
 		parameter.color = Color.WHITE;
-		parameter.shadowOffsetX = 1;
-		parameter.shadowOffsetY = 1;
+		parameter.shadowOffsetX = 0;
+		parameter.shadowOffsetY = 0;
 		return parameter;
 	}
 

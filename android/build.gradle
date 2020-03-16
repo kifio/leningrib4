@@ -20,6 +20,7 @@ android {
         applicationId "kifio.leningrib"
         minSdkVersion 21
         targetSdkVersion 28
+        ndkVersion "21.0.6113669"
         versionCode 1
         versionName "1.0"
     }

@@ -1,6 +1,7 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.List;
 
 import generator.Config;
+import generator.Generator;
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.SpaceManager;
@@ -19,6 +21,7 @@ import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.actors.Space;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
+import model.Exit;
 import model.LevelMap;
 import model.Room;
 
@@ -46,14 +49,15 @@ public abstract class Level {
 
         treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
         mushroomsManager.initMushrooms(initMushrooms(gameScreen.constantsConfig, treesManager.getTrees()));
+
         spaceManager.buildSpaces(getPlayer(),
                 gameScreen.constantsConfig,
-                treesManager.getTrees(),
+                treesManager.getObstacleTrees(),
                 mushroomsManager.getMushrooms(),
                 getRoomsRectangles(levelMap, gameScreen.constantsConfig));
 
         forestGraph = new ForestGraph(gameScreen.constantsConfig,
-                treesManager.getTrees(),
+                treesManager.getObstacleTrees(),
                 forestersManager.getForesters(),
                 spaceManager.getSpaces());
 
@@ -63,7 +67,7 @@ public abstract class Level {
                 spaceManager.getSpaces());
 
         strengthForestGraph = new ForestGraph(gameScreen.constantsConfig,
-                treesManager.getTrees(),
+                treesManager.getObstacleTrees(),
                 new Array<Actor>(),
                 spaceManager.getSpaces());
 
