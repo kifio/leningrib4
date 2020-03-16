@@ -10,16 +10,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import generator.ConstantsConfig;
-import java.util.List;
+
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
+
+import generator.Config;
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
@@ -37,7 +37,7 @@ public class WorldRenderer {
 	private SpriteBatch batch;
 	private ShapeRenderer renderer;
 	private OrthographicCamera camera;
-	private ConstantsConfig constantsConfig;
+	private Config constantsConfig;
 	private int cameraWidth;
 	private int cameraHeight;
 
@@ -49,7 +49,7 @@ public class WorldRenderer {
 	private static final String GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s ГРИБОВ";
 
 	public WorldRenderer(OrthographicCamera camera, int cameraWidth, int cameraHeight, Stage stage,
-		SpriteBatch batch, ConstantsConfig constantsConfig) {
+		SpriteBatch batch, Config constantsConfig) {
 		this.camera = camera;
 		this.cameraWidth = cameraWidth;
 		this.cameraHeight = cameraHeight;

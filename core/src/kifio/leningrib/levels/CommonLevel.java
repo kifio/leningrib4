@@ -1,20 +1,19 @@
 package kifio.leningrib.levels;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
-import generator.ConstantsConfig;
-import java.util.List;
+
 import java.util.concurrent.ThreadLocalRandom;
+
+import generator.Config;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
-import model.Room;
 
 public class CommonLevel extends Level {
 
@@ -29,7 +28,7 @@ public class CommonLevel extends Level {
 		return gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig);
 	}
 
-	@Override protected Array<Mushroom> initMushrooms(ConstantsConfig config, Array<? extends Actor> trees) {
+	@Override protected Array<Mushroom> initMushrooms(Config config, Array<? extends Actor> trees) {
 		Array<Mushroom> mushrooms = new Array<>();
 
 		int levelHeight = config.getLevelHeight();

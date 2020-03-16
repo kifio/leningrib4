@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
-import generator.ConstantsConfig;
+import generator.Config;
 import java.util.HashMap;
 import java.util.Locale;
 import kifio.leningrib.Utils;
@@ -46,7 +46,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	private Array<Vector2> nodes = new Array<>();
 
 	// Инициализирует ноды, которые могут использоваться для поиска маршрута
-	public ForestGraph(ConstantsConfig constantsConfig,
+	public ForestGraph(Config constantsConfig,
 		Array<? extends Actor> trees,
 		Array<? extends Actor> actors,
 		Array<? extends Actor> spaces) {

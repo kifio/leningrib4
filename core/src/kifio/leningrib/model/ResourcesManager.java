@@ -13,7 +13,6 @@ import java.util.HashMap;
 public class ResourcesManager {
 
 	public static final String GRASS_0 = "grass_0";
-	public static final String GRASS_1 = "grass_1";
 	public static HashMap<String, TextureRegion> regions = new HashMap<>();
 	public static I18NBundle commonMushroomsSpeechBundle;
 	public static I18NBundle powerMushroomsSpeechBundle;
@@ -33,9 +32,7 @@ public class ResourcesManager {
 	public static void init() {
 
 		am = new AssetManager();
-		am.load("overworld.png", Texture.class);
-		am.load("trees_horizontal.png", Texture.class);
-		am.load("trees_vertical.png", Texture.class);
+		am.load("grass_2.png", Texture.class);
 		am.load("power_mushroom.png", Texture.class);
 		am.load("speed_mushroom.png", Texture.class);
 		am.load("dexterity_mushroom.png", Texture.class);
@@ -46,8 +43,6 @@ public class ResourcesManager {
 		am.load("enemy_1_idle.png", Texture.class);
 		am.load("enemy_2_run.png", Texture.class);
 		am.load("enemy_2_idle.png", Texture.class);
-		am.load("grass_1.png", Texture.class);
-		am.load("grass_0.png", Texture.class);
 		am.load("i18n/mushroom_speech", I18NBundle.class);
 		am.load("i18n/mushroom_power_speech", I18NBundle.class);
 		am.load("i18n/mushroom_invisibility_speech", I18NBundle.class);
@@ -65,8 +60,7 @@ public class ResourcesManager {
 		Texture overworld = am.get("overworld.png");
 		Texture horizontalTree = am.get("trees_horizontal.png");
 		Texture verticalTree = am.get("trees_vertical.png");
-		Texture grass0Texture = am.get("grass_0.png");
-		Texture grass1Texture = am.get("grass_1.png");
+		Texture grass0Texture = am.get("grass_2.png");
 
 		regions.put("horizontal_tree_top_left", new TextureRegion(horizontalTree, 0, 0, 45, 48));
 		regions.put("horizontal_tree_top_right", new TextureRegion(horizontalTree, 45, 0, 45, 48));
@@ -79,7 +73,6 @@ public class ResourcesManager {
 		regions.put("vertical_tree_bottom_right", new TextureRegion(verticalTree, 45, 42, 45, 42));
 
 		regions.put(GRASS_0, new TextureRegion(grass0Texture, 0, 0, 96, 96));
-		regions.put(GRASS_1, new TextureRegion(grass1Texture, 0, 0, 96, 96));
 		regions.put("log_0", new TextureRegion(overworld, 16 * 3, 16 * 5, 16, 16));
 		regions.put("log_1", new TextureRegion(overworld, 16 * 4, 16 * 5, 16, 16));
 		regions.put("log_2", new TextureRegion(overworld, 16 * 5, 16 * 5, 16, 16));

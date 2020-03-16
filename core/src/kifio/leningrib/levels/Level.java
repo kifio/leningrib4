@@ -5,12 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
-import generator.ConstantsConfig;
-
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
+import generator.Config;
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.SpaceManager;
@@ -82,7 +79,7 @@ public abstract class Level {
 
     protected abstract LevelMap getLevelMap(int x, int y);
 
-    protected abstract Array<Mushroom> initMushrooms(ConstantsConfig config, Array<? extends Actor> trees);
+    protected abstract Array<Mushroom> initMushrooms(Config config, Array<? extends Actor> trees);
 
     protected abstract Array<Forester> initForesters(LevelMap levelMap);
 
@@ -136,7 +133,7 @@ public abstract class Level {
         return spaceManager.getSpaces();
     }
 
-    protected Rectangle[] getRoomsRectangles(LevelMap levelMap, ConstantsConfig config) {
+    protected Rectangle[] getRoomsRectangles(LevelMap levelMap, Config config) {
         if (rectangles == null) {
             List<Room> rooms = levelMap.getRooms();
             int size = rooms.size();

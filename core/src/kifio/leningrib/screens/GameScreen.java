@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import generator.ConstantsConfig;
 
+import generator.Config;
 import kifio.leningrib.LGCGame;
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.CommonLevel;
@@ -46,16 +46,7 @@ public class GameScreen extends InputAdapter implements Screen {
     public WorldMap worldMap;
     public Player player;
 
-    public ConstantsConfig constantsConfig = new ConstantsConfig(
-            9,
-            36,
-            2,
-            0,
-            1,
-            2,
-            3,
-            4
-    );
+    public Config constantsConfig = new Config(12, 36);
 
     public GameScreen(LGCGame game) {
         Gdx.input.setInputProcessor(this);

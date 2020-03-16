@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
-import generator.ConstantsConfig;
+import generator.Config;
+import generator.Config;
 
 import java.util.Locale;
 
@@ -33,7 +34,7 @@ public class TreesManager {
     private Array<Actor> trees = new Array<>();
     private Array<Actor> outerTrees = new Array<>();
 
-    public void buildTrees(LevelMap levelMap, ConstantsConfig constantsConfig) {
+    public void buildTrees(LevelMap levelMap, Config constantsConfig) {
         for (Segment s : levelMap.getSegments()) {
             Actor tree = getActorFromCell(s.getValue(),
                     s.getX() * GameScreen.tileSize, s.getY() * GameScreen.tileSize, constantsConfig);
@@ -49,7 +50,7 @@ public class TreesManager {
         }
     }
 
-    private static Actor getActorFromCell(int value, int x, int y, ConstantsConfig constantsConfig) {
+    private static Actor getActorFromCell(int value, int x, int y, Config constantsConfig) {
         if (value == constantsConfig.getTreeTopLeft()) {
             return getObstacle(TREE, TOP_LEFT, x, y, constantsConfig);
         } else if (value == constantsConfig.getTreeTopRight()) {
@@ -65,7 +66,7 @@ public class TreesManager {
         }
     }
 
-    private static Actor getObstacle(String name, String value, int x, int y, ConstantsConfig constantsConfig) {
+    private static Actor getObstacle(String name, String value, int x, int y, Config constantsConfig) {
         TextureRegion region;
         if (name.equals(STONE)) {
             region = ResourcesManager.getRegion(String.format(Locale.getDefault(), TEXTURE_NAME_TEMPLATE, "", name, value));
@@ -78,7 +79,6 @@ public class TreesManager {
                         GameScreen.tileSize, GameScreen.tileSize);
             } else {
                 region = ResourcesManager.getRegion(String.format(Locale.getDefault(), TEXTURE_NAME_TEMPLATE, HORIZONTAL, name, value));
-                int w = region.getRegionWidth();
                 return new TreePart(region, x, y, GameScreen.tileSize, GameScreen.tileSize);
             }
         } else {

@@ -3,7 +3,7 @@ package kifio.leningrib.levels.helpers;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import generator.ConstantsConfig;
+import generator.Config;
 import java.util.concurrent.ThreadLocalRandom;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Player;
@@ -15,7 +15,7 @@ public class SpaceManager {
 	private Array<Space> spaces = new Array<>();
 
 	public void buildSpaces(Player player,
-		ConstantsConfig config,
+		Config config,
 		Array<? extends Actor> trees,
 		Array<? extends Actor> mushrooms,
 		Rectangle[] rooms) {

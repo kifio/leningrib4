@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import generator.ConstantsConfig;
+import generator.Config;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.pathfinding.ForestGraph;
@@ -207,7 +207,7 @@ public class Player extends MovableActor {
         return seq;
     }
 
-    public void resetPosition(ConstantsConfig constantsConfig) {
+    public void resetPosition(Config constantsConfig) {
         if (getY() >= (constantsConfig.getLevelHeight() - 1) * GameScreen.tileSize) {
             setY(0);
         } else if (getX() >= (constantsConfig.getLevelWidth() - 1) * GameScreen.tileSize) {
