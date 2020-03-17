@@ -46,10 +46,11 @@ public class GameScreen extends InputAdapter implements Screen {
 
     public WorldMap worldMap;
     public Player player;
+    public Config constantsConfig;
 
-    public Config constantsConfig = new Config(10, 46);
+    public GameScreen(LGCGame game, Config constantsConfig) {
+        this.constantsConfig = constantsConfig;
 
-    public GameScreen(LGCGame game) {
         Gdx.input.setInputProcessor(this);
         initScreenSize();
         initCamera();

@@ -97,7 +97,8 @@ public class Mushroom extends MovableActor {
         switch (effect) {
             case SPEED: return "speed_mushroom";
             case DEXTERITY: return "dexterity_mushroom";
-            default: return "power_mushroom";
+            case POWER: return "power_mushroom";
+            default: return "common_mushroom";
         }
     }
 

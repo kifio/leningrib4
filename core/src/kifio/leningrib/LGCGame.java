@@ -3,6 +3,7 @@ package kifio.leningrib;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 
+import generator.Config;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.screens.GameScreen;
 import kifio.leningrib.screens.MenuScreen;
@@ -10,10 +11,11 @@ import kifio.leningrib.screens.MenuScreen;
 public class LGCGame extends Game {
 
 	private Screen currentScreen;
+	private Config constantsConfig = new Config(10, 46);
 
-    @Override
+	@Override
 	public void create () {
-		ResourcesManager.init();
+		ResourcesManager.init(constantsConfig.getLevelWidth(), constantsConfig.getLevelHeight());
 		showMenuScreen();
 	}
 
@@ -28,7 +30,7 @@ public class LGCGame extends Game {
 	}
 
 	public void showGameScreen() {
-		currentScreen = new GameScreen(this);
+		currentScreen = new GameScreen(this, constantsConfig);
 		setScreen(currentScreen);
 	}
 

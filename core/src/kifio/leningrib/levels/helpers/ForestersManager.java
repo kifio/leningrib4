@@ -20,6 +20,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
 	public ForestersManager(GameScreen gameScreen, Array<Forester> foresters) {
+		foresters.clear();
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
 		gameObjects.addAll(foresters);

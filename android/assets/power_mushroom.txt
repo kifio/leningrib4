@@ -1,7 +1,7 @@
 power_mushroom.png
 size: 64, 208
 format: RGBA8888
-filter: Linear,Linear
+filter: Nearest,Nearest
 repeat: none
 power-mushroom-0
   rotate: false

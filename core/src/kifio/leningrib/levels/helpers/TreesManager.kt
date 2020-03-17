@@ -54,6 +54,8 @@ class TreesManager {
                     || value == SegmentType.BOTTOM_COMMON_RIGHT_TOP
                     || value == SegmentType.BOTTOM_LEFT_CORNER_OUT_BORDER_TOP
                     || value == SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP
+                    || value == SegmentType.TOP_COMMON_LEFT_BOTTOM
+                    || value == SegmentType.TOP_COMMON_RIGHT_BOTTOM
         }
     }
 }

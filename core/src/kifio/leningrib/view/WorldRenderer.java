@@ -33,7 +33,6 @@ public class WorldRenderer {
 	private boolean debug = true;
 	private Stage stage;
 	private Level level;
-	private boolean[] grass;
 	private SpriteBatch batch;
 	private ShapeRenderer renderer;
 	private OrthographicCamera camera;
@@ -45,6 +44,8 @@ public class WorldRenderer {
 	private Color playerDebugColor = new Color(0f, 0f, 1f, 0.5f);
 	private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
 	private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
+	private TextureRegion grass = ResourcesManager.getRegion(ResourcesManager.GRASS_0);
+	private int grassCount = 0;
 
 	private static final String GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s ГРИБОВ";
 
@@ -92,10 +93,7 @@ public class WorldRenderer {
 			stage.addActor(s);
 		}
 
-		this.grass = new boolean[constantsConfig.getLevelHeight() * constantsConfig.getLevelWidth()];
-		for (int i = 0; i <grass.length; i++) {
-			grass[i] = ThreadLocalRandom.current().nextBoolean();
-		}
+		this.grassCount = constantsConfig.getLevelHeight() * constantsConfig.getLevelWidth();
 	}
 
 	public void renderBlackScreen(boolean levelPassed, float gameOverTime, float gameOverAnimationTime) {
@@ -244,14 +242,10 @@ public class WorldRenderer {
 	private void drawGrass() {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		// TODO: Оптимизировать, не рисовать то, что пределами экрана или под деревьями
-		// TODO: Не шароебиться по карте в поисках текстуры
-		for (int i = 0; i < grass.length; i++) {
+		for (int i = 0; i < grassCount; i++) {
 			int x = GameScreen.tileSize * (i % cameraWidth);
 			int y = GameScreen.tileSize * (i / cameraWidth);
-			batch.draw(
-				ResourcesManager.getRegion(grass[i] ? ResourcesManager.GRASS_0 : ResourcesManager.GRASS_0),
-				x, y, GameScreen.tileSize, GameScreen.tileSize);
+			batch.draw(grass, x, y, GameScreen.tileSize, GameScreen.tileSize);
 		}
 		batch.end();
 	}
