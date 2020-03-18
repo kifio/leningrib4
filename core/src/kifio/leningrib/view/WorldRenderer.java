@@ -21,6 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import generator.Config;
 import kifio.leningrib.levels.Level;
+import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Mushroom;
@@ -68,8 +69,6 @@ public class WorldRenderer {
 	private void resetStage(Level level) {
 		stage.clear();
 
-		for (Actor tree : level.getTrees()) { stage.addActor(tree); }
-
 		if (level.getTutorialLabels() != null) {
 			for (Label l : level.getTutorialLabels()) {
 				stage.addActor(l);
@@ -77,7 +76,14 @@ public class WorldRenderer {
 		}
 
 		for (Actor mushroom : level.getMushrooms()) { stage.addActor(mushroom); }
+
+
+		TreesManager treesManager = level.getTreesManager();
+		for (Actor tree : treesManager.getObstacleTrees()) { stage.addActor(tree); }
+		for (Actor tree : treesManager.getTopBorderNonObstaclesTrees()) { stage.addActor(tree); }
 		stage.addActor(level.getPlayer());
+		for (Actor tree : treesManager.getBottomBorderNonObstaclesTrees()) { stage.addActor(tree); }
+
 		if (level.getGrandma() != null) { stage.addActor(level.getGrandma()); }
 
 		for (int i = 0; i < level.getForesters().size; i++) {

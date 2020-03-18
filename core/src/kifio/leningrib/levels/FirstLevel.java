@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import generator.Config;
+import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
@@ -34,7 +35,7 @@ public class FirstLevel extends Level {
 		return gameScreen.worldMap.addLevel(x, y, FirstLevelBuilder.getFirstLevel(gameScreen.constantsConfig));
 	}
 
-	@Override protected Array<Mushroom> initMushrooms(Config constantsConfig, Array<?extends Actor> trees) {
+	@Override protected Array<Mushroom> initMushrooms(Config constantsConfig, TreesManager treesManager) {
 		return FirstLevelBuilder.getMushrooms();
 	}
 

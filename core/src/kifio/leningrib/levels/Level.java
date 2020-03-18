@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public abstract class Level {
         spaceManager = new SpaceManager();
 
         treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
-        mushroomsManager.initMushrooms(initMushrooms(gameScreen.constantsConfig, treesManager.getTrees()));
+        mushroomsManager.initMushrooms(initMushrooms(gameScreen.constantsConfig, treesManager));
 
         spaceManager.buildSpaces(getPlayer(),
                 gameScreen.constantsConfig,
@@ -83,7 +84,7 @@ public abstract class Level {
 
     protected abstract LevelMap getLevelMap(int x, int y);
 
-    protected abstract Array<Mushroom> initMushrooms(Config config, Array<? extends Actor> trees);
+    protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager);
 
     protected abstract Array<Forester> initForesters(LevelMap levelMap);
 
@@ -117,8 +118,8 @@ public abstract class Level {
         return forestersManager.getForesters();
     }
 
-    public Array<? extends Actor> getTrees() {
-        return treesManager.getTrees();
+    public TreesManager getTreesManager() {
+        return treesManager;
     }
 
     public abstract Grandma getGrandma();

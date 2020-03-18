@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import generator.Config;
 import kifio.leningrib.Utils;
+import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
@@ -28,7 +29,7 @@ public class CommonLevel extends Level {
 		return gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig);
 	}
 
-	@Override protected Array<Mushroom> initMushrooms(Config config, Array<? extends Actor> trees) {
+	@Override protected Array<Mushroom> initMushrooms(Config config, TreesManager treesManager) {
 		Array<Mushroom> mushrooms = new Array<>();
 
 		int levelHeight = config.getLevelHeight();
@@ -41,7 +42,7 @@ public class CommonLevel extends Level {
 			int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
 			int y = GameScreen.tileSize * i;
 
-			if (!Utils.isOverlapsWithActors(trees, x, y)) {
+			if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
 				mushrooms.add(new Mushroom(x, y));
 			}
 		}
