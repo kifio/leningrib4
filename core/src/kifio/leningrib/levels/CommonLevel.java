@@ -38,12 +38,14 @@ public class CommonLevel extends Level {
 		int mushroomsCount = getPlayer().getMushroomsCount();
 		int step = Math.max(MIN_STEP, MAX_STEP - (mushroomsCount / 10));
 
-		for (int i = 1; i < levelHeight; i += step) {
+		for (int i = 1; i < levelHeight - 1; i += step) {
 			int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
 			int y = GameScreen.tileSize * i;
 
 			if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
-				mushrooms.add(new Mushroom(x, y));
+				boolean hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0;
+				mushrooms.add(new Mushroom(x, y,
+						mushroomsCount > 0 && hasEffect));
 			}
 		}
 

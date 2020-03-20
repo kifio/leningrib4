@@ -39,8 +39,7 @@ public class WorldController {
 		}
 
 		Label[] mushroomSpeeches = level.getMushroomsSpeeches();
-		for (int i = 0; i < mushroomSpeeches.length; i++) {
-			Label speech = mushroomSpeeches[i];
+		for (Label speech : mushroomSpeeches) {
 			if (speech != null && speech.getStage() == null) {
 				stage.addActor(speech);
 			}

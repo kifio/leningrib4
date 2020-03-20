@@ -107,8 +107,8 @@ public class FirstLevelBuilder {
 
 	static Array<Mushroom> getMushrooms() {
 		Array<Mushroom> mushrooms = new Array<>();
-		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 7));
-		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 14));
+		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 7, false));
+		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 14, false));
 //		mushrooms.add(new Mushroom(GameScreen.tileSize * 1, GameScreen.tileSize * 2, random));
 //		mushrooms.add(new Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * 1, random));
 		return mushrooms;

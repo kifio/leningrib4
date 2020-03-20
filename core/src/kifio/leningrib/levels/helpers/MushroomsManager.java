@@ -1,6 +1,7 @@
 package kifio.leningrib.levels.helpers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,7 +28,6 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
     }
 
     public void updateMushrooms(Player p, float cameraPositionY) {
-
         int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
         // Удаляем съеденные грибы, несъеденным добавляем реплики
@@ -71,15 +71,18 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private void addMushroomSpeech(Player player, Mushroom m, int index) {
         // С некоторой вероятностью добавляем новую речь
-        if (speeches[index] == null) {
-            float x = m.getX() - GameScreen.tileSize / 2f;
-            float y = m.getY() + GameScreen.tileSize;
-            speeches[index] = SpeechManager.getInstance().getLabel("", x, y, GameScreen.tileSize * 2, m.getEffect());
-        }
-
-        if (shouldAddSpeech(player) && speeches[index].textEquals("")) {
+        if (shouldAddSpeech(player) && speeches[index] == null) {
             String speech = getSpeech(m.getEffect());
-            speeches[index].setText(speech);
+            String[] words = speech.split(" ");
+            float w = SpeechManager.getLabelWidth(words);
+            float x = m.getX() - (0.5f * w) + (0.5f * GameScreen.tileSize);
+
+            float yOffset = 1.2f * GameScreen.tileSize;
+            if (words.length <= 4) {
+                yOffset *= 0.6;
+            }
+            float y = m.getY() + yOffset;
+            speeches[index] = SpeechManager.getInstance().getLabel(speech, x, y, w, m.getEffect());
             speeches[index].addAction(getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index));
         }
     }
@@ -100,12 +103,11 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
     }
 
     private boolean shouldAddSpeech(Player player) {
-        int var1 = 1; // player.getMushroomsCount() / 5;
+        int var1 = player.getMushroomsCount() / 3;
         if (var1 == 0) {
             return false;
         } else {
-            return true;
-            // return ThreadLocalRandom.current().nextInt(Math.max(256, GameScreen.SPEECH_SEED / var1)) / 8 == 0;
+            return ThreadLocalRandom.current().nextInt(Math.max(256, GameScreen.SPEECH_SEED / var1)) / 8 == 0;
         }
     }
 
@@ -117,13 +119,14 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         return speeches;
     }
 
-    private SequenceAction getSpeechAction(float duration, final int i) {
+    private SequenceAction getSpeechAction(float duration, final int speechIndex) {
         SequenceAction seq = new SequenceAction();
         seq.addAction(Actions.delay(duration));
         seq.addAction(Actions.run(new Runnable() {
             @Override
             public void run() {
-                speeches[i].setText(null);
+                speeches[speechIndex].remove();
+                speeches[speechIndex] = null;
             }
         }));
         return seq;

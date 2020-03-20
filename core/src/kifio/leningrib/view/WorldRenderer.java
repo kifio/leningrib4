@@ -88,12 +88,12 @@ public class WorldRenderer {
 
 		for (int i = 0; i < level.getForesters().size; i++) {
 			stage.addActor(level.getForesters().get(i));
-			stage.addActor(level.getForestersSpeeches()[i]);
+//			stage.addActor(level.getForestersSpeeches()[i]);
 		}
-
-		if (level.getGrandma() != null) {
-			stage.addActor(level.getGrandma().getGrandmaLabel());
-		}
+//
+//		if (level.getGrandma() != null) {
+//			stage.addActor(level.getGrandma().getGrandmaLabel());
+//		}
 
 		for (Space s : level.getSpaces()) {
 			stage.addActor(s);
@@ -136,7 +136,7 @@ public class WorldRenderer {
 
 		updateCamera();
 		drawGrass();
-		// drawDebug();
+		drawDebug();
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
@@ -169,7 +169,7 @@ public class WorldRenderer {
 //        drawGrid();
 //		  drawCharacterDebug();
 //		  drawGrandmaDebug();
-        drawMushroomsBounds();
+//        drawMushroomsBounds();
 		// drawForesterDebug();
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -177,15 +177,15 @@ public class WorldRenderer {
 
 	}
 
-//	private void drawGrid() {
-//		for (int i = 0; i < Gdx.graphics.getWidth(); i+=GameScreen.tileSize) {
-//			renderer.line(i, 0f, i, Gdx.graphics.getHeight());
-//		}
-//
-//		for (int i = 0; i < Gdx.graphics.getHeight(); i+=GameScreen.tileSize) {
-//			renderer.line(0, i, Gdx.graphics.getWidth(), i);
-//		}
-//	}
+	private void drawGrid() {
+		for (int i = 0; i < Gdx.graphics.getWidth(); i+=GameScreen.tileSize) {
+			renderer.line(i, 0f, i, Gdx.graphics.getHeight());
+		}
+
+		for (int i = 0; i < Gdx.graphics.getHeight(); i+=GameScreen.tileSize) {
+			renderer.line(0, i, Gdx.graphics.getWidth(), i);
+		}
+	}
 
 	private void drawPlayerPath() {
 		renderer.setColor(playerPathDebugColor);
@@ -197,7 +197,9 @@ public class WorldRenderer {
 	private void drawMushroomsBounds() {
 		renderer.setColor(playerPathDebugColor);
 		for (Mushroom m : level.getMushrooms()) {
-			renderer.rect(m.bounds.x, m.bounds.y, m.bounds.width, m.bounds.height);
+			if (m != null) {
+				renderer.rect(m.bounds.x, m.bounds.y, m.bounds.width, m.bounds.height);
+			}
 		}
 	}
 

@@ -24,11 +24,10 @@ public class Mushroom extends MovableActor {
     private int effect = 0;
     private boolean isEaten = false;
 
-    public Mushroom(int x, int y) {
+    public Mushroom(int x, int y, boolean hasEffect) {
         super(x, y);
 
         int effectIndex = ThreadLocalRandom.current().nextInt(effects.length);
-        boolean hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0;
 
         if (hasEffect) {
             effect = effects[effectIndex];

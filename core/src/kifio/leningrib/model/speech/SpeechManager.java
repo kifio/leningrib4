@@ -2,15 +2,19 @@ package kifio.leningrib.model.speech;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import kifio.leningrib.model.ResourcesManager;
 
+import kifio.leningrib.model.ResourcesManager;
+import kifio.leningrib.screens.GameScreen;
+
+import static com.badlogic.gdx.graphics.Texture.TextureFilter.Linear;
+import static com.badlogic.gdx.graphics.Texture.TextureFilter.MipMapNearestNearest;
+import static com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest;
+import static com.badlogic.gdx.math.MathUtils.floor;
 import static com.badlogic.gdx.math.MathUtils.random;
 
 /**
@@ -18,9 +22,9 @@ import static com.badlogic.gdx.math.MathUtils.random;
  */
 public class SpeechManager {
 
-	private BitmapFont bitmapFont;
-	private GlyphLayout glyphLayout;
-	Label.LabelStyle labelStyle = new Label.LabelStyle();
+	private static BitmapFont bitmapFont;
+	private static GlyphLayout glyphLayout = new GlyphLayout();
+	private Label.LabelStyle labelStyle = new Label.LabelStyle();
 
 	private static SpeechManager speechManager;
 
@@ -33,14 +37,13 @@ public class SpeechManager {
 
 	private SpeechManager() {
 		bitmapFont = generateFont();
-		glyphLayout = new GlyphLayout();
 		bitmapFont.getData().setScale(Gdx.graphics.getDensity());
 		labelStyle.font = bitmapFont;
 		labelStyle.fontColor = Color.WHITE;
 	}
 
 	private BitmapFont generateFont() {
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Ubuntu-Medium.ttf"));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
 		BitmapFont font = generator.generateFont(getFontParameter());
 		generator.dispose();
 		return font;
@@ -49,19 +52,21 @@ public class SpeechManager {
 	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameter() {
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		parameter.characters =
-			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}";
+			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}@";
 		parameter.color = Color.WHITE;
+		parameter.minFilter = Nearest;
+		parameter.magFilter = Nearest;
 		parameter.shadowOffsetX = 0;
 		parameter.shadowOffsetY = 0;
 		return parameter;
 	}
 
-	public float getTextWidth(String text) {
+	public static float getTextWidth(String text) {
 		glyphLayout.setText(bitmapFont, text);
 		return glyphLayout.width;
 	}
 
-	public float getTextHeight(String text) {
+	public static float getTextHeight(String text) {
 		glyphLayout.setText(bitmapFont, text);
 		return glyphLayout.height;
 	}
@@ -118,22 +123,29 @@ public class SpeechManager {
 		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
 	}
 
-	public Label getLabel(float x, float y, float targetWidth) {
-		return getLabel("", x, y, targetWidth, 0xFFFFFFFF);
+	public Label getLabel(String text, float x, float y, float w) {
+		return getLabel(text, x, y, w, 0xFFFFFFFF);
 	}
 
-	public Label getLabel(String text, float x, float y, float targetWidth) {
-		return getLabel(text, x, y, targetWidth, 0xFFFFFFFF);
-	}
-
-	public Label getLabel(String text, float x, float y, float targetWidth, int color) {
+	public Label getLabel(String text, float x, float y, float width, int color) {
 		Label label = new Label(text, labelStyle);
 		label.setWrap(true);
 		label.setColor(new Color(color));
-		label.setFontScale(Gdx.graphics.getDensity() * 0.9f, Gdx.graphics.getDensity() * 0.9f);
-		label.setWidth(targetWidth);
+		label.setFontScale(Gdx.graphics.getDensity() * 0.8f, Gdx.graphics.getDensity() * 0.8f);
+		label.setWidth(width);
 		label.setPosition(x, y);
-		label.setAlignment(Align.center, Align.center);
+		label.setAlignment(Align.center, Align.bottom);
 		return label;
+	}
+
+	public static float getLabelWidth(String[] words) {
+		float maxLabelWidth = 0;
+		for (String word : words) {
+			float w = getTextWidth(word);
+			if (maxLabelWidth < w) {
+				maxLabelWidth = w;
+			}
+		}
+		return maxLabelWidth;
 	}
 }

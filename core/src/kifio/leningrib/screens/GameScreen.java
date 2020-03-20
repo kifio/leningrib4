@@ -15,6 +15,9 @@ import kifio.leningrib.LGCGame;
 import kifio.leningrib.controller.WorldController;
 import kifio.leningrib.levels.CommonLevel;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+
+import java.awt.Color;
+
 import kifio.leningrib.levels.Level;
 import kifio.leningrib.levels.LevelFabric;
 import kifio.leningrib.model.actors.Player;
@@ -25,7 +28,7 @@ import model.WorldMap;
 public class GameScreen extends InputAdapter implements Screen {
 
     private static final float GAME_OVER_ANIMATION_TIME = 0.5f;
-    public static final int SPEECH_SEED = 5120;
+    public static final int SPEECH_SEED = 768;
 
     private LGCGame game;
     private WorldRenderer worldRenderer;
@@ -61,7 +64,7 @@ public class GameScreen extends InputAdapter implements Screen {
         this.game = game;
         SpriteBatch batch = new SpriteBatch();
         this.stage = new Stage(new ScreenViewport(camera), batch);
-        Label gameOverLabel = SpeechManager.getInstance().getLabel("", x, y, Gdx.graphics.getWidth());
+//        Label gameOverLabel = SpeechManager.getInstance().getLabel("", x, y, Gdx.graphics.getWidth(), Color.WHITE);
         this.worldController = new WorldController(this);
         this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch, constantsConfig);
         this.worldMap = new WorldMap();
