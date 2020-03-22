@@ -1,6 +1,7 @@
 package kifio.leningrib.view;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,7 +26,9 @@ import kifio.leningrib.levels.Level;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.actors.Space;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
@@ -32,78 +36,43 @@ import kifio.leningrib.screens.GameScreen;
 public class WorldRenderer {
 
 	private boolean debug = true;
-	private Stage stage;
-	private Level level;
+
 	private SpriteBatch batch;
 	private ShapeRenderer renderer;
 	private OrthographicCamera camera;
-	private Config constantsConfig;
-	private int cameraWidth;
-	private int cameraHeight;
+	private int levelWidth;
+	private int levelHeight;
+	private int grassCount = 0;
 
-	private Color demoGrass = Color.valueOf("#8f6f0b");
 	private Color playerDebugColor = new Color(0f, 0f, 1f, 0.5f);
 	private Color playerPathDebugColor = new Color(0f, 0f, 1f, 1f);
 	private Color foresterDebugColor = new Color(1f, 0f, 0f, 0.5f);
 	private TextureRegion grass = ResourcesManager.getRegion(ResourcesManager.GRASS_0);
-	private int grassCount = 0;
+	private TextureRegion hudBottle = ResourcesManager.getRegion(ResourcesManager.HUD_BOTTLE);
+	private TextureRegion hudPause = ResourcesManager.getRegion(ResourcesManager.HUD_PAUSE);
+	private TextureRegion hudBackground = ResourcesManager.getRegion(ResourcesManager.HUD_BACKGROUND);
 
 	private static final String GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s ГРИБОВ";
 
-	public WorldRenderer(OrthographicCamera camera, int cameraWidth, int cameraHeight, Stage stage,
-		SpriteBatch batch, Config constantsConfig) {
+	public WorldRenderer(OrthographicCamera camera,
+						 int levelWidth,
+						 int levelHeight,
+						 int cameraHeight,
+						 SpriteBatch batch) {
 		this.camera = camera;
-		this.cameraWidth = cameraWidth;
-		this.cameraHeight = cameraHeight;
-		this.stage = stage;
+		this.levelWidth = levelWidth;
+		this.levelHeight = levelHeight;
 		this.batch = batch;
-		this.constantsConfig = constantsConfig;
 		this.renderer = new ShapeRenderer();
+		this.grassCount = levelWidth * (cameraHeight + 2);
 	}
 
-	public void reset(Level level) {
-		this.level = level;
-		resetStage(level);
-	}
-
-	private void resetStage(Level level) {
-		stage.clear();
-
-		if (level.getTutorialLabels() != null) {
-			for (Label l : level.getTutorialLabels()) {
-				stage.addActor(l);
-			}
-		}
-
-		for (Actor mushroom : level.getMushrooms()) { stage.addActor(mushroom); }
-
-
-		TreesManager treesManager = level.getTreesManager();
-		for (Actor tree : treesManager.getObstacleTrees()) { stage.addActor(tree); }
-		for (Actor tree : treesManager.getTopBorderNonObstaclesTrees()) { stage.addActor(tree); }
-		stage.addActor(level.getPlayer());
-		for (Actor tree : treesManager.getBottomBorderNonObstaclesTrees()) { stage.addActor(tree); }
-
-		if (level.getGrandma() != null) { stage.addActor(level.getGrandma()); }
-
-		for (int i = 0; i < level.getForesters().size; i++) {
-			stage.addActor(level.getForesters().get(i));
-//			stage.addActor(level.getForestersSpeeches()[i]);
-		}
-//
-//		if (level.getGrandma() != null) {
-//			stage.addActor(level.getGrandma().getGrandmaLabel());
-//		}
-
-		for (Space s : level.getSpaces()) {
-			stage.addActor(s);
-		}
-
-		this.grassCount = constantsConfig.getLevelHeight() * constantsConfig.getLevelWidth();
-	}
-
-	public void renderBlackScreen(boolean levelPassed, float gameOverTime, float gameOverAnimationTime) {
-		render();
+	public void renderBlackScreen(boolean levelPassed,
+								  float gameOverTime,
+								  float gameOverAnimationTime,
+								  Level level,
+								  Stage stage) {
+		render(level, stage);
 
 		float alpha = Math.min(gameOverTime / gameOverAnimationTime, 1);
 
@@ -117,12 +86,12 @@ public class WorldRenderer {
 			camera.position.y - Gdx.graphics.getHeight() / 2f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		renderer.end();
 
-		if (!levelPassed) { drawGameOverText(); }
+		if (!levelPassed) { drawGameOverText(level.getPlayer().getMushroomsCount()); }
 	}
 
-	private void drawGameOverText() {
+	private void drawGameOverText(int mushroomsCount) {
 		batch.begin();
-		String text = String.format(Locale.getDefault(), GAME_OVER_TEXT, level.getPlayer().getMushroomsCount());
+		String text = String.format(Locale.getDefault(), GAME_OVER_TEXT, mushroomsCount);
 		SpeechManager speechManager = SpeechManager.getInstance();
 		float x = (Gdx.graphics.getWidth() / 2f) - (speechManager.getTextWidth(text) / 2);
 		float y = camera.position.y - (speechManager.getTextHeight(text) / 2);
@@ -130,33 +99,78 @@ public class WorldRenderer {
 		batch.end();
 	}
 
-	public void render() {
+	public void render(Level level, Stage stage) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		updateCamera();
+		updateCamera(level.getPlayer());
 		drawGrass();
-		drawDebug();
+		drawDebug(level);
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
+
+		drawHUD();
 	}
 
-	private void updateCamera() {
+	private void drawHUD() {
+
+		float w = GameScreen.tileSize * levelWidth;
+		float h = camera.position.y + Gdx.graphics.getHeight() / 2f;
+
+		float pauseX = w - 1.1f * GameScreen.tileSize;
+		float pauseY = h - 1.1f * GameScreen.tileSize;
+
+		Gdx.app.log("kifio", String.format("tileSize: %d", GameScreen.tileSize));
+
+		float buttonsWidth = GameScreen.tileSize * 1f;
+		float buttonsHeight = GameScreen.tileSize * 1f;
+
+		float bottleX = w - 1.1f * GameScreen.tileSize;
+		float bottleY = h - 2.2f * GameScreen.tileSize;
+
+		float itemsWidth = GameScreen.tileSize * 1f;
+		float itemsHeight = GameScreen.tileSize * 1f;
+
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+
+		batch.draw(hudBackground,
+				pauseX, pauseY,
+				buttonsWidth, buttonsHeight);
+
+		batch.draw(hudBackground,
+				bottleX, bottleY,
+				itemsWidth, itemsHeight);
+
+		batch.draw(
+				hudPause,
+				pauseX,
+				pauseY,
+				buttonsWidth,
+				buttonsHeight
+		);
+
+		batch.draw(
+				hudBottle,
+				bottleX,
+				bottleY,
+				buttonsWidth,
+				buttonsHeight
+		);
+		batch.end();
+	}
+
+	private void updateCamera(Player player) {
 		camera.update();
-		float playerY = level.getPlayer().getY();
 		float bottomThreshold = Gdx.graphics.getHeight() / 2f;
-		float topThreshold = constantsConfig.getLevelHeight() * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
-		if (playerY < bottomThreshold) {
+		float topThreshold = levelHeight * GameScreen.tileSize - Gdx.graphics.getHeight() / 2f;
+		if (player.getY() < bottomThreshold) {
 			camera.position.y = bottomThreshold;
-		} else if (playerY > topThreshold) {
-			camera.position.y = topThreshold;
-		} else {
-			camera.position.y = playerY;
-		}
+		} else camera.position.y = Math.min(player.getY(), topThreshold);
 	}
 
-	private void drawDebug() {
+	private void drawDebug(Level level) {
 		if (!debug) { return; }
 		// Включаем поддержку прозрачности
 		Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -187,38 +201,38 @@ public class WorldRenderer {
 		}
 	}
 
-	private void drawPlayerPath() {
+	private void drawPlayerPath(Player player) {
 		renderer.setColor(playerPathDebugColor);
-		for (Vector2 vec : level.getPlayer().getPath()) {
+		for (Vector2 vec : player.getPath()) {
 			renderer.rect(vec.x, vec.y, GameScreen.tileSize, GameScreen.tileSize);
 		}
 	}
 
-	private void drawMushroomsBounds() {
+	private void drawMushroomsBounds(Array<Mushroom> mushrooms) {
 		renderer.setColor(playerPathDebugColor);
-		for (Mushroom m : level.getMushrooms()) {
+		for (Mushroom m : mushrooms) {
 			if (m != null) {
 				renderer.rect(m.bounds.x, m.bounds.y, m.bounds.width, m.bounds.height);
 			}
 		}
 	}
 
-	private void drawCharacterDebug() {
+	private void drawCharacterDebug(Player player) {
 		renderer.setColor(playerDebugColor);
-		Rectangle bounds = level.getPlayer().bounds;
+		Rectangle bounds = player.bounds;
 		renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
 	}
 
-	private void drawGrandmaDebug() {
-		if (level.getGrandma() == null) { return; }
+	private void drawGrandmaDebug(Grandma grandma) {
+		if (grandma == null) { return; }
 		renderer.setColor(playerDebugColor);
-		Rectangle bounds = level.getGrandma().bounds;
+		Rectangle bounds = grandma.bounds;
 		renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
 	}
 
-	private void drawForesterDebug() {
-		for (Forester forester : level.getForesters()) { drawForesterPath(forester); }
-//		for (Forester forester : level.getForesters()) { drawForesterArea(forester); }
+	private void drawForesterDebug(Array<Forester> foresters) {
+		for (Forester forester : foresters) { drawForesterPath(forester); }
+//		for (Forester forester : foresters) { drawForesterArea(forester); }
 	}
 
 	private void drawExitRect() {
@@ -251,8 +265,8 @@ public class WorldRenderer {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		for (int i = 0; i < grassCount; i++) {
-			int x = GameScreen.tileSize * (i % cameraWidth);
-			int y = GameScreen.tileSize * (i / cameraWidth);
+			int x = GameScreen.tileSize * (i % levelWidth);
+			int y = GameScreen.tileSize * (i / levelWidth) + (int) (camera.position.y - (Gdx.graphics.getHeight() / 2 + GameScreen.tileSize));
 			batch.draw(grass, x, y, GameScreen.tileSize, GameScreen.tileSize);
 		}
 		batch.end();
@@ -261,10 +275,6 @@ public class WorldRenderer {
 	public void dispose() {
 		batch.dispose();
 		renderer.dispose();
-		if (stage != null) {
-			stage.dispose();
-			stage = null;
-		}
 		camera = null;
 	}
 }

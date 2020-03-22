@@ -1,6 +1,7 @@
 package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -22,6 +23,9 @@ public class Forester extends MovableActor {
     private static final float MAXIMUM_DISABLING_TIME = 3f;
     private static final String IDLE = "idle";
     private static final String RUN = "run";
+
+    public static Color DEFAULT_SPEECH_COLOR = Color.valueOf("#A0A33B");
+    public static Color AGGRESSIVE_SPEECH_COLOR = Color.valueOf("#FF603B");
 
     private final String running;
     private final String idle;
@@ -75,6 +79,9 @@ public class Forester extends MovableActor {
     private MovingState movingState = MovingState.PATROL;
     private float stoppingTime = 0f;
 
+    public String speech = "";
+    public Color speechColor = DEFAULT_SPEECH_COLOR;
+
     // Лесники начинают с патрулирования леса, поэтому у них две координаты
     public Forester(float originalFromX, float originalFromY, float originalToX, float originalToY, int index,
                     int originalBottomLimit, int originalTopLimit, int originalLeftLimit, int originalRightLimit,
@@ -103,16 +110,14 @@ public class Forester extends MovableActor {
     }
 
     public void updateMovementState(Player player,
-                                    Label label,
                                     float delta,
                                     ForestGraph forestGraph) {
-        String speech = "";
         int px = player.getOnLevelMapX();
         int py = player.getOnLevelMapY();
 
         switch (movingState) {
             case PATROL:
-
+                speechColor = DEFAULT_SPEECH_COLOR;
                 if (scaredArea.contains(px, py) && player.isStrong()) {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
                     setScared(px, py, forestGraph, true);
@@ -130,6 +135,7 @@ public class Forester extends MovableActor {
                 }
                 break;
             case PURSUE:
+                speechColor = AGGRESSIVE_SPEECH_COLOR;
                 if (player.isStrong()) {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
                     setScared(px, py, forestGraph, false);
@@ -144,6 +150,7 @@ public class Forester extends MovableActor {
                 }
                 break;
             case STOP:
+                speechColor = DEFAULT_SPEECH_COLOR;
                 if (current.getPackFile().contains(RUN)) {
                     current.setPackFile(current.getPackFile().replace(RUN, IDLE));
                 }
@@ -167,6 +174,7 @@ public class Forester extends MovableActor {
                 }
                 break;
             case SCARED:
+                speechColor = AGGRESSIVE_SPEECH_COLOR;
                 // FIXME: Лесники все еще шароебятся по комнате будучи напуганными
                 if (player.isStrong() && scaredArea.contains(px, py)) {
                     speech = SpeechManager.getInstance().getForesterScaredSpeech();
@@ -184,6 +192,7 @@ public class Forester extends MovableActor {
                 }
                 break;
             case DISABLED:
+                speechColor = DEFAULT_SPEECH_COLOR;
                 speech = "...";
                 if (current.getPackFile().contains(RUN)) {
                     current.setPackFile(current.getPackFile().replace(RUN, IDLE));
@@ -200,27 +209,20 @@ public class Forester extends MovableActor {
                 break;
         }
 
-        if (isShouldRemoveSpeech()) {
-            label.setText(null);
-        } else if (isShouldResetSpeech()) {
-            label.setText(speech);
-        }
 
-        updateSpeechDuration(delta);
         lastKnownPlayerX = px;
         lastKnownPlayerY = py;
-        Gdx.app.log("kifio", movingState.name());
     }
 
-    private boolean isShouldResetSpeech() {
+    public boolean isShouldResetSpeech() {
         return Float.compare(speechDuration, 0) == 0;
     }
 
-    private boolean isShouldRemoveSpeech() {
+    public boolean isShouldRemoveSpeech() {
         return speechDuration > 3f;
     }
 
-    private void updateSpeechDuration(float delta) {
+    public void updateSpeechDuration(float delta) {
         if (speechDuration > 3.5f) {
             speechDuration = 0f;
             return;

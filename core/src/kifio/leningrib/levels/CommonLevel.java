@@ -55,14 +55,14 @@ public class CommonLevel extends Level {
 	@Override protected Array<Forester> initForesters(LevelMap levelMap) {
 		Array<Forester> gameObjects = new Array<>();
 		Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, gameScreen.constantsConfig);
-		for (int i = 0; i < roomsRectangles.length; i++) {
-			if (!Utils.isInRoom(roomsRectangles[i],
-				gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {
+		for (Rectangle roomsRectangle : roomsRectangles) {
+			if (!Utils.isInRoom(roomsRectangle,
+					gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {
 
-				int left = (int) (roomsRectangles[i].x + 1);
-				int top = (int) (roomsRectangles[i].y + roomsRectangles[i].height - 1);
-				int right = (int) (roomsRectangles[i].width - 2);
-				int bottom = (int) roomsRectangles[i].y + 1;
+				int left = (int) (roomsRectangle.x + 1);
+				int top = (int) (roomsRectangle.y + roomsRectangle.height - 1);
+				int right = (int) (roomsRectangle.width - 2);
+				int bottom = (int) roomsRectangle.y + 1;
 
 				int originalFromY = ThreadLocalRandom.current().nextInt(bottom, top);
 				int originalToY = ThreadLocalRandom.current().nextInt(bottom, top);
@@ -70,15 +70,15 @@ public class CommonLevel extends Level {
 				boolean ltr = ThreadLocalRandom.current().nextBoolean();
 
 				Forester f = new Forester(
-					GameScreen.tileSize * (ltr ? left : right),
-					GameScreen.tileSize * originalFromY,
-					GameScreen.tileSize * (ltr ? right : left),
+						GameScreen.tileSize * (ltr ? left : right),
+						GameScreen.tileSize * originalFromY,
+						GameScreen.tileSize * (ltr ? right : left),
 						GameScreen.tileSize * originalToY,
 						ThreadLocalRandom.current().nextInt(1, 4),
 						GameScreen.tileSize * bottom,
 						GameScreen.tileSize * top,
 						GameScreen.tileSize, GameScreen.tileSize * 7,
-						roomsRectangles[i]);
+						roomsRectangle);
 
 				gameObjects.add(f);
 			}

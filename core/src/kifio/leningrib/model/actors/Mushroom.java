@@ -33,9 +33,7 @@ public class Mushroom extends MovableActor {
             effect = effects[effectIndex];
         }
     }
-
-    private boolean b = ThreadLocalRandom.current().nextBoolean();
-
+    
     @Override public void act(float delta) {
         super.act(delta);
     }
@@ -101,10 +99,12 @@ public class Mushroom extends MovableActor {
         }
     }
 
+    @Override
     protected float getDrawingWidth() {
         return GameScreen.tileSize;
     }
 
+    @Override
     protected float getDrawingHeight() {
         return GameScreen.tileSize;
     }

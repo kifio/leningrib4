@@ -43,6 +43,7 @@ public class GameScreen extends InputAdapter implements Screen {
     private int nextLevelX = 0;
     private int nextLevelY = 0;
     private Stage stage;
+	private Level level;
 
     private float gameOverTime;
     public boolean isFirstLevelPassed = true;
@@ -64,16 +65,22 @@ public class GameScreen extends InputAdapter implements Screen {
         this.game = game;
         SpriteBatch batch = new SpriteBatch();
         this.stage = new Stage(new ScreenViewport(camera), batch);
-//        Label gameOverLabel = SpeechManager.getInstance().getLabel("", x, y, Gdx.graphics.getWidth(), Color.WHITE);
         this.worldController = new WorldController(this);
-        this.worldRenderer = new WorldRenderer(camera, cameraWidth, cameraHeight, stage, batch, constantsConfig);
+        this.worldRenderer = new WorldRenderer(
+                camera,
+                constantsConfig.getLevelWidth(),
+                constantsConfig.getLevelHeight(),
+                cameraHeight,
+                batch
+        );
         this.worldMap = new WorldMap();
         if (isFirstLevelPassed) {
             this.player = new Player(2f * GameScreen.tileSize, 2f * GameScreen.tileSize);
         } else {
             this.player = new Player(2f * GameScreen.tileSize, 0f);
         }
-        setLevel(getNextLevel(nextLevelX, nextLevelY));
+        this.level = getNextLevel(nextLevelX, nextLevelY);
+        this.worldController.reset(level, stage);
     }
 
     // Инициализирует камеру ортгональную карте
@@ -91,17 +98,12 @@ public class GameScreen extends InputAdapter implements Screen {
     // в зависимости от этого рассчитывается количество кадратов по высоте
     private void initScreenSize() {
         cameraWidth = constantsConfig.getLevelWidth();
-        tileSize = (Gdx.graphics.getWidth() / cameraWidth) + 1;
+        tileSize = (Gdx.graphics.getWidth() / cameraWidth);
         cameraHeight = (Gdx.graphics.getHeight() / tileSize) + 1;
     }
 
     private Level getNextLevel(int x, int y) {
         return LevelFabric.getNextLevel(x, y, this);
-    }
-
-    public void setLevel(Level level) {
-        this.worldController.reset(level);
-        this.worldRenderer.reset(level);
     }
 
     /*
@@ -113,19 +115,18 @@ public class GameScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         if (isGameOver() && gameOverTime < GAME_OVER_ANIMATION_TIME) {
             gameOverTime += delta;
-            worldController.update(delta, camera.position.y, stage);
-            worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME);
+            worldController.update(delta, camera.position.y, level, stage);
+            worldRenderer.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME, level, stage);
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
 //            isFirstLevelPassed = true;
             player.resetPosition(constantsConfig);
-
-            setLevel(getNextLevel(nextLevelX, nextLevelY));
-
+            this.level = getNextLevel(nextLevelX, nextLevelY);
+            this.worldController.reset(level, stage);
             gameOverTime = 0f;
             win = false;
         } else if (!gameOver) {
-            worldController.update(delta, camera.position.y, stage);
-            worldRenderer.render();
+            worldController.update(delta, camera.position.y, level, stage);
+            worldRenderer.render(level, stage);
         }
     }
 
@@ -140,7 +141,18 @@ public class GameScreen extends InputAdapter implements Screen {
         if (worldController != null) {
             worldController.dispose();
             worldController = null;
-    }   }
+        }
+
+        if (this.level != null) {
+            level.dispose();
+            level = null;
+        }
+
+        if (stage != null) {
+            stage.dispose();
+            stage = null;
+        }
+    }
 
     @Override
     public void resize(int width, int height) {
@@ -172,7 +184,8 @@ public class GameScreen extends InputAdapter implements Screen {
         if (!isGameOver()) {
             worldController.movePlayerTo(
                     camera.position.x - (Gdx.graphics.getWidth() / 2f) + x,
-                    camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y));
+                    camera.position.y - (Gdx.graphics.getHeight() / 2f) + (Gdx.graphics.getHeight() - y),
+                    level);
         } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
             game.showGameScreen();
             dispose();

@@ -1,0 +1,40 @@
+bottle.png
+size: 56, 280
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bottle-0
+  rotate: false
+  xy: 0, 0
+  size: 56, 56
+  orig: 56, 56
+  offset: 0, 0
+  index: -1
+bottle-1
+  rotate: false
+  xy: 0, 56
+  size: 56, 56
+  orig: 56, 56
+  offset: 0, 0
+  index: -1
+bottle-2
+  rotate: false
+  xy: 0, 112
+  size: 56, 56
+  orig: 56, 56
+  offset: 0, 0
+  index: -1
+bottle-3
+  rotate: false
+  xy: 0, 168
+  size: 56, 56
+  orig: 56, 56
+  offset: 0, 0
+  index: -1
+bottle-4
+  rotate: false
+  xy: 0, 224
+  size: 56, 56
+  orig: 56, 56
+  offset: 0, 0
+  index: -1

@@ -1,5 +1,7 @@
 package kifio.leningrib.levels.helpers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -20,7 +22,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
 	public ForestersManager(GameScreen gameScreen, Array<Forester> foresters) {
-		foresters.clear();
+		foresters.removeRange(1, foresters.size - 1);
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
 		gameObjects.addAll(foresters);
@@ -34,7 +36,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 			String speech = SpeechManager.getInstance().getForesterPatrolSpeech();
 			speeches[i] = SpeechManager.getInstance().getLabel(speech, x, y,
-					GameScreen.tileSize * 2, 0x549A03FF);
+					GameScreen.tileSize * 2, Forester.DEFAULT_SPEECH_COLOR);
 		}
 	}
 
@@ -60,10 +62,8 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
 			} else {
-				updateForestersPath(forester, speeches[i], delta, forestGraph);
+				updateForestersPath(forester, i, delta, forestGraph);
 			}
-			speeches[i].setX(forester.getNewSpeechX());
-			speeches[i].setY(forester.getNewSpeechY());
 		}
 	}
 
@@ -75,9 +75,27 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return resultArea >= caughtArea && !player.isInvisible();
 	}
 
-	private void updateForestersPath(Forester forester, Label label, float delta, ForestGraph forestGraph) {
+	private void updateForestersPath(Forester forester, int index, float delta, ForestGraph forestGraph) {
 		forester.updateArea();
-		forester.updateMovementState(gameScreen.player, label, delta, forestGraph);
+		forester.updateMovementState(gameScreen.player, delta, forestGraph);
+
+		if (forester.isShouldRemoveSpeech()) {
+			speeches[index].remove();
+		} else if (forester.isShouldResetSpeech()) {
+			float x = forester.getNewSpeechX();
+			float y = forester.getNewSpeechY();
+			Gdx.app.log("kifio", "Forester " + index + "should update his speech to: "
+					+ forester.speech + " at (" + x + "," + y + ")");
+
+			speeches[index].remove();
+			String[] words = forester.speech.split(" ");
+			float w = SpeechManager.getLabelWidth(words);
+			speeches[index] = SpeechManager.getInstance().getLabel(forester.speech, x, y, w, forester.speechColor);
+		} else {
+			speeches[index].setX(forester.getNewSpeechX());
+			speeches[index].setY(forester.getNewSpeechY());
+		}
+		forester.updateSpeechDuration(delta);
 	}
 
 	@Override public void dispose() {

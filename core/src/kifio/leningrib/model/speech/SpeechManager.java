@@ -56,8 +56,6 @@ public class SpeechManager {
 		parameter.color = Color.WHITE;
 		parameter.minFilter = Nearest;
 		parameter.magFilter = Nearest;
-		parameter.shadowOffsetX = 0;
-		parameter.shadowOffsetY = 0;
 		return parameter;
 	}
 
@@ -128,9 +126,13 @@ public class SpeechManager {
 	}
 
 	public Label getLabel(String text, float x, float y, float width, int color) {
+		return getLabel(text, x, y, width, new Color(color));
+	}
+
+	public Label getLabel(String text, float x, float y, float width, Color color) {
 		Label label = new Label(text, labelStyle);
 		label.setWrap(true);
-		label.setColor(new Color(color));
+		label.setColor(color);
 		label.setFontScale(Gdx.graphics.getDensity() * 0.8f, Gdx.graphics.getDensity() * 0.8f);
 		label.setWidth(width);
 		label.setPosition(x, y);

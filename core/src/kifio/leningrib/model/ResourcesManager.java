@@ -17,6 +17,9 @@ public class ResourcesManager {
 
 	private static final int TILE_SIZE = 16; // Размер тайла который мы вырезаем из png в пикселя
 	public static final String GRASS_0 = "grass_0";
+	public static final String HUD_BOTTLE = "bottle_hud";
+	public static final String HUD_PAUSE = "pause_hud";
+	public static final String HUD_BACKGROUND = "background_hud";
 	public static HashMap<String, TextureRegion> regions = new HashMap<>();
 	public static I18NBundle commonMushroomsSpeechBundle;
 	public static I18NBundle powerMushroomsSpeechBundle;
@@ -51,6 +54,10 @@ public class ResourcesManager {
 		am.load("enemy_2_run.png", Texture.class);
 		am.load("enemy_2_idle.png", Texture.class);
 		am.load("trees_map.png", Texture.class);
+		am.load("bottle.png", Texture.class);
+		am.load("bottle_hud.png", Texture.class);
+		am.load("pause_hud.png", Texture.class);
+		am.load("background_hud.png", Texture.class);
 		am.load("i18n/mushroom_speech", I18NBundle.class);
 		am.load("i18n/mushroom_power_speech", I18NBundle.class);
 		am.load("i18n/mushroom_invisibility_speech", I18NBundle.class);
@@ -69,6 +76,10 @@ public class ResourcesManager {
 		start = System.nanoTime();
 		Texture treesMap = am.get("trees_map.png");
 		Texture grassTexture = am.get("grass_2.png");
+
+		Texture bottleHud = am.get("bottle_hud.png");
+		Texture pauseHud = am.get("pause_hud.png");
+		Texture backgroundHud = am.get("background_hud.png");
 
 		regions.put(SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP.name(), new TextureRegion(treesMap, 0, 32, TILE_SIZE, TILE_SIZE));
 		regions.put(SegmentType.BOTTOM_LEFT_CORNER_COMMON_BOTTOM.name(), new TextureRegion(treesMap, 0, 48, TILE_SIZE, TILE_SIZE));
@@ -133,8 +144,10 @@ public class ResourcesManager {
 		regions.put(SegmentType.ROOM_WALL_END_TOP.name(), new TextureRegion(treesMap, 80, 32, -TILE_SIZE, TILE_SIZE));
 		regions.put(SegmentType.ROOM_WALL_END_BOTTOM.name(), new TextureRegion(treesMap, 80, 48, -TILE_SIZE, TILE_SIZE));
 
-
 		regions.put(GRASS_0, new TextureRegion(grassTexture, 0, 0, TILE_SIZE * 4, TILE_SIZE * 4));
+		regions.put(HUD_BOTTLE, new TextureRegion(bottleHud, 0, 0, bottleHud.getWidth(), bottleHud.getHeight()));
+		regions.put(HUD_PAUSE, new TextureRegion(pauseHud, 0, 0, pauseHud.getWidth(), pauseHud.getHeight()));
+		regions.put(HUD_BACKGROUND, new TextureRegion(backgroundHud, 0, 0, backgroundHud.getWidth(), backgroundHud.getHeight()));
 //		regions.put("log_0", new TextureRegion(overworld, 16 * 3, 16 * 5, 16, 16));
 //		regions.put("log_1", new TextureRegion(overworld, 16 * 4, 16 * 5, 16, 16));
 //		regions.put("log_2", new TextureRegion(overworld, 16 * 5, 16 * 5, 16, 16));
