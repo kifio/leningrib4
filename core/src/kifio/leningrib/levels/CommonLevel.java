@@ -26,7 +26,7 @@ public class CommonLevel extends Level {
 	}
 
 	@Override protected LevelMap getLevelMap(int x, int y) {
-		return gameScreen.worldMap.addLevel(x, y, gameScreen.constantsConfig);
+		return gameScreen.worldMap.addLevel(x, y, gameScreen.getConstantsConfig());
 	}
 
 	@Override protected Array<Mushroom> initMushrooms(Config config, TreesManager treesManager) {
@@ -54,7 +54,7 @@ public class CommonLevel extends Level {
 
 	@Override protected Array<Forester> initForesters(LevelMap levelMap) {
 		Array<Forester> gameObjects = new Array<>();
-		Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, gameScreen.constantsConfig);
+		Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, gameScreen.getConstantsConfig());
 		for (Rectangle roomsRectangle : roomsRectangles) {
 			if (!Utils.isInRoom(roomsRectangle,
 					gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {

@@ -5,20 +5,8 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import generator.Config;
 
 import kifio.leningrib.LGCGame;
-import kifio.leningrib.controller.WorldController;
-import kifio.leningrib.levels.CommonLevel;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import kifio.leningrib.levels.Level;
-import kifio.leningrib.levels.LevelFabric;
-import kifio.leningrib.model.actors.Player;
-import kifio.leningrib.model.speech.SpeechManager;
-import kifio.leningrib.view.WorldRenderer;
-import model.WorldMap;
 
 public class MenuScreen extends InputAdapter implements Screen {
 

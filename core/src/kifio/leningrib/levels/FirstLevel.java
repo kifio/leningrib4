@@ -17,7 +17,7 @@ public class FirstLevel extends Level {
 
 	FirstLevel(GameScreen gameScreen) {
 		super(0, 0, gameScreen);
-		initActors(gameScreen.constantsConfig);
+		initActors(gameScreen.getConstantsConfig());
 		gameScreen.isFirstLevelPassed = false;
 	}
 
@@ -32,7 +32,7 @@ public class FirstLevel extends Level {
 	}
 
 	@Override protected LevelMap getLevelMap(int x, int y) {
-		return gameScreen.worldMap.addLevel(x, y, FirstLevelBuilder.getFirstLevel(gameScreen.constantsConfig));
+		return gameScreen.worldMap.addLevel(x, y, FirstLevelBuilder.getFirstLevel(gameScreen.getConstantsConfig()));
 	}
 
 	@Override protected Array<Mushroom> initMushrooms(Config constantsConfig, TreesManager treesManager) {

@@ -48,33 +48,33 @@ public abstract class Level {
         mushroomsManager = new MushroomsManager();
         spaceManager = new SpaceManager();
 
-        treesManager.buildTrees(levelMap, gameScreen.constantsConfig);
-        mushroomsManager.initMushrooms(initMushrooms(gameScreen.constantsConfig, treesManager));
+        treesManager.buildTrees(levelMap, gameScreen.getConstantsConfig());
+        mushroomsManager.initMushrooms(initMushrooms(gameScreen.getConstantsConfig(), treesManager));
 
         spaceManager.buildSpaces(getPlayer(),
-                gameScreen.constantsConfig,
+                gameScreen.getConstantsConfig(),
                 treesManager.getObstacleTrees(),
                 mushroomsManager.getMushrooms(),
-                getRoomsRectangles(levelMap, gameScreen.constantsConfig));
+                getRoomsRectangles(levelMap, gameScreen.getConstantsConfig()));
 
-        forestGraph = new ForestGraph(gameScreen.constantsConfig,
+        forestGraph = new ForestGraph(gameScreen.getConstantsConfig(),
                 treesManager.getObstacleTrees(),
                 forestersManager.getForesters(),
                 spaceManager.getSpaces());
 
-        dexterityForestGraph = new ForestGraph(gameScreen.constantsConfig,
+        dexterityForestGraph = new ForestGraph(gameScreen.getConstantsConfig(),
                 treesManager.getOuterBordersTrees(),
                 forestersManager.getForesters(),
                 spaceManager.getSpaces());
 
-        strengthForestGraph = new ForestGraph(gameScreen.constantsConfig,
+        strengthForestGraph = new ForestGraph(gameScreen.getConstantsConfig(),
                 treesManager.getObstacleTrees(),
                 new Array<Actor>(),
                 spaceManager.getSpaces());
 
         // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
         if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
-            gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.constantsConfig);
+            gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.getConstantsConfig());
         }
 
         for (Forester f : forestersManager.getForesters()) {
