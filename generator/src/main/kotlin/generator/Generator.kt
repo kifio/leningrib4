@@ -62,12 +62,14 @@ class Generator {
 
             buildRooms(levelConfig, exits, this)
 
+//            map.getSegments().removeIf { it.y > 1 }
+
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
                 (it.y == 0 || it.y == levelConfig.levelHeight - 1)
                         && (it .x > 0 && it.x < levelConfig.levelWidth - 1)
             }.map {
-               additionalSegmentsMapper.convert(it)
+                additionalSegmentsMapper.convert(it)
             }
 
             addSegments(additionalSegments)

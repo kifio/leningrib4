@@ -7,9 +7,7 @@ import model.Segment
 internal class HorizontalSideMapper : SideMapper() {
 
     init {
-        segmentsMap[SegmentType.TOP_RIGHT_CORNER_COMMON_TOP] = SegmentType.TOP_LEFT_CORNER_COMMON_TOP
         segmentsMap[SegmentType.TOP_RIGHT_CORNER_COMMON_BOTTOM] = SegmentType.TOP_LEFT_CORNER_COMMON_BOTTOM
-        segmentsMap[SegmentType.TOP_RIGHT_CORNER_OUT_BORDER_TOP] = SegmentType.TOP_RIGHT_CORNER_OUT_BORDER_TOP
 
         segmentsMap[SegmentType.RIGHT_COMMON_TOP] = SegmentType.LEFT_COMMON_TOP
         segmentsMap[SegmentType.RIGHT_COMMON_BOTTOM] = SegmentType.LEFT_COMMON_BOTTOM
@@ -30,9 +28,7 @@ internal class HorizontalSideMapper : SideMapper() {
         segmentsMap[SegmentType.LEFT_END_BOTTOM] = SegmentType.RIGHT_END_BOTTOM
 
         segmentsMap[SegmentType.BOTTOM_RIGHT_CORNER_COMMON_TOP] = SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP
-        segmentsMap[SegmentType.BOTTOM_RIGHT_CORNER_COMMON_BOTTOM] = SegmentType.BOTTOM_LEFT_CORNER_COMMON_BOTTOM
-        segmentsMap[SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP] = SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP
-        segmentsMap[SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_BOTTOM] = SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_BOTTOM
+//        segmentsMap[SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP] = SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP
 
         segmentsMap[SegmentType.ROOM_WALL_START_TOP] = SegmentType.NONE
         segmentsMap[SegmentType.ROOM_WALL_START_BOTTOM] = SegmentType.NONE

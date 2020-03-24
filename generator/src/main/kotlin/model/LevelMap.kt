@@ -11,7 +11,7 @@ class LevelMap(
 
     lateinit var rooms: List<Room>
 
-    fun getSegments(): Set<Segment> = segments
+    fun getSegments(): MutableSet<Segment> = segments
 
     fun getEnters(side: Side) = when(side) {
         Side.RIGHT -> exits.filter { it.x == 0 }
@@ -21,9 +21,9 @@ class LevelMap(
     }
 
     fun getNeighborSide(side: Side) = when(side) {
-        Side.LEFT -> segments.filter { it.x == Config.levelWidth - 1 && it.y >= 0 && it.y <= Config.levelHeight - 1 }
+        Side.LEFT -> segments.filter { it.x == Config.levelWidth - 1 && it.y > 0 && it.y < Config.levelHeight - 1 }
         Side.TOP -> segments.filter { it.y == 0 }
-        Side.RIGHT -> segments.filter { it.x == 0 && it.y >= 0 && it.y <= Config.levelHeight - 1 }
+        Side.RIGHT -> segments.filter { it.x == 0 && it.y > 0 && it.y < Config.levelHeight - 1 }
         Side.BOTTOM -> segments.filter { it.y == Config.levelHeight - 1 }
     }
 

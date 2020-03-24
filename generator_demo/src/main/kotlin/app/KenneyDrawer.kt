@@ -43,11 +43,10 @@ class KenneyDrawer(
     val BOTTOM_RIGHT_CORNER_COMMON_TOP: BufferedImage = flip(BOTTOM_LEFT_CORNER_COMMON_TOP)
 
     val BOTTOM_RIGHT_CORNER_OUT_BORDER_BOTTOM: BufferedImage = flip(BOTTOM_LEFT_CORNER_OUT_BORDER_BOTTOM)
-    val BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP: BufferedImage = flip(BOTTOM_LEFT_CORNER_OUT_BORDER_TOP)
 
     // Top border corners
     val TOP_LEFT_CORNER_COMMON_BOTTOM: BufferedImage = treesMap.getSubimage(0, 16, 16, 16)
-    val TOP_LEFT_CORNER_OUT_BORDER_TOP: BufferedImage = treesMap.getSubimage(48, 48, 16, 16)
+    val TOP_LEFT_CORNER_OUT_BORDER_TOP: BufferedImage = treesMap.getSubimage(48, 0, 16, 16)
     val TOP_LEFT_CORNER_COMMON_TOP: BufferedImage = treesMap.getSubimage(0, 0, 16, 16)
 
     val TOP_RIGHT_CORNER_COMMON_BOTTOM: BufferedImage = flip(TOP_LEFT_CORNER_COMMON_BOTTOM)
@@ -107,20 +106,8 @@ class KenneyDrawer(
     val ROOM_WALL_END_TOP: BufferedImage = flip(ROOM_WALL_START_TOP)
 
     override fun drawLevel() {
-//        val grass = forest.getSubimage(
-//            0,
-//            0,
-//            2 * TILE_SIZE,
-//            2 * TILE_SIZE
-//        )
-//
-//        for (x in 0..levelConfig.levelWidth) {
-//            for (y in 0..levelConfig.levelHeight) {
-//                draw(x, y, grass, out)
-//            }
-//        }
 
-                for (s in level.value.getSegments()) {
+        for (s in level.value.getSegments()) {
             when (s.getValue()) {
 
                 SegmentType.RIGHT_COMMON_TOP -> draw(s.x, s.y, RIGHT_COMMON_TOP, out)
@@ -162,13 +149,11 @@ class KenneyDrawer(
                 SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP -> draw(s.x, s.y, BOTTOM_LEFT_CORNER_COMMON_TOP, out)
 
                 SegmentType.BOTTOM_LEFT_CORNER_OUT_BORDER_BOTTOM -> draw(s.x, s.y, BOTTOM_LEFT_CORNER_OUT_BORDER_BOTTOM, out)
-                SegmentType.BOTTOM_LEFT_CORNER_OUT_BORDER_TOP -> draw(s.x, s.y, BOTTOM_LEFT_CORNER_OUT_BORDER_TOP, out)
 
                 SegmentType.BOTTOM_RIGHT_CORNER_COMMON_BOTTOM -> draw(s.x, s.y, BOTTOM_RIGHT_CORNER_COMMON_BOTTOM, out)
                 SegmentType.BOTTOM_RIGHT_CORNER_COMMON_TOP -> draw(s.x, s.y, BOTTOM_RIGHT_CORNER_COMMON_TOP, out)
 
                 SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_BOTTOM -> draw(s.x, s.y, BOTTOM_RIGHT_CORNER_OUT_BORDER_BOTTOM, out)
-                SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP -> draw(s.x, s.y, BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP, out)
 
                 SegmentType.TOP_LEFT_CORNER_OUT_BORDER_TOP -> draw(s.x, s.y, TOP_LEFT_CORNER_OUT_BORDER_TOP, out)
                 SegmentType.TOP_LEFT_CORNER_COMMON_TOP -> draw(s.x, s.y, TOP_LEFT_CORNER_COMMON_TOP, out)
@@ -193,10 +178,6 @@ class KenneyDrawer(
                 SegmentType.NONE -> {
                     // ignore
                 }
-
-//                SegmentType.TOP_LEFT_CORNER_OUT_BORDER_BOTTOM -> draw(s.x, s.y, ROOM_WALL_END_TOP, out)
-//                SegmentType.TOP_RIGHT_CORNER_OUT_BORDER_BOTTOM -> draw(s.x, s.y, ROOM_WALL_END_TOP, out)
-
 //                Segments.STONE -> draw(s.x, s.y, stone, out)
             }
         }

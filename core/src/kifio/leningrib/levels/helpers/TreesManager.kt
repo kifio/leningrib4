@@ -65,8 +65,8 @@ class TreesManager {
         private fun isBottomLineIgnoredTree(value: SegmentType): Boolean {
             return value == SegmentType.BOTTOM_COMMON_LEFT_TOP
                     || value == SegmentType.BOTTOM_COMMON_RIGHT_TOP
-                    || value == SegmentType.BOTTOM_LEFT_CORNER_OUT_BORDER_TOP
-                    || value == SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_TOP
+                    || value == SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP
+                    || value == SegmentType.BOTTOM_RIGHT_CORNER_COMMON_TOP
         }
 
         private fun isTopLineIgnoredTree(value: SegmentType): Boolean {

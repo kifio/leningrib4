@@ -72,11 +72,6 @@ public abstract class Level {
                 new Array<Actor>(),
                 spaceManager.getSpaces());
 
-        // Хак, чтобы обойти момент с тем, что генератор складно выдает уровни лишь слева направо, снизу вверх
-        if (y > 0 && gameScreen.worldMap.getLevel(x + 1, y - 1) == null) {
-            gameScreen.worldMap.addLevel(x + 1, y - 1, gameScreen.getConstantsConfig());
-        }
-
         for (Forester f : forestersManager.getForesters()) {
             f.initPath(forestGraph);
         }
