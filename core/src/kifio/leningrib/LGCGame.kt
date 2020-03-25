@@ -20,11 +20,13 @@ class LGCGame : Game() {
     }
 
     fun showGameScreen() {
+        currentScreen?.dispose()
         currentScreen = GameScreen(this, constantsConfig)
         setScreen(currentScreen)
     }
 
     fun showMenuScreen() {
+        currentScreen?.dispose()
         currentScreen = MenuScreen(this)
         setScreen(currentScreen)
     }

@@ -17,11 +17,15 @@ public class ResourcesManager {
 
     private static final int TILE_SIZE = 16; // Размер тайла который мы вырезаем из png в пикселя
     public static final String GRASS_0 = "grass_0";
-    public static final String HUD_BOTTLE = "bottle_hud";
-    public static final String HUD_BOTTLE_PRESSED = "bottle_hud_pressed";
-    public static final String HUD_PAUSE = "pause_hud";
-    public static final String HUD_PAUSE_PRESSED = "pause_hud_pressed";
-    public static final String HUD_BACKGROUND = "background_hud";
+    public static final String HUD_BOTTLE = "bottle_hud.png";
+    public static final String HUD_BOTTLE_PRESSED = "bottle_hud_pressed.png";
+    public static final String HUD_PAUSE = "pause_hud.png";
+    public static final String HUD_PAUSE_PRESSED = "pause_hud_pressed.png";
+    public static final String HUD_BACKGROUND = "background_hud.png";
+    public static final String BACK = "back.png";
+    public static final String RESTART = "restart.png";
+
+
     public static HashMap<String, TextureRegion> regions = new HashMap<>();
     public static I18NBundle commonMushroomsSpeechBundle;
     public static I18NBundle powerMushroomsSpeechBundle;
@@ -57,11 +61,15 @@ public class ResourcesManager {
         am.load("enemy_2_idle.png", Texture.class);
         am.load("trees_map.png", Texture.class);
         am.load("bottle.png", Texture.class);
-        am.load("bottle_hud.png", Texture.class);
-        am.load("bottle_hud_pressed.png", Texture.class);
-        am.load("pause_hud.png", Texture.class);
-        am.load("pause_hud_pressed.png", Texture.class);
-        am.load("background_hud.png", Texture.class);
+
+        am.load(HUD_BOTTLE, Texture.class);
+        am.load(HUD_BOTTLE_PRESSED, Texture.class);
+        am.load(HUD_PAUSE, Texture.class);
+        am.load(HUD_PAUSE_PRESSED, Texture.class);
+        am.load(HUD_BACKGROUND, Texture.class);
+        am.load(BACK, Texture.class);
+        am.load(RESTART, Texture.class);
+
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
         am.load("i18n/mushroom_invisibility_speech", I18NBundle.class);
@@ -79,14 +87,48 @@ public class ResourcesManager {
         Gdx.app.log("kifio", "loading take: " + (System.nanoTime() - start) / 1000 + "ms");
         start = System.nanoTime();
         Texture treesMap = am.get("trees_map.png");
+
+        putTrees(treesMap);
+
+        putTexture(HUD_BOTTLE);
+        putTexture(HUD_BOTTLE_PRESSED);
+        putTexture(HUD_PAUSE);
+        putTexture(HUD_PAUSE_PRESSED);
+        putTexture(HUD_BACKGROUND);
+        putTexture(BACK);
+        putTexture(RESTART);
+
+
         Texture grassTexture = am.get("grass_2.png");
+        regions.put(GRASS_0, new TextureRegion(grassTexture, 0, 0, TILE_SIZE * 4, TILE_SIZE * 4));
 
-        Texture bottleHud = am.get("bottle_hud.png");
-        Texture bottleHudPressed = am.get("bottle_hud_pressed.png");
-        Texture pauseHud = am.get("pause_hud.png");
-        Texture pauseHudPressed = am.get("pause_hud_pressed.png");
-        Texture backgroundHud = am.get("background_hud.png");
+        Gdx.app.log("kifio", "building regions take: " + (System.nanoTime() - start) / 1000 + "ms");
 
+        commonMushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);
+        powerMushroomsSpeechBundle = am.get("i18n/mushroom_power_speech", I18NBundle.class);
+        dexterityMushroomsSpeechBundle = am.get("i18n/mushroom_dexterity_speech", I18NBundle.class);
+        invisibilityMushroomsSpeechBundle = am.get("i18n/mushroom_invisibility_speech", I18NBundle.class);
+        speedMushroomsSpeechBundle = am.get("i18n/mushroom_speed_speech", I18NBundle.class);
+        forestersSpeechesAlarmBundle = am.get("i18n/foresters_speeches_alarm", I18NBundle.class);
+        forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
+        forestersSpeechesFearBundle = am.get("i18n/foresters_speeches_fear", I18NBundle.class);
+        forestersSpeechesPatrolBundle = am.get("i18n/foresters_speeches_patrol", I18NBundle.class);
+        forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
+        grandmaSpeechesBundle = am.get("i18n/grandma_speeches", I18NBundle.class);
+        forestersSpeechesInvisiblePlayerBundle = am.get("i18n/foresters_speeches_invisible_player", I18NBundle.class);
+    }
+
+    // Кладем регион размером с текстуру
+    private static void putTexture(String key) {
+        Texture texture = am.get(key);
+        regions.put(key, new TextureRegion(
+                texture,
+                0, 0,
+                texture.getWidth(),
+                texture.getHeight()));
+    }
+
+    private static void putTrees(Texture treesMap) {
         regions.put(SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP.name(), new TextureRegion(treesMap, 0, 32, TILE_SIZE, TILE_SIZE));
         regions.put(SegmentType.BOTTOM_LEFT_CORNER_COMMON_BOTTOM.name(), new TextureRegion(treesMap, 0, 48, TILE_SIZE, TILE_SIZE));
         regions.put(SegmentType.BOTTOM_LEFT_CORNER_OUT_BORDER_BOTTOM.name(), new TextureRegion(treesMap, 48, 48, TILE_SIZE, TILE_SIZE));
@@ -147,28 +189,6 @@ public class ResourcesManager {
         regions.put(SegmentType.ROOM_WALL_COMMON_BOTTOM.name(), new TextureRegion(treesMap, 80, 48, TILE_SIZE, TILE_SIZE));
         regions.put(SegmentType.ROOM_WALL_END_TOP.name(), new TextureRegion(treesMap, 80, 32, -TILE_SIZE, TILE_SIZE));
         regions.put(SegmentType.ROOM_WALL_END_BOTTOM.name(), new TextureRegion(treesMap, 80, 48, -TILE_SIZE, TILE_SIZE));
-
-        regions.put(GRASS_0, new TextureRegion(grassTexture, 0, 0, TILE_SIZE * 4, TILE_SIZE * 4));
-        regions.put(HUD_BOTTLE, new TextureRegion(bottleHud, 0, 0, bottleHud.getWidth(), bottleHud.getHeight()));
-        regions.put(HUD_BOTTLE_PRESSED, new TextureRegion(bottleHudPressed, 0, 0, bottleHud.getWidth(), bottleHud.getHeight()));
-        regions.put(HUD_PAUSE, new TextureRegion(pauseHud, 0, 0, pauseHud.getWidth(), pauseHud.getHeight()));
-        regions.put(HUD_PAUSE_PRESSED, new TextureRegion(pauseHudPressed, 0, 0, pauseHud.getWidth(), pauseHud.getHeight()));
-        regions.put(HUD_BACKGROUND, new TextureRegion(backgroundHud, 0, 0, backgroundHud.getWidth(), backgroundHud.getHeight()));
-
-        Gdx.app.log("kifio", "building regions take: " + (System.nanoTime() - start) / 1000 + "ms");
-
-        commonMushroomsSpeechBundle = am.get("i18n/mushroom_speech", I18NBundle.class);
-        powerMushroomsSpeechBundle = am.get("i18n/mushroom_power_speech", I18NBundle.class);
-        dexterityMushroomsSpeechBundle = am.get("i18n/mushroom_dexterity_speech", I18NBundle.class);
-        invisibilityMushroomsSpeechBundle = am.get("i18n/mushroom_invisibility_speech", I18NBundle.class);
-        speedMushroomsSpeechBundle = am.get("i18n/mushroom_speed_speech", I18NBundle.class);
-        forestersSpeechesAlarmBundle = am.get("i18n/foresters_speeches_alarm", I18NBundle.class);
-        forestersSpeechesPursuitBundle = am.get("i18n/foresters_speeches_pursuit", I18NBundle.class);
-        forestersSpeechesFearBundle = am.get("i18n/foresters_speeches_fear", I18NBundle.class);
-        forestersSpeechesPatrolBundle = am.get("i18n/foresters_speeches_patrol", I18NBundle.class);
-        forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
-        grandmaSpeechesBundle = am.get("i18n/grandma_speeches", I18NBundle.class);
-        forestersSpeechesInvisiblePlayerBundle = am.get("i18n/foresters_speeches_invisible_player", I18NBundle.class);
     }
 
     public static TextureRegion getRegion(String name) {

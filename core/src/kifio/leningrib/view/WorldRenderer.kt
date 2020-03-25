@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
 import kifio.leningrib.levels.Level
+import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Forester
@@ -31,6 +32,7 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     private val playerPathDebugColor = Color(0f, 0f, 1f, 1f)
     private val foresterDebugColor = Color(1f, 0f, 0f, 0.5f)
     private val grass = ResourcesManager.getRegion(ResourcesManager.GRASS_0)
+    private var gameOverDisplay: GameOverDisplay? = null
 
     fun renderBlackScreen(levelPassed: Boolean,
                           gameOverTime: Float,
@@ -47,19 +49,21 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         renderer.rect(0f,
                 camera!!.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         renderer.end()
+
         if (!levelPassed) {
+            gameOverDisplay = GameOverDisplay(level.player.mushroomsCount, camera!!.position.y)
             drawGameOverText(level.player.mushroomsCount)
         }
     }
 
     private fun drawGameOverText(mushroomsCount: Int) {
-        batch.begin()
-        val text = String.format(Locale.getDefault(), GAME_OVER_TEXT, mushroomsCount)
-        val speechManager = SpeechManager.getInstance()
-        val x = Gdx.graphics.width / 2f - SpeechManager.getTextWidth(text) / 2
-        val y = camera!!.position.y - SpeechManager.getTextHeight(text) / 2
-        speechManager.bitmapFont.draw(batch, text, x, y)
-        batch.end()
+        gameOverDisplay?.let {
+            batch.begin()
+            SpeechManager.getInstance().bitmapFont.draw(batch, it.label, it.labelX, it.labelY)
+            batch.draw(it.back, it.backX, it.backY, it.btnSize, it.btnSize)
+            batch.draw(it.restart, it.restartX, it.restartY, it.btnSize, it.btnSize)
+            batch.end()
+        }
     }
 
     fun render(level: Level,
@@ -214,8 +218,6 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         camera = null
     }
 
-    companion object {
-        private const val GAME_OVER_TEXT = "ЯДРЕНА КОЧЕРЫЖКА\nТЫ СОБРАЛ %s ГРИБОВ"
-    }
+
 
 }
