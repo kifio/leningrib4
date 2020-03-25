@@ -19,7 +19,6 @@ class BordersBuilder(
 
     private val verticalSide = mutableListOf<Segment>()
     private val horizontalSide = mutableListOf<Segment>()
-    val list = LinkedList<Segment>()
 
     private val bottomSegments = HorizontalSegments(
             SegmentType.BOTTOM_COMMON_LEFT_BOTTOM,
@@ -49,15 +48,13 @@ class BordersBuilder(
                     verticalSideMapper.mapSideBySide(neighbour.getNeighborSide(side), side)
                 } else {
                     generateSide(side)
-                    list
                 }
             } else {
                 generateSide(side)
-                list
             }
 
-    private fun generateSide(side: Side) {
-        list.clear()
+    private fun generateSide(side: Side): List<Segment> {
+        val list = LinkedList<Segment>()
         if (side == Side.LEFT) {
             buildLeftSide()
             list.addAll(verticalSide)
@@ -71,6 +68,7 @@ class BordersBuilder(
             buildHorizontalSide(side, levelConfig.levelHeight - 1, topSegments)
             list.addAll(horizontalSide)
         }
+        return list
     }
 
     private fun buildHorizontalSide(
@@ -78,13 +76,21 @@ class BordersBuilder(
             y: Int,
             segments: HorizontalSegments
     ) {
-        buildHorizontalSide(y, segments)
-        val exits = exits.getExitsOnSide(side)
 
-        if (exits.isNotEmpty()) {
-            val exit = IntArray(2)
+        horizontalSide.clear()
+        for (i in 0 until levelConfig.levelWidth) {
+            horizontalSide.add(Segment(i, y, if (i % 2 != 0) segments.commonRight else segments.commonLeft))
+        }
 
-            exit[0] = exits.first().x
+        val exitCoordinates = exits.getExitsOnSide(side)
+        var exitsBorderLeft: Int? = null
+        var exitsBorderRight: Int? = null
+        var exitSize = 0
+
+        if (exitCoordinates.isNotEmpty()) {
+            exitSize = 2
+            val exit = IntArray(exitSize)
+            exit[0] = exitCoordinates.first().x
 
             if (exit[0] % 2 == 0) {
                 exit[1] = exit[0] - 1
@@ -93,36 +99,35 @@ class BordersBuilder(
             }
 
             horizontalSide.removeIf { exit.contains(it.x) }
+            exitsBorderLeft = exit.min()?.minus(1)
+            exitsBorderRight = exit.max()?.plus(1)
+        }
 
-            val exitsBorderLeft = exit.min()?.minus(1)
-            val exitsBorderRight = exit.max()?.plus(1)
-
-            // TODO: можно оптимизировать
-            for (i in horizontalSide.indices) {
-                val segment = horizontalSide[i]
-                if (segment.x == 0) {
-                    if (segment.x == exitsBorderLeft) {
-                        horizontalSide[i].setValue(segments.exitLeftCornerBorder)
-                    } else {
-                        horizontalSide[i].setValue(segments.commonLeftConrer)
-                    }
-                } else if (segment.x == horizontalSide.size + exit.size - 1) {
-                    if (segment.x == exitsBorderRight) {
-                        horizontalSide[i].setValue(segments.exitRightCornerBorder)
-                    } else {
-                        horizontalSide[i].setValue(segments.commonRightConrer)
-                    }
+        // TODO: можно оптимизировать
+        for (i in horizontalSide.indices) {
+            val segment = horizontalSide[i]
+            if (segment.x == 0) {
+                if (segment.x == exitsBorderLeft) {
+                    horizontalSide[i].setValue(segments.exitLeftCornerBorder)
                 } else {
-                    if (segment.x == exitsBorderLeft) {
-                        horizontalSide[i].setValue(segments.roomLeftBorder)
-                    } else if (segment.x == exitsBorderRight) {
-                        horizontalSide[i].setValue(segments.roomRightBorder)
-                    }
+                    horizontalSide[i].setValue(segments.commonLeftConrer)
+                }
+            } else if (segment.x == horizontalSide.size + exitSize - 1) {
+                if (segment.x == exitsBorderRight) {
+                    horizontalSide[i].setValue(segments.exitRightCornerBorder)
+                } else {
+                    horizontalSide[i].setValue(segments.commonRightConrer)
+                }
+            } else {
+                if (segment.x == exitsBorderLeft) {
+                    horizontalSide[i].setValue(segments.roomLeftBorder)
+                } else if (segment.x == exitsBorderRight) {
+                    horizontalSide[i].setValue(segments.roomRightBorder)
                 }
             }
-
-            horizontalSide
         }
+
+        horizontalSide
     }
 
     private fun buildLeftSide() {
@@ -174,31 +179,24 @@ class BordersBuilder(
         for (i in verticalSide.indices) {
             val segment = verticalSide[i]
             if (exitsBorders.contains(segment.y)) {
-                if (exitsBorders.size % 2 == 0) {
-                    verticalSide[i].setValue(SegmentType.RIGHT_END_TOP)
-                } else {
-                    verticalSide[i].setValue(SegmentType.RIGHT_BEGIN_BOTTOM)
+                if (segment.y != 1) {
+                    if (exitsBorders.size % 2 == 0) {
+                        segment.setValue(SegmentType.RIGHT_END_TOP)
+                    } else {
+                        segment.setValue(SegmentType.RIGHT_BEGIN_BOTTOM)
+                    }
                 }
                 exitsBorders.removeAt(0)
             }
         }
 
 //        // Generate top corner
-        val y = levelConfig.levelHeight - 2
-        verticalSide.add(Segment(x, y, SegmentType.TOP_RIGHT_CORNER_COMMON_BOTTOM))
+        verticalSide.add(
+                Segment(x, levelConfig.levelHeight - 2, SegmentType.TOP_RIGHT_CORNER_COMMON_BOTTOM))
     }
 
-    // from - included, to - excluded
-    private fun buildHorizontalSide(
-            y: Int,
-            segments: HorizontalSegments
-    ) {
+    private fun buildHorizontalSide(y: Int, segments: HorizontalSegments) {
 
-        horizontalSide.clear()
-
-        for (i in 0 until levelConfig.levelWidth) {
-            horizontalSide.add(Segment(i, y, if (i % 2 != 0) segments.commonRight else segments.commonLeft))
-        }
     }
 
     private fun List<Exit>.contains(x: Int, y: Int): Boolean {

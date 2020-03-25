@@ -5,14 +5,15 @@ import generator.Generator
 import generator.Generator.Side
 import kotlin.random.Random
 import model.*
+import javax.sound.sampled.LineEvent
 
 class ExitsBuilder(private val levelConfig: Config) {
 
     private val exitsOnSide = mutableListOf<Int>()
 
     // Returns all exits on current side
-    internal fun getExits(x: Int, y: Int, side: Side, worldMap: WorldMap): List<Exit> {
-        val enters = worldMap.getNeighbour(x, y, side)?.getEnters(side)
+    internal fun getExits(x: Int, y: Int, side: Side, neighbour: LevelMap?): List<Exit> {
+        val enters = neighbour?.getEnters(side)
         if (enters != null) return mapEntersToExits(enters, side)
         generateSide(getExitsCount(side, x, y), getSideSize(side))
         return createExitsFromLine(side)
@@ -26,11 +27,12 @@ class ExitsBuilder(private val levelConfig: Config) {
                 return
             }
             1 -> {
-//                exitsOnSide.add(Random.nextInt(1, sideSize - 1))
-                exitsOnSide.add(1)
+                exitsOnSide.add(Random.nextInt(1, sideSize - 1))
+//                exitsOnSide.add(1)
             }
             else -> {
-                exitsOnSide.add(Generator.getRandomNotOddNumber(2, sideSize / 2))
+//                exitsOnSide.add(Generator.getRandomNotOddNumber(2, sideSize / 2))
+                exitsOnSide.add(3)
                 exitsOnSide.add(Generator.getRandomNotOddNumber(sideSize / 2, sideSize - 1))
                 exitsOnSide.sort()
             }

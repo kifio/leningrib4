@@ -25,10 +25,8 @@ class WorldMap {
     fun getLevels() = levels
     fun getLevel(x: Int, y: Int) = levels.get(Pair(x, y))
 
-    fun getNeighbour(x: Int, y: Int, side: Side) = when (side) {
-        Side.LEFT -> levels[Pair(x - 1, y)]
-        Side.TOP -> levels[Pair(x, y + 1)]
-        Side.RIGHT -> levels[Pair(x + 1, y)]
-        Side.BOTTOM -> levels[Pair(x, y - 1)]
-    }
+    fun getLeftNeighbour(x: Int, y: Int) = levels[Pair(x - 1, y)]
+    fun getRightNeighbour(x: Int, y: Int) = levels[Pair(x + 1, y)]
+    fun getTopNeighbour(x: Int, y: Int) = levels[Pair(x, y + 1)]
+    fun getBottomNeighbour(x: Int, y: Int) = levels[Pair(x, y - 1)]
 }

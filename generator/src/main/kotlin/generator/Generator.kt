@@ -29,40 +29,26 @@ class Generator {
 
         map.apply {
 
-            val exits = exitsBuilder.getExits(x, y, Side.LEFT, worldMap)
-                .plus(exitsBuilder.getExits(x, y, Side.RIGHT, worldMap))
-                .plus(exitsBuilder.getExits(x, y, Side.TOP, worldMap))
-                .plus(exitsBuilder.getExits(x, y, Side.BOTTOM, worldMap))
+            val bottomNeighbour = worldMap.getBottomNeighbour(x, y)
+            val topNeighbour = worldMap.getTopNeighbour(x, y)
+            val leftNeighbour = worldMap.getLeftNeighbour(x, y)
+            val rightNeighbour = worldMap.getRightNeighbour(x, y)
+
+            val exits = exitsBuilder.getExits(x, y, Side.LEFT, leftNeighbour)
+                .plus(exitsBuilder.getExits(x, y, Side.RIGHT, rightNeighbour))
+                .plus(exitsBuilder.getExits(x, y, Side.TOP, topNeighbour))
+                .plus(exitsBuilder.getExits(x, y, Side.BOTTOM, bottomNeighbour))
 
             addExits(exits)
 
-            val bordersBuilder =
-                BordersBuilder(levelConfig, exits)
+            val bordersBuilder = BordersBuilder(levelConfig, exits)
 
-            addSegments(
-                bordersBuilder.buildBorder(
-                    Side.BOTTOM, worldMap.getNeighbour(x, y, Side.BOTTOM)
-                )
-            )
-            addSegments(
-                bordersBuilder.buildBorder(
-                    Side.TOP, worldMap.getNeighbour(x, y, Side.TOP)
-                )
-            )
-            addSegments(
-                bordersBuilder.buildBorder(
-                    Side.LEFT, worldMap.getNeighbour(x, y, Side.LEFT)
-                )
-            )
-            addSegments(
-                bordersBuilder.buildBorder(
-                    Side.RIGHT, worldMap.getNeighbour(x, y, Side.RIGHT)
-                )
-            )
+            addSegments(bordersBuilder.buildBorder(Side.BOTTOM, bottomNeighbour))
+            addSegments(bordersBuilder.buildBorder(Side.TOP, topNeighbour))
+            addSegments(bordersBuilder.buildBorder(Side.LEFT, leftNeighbour))
+            addSegments(bordersBuilder.buildBorder(Side.RIGHT, rightNeighbour))
 
             buildRooms(levelConfig, exits, this)
-
-//            map.getSegments().removeIf { it.y > 1 }
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
