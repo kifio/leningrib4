@@ -18,23 +18,20 @@ import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.Player
 import kifio.leningrib.model.speech.SpeechManager
 import kifio.leningrib.screens.GameScreen
-import java.util.*
 
 class WorldRenderer(private var camera: OrthographicCamera?,
                     private val levelWidth: Int,
-                    cameraHeight: Int,
+                    private val grassCount: Int,
                     private val batch: SpriteBatch) {
 
     private val debug = false
     private val renderer: ShapeRenderer = ShapeRenderer()
-    private val grassCount: Int = levelWidth * (cameraHeight + 2)
     private val playerDebugColor = Color(0f, 0f, 1f, 0.5f)
     private val playerPathDebugColor = Color(0f, 0f, 1f, 1f)
     private val foresterDebugColor = Color(1f, 0f, 0f, 0.5f)
     private val grass = ResourcesManager.getRegion(ResourcesManager.GRASS_0)
-    private var gameOverDisplay: GameOverDisplay? = null
 
-    fun renderBlackScreen(levelPassed: Boolean,
+    fun renderBlackScreen(gameOverDisplay: GameOverDisplay?,
                           gameOverTime: Float,
                           gameOverAnimationTime: Float,
                           level: Level,
@@ -46,24 +43,18 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         renderer.projectionMatrix = camera!!.combined
         renderer.begin(ShapeRenderer.ShapeType.Filled)
         renderer.setColor(0f, 0f, 0f, alpha)
-        renderer.rect(0f,
-                camera!!.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        renderer.rect(0f, camera!!.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         renderer.end()
 
-        if (!levelPassed) {
-            gameOverDisplay = GameOverDisplay(level.player.mushroomsCount, camera!!.position.y)
-            drawGameOverText(level.player.mushroomsCount)
-        }
+        gameOverDisplay?.let { drawGameOverText(it) }
     }
 
-    private fun drawGameOverText(mushroomsCount: Int) {
-        gameOverDisplay?.let {
-            batch.begin()
-            SpeechManager.getInstance().bitmapFont.draw(batch, it.label, it.labelX, it.labelY)
-            batch.draw(it.back, it.backX, it.backY, it.btnSize, it.btnSize)
-            batch.draw(it.restart, it.restartX, it.restartY, it.btnSize, it.btnSize)
-            batch.end()
-        }
+    private fun drawGameOverText(it: GameOverDisplay) {
+        batch.begin()
+        SpeechManager.getInstance().bitmapFont.draw(batch, it.label, it.labelX, it.labelY)
+        batch.draw(it.menu, it.menuX, it.menuY, it.menuSize, it.menuSize)
+        batch.draw(it.restart, it.restartX, it.restartY, it.restartSize, it.restartSize)
+        batch.end()
     }
 
     fun render(level: Level,
@@ -217,7 +208,4 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         renderer.dispose()
         camera = null
     }
-
-
-
 }

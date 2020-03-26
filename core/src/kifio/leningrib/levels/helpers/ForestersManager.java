@@ -88,7 +88,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 			speeches[index].remove();
 			String[] words = forester.speech.split(" ");
-			float w = SpeechManager.getLabelWidth(words);
+			float w = SpeechManager.getInstance().getLabelWidth(words);
 			speeches[index] = SpeechManager.getInstance().getLabel(forester.speech, x, y, w, forester.speechColor);
 		} else {
 			speeches[index].setX(forester.getNewSpeechX());

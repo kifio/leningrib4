@@ -16,7 +16,7 @@ class HeadsUpDisplay {
     var selectedItem = -1
 
     private val pauseButtonPosition = Rectangle()
-    private val itemsButtonsPositions = mutableListOf<Rectangle>(Rectangle())
+    private val itemsButtonsPositions = mutableListOf(Rectangle())
 
     fun setPauseButtonPosition(screenRightX: Float,
                                screenTopY: Float) {

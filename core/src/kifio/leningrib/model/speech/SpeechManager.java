@@ -23,7 +23,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class SpeechManager {
 
 	private static BitmapFont bitmapFont;
-	private static GlyphLayout glyphLayout = new GlyphLayout();
+	private GlyphLayout glyphLayout = new GlyphLayout();
 	private Label.LabelStyle labelStyle = new Label.LabelStyle();
 
 	private static SpeechManager speechManager;
@@ -59,12 +59,12 @@ public class SpeechManager {
 		return parameter;
 	}
 
-	public static float getTextWidth(String text) {
+	public float getTextWidth(String text) {
 		glyphLayout.setText(bitmapFont, text);
 		return glyphLayout.width;
 	}
 
-	public static float getTextHeight(String text) {
+	public float getTextHeight(String text) {
 		glyphLayout.setText(bitmapFont, text);
 		return glyphLayout.height;
 	}
@@ -122,25 +122,30 @@ public class SpeechManager {
 	}
 
 	public Label getLabel(String text, float x, float y, float w) {
-		return getLabel(text, x, y, w, 0xFFFFFFFF);
-	}
-
-	public Label getLabel(String text, float x, float y, float width, int color) {
-		return getLabel(text, x, y, width, new Color(color));
+		return getLabel(text, x, y, w, Color.WHITE);
 	}
 
 	public Label getLabel(String text, float x, float y, float width, Color color) {
+		return getLabel(text, x, y, 0.8f, width, color);
+	}
+
+	public Label getLabel(String text,
+						  float x,
+						  float y,
+						  float scale,
+						  float width,
+						  Color color) {
 		Label label = new Label(text, labelStyle);
 		label.setWrap(true);
 		label.setColor(color);
-		label.setFontScale(Gdx.graphics.getDensity() * 0.8f, Gdx.graphics.getDensity() * 0.8f);
+		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
 		label.setWidth(width);
 		label.setPosition(x, y);
 		label.setAlignment(Align.center, Align.bottom);
 		return label;
 	}
 
-	public static float getLabelWidth(String[] words) {
+	public float getLabelWidth(String[] words) {
 		float maxLabelWidth = 0;
 		for (String word : words) {
 			float w = getTextWidth(word);

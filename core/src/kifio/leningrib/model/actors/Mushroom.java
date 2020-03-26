@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.concurrent.ThreadLocalRandom;
@@ -17,6 +18,8 @@ public class Mushroom extends MovableActor {
     public static final int INVISIBILITY = 0xFFFFFF20;
     public static final int NO_EFFECT = 0xFFFFFFFF;
 
+    private Color speechColor = new Color(NO_EFFECT);
+
     public int[] effects = new int[]{
             POWER, DEXTERITY, INVISIBILITY, SPEED
     };
@@ -31,6 +34,7 @@ public class Mushroom extends MovableActor {
 
         if (hasEffect) {
             effect = effects[effectIndex];
+            speechColor = new Color(effect);
         }
     }
     
@@ -116,5 +120,9 @@ public class Mushroom extends MovableActor {
 
     public void setEaten() {
         this.isEaten = true;
+    }
+
+    public Color getSpeechColor() {
+        return speechColor;
     }
 }

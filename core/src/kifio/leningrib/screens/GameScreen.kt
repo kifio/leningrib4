@@ -12,6 +12,7 @@ import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.levels.Level
 import kifio.leningrib.levels.LevelFabric
+import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
 import kifio.leningrib.model.actors.Player
 import kifio.leningrib.view.WorldRenderer
@@ -53,6 +54,7 @@ class GameScreen(game: LGCGame,
     private val topCameraThreshold: Float
 
     private val headsUpDisplay = HeadsUpDisplay()
+    private var gameOverDisplay: GameOverDisplay? = null
 
     // Инициализирует камеру ортгональную карте
     private fun initCamera() {
@@ -68,7 +70,7 @@ class GameScreen(game: LGCGame,
         camera!!.update()
         if (player.y < bottomCameraThreshold) {
             camera!!.position.y = bottomCameraThreshold
-        } else camera!!.position.y = Math.min(player.y, topCameraThreshold)
+        } else camera!!.position.y = player.y.coerceAtMost(topCameraThreshold)
     }
 
     // Инициализирует размер экрана.
@@ -93,7 +95,10 @@ class GameScreen(game: LGCGame,
         if (isGameOver() && gameOverTime < GAME_OVER_ANIMATION_TIME) {
             gameOverTime += delta
             update(delta, camera!!.position.y, level, stage)
-            worldRenderer!!.renderBlackScreen(win, gameOverTime, GAME_OVER_ANIMATION_TIME, level!!, stage!!)
+            if (!win && gameOverDisplay == null) {
+                gameOverDisplay = GameOverDisplay(player?.mushroomsCount ?: 0, camera!!.position.y)
+            }
+            worldRenderer!!.renderBlackScreen(gameOverDisplay, gameOverTime, GAME_OVER_ANIMATION_TIME, level!!, stage!!)
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
 //            isFirstLevelPassed = true;
             player!!.resetPosition(constantsConfig)
@@ -205,7 +210,7 @@ class GameScreen(game: LGCGame,
 
     override fun touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
         val touchX = x.mapX()
-        val touchY = y.mapY()
+        val touchY = y.mapYToLevel()
 
         if (headsUpDisplay.getPauseButtonPosition().contains(touchX, touchY)) {
             headsUpDisplay.isPauseButtonPressed = true
@@ -220,18 +225,27 @@ class GameScreen(game: LGCGame,
 
     override fun touchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
         if (!isGameOver()) {
-            level!!.movePlayerTo(x.mapX(), y.mapY())
+            level!!.movePlayerTo(x.mapX(), y.mapYToLevel())
         } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
-            game.showGameScreen()
+            val touchX = x.mapX()
+            val touchY = y.mapYToLevel()
+            if (gameOverDisplay?.isRestartTouched(touchX, touchY) == true) {
+                headsUpDisplay.isPauseButtonPressed = false
+                headsUpDisplay.selectedItem = -1
+                game.showGameScreen()
+            } else if (gameOverDisplay?.isMenuTouched(touchX, touchY) == true) {
+                game.showMenuScreen()
+            }
             dispose()
         }
-        headsUpDisplay.isPauseButtonPressed = false
-        headsUpDisplay.selectedItem = -1
         return true
     }
 
-    private fun Int.mapX(): Float = camera!!.position.x - Gdx.graphics.width / 2f + this
-    private fun Int.mapY(): Float = camera!!.position.y - Gdx.graphics.height / 2f + (Gdx.graphics.height - this)
+    private fun Int.mapX(): Float = this.toFloat()
+    private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
+    private fun Int.mapYToLevel(): Float = camera!!.position.y - Gdx.graphics.height / 2f + mapYToScreen()
+
+
 
     fun isGameOver(): Boolean {
         return gameOver || win
@@ -258,7 +272,7 @@ class GameScreen(game: LGCGame,
         worldRenderer = WorldRenderer(
                 camera,
                 constantsConfig.levelWidth,
-                cameraHeight,
+                constantsConfig.levelWidth * (cameraHeight + 2),
                 batch
         )
         worldMap = WorldMap()

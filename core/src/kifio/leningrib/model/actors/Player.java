@@ -39,9 +39,9 @@ public class Player extends MovableActor {
     public void act(float delta) {
         super.act(delta);
 
-        if (this.mushroom == null) {
-            updateClothesColor(delta);
-        }
+//        if (this.mushroom != null) {
+//            updateClothesColor(delta);
+//        }
 
         updateEffectState(delta);
     }
