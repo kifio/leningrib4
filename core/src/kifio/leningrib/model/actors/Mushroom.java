@@ -115,7 +115,7 @@ public class Mushroom extends MovableActor {
 
     @Override
     public float getFrameDuration() {
-        return 1 / 2f;
+        return 0.1f;
     }
 
     public void setEaten() {

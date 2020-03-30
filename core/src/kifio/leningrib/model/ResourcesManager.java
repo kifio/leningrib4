@@ -23,6 +23,8 @@ public class ResourcesManager {
     public static final String HUD_PAUSE_PRESSED = "pause_hud_pressed.png";
     public static final String HUD_BACKGROUND = "background_hud.png";
     public static final String BACK = "back.png";
+    public static final String RESUME = "resume.png";
+    public static final String MENU = "menu.png";
     public static final String RESTART = "restart.png";
 
 
@@ -53,6 +55,7 @@ public class ResourcesManager {
         am.load("dexterity_mushroom.png", Texture.class);
         am.load("common_mushroom.png", Texture.class);
         am.load("bottle.png", Texture.class);
+        am.load("bottle_smol.png", Texture.class);
         am.load("player_run.png", Texture.class);
         am.load("player_idle.png", Texture.class);
         am.load("enemy_1_run.png", Texture.class);
@@ -60,7 +63,8 @@ public class ResourcesManager {
         am.load("enemy_2_run.png", Texture.class);
         am.load("enemy_2_idle.png", Texture.class);
         am.load("trees_map.png", Texture.class);
-        am.load("bottle.png", Texture.class);
+        am.load("resume.png", Texture.class);
+        am.load("menu.png", Texture.class);
 
         am.load(HUD_BOTTLE, Texture.class);
         am.load(HUD_BOTTLE_PRESSED, Texture.class);
@@ -69,6 +73,8 @@ public class ResourcesManager {
         am.load(HUD_BACKGROUND, Texture.class);
         am.load(BACK, Texture.class);
         am.load(RESTART, Texture.class);
+        am.load(RESUME, Texture.class);
+        am.load(MENU, Texture.class);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -97,6 +103,8 @@ public class ResourcesManager {
         putTexture(HUD_BACKGROUND);
         putTexture(BACK);
         putTexture(RESTART);
+        putTexture(RESUME);
+        putTexture(MENU);
 
 
         Texture grassTexture = am.get("grass_2.png");

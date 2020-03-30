@@ -27,7 +27,8 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         speeches = new Label[gameObjects.size];
     }
 
-    public void updateMushrooms(Player p, float cameraPositionY) {
+    public void updateMushrooms(Player p, float cameraPositionY, boolean isPaused) {
+        if (isPaused) return;
         int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
         // Удаляем съеденные грибы, несъеденным добавляем реплики

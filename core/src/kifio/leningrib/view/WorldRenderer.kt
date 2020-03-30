@@ -11,11 +11,13 @@ import com.badlogic.gdx.utils.Array
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
+import kifio.leningrib.model.PauseDisplay
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Forester
 import kifio.leningrib.model.actors.Grandma
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.Player
+import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.model.speech.SpeechManager
 import kifio.leningrib.screens.GameScreen
 
@@ -36,7 +38,7 @@ class WorldRenderer(private var camera: OrthographicCamera?,
                           gameOverAnimationTime: Float,
                           level: Level,
                           stage: Stage) {
-        render(level, stage, null)
+        render(level, stage, null, null)
         val alpha = (gameOverTime / gameOverAnimationTime).coerceAtMost(1f)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
@@ -45,7 +47,6 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         renderer.setColor(0f, 0f, 0f, alpha)
         renderer.rect(0f, camera!!.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         renderer.end()
-
         gameOverDisplay?.let { drawGameOverText(it) }
     }
 
@@ -59,23 +60,36 @@ class WorldRenderer(private var camera: OrthographicCamera?,
 
     fun render(level: Level,
                stage: Stage,
-               headsUpDisplay: HeadsUpDisplay?) {
+               headsUpDisplay: HeadsUpDisplay?,
+               pauseDisplay: PauseDisplay?) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         drawGrass()
-        drawDebug(level)
-        stage.act(Gdx.graphics.deltaTime)
+//        drawDebug(level)
         stage.draw()
+
+        batch.projectionMatrix = camera!!.combined
+        batch.begin()
+
         headsUpDisplay?.let { drawHUD(it) }
+        pauseDisplay?.let { drawPauseInterface(it) }
+
+        batch.end()
+    }
+
+    private fun drawPauseInterface(pauseDisplay: PauseDisplay) {
+        batch.draw(pauseDisplay.resume,
+                pauseDisplay.resumeX, pauseDisplay.resumeY,
+                pauseDisplay.resumeWidth, pauseDisplay.resumeHeight)
+        batch.draw(pauseDisplay.menu,
+                pauseDisplay.menuX, pauseDisplay.menuY,
+                pauseDisplay.menuWidth, pauseDisplay.menuHeight)
     }
 
     private fun drawHUD(headsUpDisplay: HeadsUpDisplay) {
-        batch.projectionMatrix = camera!!.combined
-
         val pauseRectangle = headsUpDisplay.getPauseButtonPosition()
         val bottleRectangle = headsUpDisplay.getItemsPositions()[0]
 
-        batch.begin()
         batch.draw(headsUpDisplay.getBackgroundTexture(),
                 pauseRectangle.x, pauseRectangle.y,
                 pauseRectangle.width, pauseRectangle.height)
@@ -93,8 +107,6 @@ class WorldRenderer(private var camera: OrthographicCamera?,
                 headsUpDisplay.getBottleTexture(),
                 bottleRectangle.x, bottleRectangle.y,
                 bottleRectangle.width, bottleRectangle.height)
-
-        batch.end()
     }
 
     private fun drawDebug(level: Level) {

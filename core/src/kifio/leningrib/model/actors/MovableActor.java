@@ -26,7 +26,7 @@ public abstract class MovableActor extends Actor {
 
 	private float elapsedTime = 0;
 	private float previousX = -1;
-	private boolean goLeft = false;
+	public boolean goLeft = false;
 
 	// TextureRegion sizes
 	private int x = 16;

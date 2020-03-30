@@ -83,11 +83,11 @@ public abstract class Level {
 
     protected abstract Array<Forester> initForesters(LevelMap levelMap);
 
-    public void update(float delta, float cameraY) {
+    public void update(float delta, float cameraY, boolean isPaused) {
         strengthForestGraph.updateForestGraph(cameraY);
         forestGraph.updateForestGraph(cameraY);
-        forestersManager.updateForesters(delta, forestGraph);
-        mushroomsManager.updateMushrooms(gameScreen.player, cameraY);
+        forestersManager.updateForesters(delta, forestGraph, isPaused);
+        mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
     }
 
     public Player getPlayer() {

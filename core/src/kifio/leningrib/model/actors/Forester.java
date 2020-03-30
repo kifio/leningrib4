@@ -405,8 +405,8 @@ public class Forester extends MovableActor {
         return 500f;
     }
 
-    public float getNewSpeechX() {
-        return getX() - GameScreen.tileSize / 2f;
+    public float getNewSpeechX(float w) {
+        return getX() - (w * 0.5f) + (0.5f * GameScreen.tileSize);
     }
 
     public float getNewSpeechY() {

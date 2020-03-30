@@ -30,12 +30,15 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		for (int i = 0; i < foresters.size; i++) {
 			Forester f = foresters.get(i);
 
-			float x = f.getNewSpeechX();
+			String speech = SpeechManager.getInstance().getForesterPatrolSpeech();
+			String[] words = speech.split(" ");
+			float w = SpeechManager.getInstance().getLabelWidth(words);
+
+			float x = f.getNewSpeechX(w);
 			float y = f.getNewSpeechY();
 
-			String speech = SpeechManager.getInstance().getForesterPatrolSpeech();
 			speeches[i] = SpeechManager.getInstance().getLabel(speech, x, y,
-					GameScreen.tileSize * 2, Forester.DEFAULT_SPEECH_COLOR);
+					w, Forester.DEFAULT_SPEECH_COLOR);
 		}
 	}
 
@@ -43,7 +46,8 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return gameObjects;
 	}
 
-	public void updateForesters(float delta, ForestGraph forestGraph) {
+	public void updateForesters(float delta, ForestGraph forestGraph, boolean isPaused) {
+		if (isPaused) return;
 		for (int i = 0; i < gameObjects.size; i++) {
 			Forester forester = gameObjects.get(i);
 			result.set(0f, 0f, 0f, 0f);
@@ -81,17 +85,18 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		if (forester.isShouldRemoveSpeech()) {
 			speeches[index].remove();
 		} else if (forester.isShouldResetSpeech()) {
-			float x = forester.getNewSpeechX();
+			String[] words = forester.speech.split(" ");
+			float w = SpeechManager.getInstance().getLabelWidth(words);
+
+			float x = forester.getNewSpeechX(w);
 			float y = forester.getNewSpeechY();
 			Gdx.app.log("kifio", "Forester " + index + "should update his speech to: "
 					+ forester.speech + " at (" + x + "," + y + ")");
-
 			speeches[index].remove();
-			String[] words = forester.speech.split(" ");
-			float w = SpeechManager.getInstance().getLabelWidth(words);
+
 			speeches[index] = SpeechManager.getInstance().getLabel(forester.speech, x, y, w, forester.speechColor);
 		} else {
-			speeches[index].setX(forester.getNewSpeechX());
+			speeches[index].setX(forester.getNewSpeechX(speeches[index].getWidth()));
 			speeches[index].setY(forester.getNewSpeechY());
 		}
 		forester.updateSpeechDuration(delta);
