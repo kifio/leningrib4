@@ -71,7 +71,7 @@ public class Player extends MovableActor {
     }
 
     public float getVelocity() {
-        return 1200f * getVelocityCoeff();
+        return 400f * getVelocityCoeff();
     }
 
     public void increaseMushroomCount() {
@@ -120,7 +120,7 @@ public class Player extends MovableActor {
 
     @Override
     protected float getDelayTime() {
-        return 0.1f;
+        return 0.0f;
     }
 
     @Override

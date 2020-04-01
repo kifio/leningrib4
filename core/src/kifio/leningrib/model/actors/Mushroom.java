@@ -37,6 +37,12 @@ public class Mushroom extends MovableActor {
             speechColor = new Color(effect);
         }
     }
+
+    public Mushroom(int x, int y, int effect) {
+        super(x, y);
+        this.effect = effect;
+        speechColor = new Color(effect);
+    }
     
     @Override public void act(float delta) {
         super.act(delta);
