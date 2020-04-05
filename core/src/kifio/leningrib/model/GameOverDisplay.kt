@@ -47,14 +47,12 @@ class GameOverDisplay(val mushroomsCount: Int,
     fun isRestartTouched(x: Float, y: Float): Boolean {
         val isXValid = x > restartX && x < restartX + restartSize
         val isYValid = y > restartY && y < restartY + restartSize
-        Gdx.app.log("kifio", "Restart: isXValid: $isXValid; isYValid: $isYValid")
         return isXValid && isYValid
     }
     
     fun isMenuTouched(x: Float, y: Float): Boolean {
         val isXValid = x > menuX && x < menuX + menuSize
         val isYValid = y > menuY && y < menuY + menuSize
-        Gdx.app.log("kifio", "Menu: isXValid: $isXValid; isYValid: $isYValid")
         return isXValid && isYValid
     }
 }

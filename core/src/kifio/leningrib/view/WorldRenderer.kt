@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
+import kifio.leningrib.LGCGame
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
@@ -26,7 +27,6 @@ class WorldRenderer(private var camera: OrthographicCamera?,
                     private val grassCount: Int,
                     private val batch: SpriteBatch) {
 
-    private val debug = false
     private val renderer: ShapeRenderer = ShapeRenderer()
     private val playerDebugColor = Color(0f, 0f, 1f, 0.5f)
     private val playerPathDebugColor = Color(0f, 0f, 1f, 1f)
@@ -65,7 +65,7 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         drawGrass()
-//        drawDebug(level)
+        drawDebug(level)
         stage.draw()
 
         batch.projectionMatrix = camera!!.combined
@@ -110,21 +110,20 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     }
 
     private fun drawDebug(level: Level) {
-        if (!debug) {
-            return
-        }
+        if (!LGCGame.isDebug) return
+
         // Включаем поддержку прозрачности
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         renderer.projectionMatrix = camera!!.combined
         renderer.begin(ShapeRenderer.ShapeType.Filled)
 
-        // drawPlayerPath();
+        drawPlayerPath(level.player);
 //        drawGrid();
 //		  drawCharacterDebug();
 //		  drawGrandmaDebug();
 //        drawMushroomsBounds();
-        // drawForesterDebug();
+        drawForesterDebug(level.foresters);
         Gdx.gl.glDisable(GL20.GL_BLEND)
         renderer.end()
     }
@@ -179,7 +178,7 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         for (forester in foresters) {
             drawForesterPath(forester)
         }
-        //		for (Forester forester : foresters) { drawForesterArea(forester); }
+//        		for (Forester forester : foresters) { drawForesterArea(forester); }
     }
 
     private fun drawExitRect() {
@@ -195,14 +194,14 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         }
     }
 
-    private fun drawForesterArea(forester: Forester) {
-        var r = forester.pursueArea
-        renderer.color = foresterDebugColor
-        renderer.rect(r.x, r.y, r.width, r.height)
-        r = forester.noticeArea
-        renderer.color = playerDebugColor
-        renderer.rect(r.x, r.y, r.width, r.height)
-    }
+//    private fun drawForesterArea(forester: Forester) {
+//        var r = forester.pursueArea
+//        renderer.color = foresterDebugColor
+//        renderer.rect(r.x, r.y, r.width, r.height)
+//        r = forester.noticeArea
+//        renderer.color = playerDebugColor
+//        renderer.rect(r.x, r.y, r.width, r.height)
+//    }
 
     private fun drawGrass() {
         batch.projectionMatrix = camera!!.combined

@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
@@ -39,7 +40,7 @@ public class FirstLevel extends Level {
 		return FirstLevelBuilder.getMushrooms();
 	}
 
-	@Override protected Array<Forester> initForesters(LevelMap levelMap) {
+	@Override protected Array<Forester> initForesters(LevelMap levelMap, Config config, Rectangle[] roomRectangles) {
 		Array<Forester> foresters = new Array<>(1);
 		foresters.add(FirstLevelBuilder.getForester());
 		return foresters;

@@ -22,7 +22,7 @@ import kifio.leningrib.model.ResourcesManager;
 public abstract class MovableActor extends Actor {
 
 	// Путь в который будет записываться найденный путь
-	protected GraphPath<Vector2> path = new DefaultGraphPath<>();
+	protected DefaultGraphPath<Vector2> path = new DefaultGraphPath<>();
 
 	private float elapsedTime = 0;
 	private float previousX = -1;

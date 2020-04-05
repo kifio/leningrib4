@@ -7,7 +7,12 @@ import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.MenuScreen
 
-class LGCGame : Game() {
+class LGCGame() : Game() {
+
+    companion object {
+        @JvmStatic var isDebug = false
+    }
+
     private var currentScreen: Screen? = null
     private val constantsConfig = Config(10, 46)
     override fun create() {

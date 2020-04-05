@@ -38,14 +38,12 @@ class PauseDisplay(cameraY: Float) {
     fun isResumeTouched(x: Float, y: Float): Boolean {
         val isXValid = x > resumeX && x < resumeX + resumeWidth
         val isYValid = y > resumeY && y < resumeY + resumeHeight
-        Gdx.app.log("kifio", "Restart: isXValid: $isXValid; isYValid: $isYValid")
         return isXValid && isYValid
     }
     
     fun isMenuTouched(x: Float, y: Float): Boolean {
         val isXValid = x > menuX && x < menuX + menuWidth
         val isYValid = y > menuY && y < menuY + menuHeight
-        Gdx.app.log("kifio", "Menu: isXValid: $isXValid; isYValid: $isYValid")
         return isXValid && isYValid
     }
 }

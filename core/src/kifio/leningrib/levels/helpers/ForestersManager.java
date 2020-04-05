@@ -1,14 +1,11 @@
 package kifio.leningrib.levels.helpers;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
-import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.Forester;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
@@ -21,7 +18,8 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	private Rectangle result = new Rectangle();
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
-	public ForestersManager(GameScreen gameScreen, Array<Forester> foresters) {
+	public ForestersManager(GameScreen gameScreen,
+							Array<Forester> foresters) {
 		foresters.removeRange(1, foresters.size - 1);
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
@@ -61,7 +59,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 					gameScreen.player.stop();
 					forester.stop();
 					forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
-					forester.addAction(forester.getMoveActionsSequence(forestGraph));
+					forester.addAction(forester.getMoveActionsSequence());
 				}
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
@@ -76,13 +74,13 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		Rectangle p = player.bounds;
 		Intersector.intersectRectangles(f, p, result);
 		float resultArea = result.area();
-		return resultArea >= caughtArea && !player.isInvisible();
+		return resultArea >= caughtArea && !player.isInvisible() && !player.isDexterous();
 	}
 
 	private void updateForestersPath(Forester forester, int index, float delta, ForestGraph forestGraph) {
 		forester.updateArea();
 		forester.updateMovementState(gameScreen.player, delta, forestGraph);
-
+		forester.updatePath(forestGraph, gameScreen.player);
 		if (forester.isShouldRemoveSpeech()) {
 			speeches[index].remove();
 		} else if (forester.isShouldResetSpeech()) {
@@ -91,10 +89,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 			float x = forester.getNewSpeechX(w);
 			float y = forester.getNewSpeechY();
-			Gdx.app.log("kifio", "Forester " + index + "should update his speech to: "
-					+ forester.speech + " at (" + x + "," + y + ")");
 			speeches[index].remove();
-
 			speeches[index] = SpeechManager.getInstance().getLabel(forester.speech, x, y, w, forester.speechColor);
 		} else {
 			speeches[index].setX(forester.getNewSpeechX(speeches[index].getWidth()));

@@ -117,9 +117,9 @@ public class FirstLevelBuilder {
 	// FIXME: scaredArea should not be null!
 	static Forester getForester() {
 		return new Forester(GameScreen.tileSize, GameScreen.tileSize * 27,
-			GameScreen.tileSize * 6, GameScreen.tileSize * 27, 1,
+			GameScreen.tileSize * 6, GameScreen.tileSize * 27,
 			GameScreen.tileSize * 23, GameScreen.tileSize * 29,
-				GameScreen.tileSize, GameScreen.tileSize * 7, null);
+				GameScreen.tileSize, GameScreen.tileSize * 7);
 	}
 
 	private static float labelWidth =  Gdx.graphics.getWidth() - 2 * GameScreen.tileSize;

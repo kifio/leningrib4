@@ -177,7 +177,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	}
 
 	// Поиск ноды, чтобы не создавать новую.
-	// TODO: Эффективнее использовать SpatialMap
 	private Vector2 getVector2(float x, float y) {
 		for (int i = 0; i < nodes.size; i++) {
 			Vector2 node = nodes.get(i);

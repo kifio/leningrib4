@@ -110,7 +110,7 @@ public class SpeechManager {
 	}
 
 	public String getForesterPursuitSpeech() {
-		return ResourcesManager.forestersSpeechesPursuitBundle.get(String.valueOf(random(1, 19)));
+		return ResourcesManager.forestersSpeechesPursuitBundle.get(String.valueOf(random(1, 21)));
 	}
 
 	public String getForesterStopSpeech() {

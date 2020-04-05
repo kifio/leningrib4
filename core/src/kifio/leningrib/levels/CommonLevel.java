@@ -45,32 +45,29 @@ public class CommonLevel extends Level {
 //			if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
 //				boolean hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0;
 				int size = GameScreen.tileSize;
-				mushrooms.add(new Mushroom(size * 3, size * 2, Mushroom.SPEED));
-				mushrooms.add(new Mushroom(size * 4, size * 2, Mushroom.INVISIBILITY));
-				mushrooms.add(new Mushroom(size * 5, size * 2, Mushroom.DEXTERITY));
-				mushrooms.add(new Mushroom(size * 6, size * 2, Mushroom.POWER));
+//				mushrooms.add(new Mushroom(size * 3, size * 2, Mushroom.SPEED));
+//				mushrooms.add(new Mushroom(size * 4, size * 2, Mushroom.INVISIBILITY));
+//				mushrooms.add(new Mushroom(size * 5, size * 2, Mushroom.DEXTERITY));
+				mushrooms.add(new Mushroom(size * 3, size * 2, Mushroom.POWER));
 //			}
 //		}
-
-
-
 		return mushrooms;
 	}
 
-	@Override protected Array<Forester> initForesters(LevelMap levelMap) {
+	@Override protected Array<Forester> initForesters(LevelMap levelMap,
+													  Config config,
+													  Rectangle[] roomsRectangles) {
 		Array<Forester> gameObjects = new Array<>();
-		Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, gameScreen.getConstantsConfig());
 		for (Rectangle roomsRectangle : roomsRectangles) {
 			if (!Utils.isInRoom(roomsRectangle,
 					gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {
 
 				int left = (int) (roomsRectangle.x + 1);
-				int top = (int) (roomsRectangle.y + roomsRectangle.height - 2);
+				int top = (int) (roomsRectangle.y + roomsRectangle.height);
 				int right = (int) (roomsRectangle.width - 2);
 				int bottom = (int) roomsRectangle.y;
 
 				int originalFromY = ThreadLocalRandom.current().nextInt(bottom, top);
-				int originalToY = ThreadLocalRandom.current().nextInt(bottom, top);
 
 				boolean ltr = ThreadLocalRandom.current().nextBoolean();
 
@@ -78,12 +75,11 @@ public class CommonLevel extends Level {
 						GameScreen.tileSize * (ltr ? left : right),
 						GameScreen.tileSize * originalFromY,
 						GameScreen.tileSize * (ltr ? right : left),
-						GameScreen.tileSize * originalToY,
 						ThreadLocalRandom.current().nextInt(1, 4),
 						GameScreen.tileSize * bottom,
 						GameScreen.tileSize * top,
-						GameScreen.tileSize, GameScreen.tileSize * 7,
-						roomsRectangle);
+						GameScreen.tileSize,
+						GameScreen.tileSize * (config.getLevelWidth() - 2));
 
 				gameObjects.add(f);
 			}

@@ -42,8 +42,11 @@ public abstract class Level {
     Level(int x, int y, GameScreen gameScreen) {
         this.gameScreen = gameScreen;
         LevelMap levelMap = getLevelMap(x, y);
+        Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, gameScreen.getConstantsConfig());
 
-        forestersManager = new ForestersManager(gameScreen, initForesters(levelMap));
+        forestersManager = new ForestersManager(gameScreen,
+                initForesters(levelMap, gameScreen.getConstantsConfig(), roomsRectangles));
+
         treesManager = new TreesManager();
         mushroomsManager = new MushroomsManager();
         spaceManager = new SpaceManager();
@@ -81,7 +84,7 @@ public abstract class Level {
 
     protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager);
 
-    protected abstract Array<Forester> initForesters(LevelMap levelMap);
+    protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Rectangle[] roomRectangles);
 
     public void update(float delta, float cameraY, boolean isPaused) {
         strengthForestGraph.updateForestGraph(cameraY);
