@@ -7,11 +7,18 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Array;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 import kifio.leningrib.Utils;
+import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
@@ -61,9 +68,23 @@ public class Forester extends MovableActor {
     private int toX, toY;
     private int originalBottomLimit, originalTopLimit, originalLeftLimit, originalRightLimit;
     private ForesterStateMachine.MovingState movingState = ForesterStateMachine.MovingState.PATROL;
+    private Bottle nearestBottle;
 
     public String speech = "";
     public Color speechColor = DEFAULT_SPEECH_COLOR;
+
+    private Comparator<Bottle> bottleComparator = new Comparator<Bottle>() {
+        @Override
+        public int compare(Bottle o1, Bottle o2) {
+
+            final float x = Utils.mapCoordinate(getX());
+            final float y = Utils.mapCoordinate(getY());
+
+            return Float.compare(
+                    Vector2.dst(o1.getX(), o1.getY(), x, y),
+                    Vector2.dst(o2.getX(), o2.getY(), x, y));
+        }
+    };
 
     // Лесники начинают с патрулирования леса, поэтому у них две координаты
     public Forester(float originalFromX, float originalFromY, float originalToX, int index,
@@ -84,17 +105,29 @@ public class Forester extends MovableActor {
     }
 
     public void updateMovementState(Player player,
+                                    ArrayList<Bottle> bottles,
                                     float delta,
                                     ForestGraph forestGraph) {
 
         int px = player.getOnLevelMapX();
         int py = player.getOnLevelMapY();
 
+        Collections.sort(bottles, bottleComparator);
+
+        for (Bottle bottle : bottles) {
+            if (!bottle.isEmpty() && noticeArea.contains(bottle.getX(), bottle.getY())) {
+                nearestBottle = bottle;
+                break;
+            }
+        }
+
         ForesterStateMachine.MovingState state = foresterStateMachine.updateState(
                 movingState,
                 noticeArea.contains(px, py) && !player.isInvisible(),
                 pursueArea.contains(px, py),
-                player.isStrong(), player.isInvisible(), stopTime, null
+                player.isStrong(), player.isInvisible(),
+                nearestBottle != null,
+                nearestBottle != null && nearestBottle.hasDrinker(this), stopTime
         );
 
 //        Gdx.app.log("kifio", state.name());
@@ -154,6 +187,29 @@ public class Forester extends MovableActor {
 
                 replaceAnimation(Forester.RUN, Forester.IDLE);
                 break;
+
+            case RUN_TO_BOTTLE:
+                if (wasChanged) {
+                    // FIXME: getRunToBottleSpeech!
+                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                }
+                replaceAnimation(Forester.IDLE, Forester.RUN);
+                break;
+
+            case DRINKING:
+                if (wasChanged) {
+                    // FIXME: getDrinkingSpeech!
+                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                }
+                replaceAnimation(Forester.RUN, Forester.IDLE);
+                break;
+            case DRUNK:
+                nearestBottle = null;
+                if (wasChanged) {
+                    // FIXME: getDrunkSpeech!
+                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                }
+                break;
         }
 
         movingState = state;
@@ -170,7 +226,7 @@ public class Forester extends MovableActor {
     }
 
     public boolean isShouldRemoveSpeech() {
-        return speechDuration > 3f ;
+        return speechDuration > 3f;
     }
 
     public void updateSpeechDuration(float delta) {
@@ -242,10 +298,11 @@ public class Forester extends MovableActor {
         int px = player.getOnLevelMapX();
         int py = player.getOnLevelMapY();
 
+        int fx = (int) Utils.mapCoordinate(getX());
+        int fy = (int) Utils.mapCoordinate(getY());
+
         switch (movingState) {
             case PATROL:
-                int fx = (int) Utils.mapCoordinate(getX());
-                int fy = (int) Utils.mapCoordinate(getY());
                 if (fx == toX && fy == toY) {
                     setNewPath(forestGraph);
                 }
@@ -259,6 +316,14 @@ public class Forester extends MovableActor {
                 break;
             case STOP:
             case DISABLED:
+                break;
+            case RUN_TO_BOTTLE:
+                if (nearestBottle != null) {
+                    setPath(nearestBottle.getX(), nearestBottle.getY(), forestGraph);
+                    if (fx == (int) nearestBottle.getX() && fy == (int) nearestBottle.getY()) {
+                        nearestBottle.addDrinker(this);
+                    }
+                }
                 break;
         }
 
@@ -302,6 +367,14 @@ public class Forester extends MovableActor {
     // Вычисляет путь лесника от a, до b.
     private void setPath(float tx, float ty, ForestGraph forestGraph) {
         if (forestGraph == null) return;
+
+        // Провеярем, что имеющийся уже маршрут не ведет в ту же точку
+        Array<Vector2> nodes = this.path.nodes;
+        int size = nodes.size;
+        if (!nodes.isEmpty() && nodes.get(size - 1).epsilonEquals(tx, ty)) {
+            return;
+        }
+
         stop();
 
         forestGraph.updatePath(Utils.mapCoordinate(getX()), Utils.mapCoordinate(getY()),
@@ -313,12 +386,12 @@ public class Forester extends MovableActor {
     private void setPathToPlayer(int px, int py, ForestGraph forestGraph) {
         if (forestGraph == null) return;
 
-        DefaultGraphPath<Vector2> path = new DefaultGraphPath<Vector2>();
+        DefaultGraphPath<Vector2> path = new DefaultGraphPath<>();
         forestGraph.updatePath(
-                    Utils.mapCoordinate(getX()),
-                    Utils.mapCoordinate(getY()),
-                    px, py,
-                    path);
+                Utils.mapCoordinate(getX()),
+                Utils.mapCoordinate(getY()),
+                px, py,
+                path);
 
         for (int i = 0; i < path.getCount(); i++) {
             if (!this.path.nodes.contains(path.get(i), false)) {

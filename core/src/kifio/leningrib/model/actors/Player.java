@@ -98,7 +98,6 @@ public class Player extends MovableActor {
             if (effectTime >= EFFECT_ALERT_TIME) {
                 float t = effectTime - EFFECT_ALERT_TIME;
                 int intervalIndex = (int) (t / EFFECT_ALERT_INTERVAL);
-                Gdx.app.log("kifio", "Interval index: " + intervalIndex);
                 if (intervalIndex % 2 == 0) {
                     clearEffectTexture();
                 } else {
@@ -111,17 +110,14 @@ public class Player extends MovableActor {
     }
 
     private void setEffectTexture(Mushroom mushroom) {
-        Mushroom.Effect effect = mushroom.getEffect();
-        if (effect == Mushroom.Effect.NO_EFFECT) return;
-
-        String effectName = effect.name();
+        String effectName = mushroom.getEffectName();
         String packFile;
 
         if (this.mushroom == null) {
             // Игрок взял новый гриб
             packFile = current.getPackFile() + "_" + effectName;
         } else {
-            String currentEffect = this.mushroom.getEffect().name();
+            String currentEffect = mushroom.getEffectName();
             packFile = current.getPackFile();
 
             // Игрок взял новый гриб, когда у него был старый гриб
@@ -132,15 +128,14 @@ public class Player extends MovableActor {
                 packFile = packFile + "_" + effectName;
             }
         }
-        Gdx.app.log("kifio", "Pack file: " + packFile);
-        current.setPackFile(packFile);
+        current.setPackFile(packFile.toLowerCase());
     }
 
     private void clearEffectTexture() {
-        Mushroom.Effect effect = mushroom.getEffect();
-        String effectName = effect.name();
+        String effectName = mushroom.getEffectName();
         if (current.getPackFile().contains(effectName)) {
-            current.setPackFile(current.getPackFile().replace("_" + effectName, ""));
+            String packFile = current.getPackFile().replace("_" + effectName, "");
+            current.setPackFile(packFile.toLowerCase());
         }
     }
 
@@ -172,16 +167,14 @@ public class Player extends MovableActor {
     protected String getIdlingState() {
         Mushroom m = this.mushroom;
         if (m == null) return IDLE;
-        Mushroom.Effect effect = m.getEffect();
-        return IDLE + "_" + effect.name();
+        return IDLE + "_" + m.getEffectName();
     }
 
     @Override
     protected String getRunningState() {
         Mushroom m = this.mushroom;
         if (m == null) return RUNING;
-        Mushroom.Effect effect = m.getEffect();
-        return RUNING + "_" + effect.name();
+        return RUNING + "_" + m.getEffectName();
     }
 
     public void resetPlayerPath(float x, float y, ForestGraph forestGraph, GameScreen gameScreen) {

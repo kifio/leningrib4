@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import generator.Config;
@@ -20,6 +21,7 @@ import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.Player;
 import kifio.leningrib.model.actors.Space;
+import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
 import model.Exit;
@@ -86,10 +88,10 @@ public abstract class Level {
 
     protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Rectangle[] roomRectangles);
 
-    public void update(float delta, float cameraY, boolean isPaused) {
+    public void update(float delta, ArrayList<Bottle> bottles, float cameraY, boolean isPaused) {
         strengthForestGraph.updateForestGraph(cameraY);
         forestGraph.updateForestGraph(cameraY);
-        forestersManager.updateForesters(delta, forestGraph, isPaused);
+        forestersManager.updateForesters(delta, bottles, forestGraph, isPaused);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
     }
 

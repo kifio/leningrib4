@@ -29,6 +29,7 @@ class GameScreen(game: LGCGame,
     private val game: LGCGame?
     private var worldRenderer: WorldRenderer?
     private var camera: OrthographicCamera = OrthographicCamera()
+    private val bottles = ArrayList<Bottle>()
     private var cameraWidth = 0
     private var cameraHeight = 0
     private var win = false
@@ -126,6 +127,12 @@ class GameScreen(game: LGCGame,
     }
 
     private fun update(delta: Float, cameraPositionY: Float) {
+        for (b in bottles) {
+            if (b.isEmpty()) {
+                b.remove()
+                bottles.remove(b)
+            }
+        }
         if (level.grandma != null) {
             if (level.grandma.isReadyForDialog(level.player)) {
                 level.grandma.startDialog()
@@ -147,7 +154,7 @@ class GameScreen(game: LGCGame,
             win = true
             return
         }
-        level.update(delta, cameraPositionY, pauseDisplay != null)
+        level.update(delta, bottles, cameraPositionY, pauseDisplay != null)
     }
 
     private fun addSpeechesToStage(speeches: Array<Label?>) {
@@ -268,8 +275,9 @@ class GameScreen(game: LGCGame,
     private fun setupVodka() {
         val playerX = Utils.mapCoordinate(player.x)
         val playerY = Utils.mapCoordinate(player.y)
-        val bottle = Bottle(playerX, playerY + tileSize / 2f)
+        val bottle = Bottle(playerX, playerY)
         stage.addActor(bottle)
+        bottles.add(bottle)
         bottle.addAction(if (player.goLeft) {
             Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
         } else {

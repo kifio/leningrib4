@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import kifio.leningrib.model.speech.SpeechManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class Mushroom extends MovableActor {
@@ -60,8 +61,26 @@ public class Mushroom extends MovableActor {
         batch.draw(getTextureRegion(), x, y, getDrawingWidth(), getDrawingHeight());
     }
 
-    public Effect getEffect() {
-        return effect;
+    public String getEffectName() {
+        if (effect == Effect.NO_EFFECT) {
+            return null;
+        } else {
+            return effect.name().toLowerCase();
+        }
+    }
+
+    public String getSpeech() {
+        if (effect == Mushroom.Effect.POWER) {
+            return SpeechManager.getInstance().getPowerMushroomSpeech();
+        } else if (effect == Mushroom.Effect.SPEED) {
+            return SpeechManager.getInstance().getSpeedMushroomSpeech();
+        } else if (effect == Mushroom.Effect.DEXTERITY) {
+            return SpeechManager.getInstance().getDexterityMushroomSpeech();
+        } else if (effect == Mushroom.Effect.INVISIBLE) {
+            return SpeechManager.getInstance().getInvisibilityMushroomSpeech();
+        } else {
+            return SpeechManager.getInstance().getRandomMushroomSpeech();
+        }
     }
 
     public float getEffectTime() {

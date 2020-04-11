@@ -1,8 +1,6 @@
 package kifio.leningrib.model.actors
 
-import com.badlogic.gdx.math.Rectangle
-import kifio.leningrib.model.items.Bottle
-import kifio.leningrib.screens.GameScreen
+import com.sun.org.apache.xpath.internal.operations.Bool
 
 class ForesterStateMachine {
 
@@ -11,22 +9,25 @@ class ForesterStateMachine {
     }
 
     enum class MovingState {
-        PATROL, PURSUE, STOP, SCARED, DISABLED
+        PATROL, PURSUE, STOP, SCARED, DISABLED, RUN_TO_BOTTLE, DRINKING, DRUNK
     }
 
     fun updateState(currentState: MovingState,
                     isPlayerNoticed: Boolean,
                     isPlayerPursued: Boolean,
-                    isStrong: Boolean,
-                    isInvisible: Boolean,
-                    stopTime: Float,
-                    bottle: Bottle? = null): MovingState {
+                    isPlayerStrong: Boolean,
+                    isPlayerInvisible: Boolean,
+                    isBottleNoticed: Boolean,
+                    isDrinking: Boolean,
+                    stopTime: Float): MovingState {
 
         when (currentState) {
 
             MovingState.PATROL -> {
-                return if (isPlayerNoticed) {
-                    if (isStrong) {
+                return if (isBottleNoticed) {
+                      MovingState.RUN_TO_BOTTLE
+                } else if (isPlayerNoticed) {
+                    if (isPlayerStrong) {
                         MovingState.SCARED
                     } else {
                         MovingState.PURSUE
@@ -37,9 +38,11 @@ class ForesterStateMachine {
             }
 
             MovingState.PURSUE -> {
-                return if (isStrong) {
+                return if (isBottleNoticed) {
+                    MovingState.RUN_TO_BOTTLE
+                } else if (isPlayerStrong) {
                     MovingState.SCARED
-                } else if (isInvisible || !isPlayerPursued) {
+                } else if (isPlayerInvisible || !isPlayerPursued) {
                     MovingState.STOP
                 } else {
                     MovingState.PURSUE
@@ -48,13 +51,15 @@ class ForesterStateMachine {
 
             MovingState.SCARED -> {
                 return if (isPlayerPursued) {
-                    if (isStrong) {
+                    if (isPlayerStrong) {
                         MovingState.SCARED
-                    } else if (isInvisible) {
+                    } else if (isPlayerInvisible) {
                         MovingState.STOP
                     } else {
                         MovingState.PURSUE
                     }
+                } else if (isBottleNoticed) {
+                    MovingState.RUN_TO_BOTTLE
                 } else {
                     MovingState.PURSUE
                 }
@@ -73,6 +78,30 @@ class ForesterStateMachine {
                     MovingState.PATROL
                 } else {
                     MovingState.DISABLED
+                }
+            }
+
+            MovingState.RUN_TO_BOTTLE -> {
+                return if (isDrinking) {
+                    MovingState.DRINKING
+                } else {
+                    MovingState.RUN_TO_BOTTLE
+                }
+            }
+
+            MovingState.DRINKING -> {
+                return if (isDrinking) {
+                    MovingState.DRINKING
+                } else {
+                    MovingState.DRUNK
+                }
+            }
+
+            MovingState.DRUNK -> {
+                return if (stopTime > MAXIMUM_STOP_TIME || isPlayerNoticed) {
+                    MovingState.PATROL
+                } else {
+                    MovingState.STOP
                 }
             }
         }

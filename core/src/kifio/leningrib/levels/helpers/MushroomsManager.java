@@ -51,7 +51,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
                             speeches[index] = null;
                         }
 
-                        if (m.getEffect() != Mushroom.Effect.NO_EFFECT) {
+                        if (m.getEffectName() != null) {
                             p.onEffectiveMushroomTake(m);
                         }
 
@@ -73,7 +73,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
     private void addMushroomSpeech(Player player, Mushroom m, int index) {
         // С некоторой вероятностью добавляем новую речь
         if (shouldAddSpeech(player) && speeches[index] == null) {
-            String speech = getSpeech(m.getEffect());
+            String speech = m.getSpeech();
             String[] words = speech.split(" ");
             float w = SpeechManager.getInstance().getLabelWidth(words);
             float x = m.getX() - (0.5f * w) + (0.5f * GameScreen.tileSize);
@@ -85,20 +85,6 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
             float y = m.getY() + yOffset;
             speeches[index] = SpeechManager.getInstance().getLabel(speech, x, y, w, m.getSpeechColor());
             speeches[index].addAction(getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index));
-        }
-    }
-
-    private String getSpeech(Mushroom.Effect effect) {
-        if (effect == Mushroom.Effect.POWER) {
-            return SpeechManager.getInstance().getPowerMushroomSpeech();
-        } else if (effect == Mushroom.Effect.SPEED) {
-            return SpeechManager.getInstance().getSpeedMushroomSpeech();
-        } else if (effect == Mushroom.Effect.DEXTERITY) {
-            return SpeechManager.getInstance().getDexterityMushroomSpeech();
-        } else if (effect == Mushroom.Effect.INVISIBLE) {
-            return SpeechManager.getInstance().getInvisibilityMushroomSpeech();
-        } else {
-            return SpeechManager.getInstance().getRandomMushroomSpeech();
         }
     }
 
