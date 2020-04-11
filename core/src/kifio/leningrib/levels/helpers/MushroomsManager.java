@@ -51,7 +51,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
                             speeches[index] = null;
                         }
 
-                        if (m.getEffect() != 0) {
+                        if (m.getEffect() != Mushroom.Effect.NO_EFFECT) {
                             p.onEffectiveMushroomTake(m);
                         }
 
@@ -88,18 +88,17 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         }
     }
 
-    private String getSpeech(int effect) {
-        switch (effect) {
-            case Mushroom.POWER:
-                return SpeechManager.getInstance().getPowerMushroomSpeech();
-            case Mushroom.SPEED:
-                return SpeechManager.getInstance().getSpeedMushroomSpeech();
-            case Mushroom.DEXTERITY:
-                return SpeechManager.getInstance().getDexterityMushroomSpeech();
-            case Mushroom.INVISIBILITY:
-                return SpeechManager.getInstance().getInvisibilityMushroomSpeech();
-            default:
-                return SpeechManager.getInstance().getRandomMushroomSpeech();
+    private String getSpeech(Mushroom.Effect effect) {
+        if (effect == Mushroom.Effect.POWER) {
+            return SpeechManager.getInstance().getPowerMushroomSpeech();
+        } else if (effect == Mushroom.Effect.SPEED) {
+            return SpeechManager.getInstance().getSpeedMushroomSpeech();
+        } else if (effect == Mushroom.Effect.DEXTERITY) {
+            return SpeechManager.getInstance().getDexterityMushroomSpeech();
+        } else if (effect == Mushroom.Effect.INVISIBLE) {
+            return SpeechManager.getInstance().getInvisibilityMushroomSpeech();
+        } else {
+            return SpeechManager.getInstance().getRandomMushroomSpeech();
         }
     }
 

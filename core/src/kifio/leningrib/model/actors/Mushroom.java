@@ -2,46 +2,50 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 import java.util.concurrent.ThreadLocalRandom;
-import kifio.leningrib.model.ResourcesManager;
+
 import kifio.leningrib.screens.GameScreen;
 
 public class Mushroom extends MovableActor {
 
-    private static final float DEFAULT_EFFECT_TIME = 10f; // nanoseconds
+    private static final float DEFAULT_EFFECT_TIME = 5f;
 
-    // COLORS in rgba!! not argb.
-    public static final int POWER = 0xD8390FFF;
-    public static final int SPEED = 0x106189FF;
-    public static final int DEXTERITY = 0xF49C37FF;
-    public static final int INVISIBILITY = 0xFFFFFF20;
-    public static final int NO_EFFECT = 0xFFFFFFFF;
+    private Color speechColor = new Color(Effect.NO_EFFECT.color);
 
-    private Color speechColor = new Color(NO_EFFECT);
+    public enum Effect {
+        POWER(0xD8390FFF),
+        DEXTERITY(0x106189FF),
+        INVISIBLE(0xF49C37FF),
+        SPEED(0xFFFFFF20),
+        NO_EFFECT(0xFFFFFFFF);
 
-    public int[] effects = new int[]{
-            POWER, DEXTERITY, INVISIBILITY, SPEED
+        public final int color;
+
+        private Effect(int color) {
+            this.color = color;
+        }
     };
 
-    private int effect = 0;
+    private Effect effect = Effect.NO_EFFECT;
     private boolean isEaten = false;
 
     public Mushroom(int x, int y, boolean hasEffect) {
         super(x, y);
 
+        Effect[] effects = Effect.values();
         int effectIndex = ThreadLocalRandom.current().nextInt(effects.length);
 
         if (hasEffect) {
             effect = effects[effectIndex];
-            speechColor = new Color(effect);
+            speechColor.set(effect.color);
         }
     }
 
-    public Mushroom(int x, int y, int effect) {
+    public Mushroom(int x, int y, Effect effect) {
         super(x, y);
         this.effect = effect;
-        speechColor = new Color(effect);
+        speechColor.set(effect.color);
     }
     
     @Override public void act(float delta) {
@@ -56,30 +60,30 @@ public class Mushroom extends MovableActor {
         batch.draw(getTextureRegion(), x, y, getDrawingWidth(), getDrawingHeight());
     }
 
-    public int getEffect() {
-        return effect != 0 ? effect : NO_EFFECT;
+    public Effect getEffect() {
+        return effect;
     }
 
     public float getEffectTime() {
-        if (effect != NO_EFFECT) return DEFAULT_EFFECT_TIME;
+        if (effect != Effect.NO_EFFECT) return DEFAULT_EFFECT_TIME;
         else return 0;
     }
 
-    public float getSpeedModificator() {
-        if (effect == SPEED) return 1.5f;
+    public float getSpeedMultiplier() {
+        if (effect == Effect.SPEED) return 1.5f;
         else return 1f;
     }
 
     public boolean isInvisibilityMushroom() {
-        return effect == INVISIBILITY;
+        return effect == Effect.INVISIBLE;
     }
 
     public boolean isStrengthMushroom() {
-        return effect == POWER;
+        return effect == Effect.POWER;
     }
 
     public boolean isDexterityMushroom() {
-        return effect == DEXTERITY;
+        return effect == Effect.DEXTERITY;
     }
 
     @Override

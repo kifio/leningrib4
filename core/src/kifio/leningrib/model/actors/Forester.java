@@ -97,7 +97,7 @@ public class Forester extends MovableActor {
                 player.isStrong(), player.isInvisible(), stopTime, null
         );
 
-        Gdx.app.log("kifio", state.name());
+//        Gdx.app.log("kifio", state.name());
         boolean wasChanged = !state.equals(movingState);
 
         if (wasChanged) {

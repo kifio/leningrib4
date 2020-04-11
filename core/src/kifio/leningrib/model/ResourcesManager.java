@@ -56,8 +56,19 @@ public class ResourcesManager {
         am.load("common_mushroom.png", Texture.class);
         am.load("bottle.png", Texture.class);
         am.load("bottle_smol.png", Texture.class);
+
         am.load("player_run.png", Texture.class);
         am.load("player_idle.png", Texture.class);
+
+        am.load("player_run_speed.png", Texture.class);
+        am.load("player_idle_speed.png", Texture.class);
+
+        am.load("player_run_power.png", Texture.class);
+        am.load("player_idle_power.png", Texture.class);
+
+        am.load("player_run_dexterity.png", Texture.class);
+        am.load("player_idle_dexterity.png", Texture.class);
+
         am.load("enemy_1_run.png", Texture.class);
         am.load("enemy_1_idle.png", Texture.class);
         am.load("enemy_2_run.png", Texture.class);

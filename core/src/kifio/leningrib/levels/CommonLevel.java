@@ -32,26 +32,28 @@ public class CommonLevel extends Level {
 	@Override protected Array<Mushroom> initMushrooms(Config config, TreesManager treesManager) {
 		Array<Mushroom> mushrooms = new Array<>();
 
-		int levelHeight = config.getLevelHeight();
-		int levelWidth = config.getLevelWidth();
+//		int levelHeight = config.getLevelHeight();
+//		int levelWidth = config.getLevelWidth();
+//
+//		int mushroomsCount = getPlayer().getMushroomsCount();
+//		int step = Math.max(MIN_STEP, MAX_STEP - (mushroomsCount / 10));
+//
+//		for (int i = 1; i < levelHeight - 1; i += step) {
+//			int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
+//			int y = GameScreen.tileSize * i;
+//
+//			if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
+//				boolean hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0;
+//				mushrooms.add(new Mushroom(x, y, mushroomsCount > 0 && hasEffect));
+//			}
+//		}
 
-		int mushroomsCount = getPlayer().getMushroomsCount();
-		int step = Math.max(MIN_STEP, MAX_STEP - (mushroomsCount / 10));
+		int size = GameScreen.tileSize;
+		mushrooms.add(new Mushroom(size * 4, size * 2, Mushroom.Effect.SPEED));
+		mushrooms.add(new Mushroom(size * 5, size * 2, Mushroom.Effect.INVISIBLE));
+		mushrooms.add(new Mushroom(size * 6, size * 2, Mushroom.Effect.DEXTERITY));
+		mushrooms.add(new Mushroom(size * 7, size * 2, Mushroom.Effect.POWER));
 
-		for (int i = 1; i < levelHeight - 1; i += step) {
-			int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
-			int y = GameScreen.tileSize * i;
-
-			if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
-				boolean hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0;
-				mushrooms.add(new Mushroom(x, y, mushroomsCount > 0 && hasEffect));
-//				int size = GameScreen.tileSize;
-//				mushrooms.add(new Mushroom(size * 3, size * 2, Mushroom.SPEED));
-//				mushrooms.add(new Mushroom(size * 4, size * 2, Mushroom.INVISIBILITY));
-//				mushrooms.add(new Mushroom(size * 5, size * 2, Mushroom.DEXTERITY));
-//				mushrooms.add(new Mushroom(size * 3, size * 2, Mushroom.POWER));
-			}
-		}
 		return mushrooms;
 	}
 

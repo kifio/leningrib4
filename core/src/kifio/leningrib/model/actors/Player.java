@@ -18,7 +18,10 @@ public class Player extends MovableActor {
 
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
-    private static final String INVISIBLE = "_invisible";
+
+    public static final float EFFECT_ALERT_TIME = 2f; // Время, спустя котрое персонаж начинает мигать
+    public static final float EFFECT_ALERT_INTERVAL = 0.2f; // Интервал мигания
+
     private int newColor;
     private Color tmpColor = Color.valueOf("#FDA010");
     private float[] clothesHSV = new float[3];
@@ -80,34 +83,71 @@ public class Player extends MovableActor {
 
     public void onEffectiveMushroomTake(Mushroom mushroom) {
         effectTime = 0f;
+        setEffectTexture(mushroom);
         this.mushroom = mushroom;
-
-        if (mushroom.isInvisibilityMushroom() && !current.getPackFile().contains(INVISIBLE)) {
-            current.setPackFile(current.getPackFile() + INVISIBLE);
-        }
     }
 
     private void updateEffectState(float delta) {
-
         if (this.mushroom == null) return;
 
         if (effectTime >= this.mushroom.getEffectTime()) {
-
-            if (current.getPackFile().contains(INVISIBLE)) {
-                current.setPackFile(current.getPackFile().replace(INVISIBLE, ""));
-            }
-
             effectTime = 0f;
+            clearEffectTexture();
             this.mushroom = null;
         } else {
+            if (effectTime >= EFFECT_ALERT_TIME) {
+                float t = effectTime - EFFECT_ALERT_TIME;
+                int intervalIndex = (int) (t / EFFECT_ALERT_INTERVAL);
+                Gdx.app.log("kifio", "Interval index: " + intervalIndex);
+                if (intervalIndex % 2 == 0) {
+                    clearEffectTexture();
+                } else {
+                    setEffectTexture(this.mushroom);
+                }
+            }
+
             effectTime += delta;
+        }
+    }
+
+    private void setEffectTexture(Mushroom mushroom) {
+        Mushroom.Effect effect = mushroom.getEffect();
+        if (effect == Mushroom.Effect.NO_EFFECT) return;
+
+        String effectName = effect.name();
+        String packFile;
+
+        if (this.mushroom == null) {
+            // Игрок взял новый гриб
+            packFile = current.getPackFile() + "_" + effectName;
+        } else {
+            String currentEffect = this.mushroom.getEffect().name();
+            packFile = current.getPackFile();
+
+            // Игрок взял новый гриб, когда у него был старый гриб
+            if (packFile.endsWith(currentEffect)) {
+                packFile = packFile.replace(currentEffect, effectName);
+            } else {
+                // У игрока есть гриб, но его эффект подходит к коцну. Игрок мигает.
+                packFile = packFile + "_" + effectName;
+            }
+        }
+        Gdx.app.log("kifio", "Pack file: " + packFile);
+        current.setPackFile(packFile);
+    }
+
+    private void clearEffectTexture() {
+        Mushroom.Effect effect = mushroom.getEffect();
+        String effectName = effect.name();
+        if (current.getPackFile().contains(effectName)) {
+            current.setPackFile(current.getPackFile().replace("_" + effectName, ""));
         }
     }
 
     //  If player have took speed mushroom
     private float getVelocityCoeff() {
         if (this.mushroom == null) return 1f;
-        else return this.mushroom.getSpeedModificator();
+        else return this.mushroom.getSpeedMultiplier();
     }
 
     public int getPassedLevelsCount() {
@@ -131,21 +171,17 @@ public class Player extends MovableActor {
     @Override
     protected String getIdlingState() {
         Mushroom m = this.mushroom;
-        if (m != null && m.isInvisibilityMushroom()) {
-            return IDLE + INVISIBLE;
-        } else {
-            return IDLE;
-        }
+        if (m == null) return IDLE;
+        Mushroom.Effect effect = m.getEffect();
+        return IDLE + "_" + effect.name();
     }
 
     @Override
     protected String getRunningState() {
         Mushroom m = this.mushroom;
-        if (m != null && m.isInvisibilityMushroom()) {
-            return RUNING + INVISIBLE;
-        } else {
-            return RUNING;
-        }
+        if (m == null) return RUNING;
+        Mushroom.Effect effect = m.getEffect();
+        return RUNING + "_" + effect.name();
     }
 
     public void resetPlayerPath(float x, float y, ForestGraph forestGraph, GameScreen gameScreen) {

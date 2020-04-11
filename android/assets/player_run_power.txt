@@ -1,4 +1,4 @@
-player_run_invisible.png
+player_run_power.png
 size: 64, 24
 format: RGBA8888
 filter: Nearest,Nearest
