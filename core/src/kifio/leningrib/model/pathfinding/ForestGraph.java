@@ -219,7 +219,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	private Array<Vector2> playerNeighbours = new Array<>();
 
 	public Vector2 findNearest(int px, int py, int fx, int fy) {
-		Vector2 p = getVector2(px, py);
 
 		playerNeighbours.clear();
 

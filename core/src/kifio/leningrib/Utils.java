@@ -15,6 +15,16 @@ public class Utils {
         return (float) (c * GameScreen.tileSize);
     }
 
+    public static boolean isOverlapsWithActors(Array<? extends Actor> actors, int x, int y) {
+        for (int k = 0; k < actors.size; k++) {
+            Actor a = actors.get(k);
+            if ((int) a.getX() == x && (int) a.getY() == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isInRoom(Rectangle room, float x, float y) {
 
         int left = 0;

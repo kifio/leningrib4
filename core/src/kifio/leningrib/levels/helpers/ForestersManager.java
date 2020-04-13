@@ -24,7 +24,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 	public ForestersManager(GameScreen gameScreen,
 							Array<Forester> foresters) {
-		foresters.removeRange(1, foresters.size - 1);
+//		foresters.removeRange(1, foresters.size - 1);
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
 		gameObjects.addAll(foresters);

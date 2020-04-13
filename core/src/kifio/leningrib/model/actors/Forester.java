@@ -157,10 +157,9 @@ public class Forester extends MovableActor {
 
             case PURSUE:
                 speechColor = Forester.AGGRESSIVE_SPEECH_COLOR;
-                speech = SpeechManager.getInstance().getForesterPursuitSpeech();
 
                 if (wasChanged) {
-                    speech = SpeechManager.getInstance().getForesterAlarmSpeech();
+                    speech = SpeechManager.getInstance().getForesterPursuitSpeech();
                 }
 
                 replaceAnimation(Forester.IDLE, Forester.RUN);
