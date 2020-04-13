@@ -12,11 +12,11 @@ import model.LevelMap
 
 class TreesManager {
 
-    private val outerTrees = Array<Actor>()
-    private val obstacleTrees = Array<Actor>()
-    private val bottomBorderNonObstaclesTrees = Array<Actor>()
-    private val topBorderNonObstaclesTrees = Array<Actor>()
-    private val innerBorderTrees = Array<Actor>()
+    private val outerTrees = Array<TreePart>()
+    private val obstacleTrees = Array<TreePart>()
+    private val bottomBorderNonObstaclesTrees = Array<TreePart>()
+    private val topBorderNonObstaclesTrees = Array<TreePart>()
+    private val innerBorderTrees = Array<TreePart>()
 
     fun buildTrees(levelMap: LevelMap, constantsConfig: Config) {
         for (s in levelMap.getSegments()) {
@@ -57,7 +57,7 @@ class TreesManager {
 
     companion object {
 
-        private fun getActorFromCell(segmentType: SegmentType, x: Int, y: Int): Actor? {
+        private fun getActorFromCell(segmentType: SegmentType, x: Int, y: Int): TreePart? {
             val region: TextureRegion = ResourcesManager.getRegion(segmentType.name) ?: return null
             return TreePart(region, x.toFloat(), y.toFloat(), GameScreen.tileSize, GameScreen.tileSize)
         }

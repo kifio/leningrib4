@@ -10,14 +10,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
-import generator.Config;
 import java.util.HashMap;
-import java.util.Locale;
+
+import generator.Config;
 import kifio.leningrib.Utils;
-import kifio.leningrib.levels.helpers.ForestersManager;
-import kifio.leningrib.levels.helpers.TreesManager;
-import kifio.leningrib.model.actors.Grandma;
 import kifio.leningrib.screens.GameScreen;
+import kotlin.Pair;
 
 public class ForestGraph implements IndexedGraph<Vector2> {
 
@@ -216,5 +214,38 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 		this.nodes.clear();
 		this.connections = null;
 		this.nodes = null;
+	}
+
+	private Array<Vector2> playerNeighbours = new Array<>();
+
+	public Vector2 findNearest(int px, int py, int fx, int fy) {
+		Vector2 p = getVector2(px, py);
+
+		playerNeighbours.clear();
+
+		playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py + GameScreen.tileSize));
+		playerNeighbours.add(new Vector2(px, py + GameScreen.tileSize));
+		playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py + GameScreen.tileSize));
+
+		playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py));
+		playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py));
+
+		playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py - GameScreen.tileSize));
+		playerNeighbours.add(new Vector2(px, py - GameScreen.tileSize));
+		playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py - GameScreen.tileSize));
+
+		Vector2 target = new Vector2(px, py);
+		float minL = Float.POSITIVE_INFINITY;
+		float l;
+
+		for (Vector2 v : nodes) {
+			l = v.dst2(fx, fy);
+			if (playerNeighbours.contains(v, false) && l < minL) {
+				minL = l;
+				target = v;
+			}
+		}
+
+		return target;
 	}
 }

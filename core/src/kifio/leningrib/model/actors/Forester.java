@@ -1,6 +1,5 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
@@ -10,10 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -37,6 +34,7 @@ public class Forester extends MovableActor {
     private final String running;
     private final String idle;
 
+//    private DefaultGraphPath<Vector2> tPath = new DefaultGraphPath<>();
     private ForesterStateMachine foresterStateMachine = new ForesterStateMachine();
 
     // Не обновляем путь для лесника, если позиция персонажа не изменилась
@@ -161,7 +159,6 @@ public class Forester extends MovableActor {
                 speechColor = Forester.AGGRESSIVE_SPEECH_COLOR;
                 speech = SpeechManager.getInstance().getForesterPursuitSpeech();
 
-
                 if (wasChanged) {
                     speech = SpeechManager.getInstance().getForesterAlarmSpeech();
                 }
@@ -204,6 +201,7 @@ public class Forester extends MovableActor {
                 replaceAnimation(Forester.RUN, Forester.IDLE);
                 break;
             case DRUNK:
+                stopTime += delta;
                 nearestBottle = null;
                 if (wasChanged) {
                     // FIXME: getDrunkSpeech!
@@ -312,7 +310,7 @@ public class Forester extends MovableActor {
                 break;
 
             case PURSUE:
-                setPathToPlayer(px, py, forestGraph);
+                setPathToPlayer(px, py, fx, fy,  player.isUnderTrees, forestGraph);
                 break;
             case STOP:
             case DISABLED:
@@ -368,7 +366,7 @@ public class Forester extends MovableActor {
     private void setPath(float tx, float ty, ForestGraph forestGraph) {
         if (forestGraph == null) return;
 
-        // Провеярем, что имеющийся уже маршрут не ведет в ту же точку
+//         Провеярем, что имеющийся уже маршрут не ведет в ту же точку
         Array<Vector2> nodes = this.path.nodes;
         int size = nodes.size;
         if (!nodes.isEmpty() && nodes.get(size - 1).epsilonEquals(tx, ty)) {
@@ -383,15 +381,16 @@ public class Forester extends MovableActor {
         addAction(getMoveActionsSequence());
     }
 
-    private void setPathToPlayer(int px, int py, ForestGraph forestGraph) {
+    private void setPathToPlayer(int px, int py, int fx, int fy, boolean isUnderTrees, ForestGraph forestGraph) {
         if (forestGraph == null) return;
-
         DefaultGraphPath<Vector2> path = new DefaultGraphPath<>();
-        forestGraph.updatePath(
-                Utils.mapCoordinate(getX()),
-                Utils.mapCoordinate(getY()),
-                px, py,
-                path);
+
+        if (isUnderTrees) {
+            Vector2 target = forestGraph.findNearest(px, py, fx, fy);
+            forestGraph.updatePath(fx, fy, target.x, target.y, path);
+        } else {
+            forestGraph.updatePath(fx, fy, px, py, path);
+        }
 
         for (int i = 0; i < path.getCount(); i++) {
             if (!this.path.nodes.contains(path.get(i), false)) {
@@ -404,7 +403,7 @@ public class Forester extends MovableActor {
     }
 
     public float getVelocity() {
-        return 200f * Gdx.graphics.getDensity();
+        return GameScreen.tileSize * 4;
     }
 
     public float getNewSpeechX(float w) {

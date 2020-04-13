@@ -128,7 +128,7 @@ class GameScreen(game: LGCGame,
 
     private fun update(delta: Float, cameraPositionY: Float) {
         for (b in bottles) {
-            if (b.isEmpty()) {
+            if (b.isRemovable()) {
                 b.remove()
                 bottles.remove(b)
             }
@@ -306,6 +306,7 @@ class GameScreen(game: LGCGame,
         yLimit = (constantsConfig.levelHeight - 1) * tileSize.toFloat()
         this.game = game
         val batch = SpriteBatch()
+        batch.enableBlending()
         stage = Stage(ScreenViewport(camera), batch)
         worldRenderer = WorldRenderer(
                 camera,

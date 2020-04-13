@@ -66,7 +66,7 @@ public class CommonLevel extends Level {
 					gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {
 
 				int left = (int) (roomsRectangle.x + 1);
-				int top = (int) (roomsRectangle.y + roomsRectangle.height);
+				int top = (int) (roomsRectangle.y + roomsRectangle.height - 2);
 				int right = (int) (roomsRectangle.width - 2);
 				int bottom = (int) roomsRectangle.y;
 

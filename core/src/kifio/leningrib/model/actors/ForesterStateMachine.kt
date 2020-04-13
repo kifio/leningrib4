@@ -101,7 +101,7 @@ class ForesterStateMachine {
                 return if (stopTime > MAXIMUM_STOP_TIME || isPlayerNoticed) {
                     MovingState.PATROL
                 } else {
-                    MovingState.STOP
+                    MovingState.DRUNK
                 }
             }
         }

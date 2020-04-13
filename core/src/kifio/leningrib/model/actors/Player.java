@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -7,9 +8,12 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.utils.Array;
 
 import generator.Config;
 import kifio.leningrib.Utils;
+import kifio.leningrib.levels.helpers.TreesManager;
+import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
@@ -30,6 +34,9 @@ public class Player extends MovableActor {
     private float effectTime = 0L;
     private Mushroom mushroom;
     private int passedLevelsCount;
+
+    private boolean shouldCheckStuckUnderTrees = false;
+    public boolean isUnderTrees = false;
 
     public Player(float x, float y) {
         super(x, y);
@@ -74,7 +81,7 @@ public class Player extends MovableActor {
     }
 
     public float getVelocity() {
-        return 400f * getVelocityCoeff();
+        return (GameScreen.tileSize * 6) * getVelocityCoeff();
     }
 
     public void increaseMushroomCount() {
@@ -85,6 +92,7 @@ public class Player extends MovableActor {
         effectTime = 0f;
         setEffectTexture(mushroom);
         this.mushroom = mushroom;
+        shouldCheckStuckUnderTrees = mushroom.isDexterityMushroom();
     }
 
     private void updateEffectState(float delta) {
@@ -117,7 +125,7 @@ public class Player extends MovableActor {
             // Игрок взял новый гриб
             packFile = current.getPackFile() + "_" + effectName;
         } else {
-            String currentEffect = mushroom.getEffectName();
+            String currentEffect = this.mushroom.getEffectName();
             packFile = current.getPackFile();
 
             // Игрок взял новый гриб, когда у него был старый гриб
@@ -264,5 +272,37 @@ public class Player extends MovableActor {
 
     public int getOnLevelMapY() {
         return (int) Utils.mapCoordinate(bounds.y);
+    }
+
+    public void checkStuckUnderTrees(GameScreen gameScreen, TreesManager treesManager) {
+        if (!shouldCheckStuckUnderTrees) {
+            return;
+        }
+
+        boolean isDexterous = isDexterous();
+
+        float x = gameScreen.player.getOnLevelMapX();
+        float y = gameScreen.player.getOnLevelMapY();
+
+        Array<TreePart> obstacleTrees = treesManager.getInnerBordersTrees();
+
+        for (TreePart t : obstacleTrees) {
+            if (t.position.epsilonEquals(x, y)) {
+                if (isDexterous) {
+                    isUnderTrees = true;
+                    return;
+                } else {
+                    gameScreen.gameOver = true;
+                    gameScreen.player.stop();
+                    return;
+                }
+            }
+        }
+
+        // Если дошли до конца массива, значит игрок не скрылся за деревьями.
+        if (!isDexterous) {
+            shouldCheckStuckUnderTrees = false;
+            isUnderTrees = false;
+        }
     }
 }
