@@ -15,6 +15,11 @@ public class Utils {
         return (float) (c * GameScreen.tileSize);
     }
 
+    public static float mapCoordinate(int coordiante) {
+        int c = coordiante / GameScreen.tileSize;
+        return (float) (c * GameScreen.tileSize);
+    }
+
     public static boolean isOverlapsWithActors(Array<? extends Actor> actors, int x, int y) {
         for (int k = 0; k < actors.size; k++) {
             Actor a = actors.get(k);

@@ -27,6 +27,7 @@ public abstract class MovableActor extends Actor {
 	private float elapsedTime = 0;
 	private float previousX = -1;
 	public boolean goLeft = false;
+	private float lastChangeDirectionTime = 0f;
 
 	// TextureRegion sizes
 	private int x = 16;
@@ -51,7 +52,10 @@ public abstract class MovableActor extends Actor {
 	@Override public void act(float delta) {
 		elapsedTime += delta;
 		float x = getX();
-		if (!MathUtils.isEqual(previousX, x)) goLeft = previousX > x;
+		if (!MathUtils.isEqual(previousX, x) && elapsedTime - lastChangeDirectionTime > 0.2F) {
+			goLeft = previousX > x;
+			lastChangeDirectionTime = elapsedTime;
+		}
 		previousX = (int) getX();
 		super.act(delta);
 	}

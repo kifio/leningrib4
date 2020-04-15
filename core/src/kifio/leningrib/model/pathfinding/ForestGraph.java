@@ -1,11 +1,13 @@
 package kifio.leningrib.model.pathfinding;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.ai.pfa.Heuristic;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
@@ -20,6 +22,7 @@ import kotlin.Pair;
 public class ForestGraph implements IndexedGraph<Vector2> {
 
 	private Array<Connection<Vector2>> empty = new Array<>();
+	private int nodeSize = GameScreen.tileSize / 4;
 //	private ForestersManager forestersManager;
 
 	private int mapWidth;

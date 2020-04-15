@@ -113,6 +113,18 @@ public class SpeechManager {
 		return ResourcesManager.forestersSpeechesStopBundle.get(String.valueOf(random(1, 5)));
 	}
 
+	public String getForesterDrinkingSpeech() {
+		return ResourcesManager.forestersSpeechesDrinking.get(String.valueOf(random(1, 10)));
+	}
+
+	public String getForesterDrunkSpeech() {
+		return ResourcesManager.forestersSpeechesDrunk.get(String.valueOf(random(1, 10)));
+	}
+
+	public String getForesterRunToBottleSpeech() {
+		return ResourcesManager.forestersSpeechesRunToBottle.get(String.valueOf(random(1, 6)));
+	}
+
 	public String getGrandmaSpeech(int i) {
 		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
 	}

@@ -185,17 +185,17 @@ public class Forester extends MovableActor {
                 break;
 
             case RUN_TO_BOTTLE:
+                speechColor = Forester.DEFAULT_SPEECH_COLOR;
                 if (wasChanged) {
-                    // FIXME: getRunToBottleSpeech!
-                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                    speech = SpeechManager.getInstance().getForesterRunToBottleSpeech();
                 }
                 replaceAnimation(Forester.IDLE, Forester.RUN);
                 break;
 
             case DRINKING:
+                speechColor = Forester.DEFAULT_SPEECH_COLOR;
                 if (wasChanged) {
-                    // FIXME: getDrinkingSpeech!
-                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                    speech = SpeechManager.getInstance().getForesterDrinkingSpeech();
                 }
                 replaceAnimation(Forester.RUN, Forester.IDLE);
                 break;
@@ -203,8 +203,8 @@ public class Forester extends MovableActor {
                 stopTime += delta;
                 nearestBottle = null;
                 if (wasChanged) {
-                    // FIXME: getDrunkSpeech!
-                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                    stopTime = 0;
+                    speech = SpeechManager.getInstance().getForesterDrunkSpeech();
                 }
                 break;
         }
@@ -402,7 +402,7 @@ public class Forester extends MovableActor {
     }
 
     public float getVelocity() {
-        return GameScreen.tileSize * 4;
+        return GameScreen.tileSize * 3;
     }
 
     public float getNewSpeechX(float w) {

@@ -310,8 +310,7 @@ class GameScreen(game: LGCGame,
         stage = Stage(ScreenViewport(camera), batch)
         worldRenderer = WorldRenderer(
                 camera,
-                constantsConfig.levelWidth,
-                constantsConfig.levelWidth * (cameraHeight + 2),
+                constantsConfig,
                 batch
         )
         worldMap = WorldMap()

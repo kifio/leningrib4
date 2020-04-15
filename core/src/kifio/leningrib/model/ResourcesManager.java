@@ -39,6 +39,9 @@ public class ResourcesManager {
     public static I18NBundle forestersSpeechesFearBundle;
     public static I18NBundle forestersSpeechesInvisiblePlayerBundle;
     public static I18NBundle forestersSpeechesStopBundle;
+    public static I18NBundle forestersSpeechesDrinking;
+    public static I18NBundle forestersSpeechesDrunk;
+    public static I18NBundle forestersSpeechesRunToBottle;
     public static I18NBundle grandmaSpeechesBundle;
 
     private static AssetManager am;
@@ -84,6 +87,9 @@ public class ResourcesManager {
         am.load("i18n/foresters_speeches_pursuit", I18NBundle.class);
         am.load("i18n/foresters_speeches_stop", I18NBundle.class);
         am.load("i18n/foresters_speeches_invisible_player", I18NBundle.class);
+        am.load("i18n/foresters_speeches_drinking", I18NBundle.class);
+        am.load("i18n/foresters_speeches_drunk", I18NBundle.class);
+        am.load("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
         am.load("i18n/grandma_speeches", I18NBundle.class);
         am.finishLoading();
 
@@ -105,7 +111,7 @@ public class ResourcesManager {
 
 
         Texture grassTexture = am.get("grass_2.png");
-        regions.put(GRASS_0, new TextureRegion(grassTexture, 0, 0, TILE_SIZE * 4, TILE_SIZE * 4));
+        regions.put(GRASS_0, new TextureRegion(grassTexture, 0, 0, TILE_SIZE * 2, TILE_SIZE * 2));
 
         Gdx.app.log("kifio", "building regions take: " + (System.nanoTime() - start) / 1000 + "ms");
 
@@ -120,6 +126,9 @@ public class ResourcesManager {
         forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
         grandmaSpeechesBundle = am.get("i18n/grandma_speeches", I18NBundle.class);
         forestersSpeechesInvisiblePlayerBundle = am.get("i18n/foresters_speeches_invisible_player", I18NBundle.class);
+        forestersSpeechesDrinking = am.get("i18n/foresters_speeches_drinking", I18NBundle.class);
+        forestersSpeechesDrunk = am.get("i18n/foresters_speeches_drunk", I18NBundle.class);
+        forestersSpeechesRunToBottle = am.get("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
     }
 
     // Кладем регион размером с текстуру

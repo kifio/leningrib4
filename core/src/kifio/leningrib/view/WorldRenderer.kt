@@ -8,7 +8,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
+import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.Utils
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
@@ -23,8 +25,7 @@ import kifio.leningrib.model.speech.SpeechManager
 import kifio.leningrib.screens.GameScreen
 
 class WorldRenderer(private var camera: OrthographicCamera?,
-                    private val levelWidth: Int,
-                    private val grassCount: Int,
+                    private val config: Config,
                     private val batch: SpriteBatch) {
 
     private val renderer: ShapeRenderer = ShapeRenderer()
@@ -118,12 +119,12 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         renderer.projectionMatrix = camera!!.combined
         renderer.begin(ShapeRenderer.ShapeType.Filled)
 
-        drawPlayerPath(level.player);
+//        drawPlayerPath(level.player);
 //        drawGrid();
 //		  drawCharacterDebug();
 //		  drawGrandmaDebug();
 //        drawMushroomsBounds();
-        drawForesterDebug(level.foresters);
+//        drawForesterDebug(level.foresters);
         Gdx.gl.glDisable(GL20.GL_BLEND)
         renderer.end()
     }
@@ -204,14 +205,24 @@ class WorldRenderer(private var camera: OrthographicCamera?,
 //    }
 
     private fun drawGrass() {
-        batch.projectionMatrix = camera!!.combined
-        batch.begin()
-        for (i in 0 until grassCount) {
-            val x = GameScreen.tileSize * (i % levelWidth)
-            val y = GameScreen.tileSize * (i / levelWidth) + (camera!!.position.y - (Gdx.graphics.height / 2 + GameScreen.tileSize)).toInt()
-            batch.draw(grass, x.toFloat(), y.toFloat(), GameScreen.tileSize.toFloat(), GameScreen.tileSize.toFloat())
+        camera?.let {
+            val grassSize = GameScreen.tileSize * 2
+            val height = Gdx.graphics.height
+            val bottom = it.position.y - (height / 2) - grassSize
+            val top = it.position.y + (height / 2)
+
+            batch.projectionMatrix = camera!!.combined
+            batch.begin()
+
+            for (x in 0 .. (config.levelWidth * GameScreen.tileSize) step grassSize) {
+                for (y in 0 .. (config.levelHeight * GameScreen.tileSize) step grassSize) {
+                    if (y in bottom..top) {
+                        batch.draw(grass, x.toFloat(), y.toFloat(), grassSize.toFloat(), grassSize.toFloat())
+                    }
+                }
+            }
+            batch.end()
         }
-        batch.end()
     }
 
     fun dispose() {
