@@ -313,6 +313,7 @@ class GameScreen(game: LGCGame,
                 constantsConfig,
                 batch
         )
+        val tileSize = GameScreen.tileSize
         worldMap = WorldMap()
         if (isFirstLevelPassed) {
             player = Player(2f * tileSize, 2f * tileSize)
