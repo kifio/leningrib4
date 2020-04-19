@@ -7,13 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import kifio.leningrib.model.actors.Forester;
-import kifio.leningrib.model.actors.Player;
+import kifio.leningrib.model.actors.game.Forester;
+import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
-import kifio.leningrib.model.speech.SpeechManager;
+import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class ForestersManager extends ObjectsManager<Forester> {
@@ -33,14 +32,14 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		for (int i = 0; i < foresters.size; i++) {
 			Forester f = foresters.get(i);
 
-			String speech = SpeechManager.getInstance().getForesterPatrolSpeech();
+			String speech = LabelManager.getInstance().getForesterPatrolSpeech();
 			String[] words = speech.split(" ");
-			float w = SpeechManager.getInstance().getLabelWidth(words);
+			float w = LabelManager.getInstance().getLabelWidth(words);
 
 			float x = f.getNewSpeechX(w);
 			float y = f.getNewSpeechY();
 
-			speeches[i] = SpeechManager.getInstance().getLabel(speech, x, y,
+			speeches[i] = LabelManager.getInstance().getLabel(speech, x, y,
 					w, Forester.DEFAULT_SPEECH_COLOR);
 		}
 	}
@@ -89,12 +88,12 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			speeches[index].remove();
 		} else if (forester.isShouldResetSpeech()) {
 			String[] words = forester.speech.split(" ");
-			float w = SpeechManager.getInstance().getLabelWidth(words);
+			float w = LabelManager.getInstance().getLabelWidth(words);
 
 			float x = forester.getNewSpeechX(w);
 			float y = forester.getNewSpeechY();
 			speeches[index].remove();
-			speeches[index] = SpeechManager.getInstance().getLabel(forester.speech, x, y, w, forester.speechColor);
+			speeches[index] = LabelManager.getInstance().getLabel(forester.speech, x, y, w, forester.speechColor);
 		} else {
 			speeches[index].setX(forester.getNewSpeechX(speeches[index].getWidth()));
 			speeches[index].setY(forester.getNewSpeechY());

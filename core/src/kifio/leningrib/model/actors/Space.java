@@ -1,11 +1,7 @@
 package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import kifio.leningrib.model.speech.SpeechManager;
+
 import kifio.leningrib.screens.GameScreen;
 
 public class Space extends MovableActor {

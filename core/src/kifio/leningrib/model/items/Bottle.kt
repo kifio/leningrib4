@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.Array
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.Forester
+import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.screens.GameScreen
 
 enum class BottleState {

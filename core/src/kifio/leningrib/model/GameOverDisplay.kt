@@ -1,11 +1,8 @@
 package kifio.leningrib.model
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Rectangle
-import kifio.leningrib.model.speech.SpeechManager
+import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
-import kifio.leningrib.view.WorldRenderer
 import java.util.*
 
 class GameOverDisplay(val mushroomsCount: Int,
@@ -31,8 +28,8 @@ class GameOverDisplay(val mushroomsCount: Int,
 
     init {
         label = String.format(Locale.getDefault(), GAME_OVER_TEXT, mushroomsCount)
-        labelX = Gdx.graphics.width / 2f - SpeechManager.getInstance().getTextWidth(label) / 2
-        labelY = cameraY - SpeechManager.getInstance().getTextHeight(label) / 2
+        labelX = Gdx.graphics.width / 2f - LabelManager.getInstance().getTextWidth(label) / 2
+        labelY = cameraY - LabelManager.getInstance().getTextHeight(label) / 2
 
         val x = Gdx.graphics.width / 2f
         val y = (cameraY - Gdx.graphics.height / 2f) + 3f * GameScreen.tileSize

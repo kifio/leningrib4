@@ -1,6 +1,5 @@
 package kifio.leningrib.screens
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Screen
@@ -11,12 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import kifio.leningrib.LGCGame
-import kifio.leningrib.model.GameOverDisplay
-import kifio.leningrib.model.speech.SpeechManager
+import kifio.leningrib.model.speech.LabelManager
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import java.util.*
 
 class MenuScreen(game: LGCGame?) : InputAdapter(), Screen {
 
@@ -93,10 +89,10 @@ class MenuScreen(game: LGCGame?) : InputAdapter(), Screen {
 
     private fun getMenuLabel(text: String, order: Int): Label {
         val scale = 2f
-        val w = SpeechManager.getInstance().getTextWidth(text) * scale
-        val h = SpeechManager.getInstance().getTextHeight(text) * scale
+        val w = LabelManager.getInstance().getTextWidth(text) * scale
+        val h = LabelManager.getInstance().getTextHeight(text) * scale
         val x = Gdx.graphics.width / 2f - w / 2
         val y = Gdx.graphics.height / 2f - h / 2
-        return SpeechManager.getInstance().getLabel(text, x, y, scale, w, textColor)
+        return LabelManager.getInstance().getLabel(text, x, y, scale, w, textColor)
     }
 }

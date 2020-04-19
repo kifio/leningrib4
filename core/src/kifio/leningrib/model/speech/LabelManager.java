@@ -9,68 +9,71 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 
 import kifio.leningrib.model.ResourcesManager;
-import kifio.leningrib.screens.GameScreen;
 
-import static com.badlogic.gdx.graphics.Texture.TextureFilter.Linear;
-import static com.badlogic.gdx.graphics.Texture.TextureFilter.MipMapNearestNearest;
 import static com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest;
-import static com.badlogic.gdx.math.MathUtils.floor;
 import static com.badlogic.gdx.math.MathUtils.random;
 
 /**
  * Created by kifio on 19/02/2018.
  */
-public class SpeechManager {
+public class LabelManager {
 
-	private static BitmapFont bitmapFont;
+	private static BitmapFont smallLabelsFont;
+	private static BitmapFont largeTitleFont;
 	private GlyphLayout glyphLayout = new GlyphLayout();
 	private Label.LabelStyle labelStyle = new Label.LabelStyle();
 
-	private static SpeechManager speechManager;
+	private static LabelManager speechManager;
 
-	public static SpeechManager getInstance() {
+	public static LabelManager getInstance() {
 		if (speechManager == null) {
-			speechManager = new SpeechManager();
+			speechManager = new LabelManager();
 		}
 		return speechManager;
 	}
 
-	private SpeechManager() {
-		bitmapFont = generateFont();
-		bitmapFont.getData().setScale(Gdx.graphics.getDensity());
-		labelStyle.font = bitmapFont;
-		labelStyle.fontColor = Color.WHITE;
+	private LabelManager() {
+		smallLabelsFont = generateFont(false);
+		largeTitleFont = generateFont(true);
+//		smallLabelsFont.getData().setScale(Gdx.graphics.getDensity());
+		labelStyle.font = smallLabelsFont;
+//		labelStyle.fontColor = Color.WHITE;
 	}
 
-	private BitmapFont generateFont() {
+	private BitmapFont generateFont(boolean withShadows) {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
-		BitmapFont font = generator.generateFont(getFontParameter());
+		BitmapFont font = generator.generateFont(getFontParameters(false));
 		generator.dispose();
 		return font;
 	}
 
-	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameter() {
+	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameters(boolean withShadow) {
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		parameter.characters =
 			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}@";
 		parameter.color = Color.WHITE;
 		parameter.minFilter = Nearest;
 		parameter.magFilter = Nearest;
+
+		if (withShadow) {
+			parameter.shadowOffsetY = 1;
+		}
+
 		return parameter;
 	}
 
 	public float getTextWidth(String text) {
-		glyphLayout.setText(bitmapFont, text);
+		glyphLayout.setText(smallLabelsFont, text);
 		return glyphLayout.width;
 	}
 
 	public float getTextHeight(String text) {
-		glyphLayout.setText(bitmapFont, text);
+		glyphLayout.setText(smallLabelsFont, text);
 		return glyphLayout.height;
 	}
 
 	public BitmapFont getBitmapFont() {
-		return bitmapFont;
+		return smallLabelsFont;
 	}
 
 	public String getRandomMushroomSpeech() {
@@ -153,7 +156,23 @@ public class SpeechManager {
 		return label;
 	}
 
-	public float getLabelWidth(String[] words) {
+//	public Label getLaunchScreenLabel() {
+//		String text = "LENIN\nGRIB";
+//		Label label = new Label(text, labelStyle);
+//
+//		label.setWrap(true);
+//		label.setColor(0.249F, 0.218F, 0.74F, 1F);
+//
+//		float labelWidth = getTextWidth("LENIN");
+//		float targetWidth = Gdx.graphics.getWidth() - (40 * 2);
+//		float scale = targetWidth / labelWidth;
+//		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
+//
+//
+//
+//	}
+
+	public float getLabelWidth(String... words) {
 		float maxLabelWidth = 0;
 		for (String word : words) {
 			float w = getTextWidth(word);

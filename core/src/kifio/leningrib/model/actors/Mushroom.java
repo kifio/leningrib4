@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import kifio.leningrib.model.speech.SpeechManager;
+import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class Mushroom extends MovableActor {
@@ -30,6 +30,7 @@ public class Mushroom extends MovableActor {
 
     private Effect effect = Effect.NO_EFFECT;
     private boolean isEaten = false;
+    private float scale = 1f;
 
     public Mushroom(int x, int y, boolean hasEffect) {
         super(x, y);
@@ -48,6 +49,13 @@ public class Mushroom extends MovableActor {
         this.effect = effect;
         speechColor.set(effect.color);
     }
+
+    public Mushroom(int x, int y, Effect effect, float scale) {
+        super(x, y);
+        this.effect = effect;
+        this.scale = scale;
+        speechColor.set(effect.color);
+    }
     
     @Override public void act(float delta) {
         super.act(delta);
@@ -57,8 +65,9 @@ public class Mushroom extends MovableActor {
         if (isEaten) return;
         float x = getX();
         float y = getY();
-        bounds.set(x, y, GameScreen.tileSize, GameScreen.tileSize);
-        batch.draw(getTextureRegion(), x, y, getDrawingWidth(), getDrawingHeight());
+        float size = GameScreen.tileSize * scale;
+        bounds.set(x, y, size, size);
+        batch.draw(getTextureRegion(), x, y, size, size);
     }
 
     public String getEffectName() {
@@ -71,15 +80,15 @@ public class Mushroom extends MovableActor {
 
     public String getSpeech() {
         if (effect == Mushroom.Effect.POWER) {
-            return SpeechManager.getInstance().getPowerMushroomSpeech();
+            return LabelManager.getInstance().getPowerMushroomSpeech();
         } else if (effect == Mushroom.Effect.SPEED) {
-            return SpeechManager.getInstance().getSpeedMushroomSpeech();
+            return LabelManager.getInstance().getSpeedMushroomSpeech();
         } else if (effect == Mushroom.Effect.DEXTERITY) {
-            return SpeechManager.getInstance().getDexterityMushroomSpeech();
+            return LabelManager.getInstance().getDexterityMushroomSpeech();
         } else if (effect == Mushroom.Effect.INVISIBLE) {
-            return SpeechManager.getInstance().getInvisibilityMushroomSpeech();
+            return LabelManager.getInstance().getInvisibilityMushroomSpeech();
         } else {
-            return SpeechManager.getInstance().getRandomMushroomSpeech();
+            return LabelManager.getInstance().getRandomMushroomSpeech();
         }
     }
 
@@ -134,12 +143,12 @@ public class Mushroom extends MovableActor {
 
     @Override
     protected float getDrawingWidth() {
-        return GameScreen.tileSize;
+        return GameScreen.tileSize * scale;
     }
 
     @Override
     protected float getDrawingHeight() {
-        return GameScreen.tileSize;
+        return GameScreen.tileSize * scale;
     }
 
     @Override

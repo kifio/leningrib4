@@ -4,11 +4,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import generator.Config;
-import java.util.concurrent.ThreadLocalRandom;
-import kifio.leningrib.Utils;
-import kifio.leningrib.model.actors.Player;
+import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.actors.Space;
-import kifio.leningrib.screens.GameScreen;
 
 public class SpaceManager {
 

@@ -1,14 +1,13 @@
-package kifio.leningrib.model.actors;
+package kifio.leningrib.model.actors.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import java.util.ArrayList;
-import java.util.List;
-import kifio.leningrib.model.speech.SpeechManager;
+
+import kifio.leningrib.model.actors.MovableActor;
+import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class Grandma extends MovableActor {
@@ -35,7 +34,7 @@ public class Grandma extends MovableActor {
         speechX = x - GameScreen.tileSize / 2f;
         speechY = y;
 
-        grandmaLabel = SpeechManager.getInstance().getLabel("Ты гляди, че делает!", speechX,
+        grandmaLabel = LabelManager.getInstance().getLabel("Ты гляди, че делает!", speechX,
             y + GameScreen.tileSize, GameScreen.tileSize * 3);
 
 //        greetings.add(SpeechManager.getInstance().getLabel("Немытые грибы с земли срывает да ест!", speechX,
@@ -118,8 +117,8 @@ public class Grandma extends MovableActor {
             seq.addAction(Actions.delay(duration));
             seq.addAction(Actions.run(new Runnable() {
                 @Override public void run() {
-                    grandmaLabel = SpeechManager.getInstance().getLabel(
-                        SpeechManager.getInstance().getGrandmaSpeech(index), speechX,
+                    grandmaLabel = LabelManager.getInstance().getLabel(
+                        LabelManager.getInstance().getGrandmaSpeech(index), speechX,
                         speechY + GameScreen.tileSize, GameScreen.tileSize * 3);
 
 //                    grandmaLabel.setText(SpeechManager.getInstance().getGrandmaSpeech(index));

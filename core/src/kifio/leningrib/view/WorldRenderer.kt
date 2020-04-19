@@ -10,18 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
 import generator.Config
 import kifio.leningrib.LGCGame
-import kifio.leningrib.Utils
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
 import kifio.leningrib.model.PauseDisplay
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.Forester
-import kifio.leningrib.model.actors.Grandma
+import kifio.leningrib.model.actors.game.Forester
+import kifio.leningrib.model.actors.game.Grandma
 import kifio.leningrib.model.actors.Mushroom
-import kifio.leningrib.model.actors.Player
-import kifio.leningrib.model.items.Bottle
-import kifio.leningrib.model.speech.SpeechManager
+import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
 
 class WorldRenderer(private var camera: OrthographicCamera?,
@@ -53,7 +51,7 @@ class WorldRenderer(private var camera: OrthographicCamera?,
 
     private fun drawGameOverText(it: GameOverDisplay) {
         batch.begin()
-        SpeechManager.getInstance().bitmapFont.draw(batch, it.label, it.labelX, it.labelY)
+        LabelManager.getInstance().bitmapFont.draw(batch, it.label, it.labelX, it.labelY)
         batch.draw(it.menu, it.menuX, it.menuY, it.menuSize, it.menuSize)
         batch.draw(it.restart, it.restartX, it.restartY, it.restartSize, it.restartSize)
         batch.end()

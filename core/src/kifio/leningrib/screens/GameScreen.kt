@@ -18,20 +18,18 @@ import kifio.leningrib.levels.LevelFabric
 import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
 import kifio.leningrib.model.PauseDisplay
-import kifio.leningrib.model.actors.Player
+import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.view.WorldRenderer
 import model.WorldMap
 
 class GameScreen(game: LGCGame,
-                 public var constantsConfig: Config) : InputAdapter(), Screen {
+                 val camera: OrthographicCamera,
+                 var constantsConfig: Config) : InputAdapter(), Screen {
 
     private val game: LGCGame?
     private var worldRenderer: WorldRenderer?
-    private var camera: OrthographicCamera = OrthographicCamera()
     private val bottles = ArrayList<Bottle>()
-    private var cameraWidth = 0
-    private var cameraHeight = 0
     private var win = false
     private var nextLevelX = 0
     private var nextLevelY = 0
@@ -63,29 +61,12 @@ class GameScreen(game: LGCGame,
     private var gameOverDisplay: GameOverDisplay? = null
     private var pauseDisplay: PauseDisplay? = null
 
-    // Инициализирует камеру ортгональную карте
-    private fun initCamera() {
-        val width = Gdx.graphics.width
-        val height = Gdx.graphics.height
-
-        // create the camera and the batch
-        camera.setToOrtho(false, width.toFloat(), height.toFloat())
-    }
 
     private fun updateCamera(player: Player) {
         camera.update()
         if (player.y < bottomCameraThreshold) {
             camera.position.y = bottomCameraThreshold
         } else camera.position.y = player.y.coerceAtMost(topCameraThreshold)
-    }
-
-    // Инициализирует размер экрана.
-    // Экран разбит на квадарты, здесь задается количество квадратов по ширине,
-    // в зависимости от этого рассчитывается количество кадратов по высоте
-    private fun initScreenSize() {
-        cameraWidth = constantsConfig.levelWidth
-        tileSize = Gdx.graphics.width / cameraWidth
-        cameraHeight = Gdx.graphics.height / tileSize + 1
     }
 
     private fun getNextLevel(x: Int, y: Int): Level {
@@ -298,8 +279,6 @@ class GameScreen(game: LGCGame,
 
     init {
         Gdx.input.inputProcessor = this
-        initScreenSize()
-        initCamera()
         bottomCameraThreshold = Gdx.graphics.height / 2f
         topCameraThreshold = constantsConfig.levelHeight * tileSize - Gdx.graphics.height / 2f
         xLimit = Gdx.graphics.width - tileSize.toFloat()

@@ -1,4 +1,4 @@
-package kifio.leningrib.model.actors;
+package kifio.leningrib.model.actors.game;
 
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.graphics.Color;
@@ -15,9 +15,11 @@ import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 import kifio.leningrib.Utils;
+import kifio.leningrib.model.actors.ForesterStateMachine;
+import kifio.leningrib.model.actors.MovableActor;
 import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
-import kifio.leningrib.model.speech.SpeechManager;
+import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class Forester extends MovableActor {
@@ -138,7 +140,7 @@ public class Forester extends MovableActor {
         switch (state) {
             case PATROL:
                 speechColor = Forester.DEFAULT_SPEECH_COLOR;
-                speech = SpeechManager.getInstance().getForesterPatrolSpeech();
+                speech = LabelManager.getInstance().getForesterPatrolSpeech();
 
                 if (wasChanged) {
                     stopTime = 0f;
@@ -146,20 +148,20 @@ public class Forester extends MovableActor {
                 }
 
                 if (player.isInvisible()) {
-                    speech = SpeechManager.getInstance().getForesterInvisiblePlayerSpeech();
+                    speech = LabelManager.getInstance().getForesterInvisiblePlayerSpeech();
                 }
 
                 replaceAnimation(Forester.IDLE, Forester.RUN);
                 break;
             case SCARED:
-                speech = SpeechManager.getInstance().getForesterScaredSpeech();
+                speech = LabelManager.getInstance().getForesterScaredSpeech();
                 break;
 
             case PURSUE:
                 speechColor = Forester.AGGRESSIVE_SPEECH_COLOR;
 
                 if (wasChanged) {
-                    speech = SpeechManager.getInstance().getForesterPursuitSpeech();
+                    speech = LabelManager.getInstance().getForesterPursuitSpeech();
                 }
 
                 replaceAnimation(Forester.IDLE, Forester.RUN);
@@ -169,7 +171,7 @@ public class Forester extends MovableActor {
                 speechColor = Forester.DEFAULT_SPEECH_COLOR;
 
                 if (wasChanged) {
-                    speech = SpeechManager.getInstance().getForesterStopSpeech();
+                    speech = LabelManager.getInstance().getForesterStopSpeech();
                     stop();
                 }
 
@@ -187,7 +189,7 @@ public class Forester extends MovableActor {
             case RUN_TO_BOTTLE:
                 speechColor = Forester.DEFAULT_SPEECH_COLOR;
                 if (wasChanged) {
-                    speech = SpeechManager.getInstance().getForesterRunToBottleSpeech();
+                    speech = LabelManager.getInstance().getForesterRunToBottleSpeech();
                 }
                 replaceAnimation(Forester.IDLE, Forester.RUN);
                 break;
@@ -195,7 +197,7 @@ public class Forester extends MovableActor {
             case DRINKING:
                 speechColor = Forester.DEFAULT_SPEECH_COLOR;
                 if (wasChanged) {
-                    speech = SpeechManager.getInstance().getForesterDrinkingSpeech();
+                    speech = LabelManager.getInstance().getForesterDrinkingSpeech();
                 }
                 replaceAnimation(Forester.RUN, Forester.IDLE);
                 break;
@@ -204,7 +206,7 @@ public class Forester extends MovableActor {
                 nearestBottle = null;
                 if (wasChanged) {
                     stopTime = 0;
-                    speech = SpeechManager.getInstance().getForesterDrunkSpeech();
+                    speech = LabelManager.getInstance().getForesterDrunkSpeech();
                 }
                 break;
         }

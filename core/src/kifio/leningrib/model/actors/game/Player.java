@@ -1,7 +1,5 @@
-package kifio.leningrib.model.actors;
+package kifio.leningrib.model.actors.game;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -15,6 +13,8 @@ import kifio.leningrib.Utils;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.UIState;
+import kifio.leningrib.model.actors.MovableActor;
+import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
 

@@ -8,13 +8,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import kifio.leningrib.model.actors.Forester;
+import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.Mushroom;
-import kifio.leningrib.model.speech.SpeechManager;
+import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 import model.Exit;
 import model.LevelMap;
-import model.Room;
 import model.Segment;
 
 // Chad first level config generator.
@@ -128,10 +127,10 @@ public class FirstLevelBuilder {
 
 		Label[] list = new Label[2];
 
-		list[0] = (SpeechManager.getInstance().getLabel("Нажимай на экран, чтобы перемещать персонажа",
+		list[0] = (LabelManager.getInstance().getLabel("Нажимай на экран, чтобы перемещать персонажа",
 			(Gdx.graphics.getWidth() - labelWidth) / 2,GameScreen.tileSize * 4, GameScreen.tileSize * 4));
 
-		list[1] = (SpeechManager.getInstance().getLabel("Ты всегда можешь покинуть уровень через выход справа или сверху",
+		list[1] = (LabelManager.getInstance().getLabel("Ты всегда можешь покинуть уровень через выход справа или сверху",
 			(Gdx.graphics.getWidth() - labelWidth) / 2 + GameScreen.tileSize,
 			GameScreen.tileSize * 12 + GameScreen.tileSize / 2, GameScreen.tileSize * 4));
 

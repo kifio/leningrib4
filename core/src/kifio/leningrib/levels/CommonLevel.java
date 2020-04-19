@@ -1,7 +1,6 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
@@ -10,8 +9,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import generator.Config;
 import kifio.leningrib.Utils;
 import kifio.leningrib.levels.helpers.TreesManager;
-import kifio.leningrib.model.actors.Forester;
-import kifio.leningrib.model.actors.Grandma;
+import kifio.leningrib.model.actors.game.Forester;
+import kifio.leningrib.model.actors.game.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;

@@ -1,7 +1,6 @@
 package kifio.leningrib.levels.helpers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,8 +9,8 @@ import com.badlogic.gdx.utils.Array;
 import java.util.concurrent.ThreadLocalRandom;
 
 import kifio.leningrib.model.actors.Mushroom;
-import kifio.leningrib.model.actors.Player;
-import kifio.leningrib.model.speech.SpeechManager;
+import kifio.leningrib.model.actors.game.Player;
+import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class MushroomsManager extends ObjectsManager<Mushroom> {
@@ -75,7 +74,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         if (shouldAddSpeech(player) && speeches[index] == null) {
             String speech = m.getSpeech();
             String[] words = speech.split(" ");
-            float w = SpeechManager.getInstance().getLabelWidth(words);
+            float w = LabelManager.getInstance().getLabelWidth(words);
             float x = m.getX() - (0.5f * w) + (0.5f * GameScreen.tileSize);
 
             float yOffset = 1.2f * GameScreen.tileSize;
@@ -83,7 +82,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
                 yOffset *= 0.6;
             }
             float y = m.getY() + yOffset;
-            speeches[index] = SpeechManager.getInstance().getLabel(speech, x, y, w, m.getSpeechColor());
+            speeches[index] = LabelManager.getInstance().getLabel(speech, x, y, w, m.getSpeechColor());
             speeches[index].addAction(getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index));
         }
     }
