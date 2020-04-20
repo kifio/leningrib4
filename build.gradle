@@ -76,7 +76,6 @@ project(":ios") {
         implementation "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
-
     }
 }
 
@@ -102,6 +101,7 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         implementation project (":generator")
+        implementation "org.mini2Dx:universal-tween-engine:6.3.3"
     }
 }
 

@@ -1,15 +1,10 @@
 package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.utils.viewport.ScreenViewport
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
@@ -17,23 +12,25 @@ import kifio.leningrib.levels.Level
 import kifio.leningrib.levels.LevelFabric
 import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
-import kifio.leningrib.model.PauseDisplay
+import kifio.leningrib.model.MenuDisplay
 import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.view.WorldRenderer
+import model.LevelMap
 import model.WorldMap
 
-class GameScreen(game: LGCGame,
-                 val camera: OrthographicCamera,
-                 var constantsConfig: Config) : InputAdapter(), Screen {
+class GameScreen(game: LGCGame?,
+                 camera: OrthographicCamera,
+                 var worldMap: WorldMap,
+                 levelMap: LevelMap,    // Уровень конструируется с координатами 0,0. Карта уровня долго генерируется первый раз, передаем ее снаружи.
+                 var constantsConfig: Config
+) : BaseScreen(game, camera) {
 
-    private val game: LGCGame?
     private var worldRenderer: WorldRenderer?
     private val bottles = ArrayList<Bottle>()
     private var win = false
     private var nextLevelX = 0
     private var nextLevelY = 0
-    private var stage: Stage
     private var level: Level
     private var gameOverTime = 0f
 
@@ -42,9 +39,6 @@ class GameScreen(game: LGCGame,
 
     @JvmField
     var isFirstLevelPassed = true
-
-    @JvmField
-    var worldMap: WorldMap
 
     @JvmField
     var player: Player
@@ -59,18 +53,23 @@ class GameScreen(game: LGCGame,
 
     private val headsUpDisplay = HeadsUpDisplay()
     private var gameOverDisplay: GameOverDisplay? = null
-    private var pauseDisplay: PauseDisplay? = null
+    private var menuDisplay: MenuDisplay? = null
 
 
     private fun updateCamera(player: Player) {
-        camera.update()
-        if (player.y < bottomCameraThreshold) {
-            camera.position.y = bottomCameraThreshold
-        } else camera.position.y = player.y.coerceAtMost(topCameraThreshold)
+        camera?.let {
+            it.update()
+            it.position.y = if (player.y < bottomCameraThreshold) {
+                bottomCameraThreshold
+            } else {
+                player.y.coerceAtMost(topCameraThreshold)
+            }
+        }
     }
 
     private fun getNextLevel(x: Int, y: Int): Level {
-        return LevelFabric.getNextLevel(x, y, this)
+        val levelMap = worldMap.addLevel(x, y, constantsConfig)
+        return LevelFabric.getNextLevel(x, y, this, levelMap)
     }
 
     /*
@@ -81,9 +80,9 @@ class GameScreen(game: LGCGame,
     override fun render(delta: Float) {
         if (isGameOver() && gameOverTime < GAME_OVER_ANIMATION_TIME) {
             gameOverTime += delta
-            update(delta, camera.position.y)
+            update(delta)
             if (!win && gameOverDisplay == null) {
-                gameOverDisplay = GameOverDisplay(player.mushroomsCount ?: 0, camera.position.y)
+                gameOverDisplay = GameOverDisplay(player.mushroomsCount, getCameraPositionY())
             }
             worldRenderer!!.renderBlackScreen(gameOverDisplay, gameOverTime, GAME_OVER_ANIMATION_TIME, level, stage)
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
@@ -95,19 +94,19 @@ class GameScreen(game: LGCGame,
             win = false
         } else if (!gameOver) {
             updateCamera(level.player)
-            update(delta, camera.position.y)
+            update(delta)
             val maxX = tileSize * constantsConfig.levelWidth.toFloat()
-            val maxY = camera.position.y + Gdx.graphics.height / 2f
+            val maxY = getCameraPositionY() + Gdx.graphics.height / 2f
             headsUpDisplay.setPauseButtonPosition(maxX, maxY)
             headsUpDisplay.setItemsPosition(maxX, maxY, null)
-            if (pauseDisplay == null) {
+            if (menuDisplay == null) {
                 stage.act(Gdx.graphics.deltaTime)
             }
-            worldRenderer!!.render(level, stage, headsUpDisplay, pauseDisplay)
+            worldRenderer!!.render(level, stage, headsUpDisplay, menuDisplay)
         }
     }
 
-    private fun update(delta: Float, cameraPositionY: Float) {
+    private fun update(delta: Float) {
         for (b in bottles) {
             if (b.isRemovable()) {
                 b.remove()
@@ -122,10 +121,10 @@ class GameScreen(game: LGCGame,
         }
         addSpeechesToStage(level.mushroomsSpeeches)
         addSpeechesToStage(level.forestersSpeeches)
-        updateWorld(delta, cameraPositionY)
+        updateWorld(delta)
     }
 
-    private fun updateWorld(delta: Float, cameraPositionY: Float) {
+    private fun updateWorld(delta: Float) {
         if (!isGameOver() && level.player.y >= yLimit) {
             nextLevelY++
             win = true
@@ -135,7 +134,9 @@ class GameScreen(game: LGCGame,
             win = true
             return
         }
-        level.update(delta, bottles, cameraPositionY, pauseDisplay != null)
+        camera?.position?.y?.let {
+            level.update(delta, bottles, it,menuDisplay != null)
+        }
     }
 
     private fun addSpeechesToStage(speeches: Array<Label?>) {
@@ -202,7 +203,7 @@ class GameScreen(game: LGCGame,
     override fun touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
         val touchX = x.mapX()
         val touchY = y.mapYToLevel()
-
+        stage.touchDown(x, y, pointer, button)
         if (headsUpDisplay.getPauseButtonPosition().contains(touchX, touchY)) {
             headsUpDisplay.isPauseButtonPressed = true
         } else {
@@ -217,6 +218,7 @@ class GameScreen(game: LGCGame,
     override fun touchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
         val touchX = x.mapX()
         val touchY = y.mapYToLevel()
+        stage.touchUp(x, y, pointer, button)
         if (!isGameOver()) {
             when {
                 headsUpDisplay.selectedItem != -1 -> {
@@ -225,11 +227,7 @@ class GameScreen(game: LGCGame,
                 }
                 headsUpDisplay.isPauseButtonPressed -> {
                     headsUpDisplay.isPauseButtonPressed = false
-                    pauseDisplay = PauseDisplay(camera.position.y)
-                }
-                pauseDisplay?.isMenuTouched(touchX, touchY) == true -> game?.showMenuScreen()
-                pauseDisplay?.isResumeTouched(touchX, touchY) == true -> {
-                    pauseDisplay = null
+                    menuDisplay = MenuDisplay(getCameraPositionY(), "foo", stage)
                 }
                 else -> level.movePlayerTo(x.mapX(), y.mapYToLevel())
             }
@@ -238,10 +236,12 @@ class GameScreen(game: LGCGame,
                 gameOverDisplay?.isRestartTouched(touchX, touchY) == true -> {
                     headsUpDisplay.isPauseButtonPressed = false
                     headsUpDisplay.selectedItem = -1
-                    game?.showGameScreen()
+                    val worldMap = WorldMap()
+                    val levelMap = worldMap.addLevel(0,0, constantsConfig)
+                    game?.showGameScreen(worldMap, levelMap)
                 }
                 gameOverDisplay?.isMenuTouched(touchX, touchY) == true -> {
-                    game?.showMenuScreen()
+
                 }
             }
             dispose()
@@ -251,7 +251,7 @@ class GameScreen(game: LGCGame,
 
     private fun Int.mapX(): Float = this.toFloat()
     private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
-    private fun Int.mapYToLevel(): Float = camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
+    private fun Int.mapYToLevel(): Float = getCameraPositionY() - Gdx.graphics.height / 2f + mapYToScreen()
 
     private fun setupVodka() {
         val playerX = Utils.mapCoordinate(player.x)
@@ -283,23 +283,18 @@ class GameScreen(game: LGCGame,
         topCameraThreshold = constantsConfig.levelHeight * tileSize - Gdx.graphics.height / 2f
         xLimit = Gdx.graphics.width - tileSize.toFloat()
         yLimit = (constantsConfig.levelHeight - 1) * tileSize.toFloat()
-        this.game = game
-        val batch = SpriteBatch()
-        batch.enableBlending()
-        stage = Stage(ScreenViewport(camera), batch)
         worldRenderer = WorldRenderer(
                 camera,
                 constantsConfig,
-                batch
+                spriteBatch
         )
-        val tileSize = GameScreen.tileSize
-        worldMap = WorldMap()
         if (isFirstLevelPassed) {
             player = Player(2f * tileSize, 2f * tileSize)
         } else {
             player = Player(2f * tileSize, 0f)
         }
-        level = getNextLevel(nextLevelX, nextLevelY)
+        level = LevelFabric.getNextLevel(0, 0, this, levelMap)
         resetStage()
+        menuDisplay = MenuDisplay(getCameraPositionY(), "foo", stage)
     }
 }

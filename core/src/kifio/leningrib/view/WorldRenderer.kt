@@ -13,7 +13,7 @@ import kifio.leningrib.LGCGame
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.GameOverDisplay
 import kifio.leningrib.model.HeadsUpDisplay
-import kifio.leningrib.model.PauseDisplay
+import kifio.leningrib.model.MenuDisplay
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Grandma
@@ -60,7 +60,7 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     fun render(level: Level,
                stage: Stage,
                headsUpDisplay: HeadsUpDisplay?,
-               pauseDisplay: PauseDisplay?) {
+               menuDisplay: MenuDisplay?) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         drawGrass()
@@ -71,18 +71,18 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         batch.begin()
 
         headsUpDisplay?.let { drawHUD(it) }
-        pauseDisplay?.let { drawPauseInterface(it) }
+        menuDisplay?.let { drawPauseInterface(it) }
 
         batch.end()
     }
 
-    private fun drawPauseInterface(pauseDisplay: PauseDisplay) {
-        batch.draw(pauseDisplay.resume,
-                pauseDisplay.resumeX, pauseDisplay.resumeY,
-                pauseDisplay.resumeWidth, pauseDisplay.resumeHeight)
-        batch.draw(pauseDisplay.menu,
-                pauseDisplay.menuX, pauseDisplay.menuY,
-                pauseDisplay.menuWidth, pauseDisplay.menuHeight)
+    private fun drawPauseInterface(menuDisplay: MenuDisplay) {
+//        batch.draw(pauseDisplay.resume,
+//                pauseDisplay.resumeX, pauseDisplay.resumeY,
+//                pauseDisplay.resumeWidth, pauseDisplay.resumeHeight)
+//        batch.draw(pauseDisplay.menu,
+//                pauseDisplay.menuX, pauseDisplay.menuY,
+//                pauseDisplay.menuWidth, pauseDisplay.menuHeight)
     }
 
     private fun drawHUD(headsUpDisplay: HeadsUpDisplay) {

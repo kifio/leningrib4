@@ -37,9 +37,8 @@ public abstract class Level {
     private boolean isDisposed = false;
     private Rectangle[] rectangles;
 
-    Level(int x, int y, GameScreen gameScreen) {
+    Level(int x, int y, GameScreen gameScreen, LevelMap levelMap) {
         this.gameScreen = gameScreen;
-        LevelMap levelMap = getLevelMap(x, y);
         Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, gameScreen.getConstantsConfig());
 
         forestersManager = new ForestersManager(gameScreen,
@@ -77,8 +76,6 @@ public abstract class Level {
             f.initPath(forestGraph);
         }
     }
-
-    protected abstract LevelMap getLevelMap(int x, int y);
 
     protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager);
 

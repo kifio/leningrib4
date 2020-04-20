@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import java.util.*
 
-abstract class StaticActor(protected val region: TextureRegion) : Actor() {
+abstract class StaticActor(protected var region: TextureRegion) : Actor() {
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         super.draw(batch, parentAlpha)

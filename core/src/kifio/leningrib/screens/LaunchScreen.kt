@@ -1,26 +1,26 @@
 package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.graphics.OrthographicCamera
+import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.levels.LevelFabric
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.launch.LaunchProgressBar
 import kifio.leningrib.model.actors.launch.LaunchScreenLogo
 import kifio.leningrib.model.actors.launch.LaunchScreenTree
+import model.LevelMap
+import model.WorldMap
 
-class LaunchScreen(private var game: LGCGame?, camera: Camera) : InputAdapter(), Screen,
+class LaunchScreen(game: LGCGame?, camera: OrthographicCamera,
+                   private var config: Config?) :
+        BaseScreen(game, camera),
         ResourcesManager.ResourceLoadingListener {
 
-    private val spriteBatch = SpriteBatch()
-    private var stage: Stage = Stage(ScreenViewport(camera), spriteBatch)
+    private var accumulatedTime = 0f
+    private var finished: Boolean = false
 
     private val actors = arrayOf(
             LaunchScreenLogo(),
@@ -59,6 +59,21 @@ class LaunchScreen(private var game: LGCGame?, camera: Camera) : InputAdapter(),
         Gdx.gl.glClearColor(49 / 255f, 129 / 255f, 54f / 255f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+        if (accumulatedTime >= 2f && !finished) {
+            finished = true
+            LevelGenerationThread(config, this).start()
+        } else if (accumulatedTime >= 1.5f) {
+            ResourcesManager.initializeSpeeches()
+            onProgressChanged(100)
+        } else if (accumulatedTime >= 1f) {
+            ResourcesManager.buildRegions()
+            onProgressChanged(60)
+        } else if (accumulatedTime >= 0.5) {
+            ResourcesManager.loadAssets()
+            onProgressChanged(30)
+        }
+
+        accumulatedTime += delta
         stage.act(delta)
         stage.draw()
     }
@@ -69,22 +84,37 @@ class LaunchScreen(private var game: LGCGame?, camera: Camera) : InputAdapter(),
 
     override fun resize(width: Int, height: Int) {}
 
-    override fun dispose() {
-        game = null
+    override fun onProgressChanged(progress: Int) {
+        for (actor in actors) {
+            if (actor is LaunchProgressBar) {
+                actor.setProgress(progress)
+            }
+        }
     }
 
-    override fun onProgressChanged(progress: Int) {
-        Gdx.app.log("kifio", "Loading progress: " + progress)
+    private fun onFirstLevelCreated(worldMap: WorldMap, levelMap: LevelMap) {
         Gdx.app.postRunnable {
-            if (progress == 100) {
-                game?.showGameScreen()
-            } else {
-                for (actor in actors) {
-                    if (actor is LaunchProgressBar) {
-                        actor.setProgress(progress)
-                    }
-                }
+            config = null
+            game?.showGameScreen(worldMap, levelMap)
+        }
+    }
+
+    private class LevelGenerationThread(
+            private var config: Config?,
+            private var launchScreen: LaunchScreen?
+    ) : Thread() {
+
+        override fun run() {
+            super.run()
+            config?.let {
+                val worldMap = WorldMap()
+                val levelMap = worldMap.addLevel(0, 0, it)
+
+                launchScreen?.onFirstLevelCreated(worldMap, levelMap)
             }
+
+            config = null
+            launchScreen = null
         }
     }
 }

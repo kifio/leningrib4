@@ -20,12 +20,8 @@ public class CommonLevel extends Level {
 	private static final int MIN_STEP = 1;
 	private static final int MAX_STEP = 4;
 
-	CommonLevel(int x, int y, GameScreen gameScreen) {
-		super(x, y, gameScreen);
-	}
-
-	@Override protected LevelMap getLevelMap(int x, int y) {
-		return gameScreen.worldMap.addLevel(x, y, gameScreen.getConstantsConfig());
+	CommonLevel(int x, int y, GameScreen gameScreen, LevelMap levelMap) {
+		super(x, y, gameScreen, levelMap);
 	}
 
 	@Override protected Array<Mushroom> initMushrooms(Config config, TreesManager treesManager) {
