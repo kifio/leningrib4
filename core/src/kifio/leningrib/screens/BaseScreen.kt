@@ -10,19 +10,17 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import kifio.leningrib.LGCGame
 import kifio.leningrib.levels.Level
 import kifio.leningrib.levels.LevelFabric
+import kifio.leningrib.model.MenuDisplay
 
-abstract class BaseScreen(var game: LGCGame?,
-                          var camera: OrthographicCamera?) : InputAdapter(), Screen {
+abstract class BaseScreen(var game: LGCGame) : InputAdapter(), Screen {
 
     val spriteBatch = SpriteBatch()
-    var stage: Stage = Stage(ScreenViewport(camera), spriteBatch)
+    var stage: Stage = Stage(ScreenViewport(game.camera), spriteBatch)
 
     override fun dispose() {
-        game = null
-        camera = null
         stage.dispose()
         spriteBatch.dispose()
     }
 
-    protected fun getCameraPositionY() = camera?.position?.y ?: Gdx.graphics.height / 2f
+    protected fun getCameraPositionY() = game.camera.position.y ?: Gdx.graphics.height / 2f
 }

@@ -11,11 +11,6 @@ class MenuDisplay(cameraY: Float,
                   private val stage: Stage) {
 
     init {
-        val startGameButton = StartGameButton(
-                ResourcesManager.getRegion(ResourcesManager.START_GAME_PRESSED),
-                ResourcesManager.getRegion(ResourcesManager.START_GAME)
-        )
 
-        stage.addActor(startGameButton)
     }
 }

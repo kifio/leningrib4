@@ -35,6 +35,7 @@ public class Forester extends MovableActor {
 
     private final String running;
     private final String idle;
+    private boolean isPaused = true;
 
 //    private DefaultGraphPath<Vector2> tPath = new DefaultGraphPath<>();
     private ForesterStateMachine foresterStateMachine = new ForesterStateMachine();
@@ -107,7 +108,10 @@ public class Forester extends MovableActor {
     public void updateMovementState(Player player,
                                     ArrayList<Bottle> bottles,
                                     float delta,
-                                    ForestGraph forestGraph) {
+                                    ForestGraph forestGraph,
+                                    boolean isPaused) {
+
+        this.isPaused = isPaused;
 
         int px = player.getOnLevelMapX();
         int py = player.getOnLevelMapY();
@@ -212,6 +216,12 @@ public class Forester extends MovableActor {
         }
 
         movingState = state;
+    }
+
+    @Override
+    public void act(float delta) {
+        if (isPaused) return;
+        super.act(delta);
     }
 
     private void replaceAnimation(String from, String to) {

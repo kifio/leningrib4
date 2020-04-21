@@ -5,6 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.Array
 import generator.Config
 import generator.SegmentType
+import kifio.leningrib.LGCGame.Companion.LEVEL_HEIGHT
+import kifio.leningrib.LGCGame.Companion.LEVEL_WIDTH
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.TreePart
 import kifio.leningrib.screens.GameScreen
@@ -18,7 +20,7 @@ class TreesManager {
     private val topBorderNonObstaclesTrees = Array<TreePart>()
     private val innerBorderTrees = Array<TreePart>()
 
-    fun buildTrees(levelMap: LevelMap, constantsConfig: Config) {
+    fun buildTrees(levelMap: LevelMap) {
         for (s in levelMap.getSegments()) {
             val tree = getActorFromCell(s.getValue(), s.x * GameScreen.tileSize, s.y * GameScreen.tileSize)
             if (tree != null) {
@@ -36,7 +38,7 @@ class TreesManager {
                     }
                 }
 
-                if (s.x == 0 || s.y == 0 || s.x == constantsConfig.levelWidth - 1 || s.y == constantsConfig.levelHeight - 1) {
+                if (s.x == 0 || s.y == 0 || s.x == LEVEL_WIDTH - 1 || s.y == LEVEL_HEIGHT - 1) {
                     outerTrees.add(tree)
                 } else {
                     innerBorderTrees.add(tree)
@@ -59,7 +61,7 @@ class TreesManager {
 
         private fun getActorFromCell(segmentType: SegmentType, x: Int, y: Int): TreePart? {
             val region: TextureRegion = ResourcesManager.getRegion(segmentType.name) ?: return null
-            return TreePart(region, x.toFloat(), y.toFloat(), GameScreen.tileSize, GameScreen.tileSize)
+            return TreePart(region, x.toFloat(), y.toFloat(), GameScreen.tileSize)
         }
 
         private fun isBottomLineIgnoredTree(value: SegmentType): Boolean {

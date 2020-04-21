@@ -11,8 +11,6 @@ import com.badlogic.gdx.utils.Array
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.levels.Level
-import kifio.leningrib.model.GameOverDisplay
-import kifio.leningrib.model.HeadsUpDisplay
 import kifio.leningrib.model.MenuDisplay
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.game.Forester
@@ -23,7 +21,6 @@ import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
 
 class WorldRenderer(private var camera: OrthographicCamera?,
-                    private val config: Config,
                     private val batch: SpriteBatch) {
 
     private val renderer: ShapeRenderer = ShapeRenderer()
@@ -32,12 +29,11 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     private val foresterDebugColor = Color(1f, 0f, 0f, 0.5f)
     private val grass = ResourcesManager.getRegion(ResourcesManager.GRASS_0)
 
-    fun renderBlackScreen(gameOverDisplay: GameOverDisplay?,
-                          gameOverTime: Float,
+    fun renderBlackScreen(gameOverTime: Float,
                           gameOverAnimationTime: Float,
                           level: Level,
                           stage: Stage) {
-        render(level, stage, null, null)
+        render(level, stage)
         val alpha = (gameOverTime / gameOverAnimationTime).coerceAtMost(1f)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
@@ -46,66 +42,14 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         renderer.setColor(0f, 0f, 0f, alpha)
         renderer.rect(0f, camera!!.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         renderer.end()
-        gameOverDisplay?.let { drawGameOverText(it) }
     }
 
-    private fun drawGameOverText(it: GameOverDisplay) {
-        batch.begin()
-        LabelManager.getInstance().bitmapFont.draw(batch, it.label, it.labelX, it.labelY)
-        batch.draw(it.menu, it.menuX, it.menuY, it.menuSize, it.menuSize)
-        batch.draw(it.restart, it.restartX, it.restartY, it.restartSize, it.restartSize)
-        batch.end()
-    }
-
-    fun render(level: Level,
-               stage: Stage,
-               headsUpDisplay: HeadsUpDisplay?,
-               menuDisplay: MenuDisplay?) {
+    fun render(level: Level, stage: Stage) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         drawGrass()
         drawDebug(level)
         stage.draw()
-
-        batch.projectionMatrix = camera!!.combined
-        batch.begin()
-
-        headsUpDisplay?.let { drawHUD(it) }
-        menuDisplay?.let { drawPauseInterface(it) }
-
-        batch.end()
-    }
-
-    private fun drawPauseInterface(menuDisplay: MenuDisplay) {
-//        batch.draw(pauseDisplay.resume,
-//                pauseDisplay.resumeX, pauseDisplay.resumeY,
-//                pauseDisplay.resumeWidth, pauseDisplay.resumeHeight)
-//        batch.draw(pauseDisplay.menu,
-//                pauseDisplay.menuX, pauseDisplay.menuY,
-//                pauseDisplay.menuWidth, pauseDisplay.menuHeight)
-    }
-
-    private fun drawHUD(headsUpDisplay: HeadsUpDisplay) {
-        val pauseRectangle = headsUpDisplay.getPauseButtonPosition()
-        val bottleRectangle = headsUpDisplay.getItemsPositions()[0]
-
-        batch.draw(headsUpDisplay.getBackgroundTexture(),
-                pauseRectangle.x, pauseRectangle.y,
-                pauseRectangle.width, pauseRectangle.height)
-
-        batch.draw(headsUpDisplay.getBackgroundTexture(),
-                bottleRectangle.x, bottleRectangle.y,
-                bottleRectangle.width, bottleRectangle.height)
-
-        batch.draw(
-                headsUpDisplay.getPauseButtonTexture(),
-                pauseRectangle.x, pauseRectangle.y,
-                pauseRectangle.width, pauseRectangle.height)
-
-        batch.draw(
-                headsUpDisplay.getBottleTexture(),
-                bottleRectangle.x, bottleRectangle.y,
-                bottleRectangle.width, bottleRectangle.height)
     }
 
     private fun drawDebug(level: Level) {
@@ -212,8 +156,8 @@ class WorldRenderer(private var camera: OrthographicCamera?,
             batch.projectionMatrix = camera!!.combined
             batch.begin()
 
-            for (x in 0 .. (config.levelWidth * GameScreen.tileSize) step grassSize) {
-                for (y in 0 .. (config.levelHeight * GameScreen.tileSize) step grassSize) {
+            for (x in 0 .. (LGCGame.LEVEL_WIDTH * GameScreen.tileSize) step grassSize) {
+                for (y in 0 .. (LGCGame.LEVEL_HEIGHT * GameScreen.tileSize) step grassSize) {
                     if (y in bottom..top) {
                         batch.draw(grass, x.toFloat(), y.toFloat(), grassSize.toFloat(), grassSize.toFloat())
                     }

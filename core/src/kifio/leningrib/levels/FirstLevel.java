@@ -19,11 +19,11 @@ public class FirstLevel extends Level {
 
     FirstLevel(GameScreen gameScreen, LevelMap levelMap) {
         super(0, 0, gameScreen, levelMap);
-        initActors(gameScreen.getConstantsConfig());
+        initActors();
         gameScreen.isFirstLevelPassed = false;
     }
 
-    private void initActors(Config constantsConfig) {
+    private void initActors() {
         actors = new Actor[2];
 
         // Инициализация бабки

@@ -16,8 +16,7 @@ abstract class WideAssetActor(region: TextureRegion) : StaticActor(region) {
         this.height = (this.width / region.regionWidth) * region.regionHeight
 
         this.x = logoOffset
-        this.y = (Gdx.graphics.height * 0.35f)
-
+        this.y = (Gdx.graphics.height * 0.45f)
     }
 
 }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.Array;
 
 import generator.Config;
+import kifio.leningrib.LGCGame;
 import kifio.leningrib.Utils;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;
@@ -37,6 +38,7 @@ public class Player extends MovableActor {
 
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
+    public boolean isPaused = true;
 
     public Player(float x, float y) {
         super(x, y);
@@ -47,12 +49,8 @@ public class Player extends MovableActor {
 
     @Override
     public void act(float delta) {
+        if (isPaused) return;
         super.act(delta);
-
-//        if (this.mushroom != null) {
-//            updateClothesColor(delta);
-//        }
-
         updateEffectState(delta);
     }
 
@@ -244,10 +242,10 @@ public class Player extends MovableActor {
         return seq;
     }
 
-    public void resetPosition(Config constantsConfig) {
-        if (getY() >= (constantsConfig.getLevelHeight() - 1) * GameScreen.tileSize) {
+    public void resetPosition() {
+        if (getY() >= (LGCGame.LEVEL_HEIGHT - 1) * GameScreen.tileSize) {
             setY(0);
-        } else if (getX() >= (constantsConfig.getLevelWidth() - 1) * GameScreen.tileSize) {
+        } else if (getX() >= (LGCGame.LEVEL_WIDTH - 1) * GameScreen.tileSize) {
             setX(0);
         }
         passedLevelsCount++;

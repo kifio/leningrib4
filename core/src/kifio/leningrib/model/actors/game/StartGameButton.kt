@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.WideAssetActor
-
 
 class StartGameButton(
         private val pressedState: TextureRegion,

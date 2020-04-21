@@ -90,10 +90,6 @@ public class ResourcesManager {
         return am.get(name.contains(".png") ? name : name.concat(".png"));
     }
 
-    public interface ResourceLoadingListener {
-        void onProgressChanged(int progress);
-    }
-
     public static void loadAssets() {
         am.load("trees_map.png", Texture.class);
 
@@ -122,6 +118,7 @@ public class ResourcesManager {
         am.load("i18n/foresters_speeches_drunk", I18NBundle.class);
         am.load("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
         am.load("i18n/grandma_speeches", I18NBundle.class);
+
         am.finishLoading();
     }
 

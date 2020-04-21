@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import generator.Config;
+import kifio.leningrib.LGCGame;
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.SpaceManager;
@@ -39,35 +40,36 @@ public abstract class Level {
 
     Level(int x, int y, GameScreen gameScreen, LevelMap levelMap) {
         this.gameScreen = gameScreen;
-        Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, gameScreen.getConstantsConfig());
+        Config levelConfig = LGCGame.getConfig();
+        Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, levelConfig);
 
         forestersManager = new ForestersManager(gameScreen,
-                initForesters(levelMap, gameScreen.getConstantsConfig(), roomsRectangles));
+                initForesters(levelMap, levelConfig, roomsRectangles));
 
         treesManager = new TreesManager();
         mushroomsManager = new MushroomsManager();
         spaceManager = new SpaceManager();
 
-        treesManager.buildTrees(levelMap, gameScreen.getConstantsConfig());
-        mushroomsManager.initMushrooms(initMushrooms(gameScreen.getConstantsConfig(), treesManager));
+        treesManager.buildTrees(levelMap);
+        mushroomsManager.initMushrooms(initMushrooms(levelConfig, treesManager));
 
         spaceManager.buildSpaces(getPlayer(),
-                gameScreen.getConstantsConfig(),
+                levelConfig,
                 treesManager.getObstacleTrees(),
                 mushroomsManager.getMushrooms(),
-                getRoomsRectangles(levelMap, gameScreen.getConstantsConfig()));
+                getRoomsRectangles(levelMap, levelConfig));
 
-        forestGraph = new ForestGraph(gameScreen.getConstantsConfig(),
+        forestGraph = new ForestGraph(levelConfig,
                 treesManager.getObstacleTrees(),
                 forestersManager.getForesters(),
                 spaceManager.getSpaces());
 
-        dexterityForestGraph = new ForestGraph(gameScreen.getConstantsConfig(),
+        dexterityForestGraph = new ForestGraph(levelConfig,
                 treesManager.getOuterBordersTrees(),
                 forestersManager.getForesters(),
                 spaceManager.getSpaces());
 
-        strengthForestGraph = new ForestGraph(gameScreen.getConstantsConfig(),
+        strengthForestGraph = new ForestGraph(levelConfig,
                 treesManager.getObstacleTrees(),
                 new Array<Actor>(),
                 spaceManager.getSpaces());
@@ -82,6 +84,7 @@ public abstract class Level {
     protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Rectangle[] roomRectangles);
 
     public void update(float delta, ArrayList<Bottle> bottles, float cameraY, boolean isPaused) {
+        gameScreen.player.isPaused = isPaused;
         gameScreen.player.checkStuckUnderTrees(gameScreen, treesManager);
         strengthForestGraph.updateForestGraph(cameraY);
         forestGraph.updateForestGraph(cameraY);

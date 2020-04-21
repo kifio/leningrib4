@@ -32,10 +32,10 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		for (int i = 0; i < foresters.size; i++) {
 			Forester f = foresters.get(i);
 
-			String speech = LabelManager.getInstance().getForesterPatrolSpeech();
-			String[] words = speech.split(" ");
-			float w = LabelManager.getInstance().getLabelWidth(words);
+			String speech = "";
+			String[] words = new String[0];
 
+			float w = LabelManager.getInstance().getLabelWidth(words);
 			float x = f.getNewSpeechX(w);
 			float y = f.getNewSpeechY();
 
@@ -67,7 +67,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
 			} else {
-				updateForestersPath(forester, bottles, i, delta, forestGraph);
+				updateForestersPath(forester, bottles, i, delta, forestGraph, isPaused);
 			}
 		}
 	}
@@ -80,9 +80,13 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return resultArea >= caughtArea && !player.isInvisible() && !player.isDexterous();
 	}
 
-	private void updateForestersPath(Forester forester, ArrayList<Bottle> bottles, int index, float delta, ForestGraph forestGraph) {
+	private void updateForestersPath(Forester forester, ArrayList<Bottle> bottles,
+									 int index,
+									 float delta,
+									 ForestGraph forestGraph,
+									 boolean isPaused) {
 		forester.updateArea();
-		forester.updateMovementState(gameScreen.player, bottles, delta, forestGraph);
+		forester.updateMovementState(gameScreen.player, bottles, delta, forestGraph, isPaused);
 		forester.updatePath(forestGraph, gameScreen.player);
 		if (forester.isShouldRemoveSpeech()) {
 			speeches[index].remove();

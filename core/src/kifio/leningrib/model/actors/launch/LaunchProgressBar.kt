@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors.launch
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import kifio.leningrib.model.ResourcesManager
@@ -13,8 +14,12 @@ class LaunchProgressBar: WideAssetActor(
     private var progressForegroundRegion: TextureRegion? = null
     private var progress: Float = 0F
 
-    fun setProgress(progress: Int) {
-        this.progress = progress / 100F
+    init {
+        this.y = (Gdx.graphics.height * 0.35f)
+    }
+
+    fun setProgress(progress: Float) {
+        this.progress = progress
         this.progressForegroundRegion = TextureRegion(progressForegroundTexture,
                 (this.progressForegroundTexture.width * this.progress).toInt(),
                 this.progressForegroundTexture.height)

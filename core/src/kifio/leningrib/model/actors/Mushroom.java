@@ -49,13 +49,6 @@ public class Mushroom extends MovableActor {
         this.effect = effect;
         speechColor.set(effect.color);
     }
-
-    public Mushroom(int x, int y, Effect effect, float scale) {
-        super(x, y);
-        this.effect = effect;
-        this.scale = scale;
-        speechColor.set(effect.color);
-    }
     
     @Override public void act(float delta) {
         super.act(delta);
@@ -67,7 +60,12 @@ public class Mushroom extends MovableActor {
         float y = getY();
         float size = GameScreen.tileSize * scale;
         bounds.set(x, y, size, size);
-        batch.draw(getTextureRegion(), x, y, size, size);
+        batch.draw(getTextureRegion(), x + (GameScreen.tileSize - size) / 2, y, size, size);
+    }
+
+    @Override
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 
     public String getEffectName() {
