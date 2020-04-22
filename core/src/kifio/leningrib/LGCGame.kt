@@ -70,7 +70,7 @@ class LGCGame() : Game() {
 
     fun showGameScreen(gameScreen: GameScreen?) {
         if (gameScreen == null) return
-        gameScreen.active = true
+        gameScreen.activate()
         showScreen(gameScreen)
     }
 

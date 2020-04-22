@@ -1,6 +1,5 @@
 package kifio.leningrib.model;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,10 +12,13 @@ import generator.SegmentType;
 public class ResourcesManager {
 
     public static final String GRASS_0 = "grass_2.png";
+    public static final String OVERLAY = "overlay.png";
     public static final String HUD_BOTTLE = "bottle_hud.png";
     public static final String HUD_BOTTLE_PRESSED = "bottle_hud_pressed.png";
-    public static final String HUD_PAUSE = "pause_hud.png";
-    public static final String HUD_PAUSE_PRESSED = "pause_hud_pressed.png";
+    public static final String PAUSE = "pause_unpressed.png";
+    public static final String PAUSE_PRESSED = "pause_pressed.png";
+    public static final String SETTINGS = "settings_unpressed.png";
+    public static final String SETTINGS_PRESSED = "settings_pressed.png";
     public static final String HUD_BACKGROUND = "background_hud.png";
     public static final String BACK = "back.png";
     public static final String RESTART = "restart.png";
@@ -94,10 +96,13 @@ public class ResourcesManager {
         am.load("trees_map.png", Texture.class);
 
         am.load(GRASS_0, Texture.class);
+        am.load(OVERLAY, Texture.class);
         am.load(HUD_BOTTLE, Texture.class);
         am.load(HUD_BOTTLE_PRESSED, Texture.class);
-        am.load(HUD_PAUSE, Texture.class);
-        am.load(HUD_PAUSE_PRESSED, Texture.class);
+        am.load(PAUSE, Texture.class);
+        am.load(PAUSE_PRESSED, Texture.class);
+        am.load(SETTINGS, Texture.class);
+        am.load(SETTINGS_PRESSED, Texture.class);
         am.load(HUD_BACKGROUND, Texture.class);
         am.load(BACK, Texture.class);
         am.load(RESTART, Texture.class);
@@ -125,9 +130,13 @@ public class ResourcesManager {
     public static void buildRegions() {
         putTrees((Texture) am.get("trees_map.png"));
         putTexture(HUD_BOTTLE);
+        putTexture(OVERLAY);
         putTexture(HUD_BOTTLE_PRESSED);
-        putTexture(HUD_PAUSE);
-        putTexture(HUD_PAUSE_PRESSED);
+        putTexture(PAUSE);
+        putTexture(PAUSE_PRESSED);
+        putTexture(SETTINGS);
+        putTexture(SETTINGS_PRESSED);
+        putTexture(PAUSE_PRESSED);
         putTexture(HUD_BACKGROUND);
         putTexture(BACK);
         putTexture(RESTART);

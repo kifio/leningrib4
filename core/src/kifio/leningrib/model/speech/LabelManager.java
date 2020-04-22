@@ -133,53 +133,23 @@ public class LabelManager {
 	}
 
 	public Label getLabel(String text, float x, float y, float w) {
-		return getLabel(text, x, y, w, Color.WHITE);
+		return getLabel(text, x, y, Color.WHITE);
 	}
 
-	public Label getLabel(String text, float x, float y, float width, Color color) {
-		return getLabel(text, x, y, 0.8f, width, color);
+	public Label getLabel(String text, float x, float y, Color color) {
+		return getLabel(text, x, y, 0.8f, color);
 	}
 
 	public Label getLabel(String text,
 						  float x,
 						  float y,
 						  float scale,
-						  float width,
 						  Color color) {
 		Label label = new Label(text, labelStyle);
-		label.setWrap(true);
 		label.setColor(color);
 		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
-		label.setWidth(width);
 		label.setPosition(x, y);
 		label.setAlignment(Align.center, Align.bottom);
 		return label;
-	}
-
-//	public Label getLaunchScreenLabel() {
-//		String text = "LENIN\nGRIB";
-//		Label label = new Label(text, labelStyle);
-//
-//		label.setWrap(true);
-//		label.setColor(0.249F, 0.218F, 0.74F, 1F);
-//
-//		float labelWidth = getTextWidth("LENIN");
-//		float targetWidth = Gdx.graphics.getWidth() - (40 * 2);
-//		float scale = targetWidth / labelWidth;
-//		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
-//
-//
-//
-//	}
-
-	public float getLabelWidth(String... words) {
-		float maxLabelWidth = 0;
-		for (String word : words) {
-			float w = getTextWidth(word);
-			if (maxLabelWidth < w) {
-				maxLabelWidth = w;
-			}
-		}
-		return maxLabelWidth;
 	}
 }

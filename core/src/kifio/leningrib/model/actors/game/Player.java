@@ -38,7 +38,6 @@ public class Player extends MovableActor {
 
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
-    public boolean isPaused = true;
 
     public Player(float x, float y) {
         super(x, y);

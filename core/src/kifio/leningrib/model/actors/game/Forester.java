@@ -35,7 +35,6 @@ public class Forester extends MovableActor {
 
     private final String running;
     private final String idle;
-    private boolean isPaused = true;
 
 //    private DefaultGraphPath<Vector2> tPath = new DefaultGraphPath<>();
     private ForesterStateMachine foresterStateMachine = new ForesterStateMachine();

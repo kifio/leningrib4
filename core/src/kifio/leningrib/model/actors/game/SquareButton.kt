@@ -1,17 +1,19 @@
 package kifio.leningrib.model.actors.game
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
-import kifio.leningrib.model.actors.WideAssetActor
+import kifio.leningrib.model.actors.StaticActor
+import kifio.leningrib.screens.GameScreen
 
-class StartGameButton(
-        private val camera: Camera,
+class SquareButton(
         private val pressedState: TextureRegion,
-        private val unpressedState: TextureRegion
-) : WideAssetActor(unpressedState) {
+        private val unpressedState: TextureRegion,
+        private val camera: Camera
+) : StaticActor(unpressedState) {
 
     var onTouchHandler: (() -> Unit)? = null
 
@@ -32,7 +34,10 @@ class StartGameButton(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        y = camera.position.y
-        super.draw(batch, parentAlpha)
+        val size = GameScreen.tileSize.toFloat()
+        val x = Gdx.graphics.width - (size + 16 * Gdx.graphics.density)
+        val y = camera.position.y + (Gdx.graphics.height / 2f) - (size + 16 * Gdx.graphics.density)
+        setBounds(x, y, size, size)
+        batch.draw(region, x, y, size, size)
     }
 }

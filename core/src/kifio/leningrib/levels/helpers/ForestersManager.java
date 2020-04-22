@@ -23,7 +23,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 	public ForestersManager(GameScreen gameScreen,
 							Array<Forester> foresters) {
-//		foresters.removeRange(1, foresters.size - 1);
+		foresters.removeRange(0, foresters.size - 1);
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
 		gameObjects.addAll(foresters);
@@ -33,14 +33,12 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			Forester f = foresters.get(i);
 
 			String speech = "";
-			String[] words = new String[0];
 
-			float w = LabelManager.getInstance().getLabelWidth(words);
+			float w = 0;
 			float x = f.getNewSpeechX(w);
 			float y = f.getNewSpeechY();
 
-			speeches[i] = LabelManager.getInstance().getLabel(speech, x, y,
-					w, Forester.DEFAULT_SPEECH_COLOR);
+			speeches[i] = LabelManager.getInstance().getLabel(speech, x, y, Forester.DEFAULT_SPEECH_COLOR);
 		}
 	}
 
@@ -91,13 +89,11 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		if (forester.isShouldRemoveSpeech()) {
 			speeches[index].remove();
 		} else if (forester.isShouldResetSpeech()) {
-			String[] words = forester.speech.split(" ");
-			float w = LabelManager.getInstance().getLabelWidth(words);
-
+			float w = LabelManager.getInstance().getTextWidth(forester.speech);
 			float x = forester.getNewSpeechX(w);
 			float y = forester.getNewSpeechY();
 			speeches[index].remove();
-			speeches[index] = LabelManager.getInstance().getLabel(forester.speech, x, y, w, forester.speechColor);
+			speeches[index] = LabelManager.getInstance().getLabel(forester.speech, x, y, forester.speechColor);
 		} else {
 			speeches[index].setX(forester.getNewSpeechX(speeches[index].getWidth()));
 			speeches[index].setY(forester.getNewSpeechY());

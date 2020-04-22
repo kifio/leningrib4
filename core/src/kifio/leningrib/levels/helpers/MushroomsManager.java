@@ -73,16 +73,11 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         // С некоторой вероятностью добавляем новую речь
         if (shouldAddSpeech(player) && speeches[index] == null) {
             String speech = m.getSpeech();
-            String[] words = speech.split(" ");
-            float w = LabelManager.getInstance().getLabelWidth(words);
+            float w = LabelManager.getInstance().getTextWidth(speech);
             float x = m.getX() - (0.5f * w) + (0.5f * GameScreen.tileSize);
-
             float yOffset = 1.2f * GameScreen.tileSize;
-            if (words.length <= 4) {
-                yOffset *= 0.6;
-            }
             float y = m.getY() + yOffset;
-            speeches[index] = LabelManager.getInstance().getLabel(speech, x, y, w, m.getSpeechColor());
+            speeches[index] = LabelManager.getInstance().getLabel(speech, x, y, m.getSpeechColor());
             speeches[index].addAction(getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index));
         }
     }

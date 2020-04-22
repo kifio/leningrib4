@@ -1,18 +1,18 @@
 package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.Level
 import kifio.leningrib.levels.LevelFabric
-import kifio.leningrib.model.MenuDisplay
 import kifio.leningrib.model.ResourcesManager
+import kifio.leningrib.model.ResourcesManager.*
+import kifio.leningrib.model.actors.Overlay
+import kifio.leningrib.model.actors.StaticActor
+import kifio.leningrib.model.actors.game.SquareButton
 import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.actors.game.StartGameButton
 import kifio.leningrib.model.items.Bottle
@@ -33,9 +33,9 @@ class GameScreen(game: LGCGame,
     private var level: Level
     private var gameOverTime = 0f
 
-    private var isPaused = false
+    private var paused = true
 
-    var active = false
+    private var active = false
 
     @JvmField
     var gameOver = false
@@ -45,6 +45,12 @@ class GameScreen(game: LGCGame,
 
     @JvmField
     var player: Player
+
+
+    fun activate() {
+        pauseGame()
+        this.active = true
+    }
 
     private fun updateCamera(player: Player) {
         game.camera.update()
@@ -78,6 +84,7 @@ class GameScreen(game: LGCGame,
             player.resetPosition()
             level = getNextLevel(nextLevelX, nextLevelY)
             resetStage()
+            resumeGame()
             gameOverTime = 0f
             win = false
         } else if (!gameOver) {
@@ -119,7 +126,7 @@ class GameScreen(game: LGCGame,
             return
         }
         game.camera.position.y.let {
-            level.update(delta, bottles, it, isPaused)
+            level.update(delta, bottles, it, paused)
         }
     }
 
@@ -157,7 +164,6 @@ class GameScreen(game: LGCGame,
         }
         for (i in 0 until level.foresters.size) {
             stage.addActor(level.foresters[i])
-//            stage.addActor(level.forestersSpeeches[i])
         }
 //		if (level.getGrandma() != null) {
 //			stage.addActor(level.getGrandma().getGrandmaLabel());
@@ -177,11 +183,67 @@ class GameScreen(game: LGCGame,
         stage.dispose()
     }
 
+    private fun pauseGame() {
+        paused = true
+        val overlay = Overlay(game.camera)
+        val startGameButton = StartGameButton(
+                game.camera,
+                getRegion(ResourcesManager.START_GAME_PRESSED),
+                getRegion(ResourcesManager.START_GAME)
+        )
+
+        val settingsButton = SquareButton(
+                getRegion(SETTINGS_PRESSED),
+                getRegion(SETTINGS),
+                game.camera
+        )
+
+        settingsButton.onTouchHandler = {
+
+        }
+
+        startGameButton.onTouchHandler = {
+            settingsButton.remove()
+            overlay.remove()
+            startGameButton.remove()
+            resumeGame()
+        }
+
+        stage.addActor(overlay)
+        stage.addActor(settingsButton)
+        stage.addActor(startGameButton)
+    }
+
+    private fun resumeGame() {
+        paused = false
+
+        val pauseButton = SquareButton(
+                getRegion(PAUSE_PRESSED),
+                getRegion(PAUSE),
+                game.camera
+        )
+
+        pauseButton.onTouchHandler = {
+            pauseButton.remove()
+            pauseGame()
+        }
+
+        stage.addActor(pauseButton)
+    }
+
     override fun resize(width: Int, height: Int) {}
     override fun show() {}
     override fun hide() {}
-    override fun pause() {}
-    override fun resume() {}
+
+
+
+    override fun pause() {
+
+    }
+
+    override fun resume() {
+
+    }
 
     override fun touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
         stage.touchDown(x, y, pointer, button)
@@ -189,7 +251,11 @@ class GameScreen(game: LGCGame,
     }
 
     override fun touchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
+        val actorIsTouched = stage.actors
+                .filter { it is StaticActor }
+                .find { (it as StaticActor).touched } != null
         stage.touchUp(x, y, pointer, button)
+        if (actorIsTouched) return true
         if (!isGameOver()) {
             level.movePlayerTo(x.mapX(), y.mapYToLevel())
         } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
@@ -217,15 +283,6 @@ class GameScreen(game: LGCGame,
     }
 
     fun isGameOver() = gameOver || win
-
-    fun showMenu() {
-        val startGameButton = StartGameButton(
-                ResourcesManager.getRegion(ResourcesManager.START_GAME_PRESSED),
-                ResourcesManager.getRegion(ResourcesManager.START_GAME)
-        )
-
-        stage.addActor(startGameButton)
-    }
 
     companion object {
         private const val GAME_OVER_ANIMATION_TIME = 0.5f

@@ -8,16 +8,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
-import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.levels.Level
-import kifio.leningrib.model.MenuDisplay
 import kifio.leningrib.model.ResourcesManager
+import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Grandma
-import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.game.Player
-import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
 
 class WorldRenderer(private var camera: OrthographicCamera?,
