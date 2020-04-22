@@ -11,7 +11,8 @@ import generator.SegmentType;
 
 public class ResourcesManager {
 
-    public static final String GRASS_0 = "grass_2.png";
+    public static final String GRASS_2 = "grass_2.png";
+    public static final String GRASS_0 = "grass_0.png";
     public static final String OVERLAY = "overlay.png";
     public static final String HUD_BOTTLE = "bottle_hud.png";
     public static final String HUD_BOTTLE_PRESSED = "bottle_hud_pressed.png";
@@ -96,6 +97,7 @@ public class ResourcesManager {
         am.load("trees_map.png", Texture.class);
 
         am.load(GRASS_0, Texture.class);
+        am.load(GRASS_2, Texture.class);
         am.load(OVERLAY, Texture.class);
         am.load(HUD_BOTTLE, Texture.class);
         am.load(HUD_BOTTLE_PRESSED, Texture.class);
@@ -143,6 +145,7 @@ public class ResourcesManager {
         putTexture(START_GAME);
         putTexture(START_GAME_PRESSED);
         putTexture(GRASS_0, TILE_SIZE * 2, TILE_SIZE * 2);
+        putTexture(GRASS_2, TILE_SIZE * 2, TILE_SIZE * 2);
     }
 
     public static void initializeSpeeches() throws InterruptedException {

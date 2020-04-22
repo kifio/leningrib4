@@ -19,6 +19,7 @@ import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.view.WorldRenderer
 import model.LevelMap
 import model.WorldMap
+import java.util.concurrent.ThreadLocalRandom
 
 class GameScreen(game: LGCGame,
                  var worldMap: WorldMap,
@@ -85,6 +86,7 @@ class GameScreen(game: LGCGame,
             level = getNextLevel(nextLevelX, nextLevelY)
             resetStage()
             resumeGame()
+            worldRenderer?.isChessBoard = player.mushroomsCount > 5 && ThreadLocalRandom.current().nextBoolean()
             gameOverTime = 0f
             win = false
         } else if (!gameOver) {

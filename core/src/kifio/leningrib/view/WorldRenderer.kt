@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
@@ -24,7 +25,10 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     private val playerDebugColor = Color(0f, 0f, 1f, 0.5f)
     private val playerPathDebugColor = Color(0f, 0f, 1f, 1f)
     private val foresterDebugColor = Color(1f, 0f, 0f, 0.5f)
-    private val grass = ResourcesManager.getRegion(ResourcesManager.GRASS_0)
+    private val grass0 = ResourcesManager.getRegion(ResourcesManager.GRASS_0)
+    private val grass2 = ResourcesManager.getRegion(ResourcesManager.GRASS_2)
+
+    var isChessBoard: Boolean = false
 
     fun renderBlackScreen(gameOverTime: Float,
                           gameOverAnimationTime: Float,
@@ -155,12 +159,33 @@ class WorldRenderer(private var camera: OrthographicCamera?,
 
             for (x in 0 .. (LGCGame.LEVEL_WIDTH * GameScreen.tileSize) step grassSize) {
                 for (y in 0 .. (LGCGame.LEVEL_HEIGHT * GameScreen.tileSize) step grassSize) {
-                    if (y in bottom..top) {
-                        batch.draw(grass, x.toFloat(), y.toFloat(), grassSize.toFloat(), grassSize.toFloat())
+                    if (y.toFloat() in bottom..top) {
+                        batch.draw(
+                                if (isChessBoard) getRegion(x, y, (grassSize* 2)) else grass0,
+                                x.toFloat(),
+                                y.toFloat(),
+                                grassSize.toFloat(),
+                                grassSize.toFloat())
                     }
                 }
             }
             batch.end()
+        }
+    }
+
+    private fun getRegion(x: Int, y: Int, foo: Int): TextureRegion {
+        if (y % foo == 0) {
+            if (x % foo == 0) {
+                return grass0
+            } else {
+                return grass2
+            }
+        } else {
+            if (x % foo == 0) {
+                return grass2
+            } else {
+                return grass0
+            }
         }
     }
 
