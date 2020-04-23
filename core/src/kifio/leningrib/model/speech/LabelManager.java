@@ -35,14 +35,13 @@ public class LabelManager {
 	private LabelManager() {
 		smallLabelsFont = generateFont(false);
 		largeTitleFont = generateFont(true);
-//		smallLabelsFont.getData().setScale(Gdx.graphics.getDensity());
 		labelStyle.font = smallLabelsFont;
 //		labelStyle.fontColor = Color.WHITE;
 	}
 
 	private BitmapFont generateFont(boolean withShadows) {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
-		BitmapFont font = generator.generateFont(getFontParameters(false));
+		BitmapFont font = generator.generateFont(getFontParameters(withShadows));
 		generator.dispose();
 		return font;
 	}
@@ -57,6 +56,7 @@ public class LabelManager {
 
 		if (withShadow) {
 			parameter.shadowOffsetY = 1;
+			parameter.size *= Gdx.graphics.getDensity();
 		}
 
 		return parameter;
@@ -73,7 +73,7 @@ public class LabelManager {
 	}
 
 	public BitmapFont getBitmapFont() {
-		return smallLabelsFont;
+		return largeTitleFont;
 	}
 
 	public String getRandomMushroomSpeech() {
@@ -149,6 +149,14 @@ public class LabelManager {
 		label.setColor(color);
 		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
 		label.setPosition(x, y);
+		label.setAlignment(Align.center, Align.bottom);
+		return label;
+	}
+
+	public Label getLabel(String text,
+						  Color color) {
+		Label label = new Label(text, labelStyle);
+		label.setColor(color);
 		label.setAlignment(Align.center, Align.bottom);
 		return label;
 	}

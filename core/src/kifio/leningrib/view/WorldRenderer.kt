@@ -161,7 +161,7 @@ class WorldRenderer(private var camera: OrthographicCamera?,
                 for (y in 0 .. (LGCGame.LEVEL_HEIGHT * GameScreen.tileSize) step grassSize) {
                     if (y.toFloat() in bottom..top) {
                         batch.draw(
-                                if (isChessBoard) getRegion(x, y, (grassSize* 2)) else grass0,
+                                if (isChessBoard) getRegion(x, y, (grassSize* 2)) else grass2,
                                 x.toFloat(),
                                 y.toFloat(),
                                 grassSize.toFloat(),

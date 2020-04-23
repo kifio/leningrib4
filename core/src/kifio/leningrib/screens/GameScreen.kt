@@ -1,8 +1,11 @@
 package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
@@ -14,6 +17,7 @@ import kifio.leningrib.model.actors.Overlay
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.actors.game.SquareButton
 import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.actors.game.SettingButton
 import kifio.leningrib.model.actors.game.StartGameButton
 import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.view.WorldRenderer
@@ -47,6 +51,7 @@ class GameScreen(game: LGCGame,
     @JvmField
     var player: Player
 
+    private var settings: Group? = null
 
     fun activate() {
         pauseGame()
@@ -190,8 +195,8 @@ class GameScreen(game: LGCGame,
         val overlay = Overlay(game.camera)
         val startGameButton = StartGameButton(
                 game.camera,
-                getRegion(ResourcesManager.START_GAME_PRESSED),
-                getRegion(ResourcesManager.START_GAME)
+                getRegion(START_GAME_PRESSED),
+                getRegion(START_GAME)
         )
 
         val settingsButton = SquareButton(
@@ -201,6 +206,19 @@ class GameScreen(game: LGCGame,
         )
 
         settingsButton.onTouchHandler = {
+
+            settings = Group().apply {
+                x = Gdx.graphics.width.toFloat()
+
+                addActor(Overlay(game.camera, 40 * Gdx.graphics.density, getRegion(SETTINGS_BACKGROUND)))
+                addActor(SettingButton(game.camera, 0))
+                addActor(SettingButton(game.camera, 1))
+                addActor(SettingButton(game.camera, 2))
+
+                addAction(Actions.moveTo(0F, 0F, 0.4F))
+            }
+
+            stage.addActor(settings)
 
         }
 
@@ -236,8 +254,6 @@ class GameScreen(game: LGCGame,
     override fun resize(width: Int, height: Int) {}
     override fun show() {}
     override fun hide() {}
-
-
 
     override fun pause() {
 
@@ -303,8 +319,25 @@ class GameScreen(game: LGCGame,
         var topCameraThreshold: Float = 0f
     }
 
+    override fun keyDown(keycode: Int): Boolean {
+        val handled = keycode == Input.Keys.BACK
+        if (handled) {
+
+            val sequenceAction = SequenceAction()
+            sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, 0.4f))
+            sequenceAction.addAction(Actions.run {
+                settings?.remove()
+                settings = null
+            })
+
+            settings?.addAction(sequenceAction)
+        }
+        return handled
+    }
+
     init {
         Gdx.input.inputProcessor = this
+        Gdx.input.isCatchBackKey = true
         worldRenderer = WorldRenderer(game.camera, spriteBatch)
         if (isFirstLevelPassed) {
             player = Player(2f * tileSize, 2f * tileSize)

@@ -19,6 +19,7 @@ import model.WorldMap
 class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
     private var accumulatedTime = 0f
+    private var launchTime = 1f
     private var finished: Boolean = false
 
     // Data, which will be passed to game screen
@@ -75,15 +76,15 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                     finished = true
                 }
 
-                actor.setProgress((accumulatedTime / 2F).coerceAtMost(1F))
+                actor.setProgress((accumulatedTime / launchTime).coerceAtMost(1F))
             } else if (actor is Mushroom) {
                 if (accumulatedTime > 0.5F) {
-                    val scaleBasedOnTime = ((accumulatedTime - 0.5F) / 2F).coerceAtMost(0.3F)
+                    val scaleBasedOnTime = ((accumulatedTime - 0.5F) / launchTime).coerceAtMost(0.3F)
                     actor.setScale(5F * scaleBasedOnTime)
                 }
             } else if (actor is LaunchScreenTree) {
                 if (accumulatedTime > 0.5F) {
-                    val scaleBasedOnTime = ((accumulatedTime - 0.5F) / 2F).coerceAtMost(0.2F)
+                    val scaleBasedOnTime = ((accumulatedTime - 0.5F) / launchTime).coerceAtMost(0.2F)
                     actor.setScale(5F * scaleBasedOnTime)
                 }
             }
