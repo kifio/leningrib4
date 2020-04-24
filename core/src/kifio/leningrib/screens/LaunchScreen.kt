@@ -56,8 +56,6 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
         }
     }
 
-    override fun hide() {}
-
     override fun show() {
         ResourcesManager.loadAssets()
         LevelGenerationThread(this).start()
@@ -94,12 +92,6 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
         stage.act(delta)
         stage.draw()
     }
-
-    override fun pause() {}
-
-    override fun resume() {}
-
-    override fun resize(width: Int, height: Int) {}
 
     private fun onFirstLevelCreated(worldMap: WorldMap, levelMap: LevelMap) {
         Gdx.app.postRunnable {

@@ -27,11 +27,12 @@ public class ResourcesManager {
     public static final String LAUNCH_TREES = "launch_trees.png";
     public static final String LAUNCH_PROGRESS_BACKGROUND = "launch_progress_background.png";
     public static final String LAUNCH_PROGRESS_FOREGROUND = "launch_progress_foreground.png";
-    public static final String SETTING_PRESSED = "setting_pressed.png";
-    public static final String SETTING_UNPRESSED = "setting_unpressed.png";
+    public static final String SETTING = "setting_unpressed.png";
     public static final String SETTINGS_BACKGROUND = "settings_background.png";
-    public static final String SETTING_ENABLED = "enabled.png";
-    public static final String SETTING_DISABLED = "disabled.png";
+    public static final String SETTING_ENABLED = "enabled_unpressed.png";
+    public static final String SETTING_ENABLED_PRESSED = "enabled_pressed.png";
+    public static final String SETTING_DISABLED = "disabled_unpressed.png";
+    public static final String SETTING_DISABLED_PRESSED = "disabled_pressed.png";
     public static final String START_GAME = "start_game.png";
     public static final String START_GAME_PRESSED = "start_game_pressed.png";
 
@@ -115,11 +116,12 @@ public class ResourcesManager {
         am.load(RESTART, Texture.class);
         am.load(START_GAME, Texture.class);
         am.load(START_GAME_PRESSED, Texture.class);
-        am.load(SETTING_PRESSED, Texture.class);
-        am.load(SETTING_UNPRESSED, Texture.class);
+        am.load(SETTING, Texture.class);
         am.load(SETTINGS_BACKGROUND, Texture.class);
         am.load(SETTING_ENABLED, Texture.class);
+        am.load(SETTING_ENABLED_PRESSED, Texture.class);
         am.load(SETTING_DISABLED, Texture.class);
+        am.load(SETTING_DISABLED_PRESSED, Texture.class);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -152,11 +154,12 @@ public class ResourcesManager {
         putTexture(HUD_BACKGROUND);
         putTexture(BACK);
         putTexture(RESTART);
-        putTexture(SETTING_PRESSED);
-        putTexture(SETTING_UNPRESSED);
+        putTexture(SETTING);
         putTexture(SETTINGS_BACKGROUND);
         putTexture(SETTING_ENABLED);
+        putTexture(SETTING_ENABLED_PRESSED);
         putTexture(SETTING_DISABLED);
+        putTexture(SETTING_DISABLED_PRESSED);
         putTexture(START_GAME);
         putTexture(START_GAME_PRESSED);
         putTexture(GRASS_0, TILE_SIZE * 2, TILE_SIZE * 2);

@@ -89,7 +89,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		if (forester.isShouldRemoveSpeech()) {
 			speeches[index].remove();
 		} else if (forester.isShouldResetSpeech()) {
-			float w = LabelManager.getInstance().getTextWidth(forester.speech);
+			float w = LabelManager.getInstance().getTextWidth(forester.speech, LabelManager.getInstance().smallFont);
 			float x = forester.getNewSpeechX(w);
 			float y = forester.getNewSpeechY();
 			speeches[index].remove();

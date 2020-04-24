@@ -18,8 +18,8 @@ import static com.badlogic.gdx.math.MathUtils.random;
  */
 public class LabelManager {
 
-	private static BitmapFont smallLabelsFont;
-	private static BitmapFont largeTitleFont;
+	public BitmapFont smallFont;
+	public BitmapFont largeFont;
 	private GlyphLayout glyphLayout = new GlyphLayout();
 	private Label.LabelStyle labelStyle = new Label.LabelStyle();
 
@@ -33,9 +33,9 @@ public class LabelManager {
 	}
 
 	private LabelManager() {
-		smallLabelsFont = generateFont(false);
-		largeTitleFont = generateFont(true);
-		labelStyle.font = smallLabelsFont;
+		smallFont = generateFont(false);
+		largeFont = generateFont(true);
+		labelStyle.font = smallFont;
 //		labelStyle.fontColor = Color.WHITE;
 	}
 
@@ -62,18 +62,14 @@ public class LabelManager {
 		return parameter;
 	}
 
-	public float getTextWidth(String text) {
-		glyphLayout.setText(smallLabelsFont, text);
+	public float getTextWidth(String text, BitmapFont font) {
+		glyphLayout.setText(font, text);
 		return glyphLayout.width;
 	}
 
-	public float getTextHeight(String text) {
-		glyphLayout.setText(smallLabelsFont, text);
+	public float getTextHeight(String text, BitmapFont font) {
+		glyphLayout.setText(font, text);
 		return glyphLayout.height;
-	}
-
-	public BitmapFont getBitmapFont() {
-		return largeTitleFont;
 	}
 
 	public String getRandomMushroomSpeech() {
@@ -149,15 +145,7 @@ public class LabelManager {
 		label.setColor(color);
 		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
 		label.setPosition(x, y);
-		label.setAlignment(Align.center, Align.bottom);
-		return label;
-	}
-
-	public Label getLabel(String text,
-						  Color color) {
-		Label label = new Label(text, labelStyle);
-		label.setColor(color);
-		label.setAlignment(Align.center, Align.bottom);
+		label.setAlignment(Align.center, Align.bottomLeft);
 		return label;
 	}
 }

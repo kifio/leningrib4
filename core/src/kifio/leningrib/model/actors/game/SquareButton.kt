@@ -18,6 +18,10 @@ class SquareButton(
     var onTouchHandler: (() -> Unit)? = null
 
     init {
+
+        this.width = GameScreen.tileSize.toFloat()
+        this.height = (this.width / region.regionWidth) * region.regionHeight
+
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 region = pressedState
@@ -34,10 +38,9 @@ class SquareButton(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        val size = GameScreen.tileSize.toFloat()
-        val x = Gdx.graphics.width - (size + 16 * Gdx.graphics.density)
-        val y = camera.position.y + (Gdx.graphics.height / 2f) - (size + 16 * Gdx.graphics.density)
-        setBounds(x, y, size, size)
-        batch.draw(region, x, y, size, size)
+        val x = Gdx.graphics.width - (width + 16 * Gdx.graphics.density)
+        val y = camera.position.y + (Gdx.graphics.height / 2f) - (height + 16 * Gdx.graphics.density)
+        setBounds(x, y, width, height)
+        batch.draw(region, x, y, width, height)
     }
 }

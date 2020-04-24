@@ -15,13 +15,12 @@ import kifio.leningrib.model.speech.LabelManager
 class SettingButton(
         private val camera: Camera,
         private val index: Int,
-        private val pressedState: TextureRegion = getRegion(SETTING_PRESSED),
-        private val unpressedState: TextureRegion = getRegion(SETTING_UNPRESSED)
+        private val unpressedState: TextureRegion = getRegion(SETTING)
 ) : StaticActor(unpressedState) {
 
-    val MUSIC = "music"
-    val SOUNDS = "sounds"
-    val TUTORIAL = "tutorial"
+    private val MUSIC = "music"
+    private val SOUNDS = "sounds"
+    private val TUTORIAL = "tutorial"
 
     var onTouchHandler: (() -> Unit)? = null
 
@@ -32,10 +31,13 @@ class SettingButton(
     }
 
     private val enabledIcon = getRegion(SETTING_ENABLED)
+    private val enabledIconPressed = getRegion(SETTING_ENABLED_PRESSED)
     private val disabledIcon = getRegion(SETTING_DISABLED)
+    private val disabledIconPressed = getRegion(SETTING_DISABLED_PRESSED)
 
     private var prefs: Preferences = Gdx.app.getPreferences("kifio.leningrib")
     private var enabled: Boolean
+    private var switchIcon: TextureRegion
 
     private val labelColor = Color(249 / 255f, 218 / 255f, 74f / 255f, 1f)
 
@@ -46,6 +48,7 @@ class SettingButton(
     private val iconHeight: Float
 
     private val iconX: Float
+    private var iconY: Float
     private val labelX: Float
 
     init {
@@ -55,14 +58,15 @@ class SettingButton(
 
         this.x = 2 * offset
         enabled = prefs.getBoolean(key)
+        switchIcon = if (enabled) enabledIcon else disabledIcon
 
         iconWidth = this.height - (16 * Gdx.graphics.density)
         iconHeight = (iconWidth / enabledIcon.regionWidth) * enabledIcon.regionHeight
 
         labelWidth = this.width - iconWidth
         labelHeight = this.height
-        LabelManager.getInstance().bitmapFont.color = labelColor
 
+        iconY = this.y + 0.6f * (this.height - iconHeight)
         iconX = this.x + (this.width - iconWidth - 16 * Gdx.graphics.density)
         labelX = this.x + (16 * Gdx.graphics.density)
     }
@@ -70,15 +74,29 @@ class SettingButton(
     init {
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                region = pressedState
                 touched = true
-                return true
+                if (isSwitchTouched(x, y)) {
+                    if (switchIcon == enabledIcon) {
+                        switchIcon = enabledIconPressed
+                    } else if (switchIcon == disabledIcon) {
+                        switchIcon = disabledIconPressed
+                    }
+                    return true
+                }
+                return false
             }
 
             override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                 region = unpressedState
                 touched = false
                 enabled = !enabled
+
+                switchIcon = if (enabled) {
+                    enabledIcon
+                } else {
+                    disabledIcon
+                }
+
                 prefs.putBoolean(key, enabled)
                 prefs.flush()
                 onTouchHandler?.invoke()
@@ -92,10 +110,23 @@ class SettingButton(
             1 -> -this.height / 2F
             else -> -2 * this.height
         }
+        iconY = this.y + 0.6f * (this.height - iconHeight)
         super.draw(batch, parentAlpha)
-        batch.draw(if (enabled) enabledIcon else disabledIcon,
-                iconX, this.y + 0.6f * (this.height - iconHeight), iconWidth, iconHeight)
-        LabelManager.getInstance().bitmapFont.draw(batch, label, labelX, this.y + (0.6f * this.height))
+        batch.draw(switchIcon, iconX, iconY, iconWidth, iconHeight)
+        LabelManager.getInstance().largeFont.color = labelColor
+        LabelManager.getInstance().largeFont.draw(batch, label, labelX, this.y + (0.6f * this.height))
+    }
+
+    private fun isSwitchTouched(x: Float, y: Float): Boolean {
+        val left = iconX
+        val right = iconX + iconWidth
+        val top = iconY
+        val bottom = iconY - iconHeight
+
+        val mappedX = x + this.x
+        val mappedY = y + this.y - iconHeight
+
+        return (mappedX in left..right && mappedY in bottom..top)
     }
 
     private val label = when (index) {
