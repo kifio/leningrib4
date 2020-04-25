@@ -34,7 +34,7 @@ public class Mushroom extends MovableActor {
 
     public Mushroom(int x, int y, boolean hasEffect) {
         super(x, y);
-
+        isPaused = false;
         Effect[] effects = Effect.values();
         int effectIndex = ThreadLocalRandom.current().nextInt(effects.length);
 
@@ -46,6 +46,7 @@ public class Mushroom extends MovableActor {
 
     public Mushroom(int x, int y, Effect effect) {
         super(x, y);
+        isPaused = false;
         this.effect = effect;
         speechColor.set(effect.color);
     }

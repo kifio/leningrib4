@@ -35,7 +35,7 @@ class LGCGame() : Game() {
 
     private var halfWidth = 0f
     private var halfHeight = 0f
-    private val screenSwitchDuration = 1f
+    private val screenSwitchDuration = 0.3f
 
     override fun create() {
         halfWidth = Gdx.graphics.width / 2f
@@ -92,6 +92,7 @@ class LGCGame() : Game() {
     }
 
     private fun createScreenInAction(screen: Screen) {
+        val current = getScreen()
         setScreen(screen)
         val actor: Actor = (screen as BaseScreen).stage.root
         actor.setOrigin(halfWidth, halfHeight)
@@ -99,6 +100,7 @@ class LGCGame() : Game() {
         val sequenceAction = SequenceAction()
         sequenceAction.addAction(Actions.scaleTo(1.5f, 1.5f, 0f))
         sequenceAction.addAction(Actions.parallel(Actions.alpha(1f, screenSwitchDuration), Actions.scaleTo(1.0f, 1.0f, screenSwitchDuration, Interpolation.exp5)))
+        sequenceAction.addAction(Actions.run { current.dispose() })
         actor.addAction(sequenceAction)
     }
 }

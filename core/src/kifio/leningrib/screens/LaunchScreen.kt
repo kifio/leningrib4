@@ -20,6 +20,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
     private var accumulatedTime = 0f
     private var launchTime = 1f
+    private var halfLaunchTime = launchTime / 2
     private var finished: Boolean = false
 
     // Data, which will be passed to game screen
@@ -68,21 +69,24 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
         for (actor in actors) {
             if (actor is LaunchProgressBar) {
 
-                if (accumulatedTime >= 2f && gameScreen != null && !finished) {
+                if (accumulatedTime >= launchTime && gameScreen != null && !finished) {
+                    val start = System.nanoTime()
                     game.showGameScreen(gameScreen)
+                    val finish = System.nanoTime()
+                    Gdx.app.log("kifio", "Show game screen took: ${(finish - start) / 1_000_000}")
                     this.gameScreen = null
                     finished = true
                 }
 
-                actor.setProgress((accumulatedTime / launchTime).coerceAtMost(1F))
+                actor.setProgress((accumulatedTime / launchTime).coerceAtMost(launchTime))
             } else if (actor is Mushroom) {
-                if (accumulatedTime > 0.5F) {
-                    val scaleBasedOnTime = ((accumulatedTime - 0.5F) / launchTime).coerceAtMost(0.3F)
+                if (accumulatedTime > halfLaunchTime) {
+                    val scaleBasedOnTime = ((accumulatedTime - halfLaunchTime) / launchTime).coerceAtMost(0.3F)
                     actor.setScale(5F * scaleBasedOnTime)
                 }
             } else if (actor is LaunchScreenTree) {
-                if (accumulatedTime > 0.5F) {
-                    val scaleBasedOnTime = ((accumulatedTime - 0.5F) / launchTime).coerceAtMost(0.2F)
+                if (accumulatedTime > halfLaunchTime) {
+                    val scaleBasedOnTime = ((accumulatedTime - halfLaunchTime) / launchTime).coerceAtMost(0.2F)
                     actor.setScale(5F * scaleBasedOnTime)
                 }
             }
@@ -98,7 +102,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             val start = System.nanoTime()
             gameScreen = GameScreen(game, worldMap, levelMap)
             val finish = System.nanoTime()
-            Gdx.app.log("kifio", "show game screen took: ${(finish - start) / 1_000_000}")
+            Gdx.app.log("kifio", "Create game screen took: ${(finish - start) / 1_000_000}")
         }
     }
 

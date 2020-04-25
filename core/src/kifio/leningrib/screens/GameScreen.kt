@@ -2,15 +2,13 @@ package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.input.GestureDetector
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Group
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.Level
@@ -18,10 +16,7 @@ import kifio.leningrib.levels.LevelFabric
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.Overlay
 import kifio.leningrib.model.actors.StaticActor
-import kifio.leningrib.model.actors.game.Player
-import kifio.leningrib.model.actors.game.SettingButton
-import kifio.leningrib.model.actors.game.SquareButton
-import kifio.leningrib.model.actors.game.StartGameButton
+import kifio.leningrib.model.actors.game.*
 import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
@@ -50,8 +45,7 @@ class GameScreen(game: LGCGame,
 
     private var active = false
 
-    @JvmField
-    var gameOver = false
+    private var gameOver = false
 
     @JvmField
     var isFirstLevelPassed = true
@@ -62,7 +56,7 @@ class GameScreen(game: LGCGame,
     private var settings: Group? = null
 
     fun activate() {
-        pauseGame()
+        pauseGame(false)
         this.active = true
     }
 
@@ -86,12 +80,16 @@ class GameScreen(game: LGCGame,
         I/kifio: Delta: 0.015999753
     */
     override fun render(delta: Float) {
-        if (isGameOver() && gameOverTime < GAME_OVER_ANIMATION_TIME) {
-            gameOverTime += delta
+
+        if (active) {
             update(delta)
-            if (!win) {
-//                gameOverDisplay = GameOverDisplay(player.mushroomsCount, getCameraPositionY())
-            }
+            updateCamera(level.player)
+            stage.act(delta)
+            worldRenderer?.render(level, stage)
+        }
+
+        if (win && gameOverTime < GAME_OVER_ANIMATION_TIME) {
+            gameOverTime += delta
             worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME, level, stage)
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
 //            isFirstLevelPassed = true;
@@ -102,13 +100,6 @@ class GameScreen(game: LGCGame,
             worldRenderer?.isChessBoard = player.mushroomsCount > 5 && ThreadLocalRandom.current().nextBoolean()
             gameOverTime = 0f
             win = false
-        } else if (!gameOver) {
-            updateCamera(level.player)
-            update(delta)
-            stage.act(Gdx.graphics.deltaTime)
-            if (active) {
-                worldRenderer?.render(level, stage)
-            }
         }
     }
 
@@ -201,16 +192,97 @@ class GameScreen(game: LGCGame,
         gestureDetector?.dispose()
     }
 
-    private fun pauseGame() {
-        paused = true
+    fun showGameOver() {
+        if (gameOver) return
+        gameOver = true;
         val overlay = Overlay(game.camera)
 
-        val startGameButton = StartGameButton(
-                "НАЧАТЬ ИГРУ",
+        val gameOverLogo = GameOverLogo(game.camera)
+        val settingsButton = SquareButton(
+                getRegion(SETTINGS_PRESSED),
+                getRegion(SETTINGS),
+                game.camera
+        )
+
+        val restartGameButton = StartGameButton(
+                3,
+                "НАЧАТЬ СНАЧАЛА",
                 game.camera,
                 getRegion(START_GAME_PRESSED),
-                getRegion(START_GAME)
+                getRegion(START_GAME),
+                Color(110 / 255f, 56 / 255f, 22 / 255f, 1f)
         )
+
+        settingsButton.onTouchHandler = {
+            if (settings == null) {
+                settings = Group().apply {
+                    x = Gdx.graphics.width.toFloat()
+                    addActor(Overlay(game.camera, 40 * Gdx.graphics.density, getRegion(SETTINGS_BACKGROUND)))
+                    addActor(SettingButton(game.camera, 0))
+                    addActor(SettingButton(game.camera, 1))
+                    addActor(SettingButton(game.camera, 2))
+                    addAction(Actions.moveTo(0F, 0F, animationTime))
+                }
+
+                stage.addActor(settings)
+            }
+        }
+
+        restartGameButton.onTouchHandler = {
+            if (settings == null) {
+                val worldMap = WorldMap()
+                game.showGameScreen(GameScreen(game, worldMap, worldMap.addLevel(0, 0,
+                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT))))
+            }
+        }
+
+        stage.addActor(overlay)
+        stage.addActor(settingsButton)
+        stage.addActor(gameOverLogo)
+        stage.addActor(MushroomsCountView(game.camera, player.mushroomsCount))
+        stage.addActor(restartGameButton)
+    }
+
+    private fun pauseGame(withRestartOption: Boolean) {
+        paused = true
+
+        val overlay = Overlay(game.camera)
+
+        var resumeOffsetsCount = 0
+        var restartOffsetsCount = 0
+
+        if (withRestartOption) {
+            resumeOffsetsCount = 1
+            restartOffsetsCount = -1
+        }
+
+        val resumeGameButton = StartGameButton(
+                resumeOffsetsCount,
+                if (withRestartOption) "ПРОДОЛЖИТЬ ИГРУ" else "НАЧАТЬ ИГРУ",
+                game.camera,
+                getRegion(START_GAME_PRESSED),
+                getRegion(START_GAME),
+                Color(110 / 255f, 56 / 255f, 22 / 255f, 1f)
+        )
+
+        var restartGameButton: StartGameButton? = null
+
+        if (withRestartOption) {
+            restartGameButton = StartGameButton(
+                    restartOffsetsCount,
+                    "НАЧАТЬ СНАЧАЛА",
+                    game.camera,
+                    getRegion(RESTART_BUTTON_PRESSED),
+                    getRegion(RESTART_BUTTON),
+                    Color(249 / 255f, 218 / 255f, 74f / 255f, 1f)
+            )
+
+            restartGameButton.onTouchHandler = {
+                val worldMap = WorldMap()
+                game.showGameScreen(GameScreen(game, worldMap, worldMap.addLevel(0, 0,
+                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT))))
+            }
+        }
 
         val settingsButton = SquareButton(
                 getRegion(SETTINGS_PRESSED),
@@ -233,18 +305,23 @@ class GameScreen(game: LGCGame,
             }
         }
 
-        startGameButton.onTouchHandler = {
+        resumeGameButton.onTouchHandler = {
             if (settings == null) {
                 settingsButton.remove()
                 overlay.remove()
-                startGameButton.remove()
+                resumeGameButton.remove()
+                restartGameButton?.remove()
                 resumeGame()
             }
         }
 
         stage.addActor(overlay)
         stage.addActor(settingsButton)
-        stage.addActor(startGameButton)
+        stage.addActor(resumeGameButton)
+
+        if (restartGameButton != null) {
+            stage.addActor(restartGameButton)
+        }
     }
 
     private fun resumeGame() {
@@ -258,7 +335,7 @@ class GameScreen(game: LGCGame,
 
         pauseButton.onTouchHandler = {
             pauseButton.remove()
-            pauseGame()
+            pauseGame(true)
         }
 
         stage.addActor(pauseButton)
@@ -337,10 +414,8 @@ class GameScreen(game: LGCGame,
 
         if (!isGameOver()) {
             level.movePlayerTo(x.toFloat(), y.mapYToLevel())
-        } else if (gameOverTime > GAME_OVER_ANIMATION_TIME) {
-//            game?.showGameScreen(worldMap, levelMap)
-//            dispose()
         }
+
         return true
     }
 

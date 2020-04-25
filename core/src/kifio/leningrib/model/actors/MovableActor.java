@@ -51,6 +51,7 @@ public abstract class MovableActor extends Actor {
 	}
 
 	@Override public void act(float delta) {
+		if (isPaused) return;
 		elapsedTime += delta;
 		float x = getX();
 		if (!MathUtils.isEqual(previousX, x) && elapsedTime - lastChangeDirectionTime > 0.2F) {

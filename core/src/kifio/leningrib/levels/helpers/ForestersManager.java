@@ -23,7 +23,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
 	public ForestersManager(GameScreen gameScreen,
 							Array<Forester> foresters) {
-		foresters.removeRange(0, foresters.size - 1);
+		foresters.removeRange(1, foresters.size - 1);
 		this.gameScreen = gameScreen;
 		gameObjects = new Array<>(foresters.size);
 		gameObjects.addAll(foresters);
@@ -47,7 +47,6 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	}
 
 	public void updateForesters(float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph, boolean isPaused) {
-		if (isPaused) return;
 		for (int i = 0; i < gameObjects.size; i++) {
 			Forester forester = gameObjects.get(i);
 			result.set(0f, 0f, 0f, 0f);
@@ -56,7 +55,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 					forester.disable(speeches[i]);
 					// TODO: Добавить анимацию драки
 				} else {
-					gameScreen.gameOver = true;
+					gameScreen.showGameOver();
 					gameScreen.player.stop();
 					forester.stop();
 					forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
@@ -86,6 +85,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		forester.updateArea();
 		forester.updateMovementState(gameScreen.player, bottles, delta, forestGraph, isPaused);
 		forester.updatePath(forestGraph, gameScreen.player);
+
 		if (forester.isShouldRemoveSpeech()) {
 			speeches[index].remove();
 		} else if (forester.isShouldResetSpeech()) {
@@ -98,6 +98,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			speeches[index].setX(forester.getNewSpeechX(speeches[index].getWidth()));
 			speeches[index].setY(forester.getNewSpeechY());
 		}
+
 		forester.updateSpeechDuration(delta);
 	}
 

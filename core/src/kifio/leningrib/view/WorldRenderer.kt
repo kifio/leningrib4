@@ -57,28 +57,24 @@ class WorldRenderer(private var camera: OrthographicCamera?,
         if (!LGCGame.isDebug) return
 
         // Включаем поддержку прозрачности
-        Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-        renderer.projectionMatrix = camera!!.combined
-        renderer.begin(ShapeRenderer.ShapeType.Filled)
-
+//        Gdx.gl.glEnable(GL20.GL_BLEND)
+//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+//        renderer.projectionMatrix = camera!!.combined
+//        renderer.begin(ShapeRenderer.ShapeType.Filled)
+//
 //        drawPlayerPath(level.player);
 //        drawGrid();
 //		  drawCharacterDebug();
 //		  drawGrandmaDebug();
 //        drawMushroomsBounds();
 //        drawForesterDebug(level.foresters);
-        Gdx.gl.glDisable(GL20.GL_BLEND)
-        renderer.end()
+//        Gdx.gl.glDisable(GL20.GL_BLEND)
+//        renderer.end()
     }
 
     private fun drawGrid() {
         run {
-            var i = 0
-            while (i < Gdx.graphics.width) {
-                renderer.line(i.toFloat(), 0f, i.toFloat(), Gdx.graphics.height.toFloat())
-                i += GameScreen.tileSize
-            }
+
         }
         var i = 0
         while (i < Gdx.graphics.height) {

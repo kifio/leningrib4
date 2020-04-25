@@ -10,15 +10,16 @@ import kifio.leningrib.model.actors.WideAssetActor
 import kifio.leningrib.model.speech.LabelManager
 
 class StartGameButton(
+        private val offsetsCount: Int,
         private val title: String,
         private val camera: Camera,
         private val pressedState: TextureRegion,
-        private val unpressedState: TextureRegion
+        private val unpressedState: TextureRegion,
+        private val labelColor: Color
 ) : WideAssetActor(unpressedState) {
 
     var onTouchHandler: (() -> Unit)? = null
 
-    private val labelColor = Color(110 / 255f, 56 / 255f, 22 / 255f, 1f)
     private val labelX: Float
 
     init {
@@ -41,7 +42,7 @@ class StartGameButton(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        y = camera.position.y
+        y = camera.position.y - (height / 2) - ((0.75f * height) * offsetsCount)
         super.draw(batch, parentAlpha)
         LabelManager.getInstance().largeFont.color = labelColor
         LabelManager.getInstance().largeFont.draw(batch, title, labelX, this.y + (0.6f * this.height))

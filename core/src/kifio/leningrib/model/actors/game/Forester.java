@@ -238,6 +238,7 @@ public class Forester extends MovableActor {
     }
 
     public void updateSpeechDuration(float delta) {
+        if (isPaused) return;
         if (speechDuration > 3.5f) {
             speechDuration = 0f;
             return;

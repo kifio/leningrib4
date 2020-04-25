@@ -69,9 +69,7 @@ class SettingButton(
         iconY = this.y + 0.6f * (this.height - iconHeight)
         iconX = this.x + (this.width - iconWidth - 16 * Gdx.graphics.density)
         labelX = this.x + (16 * Gdx.graphics.density)
-    }
 
-    init {
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 touched = true

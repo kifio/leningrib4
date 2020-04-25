@@ -35,7 +35,10 @@ public class ResourcesManager {
     public static final String SETTING_DISABLED_PRESSED = "disabled_pressed.png";
     public static final String START_GAME = "start_game.png";
     public static final String START_GAME_PRESSED = "start_game_pressed.png";
-
+    public static final String RESTART_BUTTON = "restart_button.png";
+    public static final String RESTART_BUTTON_PRESSED = "restart_button_pressed.png";
+    public static final String GAME_OVER = "game_over.png";
+    public static final String RESULT_MUSHROOM = "result_mushroom.png";
 
     public static I18NBundle commonMushroomsSpeechBundle;
     public static I18NBundle powerMushroomsSpeechBundle;
@@ -122,6 +125,10 @@ public class ResourcesManager {
         am.load(SETTING_ENABLED_PRESSED, Texture.class);
         am.load(SETTING_DISABLED, Texture.class);
         am.load(SETTING_DISABLED_PRESSED, Texture.class);
+        am.load(RESTART_BUTTON, Texture.class);
+        am.load(RESTART_BUTTON_PRESSED, Texture.class);
+        am.load(GAME_OVER, Texture.class);
+        am.load(RESULT_MUSHROOM, Texture.class);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -162,6 +169,10 @@ public class ResourcesManager {
         putTexture(SETTING_DISABLED_PRESSED);
         putTexture(START_GAME);
         putTexture(START_GAME_PRESSED);
+        putTexture(RESTART_BUTTON);
+        putTexture(RESTART_BUTTON_PRESSED);
+        putTexture(GAME_OVER);
+        putTexture(RESULT_MUSHROOM);
         putTexture(GRASS_0, TILE_SIZE * 2, TILE_SIZE * 2);
         putTexture(GRASS_2, TILE_SIZE * 2, TILE_SIZE * 2);
     }

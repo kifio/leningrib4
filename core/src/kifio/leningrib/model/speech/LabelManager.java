@@ -20,6 +20,7 @@ public class LabelManager {
 
 	public BitmapFont smallFont;
 	public BitmapFont largeFont;
+	public BitmapFont xLargeFont;
 	private GlyphLayout glyphLayout = new GlyphLayout();
 	private Label.LabelStyle labelStyle = new Label.LabelStyle();
 
@@ -56,7 +57,7 @@ public class LabelManager {
 
 		if (withShadow) {
 			parameter.shadowOffsetY = 1;
-			parameter.size *= Gdx.graphics.getDensity();
+			parameter.size *= 1.2f * Gdx.graphics.getDensity();
 		}
 
 		return parameter;

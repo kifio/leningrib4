@@ -289,7 +289,7 @@ public class Player extends MovableActor {
                     isUnderTrees = true;
                     return;
                 } else {
-                    gameScreen.gameOver = true;
+                    gameScreen.showGameOver();
                     gameScreen.player.stop();
                     return;
                 }
