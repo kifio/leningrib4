@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.speech.LabelManager;
@@ -19,13 +21,13 @@ import model.Segment;
 // Chad first level config generator.
 public class FirstLevelBuilder {
 
-	static LevelMap getFirstLevel(Config constantsConfig) {
+	public static LevelMap getFirstLevel(Config constantsConfig) {
 
 		Set<Segment> segmentList = new HashSet<>();
 		List<Exit> exits = new ArrayList<>(3);
-//
-//		int firstExit = 11;
-//		int secondExit = 20;
+
+		int firstExit = 11;
+		int secondExit = 20;
 //
 //		// Добавляем нижнюю границу
 //		segmentList.add(new Segment(0, 0,
@@ -115,10 +117,15 @@ public class FirstLevelBuilder {
 
 	// FIXME: scaredArea should not be null!
 	static Forester getForester() {
-		return new Forester(GameScreen.tileSize, GameScreen.tileSize * 27,
-			GameScreen.tileSize * 6, GameScreen.tileSize * 27,
-			GameScreen.tileSize * 23, GameScreen.tileSize * 29,
-				GameScreen.tileSize, GameScreen.tileSize * 7);
+		return new Forester(
+				GameScreen.tileSize,
+				GameScreen.tileSize * 27,
+			GameScreen.tileSize * 6,
+				ThreadLocalRandom.current().nextInt(1, 4),
+				GameScreen.tileSize * 23,
+			GameScreen.tileSize * 27,
+				GameScreen.tileSize,
+				GameScreen.tileSize * 7);
 	}
 
 	private static float labelWidth =  Gdx.graphics.getWidth() - 2 * GameScreen.tileSize;

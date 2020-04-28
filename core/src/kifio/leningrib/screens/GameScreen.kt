@@ -11,8 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
+import kifio.leningrib.levels.CommonLevel
+import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
-import kifio.leningrib.levels.LevelFabric
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.Overlay
 import kifio.leningrib.model.actors.StaticActor
@@ -26,8 +27,8 @@ import model.WorldMap
 import java.util.concurrent.ThreadLocalRandom
 
 class GameScreen(game: LGCGame,
-                 var worldMap: WorldMap,
-                 levelMap: LevelMap    // Уровень конструируется с координатами 0,0. Карта уровня долго генерируется первый раз, передаем ее снаружи.
+                 levelMap: LevelMap,
+                 private var worldMap: WorldMap    // Уровень конструируется с координатами 0,0. Карта уровня долго генерируется первый раз, передаем ее снаружи.
 ) : BaseScreen(game) {
 
     private val gestureListener: LInputListener? = LInputListener(this)
@@ -48,9 +49,6 @@ class GameScreen(game: LGCGame,
     private var gameOver = false
 
     @JvmField
-    var isFirstLevelPassed = true
-
-    @JvmField
     var player: Player
 
     private var settings: Group? = null
@@ -60,7 +58,11 @@ class GameScreen(game: LGCGame,
         this.active = true
     }
 
-    private fun updateCamera(player: Player) {
+    fun isPaused() = paused
+
+    fun getCameraPostion() = game.camera.position
+
+    private fun updateCamera() {
         game.camera.update()
         game.camera.position.y = if (player.y < bottomCameraThreshold) {
             bottomCameraThreshold
@@ -71,7 +73,7 @@ class GameScreen(game: LGCGame,
 
     private fun getNextLevel(x: Int, y: Int): Level {
         val levelMap = worldMap.addLevel(x, y, LGCGame.getConfig())
-        return LevelFabric.getNextLevel(x, y, this, levelMap)
+        return CommonLevel(player, levelMap)
     }
 
     /*
@@ -83,7 +85,7 @@ class GameScreen(game: LGCGame,
 
         if (active) {
             update(delta)
-            updateCamera(level.player)
+            updateCamera()
             stage.act(delta)
             worldRenderer?.render(level, stage)
         }
@@ -104,14 +106,8 @@ class GameScreen(game: LGCGame,
     }
 
     private fun update(delta: Float) {
-        for (b in bottles) {
-            if (b.isRemovable()) {
-                b.remove()
-                bottles.remove(b)
-            }
-        }
         if (level.grandma != null) {
-            if (level.grandma.isReadyForDialog(level.player)) {
+            if (level.grandma.isReadyForDialog(player)) {
                 level.grandma.startDialog()
                 stage.addActor(level.grandma.grandmaLabel)
             }
@@ -122,17 +118,17 @@ class GameScreen(game: LGCGame,
     }
 
     private fun updateWorld(delta: Float) {
-        if (!isGameOver() && level.player.y >= yLimit) {
+        if (!isGameOver() && player.y >= yLimit) {
             nextLevelY++
             win = true
             return
-        } else if (!isGameOver() && level.player.x >= xLimit) {
+        } else if (!isGameOver() && player.x >= xLimit) {
             nextLevelX++
             win = true
             return
         }
         game.camera.position.y.let {
-            level.update(delta, bottles, it, paused)
+            level.update(delta, this)
         }
     }
 
@@ -161,7 +157,7 @@ class GameScreen(game: LGCGame,
         for (tree in treesManager.getTopBorderNonObstaclesTrees()) {
             stage.addActor(tree)
         }
-        stage.addActor(level.player)
+        stage.addActor(player)
         for (tree in treesManager.getBottomBorderNonObstaclesTrees()) {
             stage.addActor(tree)
         }
@@ -174,9 +170,6 @@ class GameScreen(game: LGCGame,
 //		if (level.getGrandma() != null) {
 //			stage.addActor(level.getGrandma().getGrandmaLabel());
 //		}
-        for (s in level.spaces) {
-            stage.addActor(s)
-        }
     }
 
     override fun dispose() {
@@ -231,8 +224,8 @@ class GameScreen(game: LGCGame,
         restartGameButton.onTouchHandler = {
             if (settings == null) {
                 val worldMap = WorldMap()
-                game.showGameScreen(GameScreen(game, worldMap, worldMap.addLevel(0, 0,
-                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT))))
+                game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
+                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT)), worldMap))
             }
         }
 
@@ -279,8 +272,8 @@ class GameScreen(game: LGCGame,
 
             restartGameButton.onTouchHandler = {
                 val worldMap = WorldMap()
-                game.showGameScreen(GameScreen(game, worldMap, worldMap.addLevel(0, 0,
-                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT))))
+                game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
+                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT)), worldMap))
             }
         }
 
@@ -413,7 +406,7 @@ class GameScreen(game: LGCGame,
         }
 
         if (!isGameOver()) {
-            level.movePlayerTo(x.toFloat(), y.mapYToLevel())
+            level.movePlayerTo(x.toFloat(), y.mapYToLevel(), player)
         }
 
         return true
@@ -426,12 +419,15 @@ class GameScreen(game: LGCGame,
         Gdx.input.inputProcessor = gestureDetector
         Gdx.input.isCatchBackKey = true
         worldRenderer = WorldRenderer(game.camera, spriteBatch)
-        player = if (isFirstLevelPassed) {
-            Player(2f * tileSize, 2f * tileSize)
+
+        if (LGCGame.firstLevelPassed()) {
+            player = Player(2f * tileSize, 2f * tileSize)
+            level = CommonLevel(player, levelMap)
         } else {
-            Player(2f * tileSize, 0f)
+            player = Player(2f * tileSize, 0f)
+            level = FirstLevel(levelMap)
+
         }
-        level = LevelFabric.getNextLevel(0, 0, this, levelMap)
         resetStage()
     }
 }

@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import generator.Config;
 import kifio.leningrib.LGCGame;
+import kifio.leningrib.levels.helpers.BottleManager;
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.SpaceManager;
@@ -27,87 +29,82 @@ import model.Room;
 
 public abstract class Level {
 
-    protected GameScreen gameScreen;
+    //    protected GameScreen gameScreen;
     private ForestGraph forestGraph;
     private ForestGraph strengthForestGraph;    // Гра, с которым можно гоняться за лесниками
     private ForestGraph dexterityForestGraph;  // Граф, с которым можно ходить за деревьями
-    protected MushroomsManager mushroomsManager;
-    protected ForestersManager forestersManager;
-    protected TreesManager treesManager;
-    private SpaceManager spaceManager;
+    private MushroomsManager mushroomsManager;
+    ForestersManager forestersManager;
+    private TreesManager treesManager;
+    private BottleManager bottleManager;
     private boolean isDisposed = false;
     private Rectangle[] rectangles;
 
-    Level(int x, int y, GameScreen gameScreen, LevelMap levelMap) {
-        this.gameScreen = gameScreen;
+    Level(Player player, LevelMap levelMap) {
         Config levelConfig = LGCGame.getConfig();
         Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, levelConfig);
+        Array<Forester> foresters = initForesters(levelMap,
+                levelConfig, player, roomsRectangles);
 
-        forestersManager = new ForestersManager(gameScreen,
-                initForesters(levelMap, levelConfig, roomsRectangles));
-
+        bottleManager = new BottleManager();
+        forestersManager = new ForestersManager(foresters);
         treesManager = new TreesManager();
         mushroomsManager = new MushroomsManager();
-        spaceManager = new SpaceManager();
 
         treesManager.buildTrees(levelMap);
-        mushroomsManager.initMushrooms(initMushrooms(levelConfig, treesManager));
-
-        spaceManager.buildSpaces(getPlayer(),
-                levelConfig,
-                treesManager.getObstacleTrees(),
-                mushroomsManager.getMushrooms(),
-                getRoomsRectangles(levelMap, levelConfig));
+        mushroomsManager.initMushrooms(initMushrooms(levelConfig,
+                treesManager,
+                player == null ? 0 : player.getMushroomsCount()));
 
         forestGraph = new ForestGraph(levelConfig,
                 treesManager.getObstacleTrees(),
-                forestersManager.getForesters(),
-                spaceManager.getSpaces());
+                forestersManager.getForesters());
 
         dexterityForestGraph = new ForestGraph(levelConfig,
                 treesManager.getOuterBordersTrees(),
-                forestersManager.getForesters(),
-                spaceManager.getSpaces());
+                forestersManager.getForesters());
 
         strengthForestGraph = new ForestGraph(levelConfig,
                 treesManager.getObstacleTrees(),
-                new Array<Actor>(),
-                spaceManager.getSpaces());
+                new Array<Actor>());
 
         for (Forester f : forestersManager.getForesters()) {
             f.initPath(forestGraph);
         }
     }
 
-    protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager);
+    protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager, int mushroomsCount);
 
-    protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Rectangle[] roomRectangles);
+    protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Player player, Rectangle[] roomRectangles);
 
-    public void update(float delta, ArrayList<Bottle> bottles, float cameraY, boolean isPaused) {
-        gameScreen.player.isPaused = isPaused;
+    public void update(float delta, GameScreen gameScreen) {
+        boolean isPaused = gameScreen.isPaused();
+        float cameraY = gameScreen.getCameraPostion().y;
+
+        gameScreen.player.isPaused = gameScreen.isPaused();
         gameScreen.player.checkStuckUnderTrees(gameScreen, treesManager);
+        bottleManager.updateBottles();
         strengthForestGraph.updateForestGraph(cameraY);
         forestGraph.updateForestGraph(cameraY);
-        forestersManager.updateForesters(delta, bottles, forestGraph, isPaused);
+        forestersManager.updateForesters(gameScreen, delta, bottleManager.getBottles(), forestGraph);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
     }
 
-    public Player getPlayer() {
-        return gameScreen.player;
-    }
+//    public Player getPlayer() {
+//        return gameScreen.player;
+//    }
 
     public Array<Mushroom> getMushrooms() {
         return mushroomsManager.getMushrooms();
     }
 
-    public void movePlayerTo(float x, float y) {
-        Player player = getPlayer();
+    public void movePlayerTo(float x, float y, Player player) {
         if (player.isDexterous()) {
-            player.resetPlayerPath(x, y, dexterityForestGraph, gameScreen);
+            player.resetPlayerPath(x, y, dexterityForestGraph);
         } else if (player.isStrong()) {
-            player.resetPlayerPath(x, y, strengthForestGraph, gameScreen);
+            player.resetPlayerPath(x, y, strengthForestGraph);
         } else {
-            player.resetPlayerPath(x, y, forestGraph, gameScreen);
+            player.resetPlayerPath(x, y, forestGraph);
         }
     }
 
@@ -131,11 +128,7 @@ public abstract class Level {
         return mushroomsManager.getSpeeches();
     }
 
-    public Array<Space> getSpaces() {
-        return spaceManager.getSpaces();
-    }
-
-    protected Rectangle[] getRoomsRectangles(LevelMap levelMap, Config config) {
+    private Rectangle[] getRoomsRectangles(LevelMap levelMap, Config config) {
         if (rectangles == null) {
             List<Room> rooms = levelMap.getRooms();
             int size = rooms.size();
@@ -154,7 +147,6 @@ public abstract class Level {
         mushroomsManager.dispose();
         forestersManager.dispose();
         forestGraph = null;
-        gameScreen = null;
         isDisposed = true;
     }
 }

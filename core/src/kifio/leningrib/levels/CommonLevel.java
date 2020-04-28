@@ -12,6 +12,7 @@ import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
 
@@ -20,17 +21,18 @@ public class CommonLevel extends Level {
 	private static final int MIN_STEP = 1;
 	private static final int MAX_STEP = 4;
 
-	CommonLevel(int x, int y, GameScreen gameScreen, LevelMap levelMap) {
-		super(x, y, gameScreen, levelMap);
+	public CommonLevel(Player player, LevelMap levelMap) {
+		super(player, levelMap);
 	}
 
-	@Override protected Array<Mushroom> initMushrooms(Config config, TreesManager treesManager) {
+	@Override protected Array<Mushroom> initMushrooms(Config config,
+													  TreesManager treesManager,
+													  int mushroomsCount) {
 		Array<Mushroom> mushrooms = new Array<>();
 
 		int levelHeight = config.getLevelHeight();
 		int levelWidth = config.getLevelWidth();
 
-		int mushroomsCount = getPlayer().getMushroomsCount();
 		int step = Math.max(MIN_STEP, MAX_STEP - (mushroomsCount / 10));
 
 		for (int i = 1; i < levelHeight - 1; i += step) {
@@ -54,11 +56,14 @@ public class CommonLevel extends Level {
 
 	@Override protected Array<Forester> initForesters(LevelMap levelMap,
 													  Config config,
+													  Player player,
 													  Rectangle[] roomsRectangles) {
 		Array<Forester> gameObjects = new Array<>();
+
 		for (Rectangle roomsRectangle : roomsRectangles) {
-			if (!Utils.isInRoom(roomsRectangle,
-					gameScreen.player.getX() / GameScreen.tileSize, gameScreen.player.getY() / GameScreen.tileSize)) {
+			if (player == null || !Utils.isInRoom(roomsRectangle,
+					player.getX() / GameScreen.tileSize,
+					player.getY() / GameScreen.tileSize)) {
 
 				int left = (int) (roomsRectangle.x + 1);
 				int top = (int) (roomsRectangle.y + roomsRectangle.height - 2);

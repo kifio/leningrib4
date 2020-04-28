@@ -2,13 +2,9 @@ package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.levels.FirstLevelBuilder
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.TreePart
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.launch.LaunchProgressBar
 import kifio.leningrib.model.actors.launch.LaunchScreenLogo
@@ -100,7 +96,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
     private fun onFirstLevelCreated(worldMap: WorldMap, levelMap: LevelMap) {
         Gdx.app.postRunnable {
             val start = System.nanoTime()
-            gameScreen = GameScreen(game, worldMap, levelMap)
+            gameScreen = GameScreen(game, levelMap, worldMap)
             val finish = System.nanoTime()
             Gdx.app.log("kifio", "Create game screen took: ${(finish - start) / 1_000_000}")
         }
@@ -115,8 +111,15 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             ResourcesManager.buildRegions()
             ResourcesManager.initializeSpeeches()
             val worldMap = WorldMap()
-            launchScreen?.onFirstLevelCreated(worldMap, worldMap.addLevel(0, 0,
-                    Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT)))
+            val level: LevelMap
+            if (LGCGame.firstLevelPassed()) {
+                level = worldMap.addLevel(0, 0, LGCGame.getConfig())
+                launchScreen?.onFirstLevelCreated(worldMap, level)
+            } else {
+                level = worldMap.addFirstLevel(LGCGame.getConfig())
+                launchScreen?.onFirstLevelCreated(worldMap, level)
+            }
+
             launchScreen = null
         }
     }

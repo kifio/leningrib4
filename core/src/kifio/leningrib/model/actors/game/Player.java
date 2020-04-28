@@ -182,7 +182,7 @@ public class Player extends MovableActor {
         return RUNING + "_" + m.getEffectName();
     }
 
-    public void resetPlayerPath(float x, float y, ForestGraph forestGraph, GameScreen gameScreen) {
+    public void resetPlayerPath(float x, float y, ForestGraph forestGraph) {
 
         float fromX = Utils.mapCoordinate(getX());
         float fromY = Utils.mapCoordinate(getY());

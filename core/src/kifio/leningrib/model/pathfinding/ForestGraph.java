@@ -49,8 +49,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 	// Инициализирует ноды, которые могут использоваться для поиска маршрута
 	public ForestGraph(Config constantsConfig,
 		Array<? extends Actor> trees,
-		Array<? extends Actor> actors,
-		Array<? extends Actor> spaces) {
+		Array<? extends Actor> actors) {
 
 		this.actors = actors;
 		currentActorsPositions = new Vector2[actors.size];
@@ -68,7 +67,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 			for (int j = 0; j < constantsConfig.getLevelHeight(); j++) {
 				x = GameScreen.tileSize * i;
 				y = GameScreen.tileSize * j;
-				if (!isActor(x, y, trees) && !isActor(x, y, spaces)) {
+				if (!isActor(x, y, trees)) {
 					nodes.add(new Vector2(x, y));
 				}
 			}

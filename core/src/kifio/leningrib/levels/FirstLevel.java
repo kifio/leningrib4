@@ -10,44 +10,32 @@ import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
 
 public class FirstLevel extends Level {
 
-    private Actor[] actors;
+    private Grandma grandma = new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize * 19);
 
-    FirstLevel(GameScreen gameScreen, LevelMap levelMap) {
-        super(0, 0, gameScreen, levelMap);
-        initActors();
-        gameScreen.isFirstLevelPassed = false;
-    }
-
-    private void initActors() {
-        actors = new Actor[2];
-
-        // Инициализация бабки
-        actors[0] = (new Grandma(GameScreen.tileSize * 4, GameScreen.tileSize * 19));
-
-        // Инициализация лесника
-        actors[1] = (forestersManager.getForesters().get(0));
+    public FirstLevel(LevelMap levelMap) {
+        super(null, levelMap);
     }
 
     @Override
-    protected Array<Mushroom> initMushrooms(Config constantsConfig, TreesManager treesManager) {
+    protected Array<Mushroom> initMushrooms(Config config, TreesManager treesManager, int mushroomsCount) {
         return FirstLevelBuilder.getMushrooms();
     }
 
     @Override
-    protected Array<Forester> initForesters(LevelMap levelMap, Config config, Rectangle[] roomRectangles) {
+    protected Array<Forester> initForesters(LevelMap levelMap, Config config, Player player, Rectangle[] roomRectangles) {
         Array<Forester> foresters = new Array<>(1);
         foresters.add(FirstLevelBuilder.getForester());
-        return foresters;
-    }
+        return foresters;    }
 
     @Override
     public Grandma getGrandma() {
-        return ((Grandma) actors[0]);
+        return grandma;
     }
 
     @Override

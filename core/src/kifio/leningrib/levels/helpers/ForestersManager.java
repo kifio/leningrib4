@@ -17,14 +17,12 @@ import kifio.leningrib.screens.GameScreen;
 
 public class ForestersManager extends ObjectsManager<Forester> {
 
-	private GameScreen gameScreen;
+//	private GameScreen gameScreen;
 	private Rectangle result = new Rectangle();
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
-	public ForestersManager(GameScreen gameScreen,
-							Array<Forester> foresters) {
-		foresters.removeRange(1, foresters.size - 1);
-		this.gameScreen = gameScreen;
+	public ForestersManager(Array<Forester> foresters) {
+//		foresters.removeRange(1, foresters.size - 1);
 		gameObjects = new Array<>(foresters.size);
 		gameObjects.addAll(foresters);
 		speeches = new Label[foresters.size];
@@ -46,7 +44,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return gameObjects;
 	}
 
-	public void updateForesters(float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph, boolean isPaused) {
+	public void updateForesters(GameScreen gameScreen, float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph) {
 		for (int i = 0; i < gameObjects.size; i++) {
 			Forester forester = gameObjects.get(i);
 			result.set(0f, 0f, 0f, 0f);
@@ -64,7 +62,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();
 			} else {
-				updateForestersPath(forester, bottles, i, delta, forestGraph, isPaused);
+				updateForestersPath(forester, bottles, i, delta, forestGraph, gameScreen);
 			}
 		}
 	}
@@ -77,13 +75,14 @@ public class ForestersManager extends ObjectsManager<Forester> {
 		return resultArea >= caughtArea && !player.isInvisible() && !player.isDexterous();
 	}
 
-	private void updateForestersPath(Forester forester, ArrayList<Bottle> bottles,
+	private void updateForestersPath(Forester forester,
+									 ArrayList<Bottle> bottles,
 									 int index,
 									 float delta,
 									 ForestGraph forestGraph,
-									 boolean isPaused) {
+									 GameScreen gameScreen) {
 		forester.updateArea();
-		forester.updateMovementState(gameScreen.player, bottles, delta, forestGraph, isPaused);
+		forester.updateMovementState(gameScreen.player, bottles, delta, forestGraph, gameScreen.isPaused());
 		forester.updatePath(forestGraph, gameScreen.player);
 
 		if (forester.isShouldRemoveSpeech()) {
@@ -103,7 +102,6 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	}
 
 	@Override public void dispose() {
-		gameScreen = null;
 		result = null;
 		super.dispose();
 	}

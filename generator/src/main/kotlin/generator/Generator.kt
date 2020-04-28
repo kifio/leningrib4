@@ -18,6 +18,42 @@ class Generator {
         BOTTOM
     }
 
+    fun getFirstLevel(worldMap: WorldMap, levelConfig: Config): LevelMap {
+        val map = LevelMap(mutableSetOf(), mutableListOf(), levelConfig)
+        val exitsBuilder = ExitsBuilder(levelConfig)
+
+        map.apply {
+            val exits = exitsBuilder.getExits(0, 0, Side.TOP, null)
+                    .plus(exitsBuilder.getExits(0, 0, Side.BOTTOM, null))
+
+            addExits(exits)
+
+            val bordersBuilder = BordersBuilder(levelConfig, exits)
+
+            addSegments(bordersBuilder.buildBorder(Side.BOTTOM, null))
+            addSegments(bordersBuilder.buildBorder(Side.TOP, null))
+            addSegments(bordersBuilder.buildBorder(Side.LEFT, null))
+            addSegments(bordersBuilder.buildBorder(Side.RIGHT, null))
+
+            // TODO: Rewrite
+            buildRooms(levelConfig, exits, this)
+
+            val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
+            val additionalSegments = getSegments().filter {
+                (it.y == 0 || it.y == levelConfig.levelHeight - 1)
+                        && (it .x > 0 && it.x < levelConfig.levelWidth - 1)
+            }.map {
+                additionalSegmentsMapper.convert(it)
+            }
+
+            addSegments(additionalSegments)
+
+        }
+
+        return map
+
+    }
+
     fun generateLevel(
         x: Int, y: Int,
         worldMap: WorldMap,

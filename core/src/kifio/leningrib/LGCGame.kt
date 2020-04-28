@@ -2,6 +2,7 @@ package kifio.leningrib
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -9,6 +10,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
+import com.sun.org.apache.xpath.internal.operations.Bool
 import generator.Config
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.screens.BaseScreen
@@ -18,10 +20,13 @@ import model.LevelMap
 import model.WorldMap
 
 
-class LGCGame() : Game() {
+class LGCGame(isDebug: Boolean) : Game() {
 
     companion object {
-        @JvmStatic
+
+        private const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
+        const val PREFERENCES_NAME = "kifio.leningrib"
+
         var isDebug = false
 
         const val LEVEL_WIDTH = 10
@@ -29,6 +34,10 @@ class LGCGame() : Game() {
 
         @JvmStatic
         fun getConfig(): Config  = Config(LEVEL_WIDTH, LEVEL_HEIGHT)
+
+        fun firstLevelPassed(): Boolean {
+            return Gdx.app.getPreferences(PREFERENCES_NAME).getBoolean(FIRST_LEVEL_PASSED)
+        }
     }
 
     val camera: OrthographicCamera = OrthographicCamera()
@@ -36,6 +45,10 @@ class LGCGame() : Game() {
     private var halfWidth = 0f
     private var halfHeight = 0f
     private val screenSwitchDuration = 0.3f
+
+    init {
+        LGCGame.isDebug = isDebug
+    }
 
     override fun create() {
         halfWidth = Gdx.graphics.width / 2f
@@ -56,7 +69,6 @@ class LGCGame() : Game() {
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
-
     }
 
     override fun dispose() {

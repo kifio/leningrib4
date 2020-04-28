@@ -12,7 +12,6 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		LGCGame.setDebug(BuildConfig.DEBUG);
-		initialize(new LGCGame(), config);
+		initialize(new LGCGame(BuildConfig.DEBUG), config);
 	}
 }

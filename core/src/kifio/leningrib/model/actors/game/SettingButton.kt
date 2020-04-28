@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
+import kifio.leningrib.LGCGame.Companion.PREFERENCES_NAME
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
@@ -35,7 +36,7 @@ class SettingButton(
     private val disabledIcon = getRegion(SETTING_DISABLED)
     private val disabledIconPressed = getRegion(SETTING_DISABLED_PRESSED)
 
-    private var prefs: Preferences = Gdx.app.getPreferences("kifio.leningrib")
+    private var prefs: Preferences = Gdx.app.getPreferences(PREFERENCES_NAME)
     private var enabled: Boolean
     private var switchIcon: TextureRegion
 
