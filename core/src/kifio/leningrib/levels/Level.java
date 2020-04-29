@@ -118,8 +118,6 @@ public abstract class Level {
 
     public abstract Grandma getGrandma();
 
-    public abstract Label[] getTutorialLabels();
-
     public Label[] getForestersSpeeches() {
         return forestersManager.speeches;
     }

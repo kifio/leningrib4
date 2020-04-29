@@ -42,6 +42,8 @@ class GameScreen(game: LGCGame,
     private var gameOverTime = 0f
     private var animationTime = 0.3f
 
+    private var shouldShowTutorial = true
+
     private var paused = true
 
     private var active = false
@@ -92,7 +94,7 @@ class GameScreen(game: LGCGame,
 
         if (win && gameOverTime < GAME_OVER_ANIMATION_TIME) {
             gameOverTime += delta
-            worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME, level, stage)
+            worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME)
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
 //            isFirstLevelPassed = true;
             player.resetPosition()
@@ -142,11 +144,6 @@ class GameScreen(game: LGCGame,
 
     private fun resetStage() {
         stage.clear()
-        if (level.tutorialLabels != null) {
-            for (l in level.tutorialLabels) {
-                stage.addActor(l)
-            }
-        }
         for (mushroom in level.mushrooms) {
             stage.addActor(mushroom)
         }
@@ -332,6 +329,10 @@ class GameScreen(game: LGCGame,
         }
 
         stage.addActor(pauseButton)
+
+        if (shouldShowTutorial) {
+            stage.addActor(Dialog(game.camera))
+        }
     }
 
     private fun setupVodka() {
@@ -424,9 +425,8 @@ class GameScreen(game: LGCGame,
             player = Player(2f * tileSize, 2f * tileSize)
             level = CommonLevel(player, levelMap)
         } else {
-            player = Player(2f * tileSize, 0f)
+            player = Player(tileSize * 5f, tileSize * 10f)
             level = FirstLevel(levelMap)
-
         }
         resetStage()
     }

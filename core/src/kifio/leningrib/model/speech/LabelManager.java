@@ -49,7 +49,7 @@ public class LabelManager {
 
 	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameters(boolean withShadow) {
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		parameter.characters =
+		parameter.characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" +
 			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}@";
 		parameter.color = Color.WHITE;
 		parameter.minFilter = Nearest;
@@ -57,7 +57,7 @@ public class LabelManager {
 
 		if (withShadow) {
 			parameter.shadowOffsetY = 1;
-			parameter.size *= 1.2f * Gdx.graphics.getDensity();
+			parameter.size *= Gdx.graphics.getDensity();
 		}
 
 		return parameter;
@@ -129,7 +129,7 @@ public class LabelManager {
 		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
 	}
 
-	public Label getLabel(String text, float x, float y, float w) {
+	public Label getLabel(String text, float x, float y) {
 		return getLabel(text, x, y, Color.WHITE);
 	}
 

@@ -93,9 +93,4 @@ public class CommonLevel extends Level {
 	@Override public Grandma getGrandma() {
 		return null;
 	}
-
-	@Override public Label[] getTutorialLabels() {
-		return null;
-	}
-
 }

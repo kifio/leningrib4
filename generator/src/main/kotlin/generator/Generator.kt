@@ -2,11 +2,7 @@ package generator
 
 import builders.*
 import mappers.AdditionalSegmentsMapper
-import model.Exit
-import model.LevelMap
-import model.Segment
-import model.WorldMap
-import java.util.function.Predicate
+import model.*
 import kotlin.random.Random
 
 class Generator {
@@ -24,7 +20,7 @@ class Generator {
 
         map.apply {
             val exits = exitsBuilder.getExits(0, 0, Side.TOP, null)
-                    .plus(exitsBuilder.getExits(0, 0, Side.BOTTOM, null))
+                    .plus(listOf(Exit(2, 0, false)))
 
             addExits(exits)
 
@@ -35,8 +31,12 @@ class Generator {
             addSegments(bordersBuilder.buildBorder(Side.LEFT, null))
             addSegments(bordersBuilder.buildBorder(Side.RIGHT, null))
 
-            // TODO: Rewrite
-            buildRooms(levelConfig, exits, this)
+            rooms.add(Room(0, 8, levelConfig.levelWidth))
+    		rooms.add(Room(8, 7, levelConfig.levelWidth))
+	    	rooms.add(Room(15, 7, levelConfig.levelWidth))
+		    rooms.add(Room(22, 6, levelConfig.levelWidth))
+
+            updateRoomBorders(this)
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
@@ -84,7 +84,12 @@ class Generator {
             addSegments(bordersBuilder.buildBorder(Side.LEFT, leftNeighbour))
             addSegments(bordersBuilder.buildBorder(Side.RIGHT, rightNeighbour))
 
-            buildRooms(levelConfig, exits, this)
+            val outerBordersHeight = 2  // height of top and bottom borders on screen
+            val roomsSpace = levelConfig.levelHeight - outerBordersHeight
+
+            rooms.addAll(RoomsBuilder(levelConfig).buildRooms(roomsSpace, exits))
+
+            updateRoomBorders(this)
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
@@ -99,17 +104,7 @@ class Generator {
         return map
     }
 
-    private fun buildRooms(levelConfig: Config,
-                           exits: List<Exit>,
-                           map: LevelMap) {
-
-        val outerBordersHeight = 2  // height of top and bottom borders on screen
-        val roomsSpace = levelConfig.levelHeight - outerBordersHeight
-
-        map.rooms = RoomsBuilder(levelConfig).buildRooms(
-            roomsSpace,
-            exits
-        )
+    private fun updateRoomBorders(map: LevelMap) {
 
         val roomBordersBuilder = RoomBordersBuilder()
 

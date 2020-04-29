@@ -9,7 +9,7 @@ class LevelMap(
     private val Config: Config
 ) {
 
-    lateinit var rooms: List<Room>
+    var rooms = mutableListOf<Room>()
 
     fun getSegments(): MutableSet<Segment> = segments
 

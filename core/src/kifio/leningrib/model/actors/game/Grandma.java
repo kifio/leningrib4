@@ -35,7 +35,7 @@ public class Grandma extends MovableActor {
         speechY = y;
 
         grandmaLabel = LabelManager.getInstance().getLabel("Ты гляди, че делает!", speechX,
-            y + GameScreen.tileSize, GameScreen.tileSize * 3);
+            y + GameScreen.tileSize);
 
 //        greetings.add(SpeechManager.getInstance().getLabel("Немытые грибы с земли срывает да ест!", speechX,
 //            y + GameScreen.tileSize, GameScreen.tileSize * 3));
@@ -119,7 +119,7 @@ public class Grandma extends MovableActor {
                 @Override public void run() {
                     grandmaLabel = LabelManager.getInstance().getLabel(
                         LabelManager.getInstance().getGrandmaSpeech(index), speechX,
-                        speechY + GameScreen.tileSize, GameScreen.tileSize * 3);
+                        speechY + GameScreen.tileSize);
 
 //                    grandmaLabel.setText(SpeechManager.getInstance().getGrandmaSpeech(index));
                 }
