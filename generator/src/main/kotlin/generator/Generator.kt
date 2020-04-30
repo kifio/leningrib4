@@ -20,7 +20,6 @@ class Generator {
 
         map.apply {
             val exits = exitsBuilder.getExits(0, 0, Side.TOP, null)
-                    .plus(listOf(Exit(2, 0, false)))
 
             addExits(exits)
 
@@ -31,10 +30,10 @@ class Generator {
             addSegments(bordersBuilder.buildBorder(Side.LEFT, null))
             addSegments(bordersBuilder.buildBorder(Side.RIGHT, null))
 
-            rooms.add(Room(0, 8, levelConfig.levelWidth))
+            rooms.add(Room(1, 8, levelConfig.levelWidth))
     		rooms.add(Room(8, 7, levelConfig.levelWidth))
 	    	rooms.add(Room(15, 7, levelConfig.levelWidth))
-		    rooms.add(Room(22, 6, levelConfig.levelWidth))
+		    rooms.add(Room(22, 8, levelConfig.levelWidth))
 
             updateRoomBorders(this)
 

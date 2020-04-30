@@ -117,7 +117,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                 level = worldMap.addLevel(0, 0, LGCGame.getConfig())
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             } else {
-                level = worldMap.addFirstLevel(Config(LEVEL_WIDTH, 30))
+                level = worldMap.addFirstLevel(Config(LEVEL_WIDTH, 35))
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             }
             launchScreen = null

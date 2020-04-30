@@ -53,11 +53,13 @@ class SettingButton(
     private val labelX: Float
 
     init {
-        val offset = 40 * Gdx.graphics.density
-        this.width = Gdx.graphics.width - (3 * offset)
-        this.height = (this.width / region.regionWidth) * region.regionHeight
+        region?.let { region ->
+            val offset = 40 * Gdx.graphics.density
+            this.width = Gdx.graphics.width - (3 * offset)
+            this.height = (this.width / region.regionWidth) * region.regionHeight
+            this.x = 2 * offset
+        }
 
-        this.x = 2 * offset
         enabled = prefs.getBoolean(key)
         switchIcon = if (enabled) enabledIcon else disabledIcon
 

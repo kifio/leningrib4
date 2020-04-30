@@ -108,12 +108,6 @@ class GameScreen(game: LGCGame,
     }
 
     private fun update(delta: Float) {
-        if (level.grandma != null) {
-            if (level.grandma.isReadyForDialog(player)) {
-                level.grandma.startDialog()
-                stage.addActor(level.grandma.grandmaLabel)
-            }
-        }
         addSpeechesToStage(level.mushroomsSpeeches)
         addSpeechesToStage(level.forestersSpeeches)
         updateWorld(delta)
@@ -158,15 +152,14 @@ class GameScreen(game: LGCGame,
         for (tree in treesManager.getBottomBorderNonObstaclesTrees()) {
             stage.addActor(tree)
         }
-        if (level.grandma != null) {
-            stage.addActor(level.grandma)
-        }
         for (i in 0 until level.foresters.size) {
             stage.addActor(level.foresters[i])
         }
-//		if (level.getGrandma() != null) {
-//			stage.addActor(level.getGrandma().getGrandmaLabel());
-//		}
+
+        (level as? FirstLevel)?.let {
+            stage.addActor(it.grandma)
+            stage.addActor(it.grandmaLabel)
+        }
     }
 
     override fun dispose() {
@@ -330,104 +323,117 @@ class GameScreen(game: LGCGame,
 
         stage.addActor(pauseButton)
 
-        if (shouldShowTutorial) {
-            stage.addActor(Dialog(game.camera))
+        if (shouldShowTutorial && !LGCGame.firstLevelPassed()) {
+            shouldShowTutorial = false
+
+            val overlay = Overlay(game.camera)
+            val dialog = Dialog(game.camera)
+
+            stage.addActor(overlay)
+            stage.addActor(dialog)
+
+            dialog.disposeHandler = {
+                dialog.addAction(Actions.run {
+                    dialog.remove()
+                    overlay.remove()
+                })
+            }
         }
     }
 
-    private fun setupVodka() {
-        val playerX = Utils.mapCoordinate(player.x)
-        val playerY = Utils.mapCoordinate(player.y)
-        val bottle = Bottle(playerX, playerY)
-        stage.addActor(bottle)
-        bottles.add(bottle)
-        bottle.addAction(if (player.goLeft) {
-            Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
-        } else {
-            Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
-        })
-    }
+private fun setupVodka() {
+    val playerX = Utils.mapCoordinate(player.x)
+    val playerY = Utils.mapCoordinate(player.y)
+    val bottle = Bottle(playerX, playerY)
+    stage.addActor(bottle)
+    bottles.add(bottle)
+    bottle.addAction(if (player.goLeft) {
+        Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
+    } else {
+        Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
+    })
+}
 
-    fun isGameOver() = gameOver || win
+fun isGameOver() = gameOver || win
 
-    companion object {
-        private const val GAME_OVER_ANIMATION_TIME = 0.5f
-        private const val MIN_FRAME_LENGTH = 1f / 60f
-        const val SPEECH_SEED = 768
+companion object {
+    private const val GAME_OVER_ANIMATION_TIME = 0.5f
+    private const val MIN_FRAME_LENGTH = 1f / 60f
+    const val SPEECH_SEED = 768
 
-        @JvmField
-        var tileSize = 0
+    @JvmField
+    var tileSize = 0
 
-        // Если позиция игрока больше одной из этих двух координат, н переходит на следующую локацию
-        var xLimit: Float = 0f
-        var yLimit: Float = 0f
+    // Если позиция игрока больше одной из этих двух координат, н переходит на следующую локацию
+    var xLimit: Float = 0f
+    var yLimit: Float = 0f
 
-        // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
-        var bottomCameraThreshold: Float = 0f
-        var topCameraThreshold: Float = 0f
-    }
+    // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
+    var bottomCameraThreshold: Float = 0f
+    var topCameraThreshold: Float = 0f
+}
 
-    internal fun handleFling() {
+internal fun handleFling() {
+    removeSettings()
+}
+
+internal fun handleKeyDown(keycode: Int): Boolean {
+    val handled = keycode == Input.Keys.BACK
+    if (handled) removeSettings()
+    return handled
+}
+
+private fun removeSettings() {
+    val sequenceAction = SequenceAction()
+    sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, animationTime))
+    sequenceAction.addAction(Actions.run {
+        settings?.remove()
+        settings = null
+    })
+
+    settings?.addAction(sequenceAction)
+}
+
+internal fun handleTouchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
+    return stage.touchDown(x, y, pointer, button)
+}
+
+internal fun handleTouchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
+    val actorIsTouched = stage.actors
+            .filterIsInstance<StaticActor>()
+            .find { it.touched } != null
+
+    stage.touchUp(x, y, pointer, button)
+    if (actorIsTouched) return true
+
+
+    if (x < 40 * Gdx.graphics.density && settings != null && settings?.actions?.isEmpty == true) {
         removeSettings()
-    }
-
-    internal fun handleKeyDown(keycode: Int): Boolean {
-        val handled = keycode == Input.Keys.BACK
-        if (handled) removeSettings()
-        return handled
-    }
-
-    private fun removeSettings() {
-        val sequenceAction = SequenceAction()
-        sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, animationTime))
-        sequenceAction.addAction(Actions.run {
-            settings?.remove()
-            settings = null
-        })
-
-        settings?.addAction(sequenceAction)
-    }
-
-    internal fun handleTouchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
-        return stage.touchDown(x, y, pointer, button)
-    }
-
-    internal fun handleTouchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
-        val actorIsTouched = stage.actors
-                .filterIsInstance<StaticActor>()
-                .find { it.touched } != null
-
-        stage.touchUp(x, y, pointer, button)
-        if (actorIsTouched) return true
-
-
-        if (x < 40 * Gdx.graphics.density && settings != null && settings?.actions?.isEmpty == true) {
-            removeSettings()
-            return true
-        }
-
-        if (!isGameOver()) {
-            level.movePlayerTo(x.toFloat(), y.mapYToLevel(), player)
-        }
-
         return true
     }
 
-    private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
-    private fun Int.mapYToLevel(): Float = game.camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
-
-    init {
-        Gdx.input.inputProcessor = gestureDetector
-        Gdx.input.isCatchBackKey = true
-        worldRenderer = WorldRenderer(game.camera, spriteBatch)
-
-        if (LGCGame.firstLevelPassed()) {
-            player = Player(2f * tileSize, 2f * tileSize)
-            level = CommonLevel(player, levelMap)
-        } else {
-            player = Player(tileSize * 5f, tileSize * 10f)
-            level = FirstLevel(levelMap)
-        }
-        resetStage()
+    if (!isGameOver()) {
+        level.movePlayerTo(x.toFloat(), y.mapYToLevel(), player)
     }
+
+    return true
+}
+
+private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
+private fun Int.mapYToLevel(): Float = game.camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
+
+init {
+    Gdx.input.inputProcessor = gestureDetector
+    Gdx.input.isCatchBackKey = true
+    worldRenderer = WorldRenderer(game.camera, spriteBatch)
+
+    if (LGCGame.firstLevelPassed()) {
+        player = Player(2f * tileSize, 2f * tileSize)
+        level = CommonLevel(player, levelMap)
+    } else {
+        player = Player(tileSize * 5f, tileSize * 9f)
+        level = FirstLevel(levelMap)
+    }
+    resetStage()
+}
 }

@@ -89,8 +89,4 @@ public class CommonLevel extends Level {
 		}
 		return gameObjects;
 	}
-
-	@Override public Grandma getGrandma() {
-		return null;
-	}
 }

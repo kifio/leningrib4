@@ -18,6 +18,8 @@ class Overlay(private val camera: Camera,
 
     init {
         x = offset
+        width = Gdx.graphics.width - x
+        height = Gdx.graphics.height.toFloat()
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 touched = true
@@ -31,7 +33,7 @@ class Overlay(private val camera: Camera,
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
+        y = camera.position.y - Gdx.graphics.height / 2f
         super.draw(batch, parentAlpha)
-        batch.draw(region, x, camera.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     }
 }

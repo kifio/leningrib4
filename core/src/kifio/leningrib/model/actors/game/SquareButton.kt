@@ -19,8 +19,10 @@ class SquareButton(
 
     init {
 
-        this.width = GameScreen.tileSize.toFloat()
-        this.height = (this.width / region.regionWidth) * region.regionHeight
+        region?.let {region ->
+            this.width = GameScreen.tileSize.toFloat()
+            this.height = (this.width / region.regionWidth) * region.regionHeight
+        }
 
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
