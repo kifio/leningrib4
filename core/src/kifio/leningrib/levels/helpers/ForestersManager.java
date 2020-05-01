@@ -22,7 +22,6 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
 
 	public ForestersManager(Array<Forester> foresters) {
-//		foresters.removeRange(1, foresters.size - 1);
 		gameObjects = new Array<>(foresters.size);
 		gameObjects.addAll(foresters);
 		speeches = new Label[foresters.size];

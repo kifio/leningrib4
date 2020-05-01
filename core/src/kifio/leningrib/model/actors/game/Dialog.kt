@@ -44,7 +44,7 @@ class Dialog(private val camera: Camera) : StaticActor(null) {
 
     private var hideAnimationStartTime = 0f
     private var accumulatedTime = 0f
-    private var delay = 0.5f
+    private var delay = 0.2f
     private val halfHeight = Gdx.graphics.height / 2
 
     init {

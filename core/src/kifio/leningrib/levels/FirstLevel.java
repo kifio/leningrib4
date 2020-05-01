@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import generator.Config;
+import kifio.leningrib.LGCGame;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Grandma;
@@ -55,14 +56,14 @@ public class FirstLevel extends Level {
     protected Array<Forester> initForesters(LevelMap levelMap, Config config, Player player, Rectangle[] roomRectangles) {
         Array<Forester> foresters = new Array<>(1);
         foresters.add(new Forester(
-                GameScreen.tileSize,
-                GameScreen.tileSize * 28,
-                GameScreen.tileSize * 6,
+                GameScreen.tileSize * 2,
+                GameScreen.tileSize * 24,
+                GameScreen.tileSize * LGCGame.Companion.getLevelWidth() - 2,
                 ThreadLocalRandom.current().nextInt(1, 4),
                 GameScreen.tileSize * 23,
-                GameScreen.tileSize * 35,
-                GameScreen.tileSize,
-                GameScreen.tileSize * 7));
+                GameScreen.tileSize * LGCGame.Companion.getLevelHeight(),
+                GameScreen.tileSize * 2,
+                GameScreen.tileSize * LGCGame.Companion.getLevelWidth() - 2));
         return foresters;
     }
 

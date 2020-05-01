@@ -49,6 +49,14 @@ class GameScreen(game: LGCGame,
 
     private var gameOver = false
 
+    // Если позиция игрока больше одной из этих двух координат, н переходит на следующую локацию
+    var xLimit: Float = Gdx.graphics.width - tileSize.toFloat()
+    var yLimit: Float = (LGCGame.getLevelHeight() - 1) * tileSize.toFloat()
+
+    // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
+    var bottomCameraThreshold: Float = Gdx.graphics.height / 2f
+    var topCameraThreshold: Float = LGCGame.getLevelHeight() * tileSize - Gdx.graphics.height / 2f
+
     @JvmField
     var player: Player
 
@@ -75,7 +83,9 @@ class GameScreen(game: LGCGame,
     }
 
     private fun getNextLevel(x: Int, y: Int): Level {
-        val levelMap = worldMap.addLevel(x, y, LGCGame.getConfig())
+        LGCGame.setFirstLevelPassed(true)
+        val levelMap = worldMap.addLevel(x, y,
+                Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight()))
         return CommonLevel(player, levelMap)
     }
 
@@ -220,7 +230,7 @@ class GameScreen(game: LGCGame,
             if (settings == null) {
                 val worldMap = WorldMap()
                 game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
-                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT)), worldMap))
+                        Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())), worldMap))
             }
         }
 
@@ -268,7 +278,7 @@ class GameScreen(game: LGCGame,
             restartGameButton.onTouchHandler = {
                 val worldMap = WorldMap()
                 game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
-                        Config(LGCGame.LEVEL_WIDTH, LGCGame.LEVEL_HEIGHT)), worldMap))
+                        Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())), worldMap))
             }
         }
 
@@ -314,6 +324,11 @@ class GameScreen(game: LGCGame,
 
     private fun resumeGame() {
         paused = false
+        bottomCameraThreshold = Gdx.graphics.height / 2f
+        topCameraThreshold = LGCGame.getLevelHeight() * tileSize - Gdx.graphics.height / 2f
+
+        xLimit = Gdx.graphics.width - tileSize.toFloat()
+        yLimit = (LGCGame.getLevelHeight() - 1) * tileSize.toFloat()
 
         val pauseButton = SquareButton(
                 getRegion(PAUSE_PRESSED),
@@ -343,7 +358,7 @@ class GameScreen(game: LGCGame,
         stage.addActor(pauseButton)
         stage.addActor(vodkaButton)
 
-        if (shouldShowTutorial && !LGCGame.firstLevelPassed()) {
+        if (shouldShowTutorial && !LGCGame.isFirstLevelPassed()) {
             shouldShowTutorial = false
 
             val overlay = Overlay(game.camera)
@@ -361,99 +376,96 @@ class GameScreen(game: LGCGame,
         }
     }
 
-private fun setupVodka() {
-    val playerX = Utils.mapCoordinate(player.x)
-    val playerY = Utils.mapCoordinate(player.y)
-    val bottle = Bottle(playerX, playerY)
-    stage.addActor(bottle)
-    level.addBottle(bottle)
-    bottle.addAction(if (player.goLeft) {
-        Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
-    } else {
-        Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
-    })
-}
+    private fun setupVodka() {
+        val playerX = Utils.mapCoordinate(player.x)
+        val playerY = Utils.mapCoordinate(player.y)
+        val bottle = Bottle(playerX, playerY)
+        stage.addActor(bottle)
+        level.addBottle(bottle)
+        bottle.addAction(if (player.goLeft) {
+            Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
+        } else {
+            Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
+        })
+    }
 
-fun isGameOver() = gameOver || win
+    fun isGameOver() = gameOver || win
 
-companion object {
-    private const val GAME_OVER_ANIMATION_TIME = 0.5f
-    private const val MIN_FRAME_LENGTH = 1f / 60f
-    const val SPEECH_SEED = 768
+    companion object {
+        private const val GAME_OVER_ANIMATION_TIME = 0.5f
+        private const val MIN_FRAME_LENGTH = 1f / 60f
+        const val SPEECH_SEED = 768
 
-    @JvmField
-    var tileSize = 0
+        @JvmField
+        var tileSize = 0
+    }
 
-    // Если позиция игрока больше одной из этих двух координат, н переходит на следующую локацию
-    var xLimit: Float = 0f
-    var yLimit: Float = 0f
-
-    // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
-    var bottomCameraThreshold: Float = 0f
-    var topCameraThreshold: Float = 0f
-}
-
-internal fun handleFling() {
-    removeSettings()
-}
-
-internal fun handleKeyDown(keycode: Int): Boolean {
-    val handled = keycode == Input.Keys.BACK
-    if (handled) removeSettings()
-    return handled
-}
-
-private fun removeSettings() {
-    val sequenceAction = SequenceAction()
-    sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, animationTime))
-    sequenceAction.addAction(Actions.run {
-        settings?.remove()
-        settings = null
-    })
-
-    settings?.addAction(sequenceAction)
-}
-
-internal fun handleTouchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
-    return stage.touchDown(x, y, pointer, button)
-}
-
-internal fun handleTouchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
-    val actorIsTouched = stage.actors
-            .filterIsInstance<StaticActor>()
-            .find { it.touched } != null
-
-    stage.touchUp(x, y, pointer, button)
-    if (actorIsTouched) return true
-
-
-    if (x < 40 * Gdx.graphics.density && settings != null && settings?.actions?.isEmpty == true) {
+    internal fun handleFling() {
         removeSettings()
+    }
+
+    internal fun handleKeyDown(keycode: Int): Boolean {
+        val handled = keycode == Input.Keys.BACK
+        if (handled) removeSettings()
+        return handled
+    }
+
+    private fun removeSettings() {
+        val sequenceAction = SequenceAction()
+        sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, animationTime))
+        sequenceAction.addAction(Actions.run {
+            settings?.remove()
+            settings = null
+        })
+
+        settings?.addAction(sequenceAction)
+    }
+
+    internal fun handleTouchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
+        return stage.touchDown(x, y, pointer, button)
+    }
+
+    internal fun handleTouchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
+        val actorIsTouched = stage.actors
+                .filterIsInstance<StaticActor>()
+                .find { it.touched } != null
+
+        stage.touchUp(x, y, pointer, button)
+        if (actorIsTouched) return true
+
+
+        if (x < 40 * Gdx.graphics.density && settings != null && settings?.actions?.isEmpty == true) {
+            removeSettings()
+            return true
+        }
+
+        if (!isGameOver()) {
+            level.movePlayerTo(x.toFloat(), y.mapYToLevel(), player)
+        }
+
         return true
     }
 
-    if (!isGameOver()) {
-        level.movePlayerTo(x.toFloat(), y.mapYToLevel(), player)
+    private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
+    private fun Int.mapYToLevel(): Float = game.camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
+
+    init {
+        Gdx.input.inputProcessor = gestureDetector
+        Gdx.input.isCatchBackKey = true
+        worldRenderer = WorldRenderer(game.camera, spriteBatch)
+
+        val room = levelMap.rooms[1]
+        val x = ThreadLocalRandom.current().nextInt(2, LGCGame.getLevelWidth() - 2).toFloat()
+        val y: Float
+
+        level = if (LGCGame.isFirstLevelPassed()) {
+            y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
+            player = Player(x * tileSize, y * tileSize)
+            CommonLevel(player, levelMap)
+        } else {
+            player = Player(x * tileSize, 9f * tileSize)
+            FirstLevel(levelMap)
+        }
+        resetStage()
     }
-
-    return true
-}
-
-private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
-private fun Int.mapYToLevel(): Float = game.camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
-
-init {
-    Gdx.input.inputProcessor = gestureDetector
-    Gdx.input.isCatchBackKey = true
-    worldRenderer = WorldRenderer(game.camera, spriteBatch)
-
-    if (LGCGame.firstLevelPassed()) {
-        player = Player(2f * tileSize, 2f * tileSize)
-        level = CommonLevel(player, levelMap)
-    } else {
-        player = Player(tileSize * 5f, tileSize * 9f)
-        level = FirstLevel(levelMap)
-    }
-    resetStage()
-}
 }

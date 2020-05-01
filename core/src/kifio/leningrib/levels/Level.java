@@ -41,7 +41,7 @@ public abstract class Level {
     private Rectangle[] rectangles;
 
     Level(Player player, LevelMap levelMap) {
-        Config levelConfig = LGCGame.getConfig();
+        Config levelConfig = new Config(LGCGame.Companion.getLevelWidth(), LGCGame.Companion.getLevelHeight());
         Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, levelConfig);
         Array<Forester> foresters = initForesters(levelMap,
                 levelConfig, player, roomsRectangles);

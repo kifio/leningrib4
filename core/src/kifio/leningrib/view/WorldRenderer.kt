@@ -112,10 +112,13 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     }
 
     private fun drawForesterDebug(foresters: Array<Forester>) {
-        for (forester in foresters) {
-            drawForesterPath(forester)
-        }
-//        		for (Forester forester : foresters) { drawForesterArea(forester); }
+//        for (forester in foresters) {
+//            drawForesterPath(forester)
+//        }
+
+//        for (Forester forester : foresters) {
+//            drawForesterArea(forester);
+//        }
     }
 
     private fun drawExitRect() {
@@ -150,8 +153,8 @@ class WorldRenderer(private var camera: OrthographicCamera?,
             batch.projectionMatrix = camera!!.combined
             batch.begin()
 
-            for (x in 0 .. (LGCGame.LEVEL_WIDTH * GameScreen.tileSize) step grassSize) {
-                for (y in 0 .. (LGCGame.LEVEL_HEIGHT * GameScreen.tileSize) step grassSize) {
+            for (x in 0 .. (LGCGame.getLevelWidth() * GameScreen.tileSize) step grassSize) {
+                for (y in 0 .. (LGCGame.getLevelHeight() * GameScreen.tileSize) step grassSize) {
                     if (y.toFloat() in bottom..top) {
                         batch.draw(
                                 if (isChessBoard) getRegion(x, y, (grassSize* 2)) else grass2,

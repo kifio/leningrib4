@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import generator.Config
 import kifio.leningrib.LGCGame
-import kifio.leningrib.LGCGame.Companion.LEVEL_WIDTH
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.launch.LaunchProgressBar
@@ -113,11 +112,12 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             ResourcesManager.initializeSpeeches()
             val worldMap = WorldMap()
             val level: LevelMap
-            if (LGCGame.firstLevelPassed()) {
-                level = worldMap.addLevel(0, 0, LGCGame.getConfig())
+            val config = Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())
+            if (LGCGame.isFirstLevelPassed()) {
+                level = worldMap.addLevel(0, 0, config)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             } else {
-                level = worldMap.addFirstLevel(Config(LEVEL_WIDTH, 35))
+                level = worldMap.addFirstLevel(config)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             }
             launchScreen = null

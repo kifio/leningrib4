@@ -1,12 +1,9 @@
 package kifio.leningrib.levels.helpers
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.Array
-import generator.Config
 import generator.SegmentType
-import kifio.leningrib.LGCGame.Companion.LEVEL_HEIGHT
-import kifio.leningrib.LGCGame.Companion.LEVEL_WIDTH
+import kifio.leningrib.LGCGame
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.TreePart
 import kifio.leningrib.screens.GameScreen
@@ -38,7 +35,7 @@ class TreesManager {
                     }
                 }
 
-                if (s.x == 0 || s.y == 0 || s.x == LEVEL_WIDTH - 1 || s.y == LEVEL_HEIGHT - 1) {
+                if (s.x == 0 || s.y == 0 || s.x == LGCGame.getLevelWidth() - 1 || s.y == LGCGame.getLevelHeight() - 1) {
                     outerTrees.add(tree)
                 } else {
                     innerBorderTrees.add(tree)

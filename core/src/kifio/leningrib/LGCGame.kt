@@ -2,42 +2,39 @@ package kifio.leningrib
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
-import com.sun.org.apache.xpath.internal.operations.Bool
-import generator.Config
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
-import model.LevelMap
-import model.WorldMap
 
 
 class LGCGame(isDebug: Boolean) : Game() {
 
     companion object {
-
         private const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
-        const val PREFERENCES_NAME = "kifio.leningrib"
+        private const val LEVEL_WIDTH = 10
+        private const val LEVEL_HEIGHT = 46
+        private const val FIRST_LEVEL_HEIGHT = 30
 
+        const val PREFERENCES_NAME = "kifio.leningrib"
         var isDebug = false
 
-        const val LEVEL_WIDTH = 10
-        const val LEVEL_HEIGHT = 46
+        private var firstLevelPassed = false
 
-        @JvmStatic
-        fun getConfig(): Config  = Config(LEVEL_WIDTH, LEVEL_HEIGHT)
+        fun isFirstLevelPassed() = firstLevelPassed
 
-        fun firstLevelPassed(): Boolean {
-            return Gdx.app.getPreferences(PREFERENCES_NAME).getBoolean(FIRST_LEVEL_PASSED)
+        fun setFirstLevelPassed(passed: Boolean) {
+            firstLevelPassed = passed
         }
+
+        fun getLevelWidth() = LEVEL_WIDTH
+        fun getLevelHeight() = if (firstLevelPassed) LEVEL_HEIGHT else FIRST_LEVEL_HEIGHT
     }
 
     val camera: OrthographicCamera = OrthographicCamera()
@@ -55,13 +52,8 @@ class LGCGame(isDebug: Boolean) : Game() {
         halfHeight = Gdx.graphics.height / 2f
         ResourcesManager.loadSplash()
 
-        GameScreen.tileSize = Gdx.graphics.width / LEVEL_WIDTH
+        GameScreen.tileSize = Gdx.graphics.width / getLevelWidth()
 
-        GameScreen.bottomCameraThreshold = Gdx.graphics.height / 2f
-        GameScreen.topCameraThreshold = LEVEL_HEIGHT * GameScreen.tileSize - Gdx.graphics.height / 2f
-
-        GameScreen.xLimit = Gdx.graphics.width - GameScreen.tileSize.toFloat()
-        GameScreen.yLimit = (LEVEL_HEIGHT - 1) * GameScreen.tileSize.toFloat()
 
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         showLaunchScreen()
