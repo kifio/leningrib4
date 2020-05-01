@@ -18,10 +18,6 @@ public class Grandma extends MovableActor {
     private boolean speechesNotStarted = true;
     private boolean giveVodkaSpeechesNotStarted = true;
 
-    public enum DialogState {
-        BEFORE_DIALOG, DIALOG_ACTIVE
-    }
-
     private Player player = null;
     private int initialPlayerMushroomCount = 0;
 
@@ -36,14 +32,11 @@ public class Grandma extends MovableActor {
     private String[] giveVodkaSpeeches = new String[]{
             "Ты гляди че делает!",
             "Грибы с земли ест!",
-            "На хоть самогончику",
-            "Рот пополощи..",
+            "На хоть рот пополощи..",
             "Лесникам не давай!",
             "Он их ума лишает..",
             ""
     };
-
-    private DialogState dialogState = DialogState.BEFORE_DIALOG;
 
     private Label grandmaLabel;
 
@@ -78,18 +71,26 @@ public class Grandma extends MovableActor {
         if (player != null && speechesNotStarted) {
             speechesNotStarted = false;
             initialPlayerMushroomCount = player.getMushroomsCount();
-            setSpeeches(speeches);
+            setSpeeches(speeches, null);
         }
 
         if (player != null && player.getMushroomsCount() != initialPlayerMushroomCount && giveVodkaSpeechesNotStarted) {
             giveVodkaSpeechesNotStarted = false;
             grandmaLabel.clearActions();
-            setSpeeches(giveVodkaSpeeches);
+            setSpeeches(giveVodkaSpeeches, new Runnable() {
+                @Override
+                public void run() {
+                    if (player != null) {
+                        player.bottlesCount++;
+                    }
+                }
+            });
         }
     }
 
-    private void setSpeeches(final String[] texts) {
+    private void setSpeeches(final String[] texts, Runnable callback) {
         SequenceAction sequenceAction = new SequenceAction();
+
         for (int i = 0; i < texts.length; i++) {
             final int index = i;
             sequenceAction.addAction(Actions.run(new Runnable() {
@@ -97,12 +98,20 @@ public class Grandma extends MovableActor {
                 public void run() {
                     LabelManager lm = LabelManager.getInstance();
                     float w = lm.getTextWidth(texts[index], lm.smallFont);
-                    grandmaLabel.setX(getX() - (w * 0.5f) - (GameScreen.tileSize));
+                    grandmaLabel.setX(getX() - (w * 0.5f) + (GameScreen.tileSize * 0.5f));
                     grandmaLabel.setText(texts[index]);
                 }
             }));
-            sequenceAction.addAction(Actions.delay(1.5f));
+
+            if (index == texts.length - 3 && callback != null) {
+                sequenceAction.addAction(Actions.run(callback));
+            }
+
+            if (index < texts.length - 1) {
+                sequenceAction.addAction(Actions.delay(1.5f));
+            }
         }
+
         grandmaLabel.addAction(sequenceAction);
     }
 
@@ -124,26 +133,6 @@ public class Grandma extends MovableActor {
     @Override
     protected String getRunningState() {
         return IDLE;
-    }
-
-    public boolean isReadyForDialog(MovableActor actor) {
-        float distance = Vector2.dst2(actor.getX() + (GameScreen.tileSize / 2f),
-            actor.getY(), getX() - (GameScreen.tileSize / 2f), getY());
-
-        return dialogState.equals(DialogState.BEFORE_DIALOG)
-            && distance < dialogThreshold;
-    }
-
-    public boolean isDialogActive() {
-        return dialogState.equals(DialogState.DIALOG_ACTIVE);
-    }
-
-    public void setDialogResult(DialogState dialogResult) {
-        dialogState = dialogResult;
-    }
-
-    public void startDialog() {
-        dialogState = DialogState.DIALOG_ACTIVE;
     }
 
     public Label getGrandmaLabel() {

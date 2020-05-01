@@ -14,4 +14,8 @@ class BottleManager {
             }
         }
     }
+
+    fun addBottle(bottle: Bottle) {
+        bottles.add(bottle)
+    }
 }

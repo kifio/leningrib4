@@ -38,6 +38,7 @@ public class Player extends MovableActor {
 
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
+    public int bottlesCount = 0;
 
     public Player(float x, float y) {
         super(x, y);

@@ -3,6 +3,7 @@ package kifio.leningrib.levels;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
@@ -25,13 +26,22 @@ import model.LevelMap;
 
 public class FirstLevel extends Level {
 
-    private Grandma grandma = new Grandma(GameScreen.tileSize * 5, GameScreen.tileSize * 18);
+    private Grandma grandma;
 
     public FirstLevel(LevelMap levelMap) {
         super(null, levelMap);
     }
 
     private float halfHeight = Gdx.graphics.getHeight() / 2f;
+
+    @Override
+    protected Array<? extends Actor> getActors() {
+        Array<Actor> arr = new Array<>();
+        if (grandma == null) grandma = new Grandma(GameScreen.tileSize * 5, GameScreen.tileSize * 18);
+        arr.add(grandma);
+        arr.addAll(forestersManager.getForesters());
+        return arr;
+    }
 
     @Override
     protected Array<Mushroom> initMushrooms(Config config, TreesManager treesManager, int mushroomsCount) {

@@ -112,6 +112,7 @@ class Dialog(private val camera: Camera) : StaticActor(null) {
             }
 
             this.batch.begin()
+
             LabelManager.getInstance().largeFont.color = labelColor
 
             LabelManager.getInstance().largeFont.draw(this.batch,

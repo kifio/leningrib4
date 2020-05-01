@@ -1,6 +1,7 @@
 package kifio.leningrib.levels;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
@@ -23,6 +24,11 @@ public class CommonLevel extends Level {
 
 	public CommonLevel(Player player, LevelMap levelMap) {
 		super(player, levelMap);
+	}
+
+	@Override
+	protected Array<? extends Actor> getActors() {
+		return forestersManager.getForesters();
 	}
 
 	@Override protected Array<Mushroom> initMushrooms(Config config,

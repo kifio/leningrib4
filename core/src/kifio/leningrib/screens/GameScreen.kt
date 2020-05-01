@@ -34,7 +34,6 @@ class GameScreen(game: LGCGame,
     private val gestureListener: LInputListener? = LInputListener(this)
     private val gestureDetector: LGestureDetector? = LGestureDetector(gestureListener, this)
     private var worldRenderer: WorldRenderer?
-    private val bottles = ArrayList<Bottle>()
     private var win = false
     private var nextLevelX = 0
     private var nextLevelY = 0
@@ -54,6 +53,8 @@ class GameScreen(game: LGCGame,
     var player: Player
 
     private var settings: Group? = null
+
+    private var vodkaButton: SquareButton? = null
 
     fun activate() {
         pauseGame(false)
@@ -108,6 +109,10 @@ class GameScreen(game: LGCGame,
     }
 
     private fun update(delta: Float) {
+        if (player.bottlesCount > 0) {
+            vodkaButton?.isVisible = true
+        }
+
         addSpeechesToStage(level.mushroomsSpeeches)
         addSpeechesToStage(level.forestersSpeeches)
         updateWorld(delta)
@@ -228,7 +233,7 @@ class GameScreen(game: LGCGame,
 
     private fun pauseGame(withRestartOption: Boolean) {
         paused = true
-
+        vodkaButton?.isVisible = false
         val overlay = Overlay(game.camera)
 
         var resumeOffsetsCount = 0
@@ -321,7 +326,22 @@ class GameScreen(game: LGCGame,
             pauseGame(true)
         }
 
+        if (vodkaButton == null) {
+            vodkaButton = SquareButton(
+                    getRegion(HUD_BOTTLE_PRESSED),
+                    getRegion(HUD_BOTTLE),
+                    game.camera,
+                    SquareButton.LEFT)
+
+            vodkaButton?.isVisible = false
+            vodkaButton?.onTouchHandler = {
+                if (vodkaButton?.isVisible == true) {
+                    setupVodka()
+                }
+            }
+        }
         stage.addActor(pauseButton)
+        stage.addActor(vodkaButton)
 
         if (shouldShowTutorial && !LGCGame.firstLevelPassed()) {
             shouldShowTutorial = false
@@ -346,7 +366,7 @@ private fun setupVodka() {
     val playerY = Utils.mapCoordinate(player.y)
     val bottle = Bottle(playerX, playerY)
     stage.addActor(bottle)
-    bottles.add(bottle)
+    level.addBottle(bottle)
     bottle.addAction(if (player.goLeft) {
         Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
     } else {

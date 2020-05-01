@@ -29,12 +29,12 @@ import model.Room;
 
 public abstract class Level {
 
-    //    protected GameScreen gameScreen;
+    protected ForestersManager forestersManager;
+
     private ForestGraph forestGraph;
     private ForestGraph strengthForestGraph;    // Гра, с которым можно гоняться за лесниками
     private ForestGraph dexterityForestGraph;  // Граф, с которым можно ходить за деревьями
     private MushroomsManager mushroomsManager;
-    ForestersManager forestersManager;
     private TreesManager treesManager;
     private BottleManager bottleManager;
     private boolean isDisposed = false;
@@ -58,7 +58,7 @@ public abstract class Level {
 
         forestGraph = new ForestGraph(levelConfig,
                 treesManager.getObstacleTrees(),
-                forestersManager.getForesters());
+                getActors());
 
         dexterityForestGraph = new ForestGraph(levelConfig,
                 treesManager.getOuterBordersTrees(),
@@ -72,6 +72,8 @@ public abstract class Level {
             f.initPath(forestGraph);
         }
     }
+
+    protected abstract Array<? extends Actor> getActors();
 
     protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager, int mushroomsCount);
 
@@ -88,6 +90,10 @@ public abstract class Level {
         forestGraph.updateForestGraph(cameraY);
         forestersManager.updateForesters(gameScreen, delta, bottleManager.getBottles(), forestGraph);
         mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
+    }
+
+    public void addBottle(Bottle bottle) {
+        bottleManager.addBottle(bottle);
     }
 
 //    public Player getPlayer() {

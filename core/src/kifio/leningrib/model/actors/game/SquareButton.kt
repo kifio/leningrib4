@@ -8,20 +8,28 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.screens.GameScreen
+import java.awt.ComponentOrientation
 
 class SquareButton(
         private val pressedState: TextureRegion,
         private val unpressedState: TextureRegion,
-        private val camera: Camera
+        private val camera: Camera,
+        private val orientation: Int = 1
 ) : StaticActor(unpressedState) {
+
+    companion object {
+        const val LEFT = 0
+        const val RIGHT = 1
+    }
 
     var onTouchHandler: (() -> Unit)? = null
 
     init {
 
         region?.let {region ->
-            this.width = GameScreen.tileSize.toFloat()
-            this.height = (this.width / region.regionWidth) * region.regionHeight
+            val scale = GameScreen.tileSize.toFloat() / region.regionWidth.toFloat()
+            this.width = region.regionWidth * scale
+            this.height = scale * region.regionHeight
         }
 
         addListener(object : InputListener() {
@@ -40,7 +48,11 @@ class SquareButton(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        val x = Gdx.graphics.width - (width + 16 * Gdx.graphics.density)
+        val x: Float = if (orientation == LEFT) {
+            8 * Gdx.graphics.density
+        } else {
+            Gdx.graphics.width - (width + 16 * Gdx.graphics.density)
+        }
         val y = camera.position.y + (Gdx.graphics.height / 2f) - (height + 16 * Gdx.graphics.density)
         setBounds(x, y, width, height)
         batch.draw(region, x, y, width, height)

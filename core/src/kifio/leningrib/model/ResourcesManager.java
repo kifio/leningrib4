@@ -1,6 +1,7 @@
 package kifio.leningrib.model;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -14,6 +15,8 @@ public class ResourcesManager {
     public static final String GRASS_2 = "grass_2.png";
     public static final String GRASS_0 = "grass_0.png";
     public static final String OVERLAY = "overlay.png";
+    public static final String BOTTLE = "bottle.png";
+    public static final String BOTTLE_SMOL = "bottle_smol.png";
     public static final String HUD_BOTTLE = "bottle_hud.png";
     public static final String HUD_BOTTLE_PRESSED = "bottle_hud_pressed.png";
     public static final String PAUSE = "pause_unpressed.png";
@@ -103,32 +106,39 @@ public class ResourcesManager {
     }
 
     public static void loadAssets() {
+
+        TextureLoader.TextureParameter param = new TextureLoader.TextureParameter();
+        param.minFilter = Texture.TextureFilter.Linear;
+        param.magFilter = Texture.TextureFilter.Linear;
+
         am.load("trees_map.png", Texture.class);
 
         am.load(GRASS_0, Texture.class);
         am.load(GRASS_2, Texture.class);
-        am.load(OVERLAY, Texture.class);
-        am.load(HUD_BOTTLE, Texture.class);
-        am.load(HUD_BOTTLE_PRESSED, Texture.class);
-        am.load(PAUSE, Texture.class);
-        am.load(PAUSE_PRESSED, Texture.class);
-        am.load(SETTINGS, Texture.class);
-        am.load(SETTINGS_PRESSED, Texture.class);
-        am.load(HUD_BACKGROUND, Texture.class);
-        am.load(BACK, Texture.class);
-        am.load(RESTART, Texture.class);
-        am.load(START_GAME, Texture.class);
-        am.load(START_GAME_PRESSED, Texture.class);
-        am.load(SETTING, Texture.class);
-        am.load(SETTINGS_BACKGROUND, Texture.class);
-        am.load(SETTING_ENABLED, Texture.class);
-        am.load(SETTING_ENABLED_PRESSED, Texture.class);
-        am.load(SETTING_DISABLED, Texture.class);
-        am.load(SETTING_DISABLED_PRESSED, Texture.class);
-        am.load(RESTART_BUTTON, Texture.class);
-        am.load(RESTART_BUTTON_PRESSED, Texture.class);
-        am.load(GAME_OVER, Texture.class);
-        am.load(RESULT_MUSHROOM, Texture.class);
+        am.load(OVERLAY, Texture.class, param);
+        am.load(BOTTLE, Texture.class, param);
+        am.load(BOTTLE_SMOL, Texture.class, param);
+        am.load(HUD_BOTTLE, Texture.class, param);
+        am.load(HUD_BOTTLE_PRESSED, Texture.class, param);
+        am.load(PAUSE, Texture.class, param);
+        am.load(PAUSE_PRESSED, Texture.class, param);
+        am.load(SETTINGS, Texture.class, param);
+        am.load(SETTINGS_PRESSED, Texture.class, param);
+        am.load(HUD_BACKGROUND, Texture.class, param);
+        am.load(BACK, Texture.class, param);
+        am.load(RESTART, Texture.class, param);
+        am.load(START_GAME, Texture.class, param);
+        am.load(START_GAME_PRESSED, Texture.class, param);
+        am.load(SETTING, Texture.class, param);
+        am.load(SETTINGS_BACKGROUND, Texture.class, param);
+        am.load(SETTING_ENABLED, Texture.class, param);
+        am.load(SETTING_ENABLED_PRESSED, Texture.class, param);
+        am.load(SETTING_DISABLED, Texture.class, param);
+        am.load(SETTING_DISABLED_PRESSED, Texture.class, param);
+        am.load(RESTART_BUTTON, Texture.class, param);
+        am.load(RESTART_BUTTON_PRESSED, Texture.class, param);
+        am.load(GAME_OVER, Texture.class, param);
+        am.load(RESULT_MUSHROOM, Texture.class, param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
