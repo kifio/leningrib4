@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
+import kifio.leningrib.LGCGame
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
@@ -29,19 +30,13 @@ class Dialog(private val camera: Camera) : StaticActor(null) {
     private val labelColor = Color.BLACK
     private val renderer = ShapeRenderer()
     private val batch = SpriteBatch()
-
     private var labelX: Float = 0f
     private var labelWidth: Float = 0f
     private var labelHeight: Float = 0f
-
     private var buttonX: Float = 0f
     private var buttonWidth: Float = 0f
     private var buttonHeight: Float = 0f
-
     private var index = 0
-
-    private val animationTime = 0.3f
-
     private var hideAnimationStartTime = 0f
     private var accumulatedTime = 0f
     private var delay = 0.2f
@@ -97,7 +92,7 @@ class Dialog(private val camera: Camera) : StaticActor(null) {
         renderer.rect(x, y, width, height)
         renderer.end()
 
-        if (accumulatedTime > animationTime + delay) {
+        if (accumulatedTime > LGCGame.ANIMATION_DURATION + delay) {
 
             if (index == instructions.size) {
                 hideAnimationStartTime = accumulatedTime
@@ -105,8 +100,8 @@ class Dialog(private val camera: Camera) : StaticActor(null) {
             }
 
             if (hideAnimationStartTime > 0) {
-                y = camera.position.y + (halfHeight * (accumulatedTime - hideAnimationStartTime) / animationTime) - (labelHeight / 2)
-                if (accumulatedTime > hideAnimationStartTime + animationTime) {
+                y = camera.position.y + (halfHeight * (accumulatedTime - hideAnimationStartTime) / LGCGame.ANIMATION_DURATION) - (labelHeight / 2)
+                if (accumulatedTime > hideAnimationStartTime + LGCGame.ANIMATION_DURATION) {
                     disposeHandler?.invoke()
                 }
             }
@@ -124,7 +119,7 @@ class Dialog(private val camera: Camera) : StaticActor(null) {
             this.batch.end()
 
         } else if (accumulatedTime > delay) {
-            y = camera.position.y + halfHeight - (halfHeight * (accumulatedTime - delay) / animationTime) - (labelHeight / 2)
+            y = camera.position.y + halfHeight - (halfHeight * (accumulatedTime - delay) / LGCGame.ANIMATION_DURATION) - (labelHeight / 2)
         }
     }
 

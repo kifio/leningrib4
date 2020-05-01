@@ -58,12 +58,12 @@ public class FirstLevel extends Level {
         foresters.add(new Forester(
                 GameScreen.tileSize * 2,
                 GameScreen.tileSize * 24,
-                GameScreen.tileSize * LGCGame.Companion.getLevelWidth() - 2,
+                GameScreen.tileSize * (LGCGame.Companion.getLevelWidth() - 2),
                 ThreadLocalRandom.current().nextInt(1, 4),
                 GameScreen.tileSize * 23,
-                GameScreen.tileSize * LGCGame.Companion.getLevelHeight(),
-                GameScreen.tileSize * 2,
-                GameScreen.tileSize * LGCGame.Companion.getLevelWidth() - 2));
+                GameScreen.tileSize * (LGCGame.Companion.getLevelHeight() - 2),
+                GameScreen.tileSize  * 2,
+                GameScreen.tileSize * (LGCGame.Companion.getLevelWidth() - 2)));
         return foresters;
     }
 

@@ -38,7 +38,6 @@ public abstract class Level {
     private TreesManager treesManager;
     private BottleManager bottleManager;
     private boolean isDisposed = false;
-    private Rectangle[] rectangles;
 
     Level(Player player, LevelMap levelMap) {
         Config levelConfig = new Config(LGCGame.Companion.getLevelWidth(), LGCGame.Companion.getLevelHeight());
@@ -131,15 +130,13 @@ public abstract class Level {
     }
 
     private Rectangle[] getRoomsRectangles(LevelMap levelMap, Config config) {
-        if (rectangles == null) {
-            List<Room> rooms = levelMap.getRooms();
-            int size = rooms.size();
-            rectangles = new Rectangle[size];
+        List<Room> rooms = levelMap.getRooms();
+        int size = rooms.size();
+        Rectangle[] rectangles = new Rectangle[size];
 
-            for (int i = 0; i < size; i++) {
-                Room room = rooms.get(i);
-                rectangles[i] = new Rectangle(0, room.getY(), config.getLevelWidth(), room.getHeight() - 2);
-            }
+        for (int i = 0; i < size; i++) {
+            Room room = rooms.get(i);
+            rectangles[i] = new Rectangle(0, room.getY(), config.getLevelWidth(), room.getHeight() - 2);
         }
         return rectangles;
     }

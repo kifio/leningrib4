@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
@@ -39,7 +40,8 @@ class GameScreen(game: LGCGame,
     private var nextLevelY = 0
     private var level: Level
     private var gameOverTime = 0f
-    private var animationTime = 0.3f
+    private var screenEnterTime = 0f
+    private var screenOut = false
 
     private var shouldShowTutorial = true
 
@@ -103,17 +105,21 @@ class GameScreen(game: LGCGame,
             worldRenderer?.render(level, stage)
         }
 
-        if (win && gameOverTime < GAME_OVER_ANIMATION_TIME) {
+        if (screenEnterTime < ANIMATION_DURATION) {
+            screenEnterTime += delta
+            worldRenderer?.renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
+        } else if (screenOut || win && gameOverTime < GAME_OVER_ANIMATION_TIME) {
             gameOverTime += delta
-            worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME)
+            worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME, false)
         } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
-//            isFirstLevelPassed = true;
+            worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME, false)
             player.resetPosition()
             level = getNextLevel(nextLevelX, nextLevelY)
             resetStage()
             resumeGame()
             worldRenderer?.isChessBoard = player.mushroomsCount > 5 && ThreadLocalRandom.current().nextBoolean()
             gameOverTime = 0f
+            screenEnterTime = 0f
             win = false
         }
     }
@@ -219,7 +225,7 @@ class GameScreen(game: LGCGame,
                     addActor(SettingButton(game.camera, 0))
                     addActor(SettingButton(game.camera, 1))
                     addActor(SettingButton(game.camera, 2))
-                    addAction(Actions.moveTo(0F, 0F, animationTime))
+                    addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
                 }
 
                 stage.addActor(settings)
@@ -228,9 +234,7 @@ class GameScreen(game: LGCGame,
 
         restartGameButton.onTouchHandler = {
             if (settings == null) {
-                val worldMap = WorldMap()
-                game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
-                        Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())), worldMap))
+                restartGame()
             }
         }
 
@@ -276,9 +280,7 @@ class GameScreen(game: LGCGame,
             )
 
             restartGameButton.onTouchHandler = {
-                val worldMap = WorldMap()
-                game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
-                        Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())), worldMap))
+                restartGame()
             }
         }
 
@@ -296,7 +298,7 @@ class GameScreen(game: LGCGame,
                     addActor(SettingButton(game.camera, 0))
                     addActor(SettingButton(game.camera, 1))
                     addActor(SettingButton(game.camera, 2))
-                    addAction(Actions.moveTo(0F, 0F, animationTime))
+                    addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
                 }
 
                 stage.addActor(settings)
@@ -376,6 +378,16 @@ class GameScreen(game: LGCGame,
         }
     }
 
+    private fun restartGame() {
+        LGCGame.setFirstLevelPassed(true)
+        screenOut = true  // Чтобы рисовать черный экран
+        val worldMap = WorldMap()
+        game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
+                Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())), worldMap))
+        stage.addAction(Actions.delay(ANIMATION_DURATION - 0.1f))
+        stage.addAction(Actions.run { stage.actors.forEach { it.remove() } })
+    }
+
     private fun setupVodka() {
         val playerX = Utils.mapCoordinate(player.x)
         val playerY = Utils.mapCoordinate(player.y)
@@ -392,9 +404,7 @@ class GameScreen(game: LGCGame,
     fun isGameOver() = gameOver || win
 
     companion object {
-        private const val GAME_OVER_ANIMATION_TIME = 0.5f
-        private const val MIN_FRAME_LENGTH = 1f / 60f
-        const val SPEECH_SEED = 768
+        private const val GAME_OVER_ANIMATION_TIME = ANIMATION_DURATION
 
         @JvmField
         var tileSize = 0
@@ -412,7 +422,7 @@ class GameScreen(game: LGCGame,
 
     private fun removeSettings() {
         val sequenceAction = SequenceAction()
-        sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, animationTime))
+        sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, ANIMATION_DURATION))
         sequenceAction.addAction(Actions.run {
             settings?.remove()
             settings = null

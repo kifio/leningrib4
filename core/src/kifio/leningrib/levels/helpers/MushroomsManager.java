@@ -15,6 +15,8 @@ import kifio.leningrib.screens.GameScreen;
 
 public class MushroomsManager extends ObjectsManager<Mushroom> {
 
+    private static int SPEECH_SEED = 768;
+
     private Array<Integer> removedMushrooms = new Array<>(4);
 
     public MushroomsManager() {
@@ -87,7 +89,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         if (var1 == 0) {
             return false;
         } else {
-            return ThreadLocalRandom.current().nextInt(Math.max(256, GameScreen.SPEECH_SEED / var1)) / 8 == 0;
+            return ThreadLocalRandom.current().nextInt(Math.max(256, SPEECH_SEED / var1)) / 8 == 0;
         }
     }
 

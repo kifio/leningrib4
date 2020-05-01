@@ -22,6 +22,7 @@ class LGCGame(isDebug: Boolean) : Game() {
         private const val LEVEL_HEIGHT = 46
         private const val FIRST_LEVEL_HEIGHT = 30
 
+        const val ANIMATION_DURATION = 0.5f
         const val PREFERENCES_NAME = "kifio.leningrib"
         var isDebug = false
 
@@ -41,7 +42,6 @@ class LGCGame(isDebug: Boolean) : Game() {
 
     private var halfWidth = 0f
     private var halfHeight = 0f
-    private val screenSwitchDuration = 0.3f
 
     init {
         LGCGame.isDebug = isDebug
@@ -53,7 +53,6 @@ class LGCGame(isDebug: Boolean) : Game() {
         ResourcesManager.loadSplash()
 
         GameScreen.tileSize = Gdx.graphics.width / getLevelWidth()
-
 
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         showLaunchScreen()
@@ -90,7 +89,7 @@ class LGCGame(isDebug: Boolean) : Game() {
         actor.setOrigin(halfWidth, halfHeight)
         actor.color.a = 1f
         val sequenceAction = SequenceAction()
-        sequenceAction.addAction(Actions.parallel(Actions.alpha(0f, screenSwitchDuration), Actions.scaleTo(1.5f, 1.5f, screenSwitchDuration, Interpolation.exp5)))
+        sequenceAction.addAction(Actions.parallel(Actions.alpha(0f, ANIMATION_DURATION), Actions.scaleTo(1.5f, 1.5f, ANIMATION_DURATION, Interpolation.exp5)))
         sequenceAction.addAction(Actions.run(runnable))
         actor.addAction(sequenceAction)
     }
@@ -103,7 +102,7 @@ class LGCGame(isDebug: Boolean) : Game() {
         actor.color.a = 0f
         val sequenceAction = SequenceAction()
         sequenceAction.addAction(Actions.scaleTo(1.5f, 1.5f, 0f))
-        sequenceAction.addAction(Actions.parallel(Actions.alpha(1f, screenSwitchDuration), Actions.scaleTo(1.0f, 1.0f, screenSwitchDuration, Interpolation.exp5)))
+        sequenceAction.addAction(Actions.parallel(Actions.alpha(1f, ANIMATION_DURATION), Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5)))
         sequenceAction.addAction(Actions.run { current.dispose() })
         actor.addAction(sequenceAction)
     }

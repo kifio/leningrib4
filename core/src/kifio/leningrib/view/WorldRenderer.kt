@@ -31,8 +31,10 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     var isChessBoard: Boolean = false
 
     fun renderBlackScreen(currentTime: Float,
-                          maximumTime: Float) {
-        val alpha = (currentTime / maximumTime).coerceAtMost(1f)
+                          maximumTime: Float,
+                          inverted: Boolean) {
+        var alpha = (currentTime / maximumTime).coerceAtMost(1f)
+        if (inverted) alpha = 1f - alpha
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         renderer.projectionMatrix = camera!!.combined
