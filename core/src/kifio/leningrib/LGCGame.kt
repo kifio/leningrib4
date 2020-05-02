@@ -2,6 +2,7 @@ package kifio.leningrib
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
@@ -17,23 +18,29 @@ import kifio.leningrib.screens.LaunchScreen
 class LGCGame(isDebug: Boolean) : Game() {
 
     companion object {
-        private const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
         private const val LEVEL_WIDTH = 10
         private const val LEVEL_HEIGHT = 46
         private const val FIRST_LEVEL_HEIGHT = 30
 
         const val ANIMATION_DURATION = 0.5f
         const val PREFERENCES_NAME = "kifio.leningrib"
+        const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
+
         var isDebug = false
 
         private var firstLevelPassed = false
+
+        private var prefs: Preferences? = null
 
         fun isFirstLevelPassed() = firstLevelPassed
 
         fun setFirstLevelPassed(passed: Boolean) {
             firstLevelPassed = passed
+            prefs?.putBoolean(FIRST_LEVEL_PASSED, passed)
+            prefs?.flush()
         }
 
+        fun getPreferences() = prefs
         fun getLevelWidth() = LEVEL_WIDTH
         fun getLevelHeight() = if (firstLevelPassed) LEVEL_HEIGHT else FIRST_LEVEL_HEIGHT
     }
@@ -48,12 +55,12 @@ class LGCGame(isDebug: Boolean) : Game() {
     }
 
     override fun create() {
+        prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
+        firstLevelPassed = prefs?.getBoolean(FIRST_LEVEL_PASSED) ?: false
         halfWidth = Gdx.graphics.width / 2f
         halfHeight = Gdx.graphics.height / 2f
         ResourcesManager.loadSplash()
-
         GameScreen.tileSize = Gdx.graphics.width / getLevelWidth()
-
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         showLaunchScreen()
     }

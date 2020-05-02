@@ -162,6 +162,14 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 			this.connections.put(fromIndex, connections);
 		}
 
+		for (Connection connection : connections) {
+			Vector2 foo = ((PointsConnection) connection).getFromNode();
+			Vector2 bar = ((PointsConnection) connection).getToNode();
+			if (foo.epsilonEquals(from) && to.epsilonEquals(bar)) {
+				 return;
+			}
+		}
+
 		connections.add(new PointsConnection(from, to));
 	}
 

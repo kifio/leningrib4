@@ -21,6 +21,7 @@ class StartGameButton(
     var onTouchHandler: (() -> Unit)? = null
 
     private val labelX: Float
+    private var offset: Float = 0f
 
     init {
         val labelWidth = LabelManager.getInstance().getTextWidth(title, LabelManager.getInstance().largeFont)
@@ -44,7 +45,8 @@ class StartGameButton(
     override fun draw(batch: Batch, parentAlpha: Float) {
         y = camera.position.y - (height / 2) - ((0.75f * height) * offsetsCount)
         super.draw(batch, parentAlpha)
+        offset = if (touched) 0.5f else 0.6f
         LabelManager.getInstance().largeFont.color = labelColor
-        LabelManager.getInstance().largeFont.draw(batch, title, labelX, this.y + (0.6f * this.height))
+        LabelManager.getInstance().largeFont.draw(batch, title, labelX, this.y + (offset * this.height))
     }
 }

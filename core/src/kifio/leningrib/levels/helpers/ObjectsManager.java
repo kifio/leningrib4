@@ -17,6 +17,7 @@ public class ObjectsManager<T extends Actor> {
 		 	while (iterator.hasNext()) {
 				T next = iterator.next();
 				if (next != null) {
+					next.clear();
 		 			next.remove();
 				}
 		 		iterator.remove();
@@ -27,6 +28,7 @@ public class ObjectsManager<T extends Actor> {
 		if (speeches != null) {
 			for (int i = 0; i < speeches.length; i++) {
 				if (speeches[i] != null) {
+					speeches[i].clear();
 					speeches[i].remove();
 					speeches[i] = null;
 				}

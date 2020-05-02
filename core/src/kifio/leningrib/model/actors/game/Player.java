@@ -200,7 +200,7 @@ public class Player extends MovableActor {
         stop();
         forestGraph.updatePath(fromX, fromY, toX, toY, path);
 
-        if (path.getCount() > 0) {
+        if (path.getCount() > 0 && current != null) {
             addAction(getMoveActionsSequence());
         }
     }

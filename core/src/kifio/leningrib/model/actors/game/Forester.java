@@ -27,7 +27,7 @@ public class Forester extends MovableActor {
     private static final String IDLE = "idle";
     private static final String RUN = "run";
 
-    public static Color DEFAULT_SPEECH_COLOR = Color.valueOf("#A0A33B");
+    public static Color DEFAULT_SPEECH_COLOR = new Color(249 / 255f, 218 / 255f, 74f / 255f, 1f);
     public static Color AGGRESSIVE_SPEECH_COLOR = Color.valueOf("#FF603B");
 
     private static int NOTICE_AREA_SIDE = 7;
@@ -388,7 +388,7 @@ public class Forester extends MovableActor {
 
         forestGraph.updatePath(Utils.mapCoordinate(getX()), Utils.mapCoordinate(getY()),
                 Utils.mapCoordinate(tx), Utils.mapCoordinate(ty), this.path);
-
+        clearActions();
         addAction(getMoveActionsSequence());
     }
 

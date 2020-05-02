@@ -107,6 +107,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         seq.addAction(Actions.run(new Runnable() {
             @Override
             public void run() {
+                speeches[speechIndex].clear();
                 speeches[speechIndex].remove();
                 speeches[speechIndex] = null;
             }
