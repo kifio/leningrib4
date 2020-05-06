@@ -11,10 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
+import kifio.leningrib.LGCGame.Companion.isFirstLevelPassed
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
+import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.Overlay
 import kifio.leningrib.model.actors.StaticActor
@@ -39,9 +41,11 @@ class GameScreen(game: LGCGame,
     private var nextLevelX = 0
     private var nextLevelY = 0
     private var level: Level
-    private var gameOverTime = 0f
+
+    private var blackScreenTime = 0f
     private var screenEnterTime = 0f
     private var screenOut = false
+    private var startGame = false
 
     private var shouldShowTutorial = true
 
@@ -76,12 +80,12 @@ class GameScreen(game: LGCGame,
     fun getCameraPostion() = game.camera.position
 
     private fun updateCamera() {
-        game.camera.update()
-        game.camera.position.y = if (player.y < bottomCameraThreshold) {
-            bottomCameraThreshold
-        } else {
-            player.y.coerceAtMost(topCameraThreshold)
-        }
+//        game.camera.update()
+//        game.camera.position.y = if (player.y < bottomCameraThreshold) {
+//            bottomCameraThreshold
+//        } else {
+//            player.y.coerceAtMost(topCameraThreshold)
+//        }
     }
 
     private fun getNextLevel(x: Int, y: Int): Level {
@@ -108,19 +112,26 @@ class GameScreen(game: LGCGame,
         if (screenEnterTime < ANIMATION_DURATION) {
             screenEnterTime += delta
             worldRenderer?.renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
-        } else if (screenOut || win && gameOverTime < GAME_OVER_ANIMATION_TIME) {
-            gameOverTime += delta
-            worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME, false)
-        } else if (win && gameOverTime >= GAME_OVER_ANIMATION_TIME) {
-            worldRenderer?.renderBlackScreen(gameOverTime, GAME_OVER_ANIMATION_TIME, false)
+        } else if (blackScreenTime < ANIMATION_DURATION && (startGame || screenOut || win)) {
+            blackScreenTime += delta
+            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
+        } else if (win && blackScreenTime >= ANIMATION_DURATION) {
+            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
             player.resetPosition()
             level = getNextLevel(nextLevelX, nextLevelY)
             resetStage()
             resumeGame()
             worldRenderer?.isChessBoard = player.mushroomsCount > 5 && ThreadLocalRandom.current().nextBoolean()
-            gameOverTime = 0f
+            blackScreenTime = 0f
             screenEnterTime = 0f
             win = false
+        } else if (startGame && blackScreenTime >= ANIMATION_DURATION) {
+            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
+            startGame = false
+            blackScreenTime = 0f
+            game.camera.position.y = player.y
+            game.camera.zoom = 0.5f
+            screenEnterTime = 0f
         }
     }
 
@@ -178,6 +189,7 @@ class GameScreen(game: LGCGame,
         }
 
         (level as? FirstLevel)?.let {
+            stage.addActor(it.friend)
             stage.addActor(it.grandma)
             stage.addActor(it.grandmaLabel)
         }
@@ -313,6 +325,10 @@ class GameScreen(game: LGCGame,
                 restartGameButton?.remove()
                 resumeGame()
             }
+
+            if (!isFirstLevelPassed()) {
+                startGame = true  // Чтобы рисовать черный экран
+            }
         }
 
         stage.addActor(overlay)
@@ -360,21 +376,52 @@ class GameScreen(game: LGCGame,
         stage.addActor(pauseButton)
         stage.addActor(vodkaButton)
 
-        if (shouldShowTutorial && !LGCGame.isFirstLevelPassed()) {
+        if (shouldShowTutorial && !isFirstLevelPassed()) {
             shouldShowTutorial = false
 
-            val overlay = Overlay(game.camera)
-            val dialog = Dialog(game.camera)
+            val sequence = SequenceAction()
+            sequence.addAction(Actions.delay(ANIMATION_DURATION * 2))
+            sequence.addAction(Actions.run {
+                val overlay = Overlay(game.camera)
+                (level as? FirstLevel)?.let {
 
-            stage.addActor(overlay)
-            stage.addActor(dialog)
+                    val speeches = arrayOf(
+                            "В моих беспокойных снах, я все чаще вижу этот лес..",
+                            "Лол, братан, чу ты несешь вообще? Мы с тобой сюда за грибами шторящими приехали.",
+                            "Только они не хранятся от слова совсем и их надо прямо на месте есть, иначе эффекта не будет.",
+                            "Ладно, ладно. Понял.\nА как их отличить?",
+                            "Да ты все подряд собирай, когда накроет, почувствуешь. Главное лесникам не попадайся.",
+                            "Эти алкаши кайфоломы еще те. Но за бутылку водки сделают вид, что тебя не видели.",
+                            "Где я им здесь водку возьму? Ты бы хоть сказал когда мы собирались!",
+                            "Да я хз. Забыл что-то. Ты иди нпчинай собирать там наверху за деревьями.\nА я в машине кое-что посмотрю и догоню.",
+                            "Слишком далеко только не уходи."
+                    )
 
-            dialog.disposeHandler = {
-                dialog.addAction(Actions.run {
-                    dialog.remove()
-                    overlay.remove()
-                })
-            }
+                     val characters = arrayOf(
+                             ResourcesManager.PLAYER_DIALOG_FACE,
+                             ResourcesManager.FRIEND_DIALOG_FACE,
+                             ResourcesManager.FRIEND_DIALOG_FACE,
+                             ResourcesManager.PLAYER_DIALOG_FACE,
+                             ResourcesManager.FRIEND_DIALOG_FACE,
+                             ResourcesManager.FRIEND_DIALOG_FACE,
+                             ResourcesManager.PLAYER_DIALOG_FACE,
+                             ResourcesManager.FRIEND_DIALOG_FACE,
+                             ResourcesManager.FRIEND_DIALOG_FACE
+                     )
+
+                    val dialog = Dialog(game.camera, speeches, characters)
+                    stage.addActor(overlay)
+                    stage.addActor(dialog)
+                    dialog.disposeHandler = {
+                        dialog.addAction(Actions.run {
+                            dialog.remove()
+                            overlay.remove()
+                        })
+                    }
+                }
+            })
+
+            stage.addAction(sequence)
         }
     }
 
@@ -404,8 +451,6 @@ class GameScreen(game: LGCGame,
     fun isGameOver() = gameOver || win
 
     companion object {
-        private const val GAME_OVER_ANIMATION_TIME = ANIMATION_DURATION
-
         @JvmField
         var tileSize = 0
     }
@@ -464,17 +509,15 @@ class GameScreen(game: LGCGame,
         Gdx.input.isCatchBackKey = true
         worldRenderer = WorldRenderer(game.camera, spriteBatch)
 
-        val room = levelMap.rooms[1]
-        val x = ThreadLocalRandom.current().nextInt(2, LGCGame.getLevelWidth() - 2).toFloat()
-        val y: Float
-
-        level = if (LGCGame.isFirstLevelPassed()) {
-            y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
+        if (isFirstLevelPassed()) {
+            val room = levelMap.rooms[1]
+            val x = ThreadLocalRandom.current().nextInt(2, LGCGame.getLevelWidth() - 2).toFloat()
+            val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
             player = Player(x * tileSize, y * tileSize)
-            CommonLevel(player, levelMap)
+            level = CommonLevel(player, levelMap)
         } else {
-            player = Player(x * tileSize, 9f * tileSize)
-            FirstLevel(levelMap)
+            level = FirstLevel(levelMap)
+            player = (level as FirstLevel).player
         }
         resetStage()
     }

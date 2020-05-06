@@ -14,8 +14,8 @@ class WorldMap {
         return level
     }
 
-    fun addFirstLevel(Config: Config): LevelMap {
-        val level = generator.getFirstLevel(this, Config)
+    fun addFirstLevel(Config: Config, firstRoomHeight: Int): LevelMap {
+        val level = generator.getFirstLevel(this, Config, firstRoomHeight)
         levels[Pair(0, 0)] = level
         return level
     }

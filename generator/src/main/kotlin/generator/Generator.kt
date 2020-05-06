@@ -14,7 +14,7 @@ class Generator {
         BOTTOM
     }
 
-    fun getFirstLevel(worldMap: WorldMap, levelConfig: Config): LevelMap {
+    fun getFirstLevel(worldMap: WorldMap, levelConfig: Config, firstRoomHeight: Int): LevelMap {
         val map = LevelMap(mutableSetOf(), mutableListOf(), levelConfig)
         val exitsBuilder = ExitsBuilder(levelConfig)
 
@@ -30,9 +30,11 @@ class Generator {
             addSegments(bordersBuilder.buildBorder(Side.LEFT, null))
             addSegments(bordersBuilder.buildBorder(Side.RIGHT, null))
 
-            rooms.add(Room(1, 8, levelConfig.levelWidth))
-    		rooms.add(Room(9, 7, levelConfig.levelWidth))
-	    	rooms.add(Room(16, 7, levelConfig.levelWidth))
+            val heights = arrayOf(firstRoomHeight, 7, 7)
+
+            rooms.add(Room(1, heights[0], levelConfig.levelWidth))
+    		rooms.add(Room(heights[0] + 1, heights[1], levelConfig.levelWidth))
+	    	rooms.add(Room(heights[0] + 1 + heights[1], heights[2], levelConfig.levelWidth))
 //		    rooms.add(Room(23, 7, levelConfig.levelWidth))
 
             updateRoomBorders(this)

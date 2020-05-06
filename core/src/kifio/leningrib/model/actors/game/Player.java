@@ -31,6 +31,7 @@ public class Player extends MovableActor {
     private Color tmpColor = Color.valueOf("#FDA010");
     private float[] clothesHSV = new float[3];
 
+    private float velocity = GameScreen.tileSize * 6;
     private int mushroomsCount = 0;
     private float effectTime = 0L;
     private Mushroom mushroom;
@@ -79,7 +80,8 @@ public class Player extends MovableActor {
     }
 
     public float getVelocity() {
-        return (GameScreen.tileSize * 6) * getVelocityCoeff();
+        if (mushroom == null) return velocity;
+        else return velocity * (this.mushroom.getSpeedMultiplier());
     }
 
     public void increaseMushroomCount() {
@@ -143,12 +145,6 @@ public class Player extends MovableActor {
             String packFile = current.getPackFile().replace("_" + effectName, "");
             current.setPackFile(packFile.toLowerCase());
         }
-    }
-
-    //  If player have took speed mushroom
-    private float getVelocityCoeff() {
-        if (this.mushroom == null) return 1f;
-        else return this.mushroom.getSpeedMultiplier();
     }
 
     public int getPassedLevelsCount() {

@@ -1,12 +1,10 @@
 package kifio.leningrib.model.actors;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
+import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
-import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
-import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -15,9 +13,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.screens.GameScreen;
-import kifio.leningrib.model.ResourcesManager;
 
 public abstract class MovableActor extends Actor {
 
@@ -54,7 +52,7 @@ public abstract class MovableActor extends Actor {
 		if (isPaused) return;
 		elapsedTime += delta;
 		float x = getX();
-		if (!MathUtils.isEqual(previousX, x) && elapsedTime - lastChangeDirectionTime > 0.2F) {
+		if (!path.nodes.isEmpty() && !MathUtils.isEqual(previousX, x) && elapsedTime - lastChangeDirectionTime > 0.2F) {
 			goLeft = previousX > x;
 			lastChangeDirectionTime = elapsedTime;
 		}

@@ -36,7 +36,6 @@ public class Forester extends MovableActor {
     private final String running;
     private final String idle;
 
-//    private DefaultGraphPath<Vector2> tPath = new DefaultGraphPath<>();
     private ForesterStateMachine foresterStateMachine = new ForesterStateMachine();
 
     // Не обновляем путь для лесника, если позиция персонажа не изменилась

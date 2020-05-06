@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 
 import kifio.leningrib.model.ResourcesManager;
 
+import static com.badlogic.gdx.graphics.Texture.TextureFilter.Linear;
 import static com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest;
 import static com.badlogic.gdx.math.MathUtils.random;
 
@@ -19,6 +20,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class LabelManager {
 
 	public BitmapFont smallFont;
+	public BitmapFont mediumFont;
 	public BitmapFont largeFont;
 	public BitmapFont xLargeFont;
 	private GlyphLayout glyphLayout = new GlyphLayout();
@@ -34,30 +36,32 @@ public class LabelManager {
 	}
 
 	private LabelManager() {
-		smallFont = generateFont(false);
-		largeFont = generateFont(true);
+		smallFont = generateFont(0f, 0);
+		largeFont = generateFont(1f, 1);
+		mediumFont = generateFont(0.4f, 0);
 		labelStyle.font = smallFont;
 //		labelStyle.fontColor = Color.WHITE;
 	}
 
-	private BitmapFont generateFont(boolean withShadows) {
+	private BitmapFont generateFont(float scale, int shadowOffsetY) {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
-		BitmapFont font = generator.generateFont(getFontParameters(withShadows));
+		BitmapFont font = generator.generateFont(getFontParameters(scale, shadowOffsetY));
 		generator.dispose();
 		return font;
 	}
 
-	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameters(boolean withShadow) {
+	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameters(float scale, int shadowOffsetY) {
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		parameter.characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" +
 			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}@";
 		parameter.color = Color.WHITE;
 		parameter.minFilter = Nearest;
-		parameter.magFilter = Nearest;
+		parameter.magFilter = Linear;
+		parameter.spaceY = (int) (2 * Gdx.graphics.getDensity());
+		parameter.shadowOffsetY = shadowOffsetY;
 
-		if (withShadow) {
-			parameter.shadowOffsetY = 1;
-			parameter.size *= Gdx.graphics.getDensity();
+		if (scale > 0) {
+			parameter.size *= (scale * Gdx.graphics.getDensity());
 		}
 
 		return parameter;

@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.HashMap;
 
+import javax.xml.soap.Text;
+
 import generator.SegmentType;
 
 public class ResourcesManager {
@@ -42,6 +44,8 @@ public class ResourcesManager {
     public static final String RESTART_BUTTON_PRESSED = "restart_button_pressed.png";
     public static final String GAME_OVER = "game_over.png";
     public static final String RESULT_MUSHROOM = "result_mushroom.png";
+    public static final String PLAYER_DIALOG_FACE = "player_dialog_face.png";
+    public static final String FRIEND_DIALOG_FACE = "friend_dialog_face.png";
 
     public static I18NBundle commonMushroomsSpeechBundle;
     public static I18NBundle powerMushroomsSpeechBundle;
@@ -140,6 +144,11 @@ public class ResourcesManager {
         am.load(GAME_OVER, Texture.class, param);
         am.load(RESULT_MUSHROOM, Texture.class, param);
 
+        param.minFilter = Texture.TextureFilter.Nearest;
+        param.magFilter = Texture.TextureFilter.Nearest;
+        am.load(PLAYER_DIALOG_FACE, Texture.class, param);
+        am.load(FRIEND_DIALOG_FACE, Texture.class, param);
+
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
         am.load("i18n/mushroom_invisibility_speech", I18NBundle.class);
@@ -183,6 +192,8 @@ public class ResourcesManager {
         putTexture(RESTART_BUTTON_PRESSED);
         putTexture(GAME_OVER);
         putTexture(RESULT_MUSHROOM);
+        putTexture(PLAYER_DIALOG_FACE);
+        putTexture(FRIEND_DIALOG_FACE);
         putTexture(GRASS_0, TILE_SIZE * 2, TILE_SIZE * 2);
         putTexture(GRASS_2, TILE_SIZE * 2, TILE_SIZE * 2);
     }

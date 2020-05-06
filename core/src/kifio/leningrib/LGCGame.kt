@@ -20,7 +20,7 @@ class LGCGame(isDebug: Boolean) : Game() {
     companion object {
         private const val LEVEL_WIDTH = 10
         private const val LEVEL_HEIGHT = 46
-        private const val FIRST_LEVEL_HEIGHT = 30
+        private const val FIRST_LEVEL_HEIGHT = 33
 
         const val ANIMATION_DURATION = 0.5f
         const val PREFERENCES_NAME = "kifio.leningrib"
@@ -32,7 +32,7 @@ class LGCGame(isDebug: Boolean) : Game() {
 
         private var prefs: Preferences? = null
 
-        fun isFirstLevelPassed() = firstLevelPassed
+        fun isFirstLevelPassed() = false // firstLevelPassed
 
         fun setFirstLevelPassed(passed: Boolean) {
             firstLevelPassed = passed

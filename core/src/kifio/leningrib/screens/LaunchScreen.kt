@@ -55,7 +55,8 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
     override fun show() {
         ResourcesManager.loadAssets()
-        LevelGenerationThread(this).start()
+        val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize)
+        LevelGenerationThread(this, firstRoomHeight).start()
     }
 
     override fun render(delta: Float) {
@@ -103,7 +104,8 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
     }
 
     private class LevelGenerationThread(
-            private var launchScreen: LaunchScreen?
+            private var launchScreen: LaunchScreen?,
+            private val cameraHeight: Int
     ) : Thread() {
 
         override fun run() {
@@ -117,7 +119,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                 level = worldMap.addLevel(0, 0, config)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             } else {
-                level = worldMap.addFirstLevel(config)
+                level = worldMap.addFirstLevel(config, cameraHeight  / 2 + 1)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             }
             launchScreen = null

@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -18,6 +19,7 @@ import generator.Config;
 import kifio.leningrib.LGCGame;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.actors.game.Forester;
+import kifio.leningrib.model.actors.game.Friend;
 import kifio.leningrib.model.actors.game.Grandma;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.game.Player;
@@ -27,7 +29,12 @@ import model.LevelMap;
 
 public class FirstLevel extends Level {
 
+    private static final int PLAYER_INITIAL_Y = GameScreen.tileSize * 5;
+    private static final int PLAYER_INITIAL_X = GameScreen.tileSize * 3;
+    private static final int FRIEND_INITIAL_X = GameScreen.tileSize * 6;
+
     private Grandma grandma;
+    private Friend friend;
 
     public FirstLevel(LevelMap levelMap) {
         super(null, levelMap);
@@ -39,9 +46,15 @@ public class FirstLevel extends Level {
     protected Array<? extends Actor> getActors() {
         Array<Actor> arr = new Array<>();
         if (grandma == null) grandma = new Grandma(GameScreen.tileSize * 5, GameScreen.tileSize * 18);
+        if (friend == null) friend = new Friend(FRIEND_INITIAL_X, PLAYER_INITIAL_Y);
         arr.add(grandma);
+        arr.add(friend);
         arr.addAll(forestersManager.getForesters());
         return arr;
+    }
+
+    public Player getPlayer() {
+        return new Player(PLAYER_INITIAL_X, PLAYER_INITIAL_Y);
     }
 
     @Override
@@ -83,6 +96,10 @@ public class FirstLevel extends Level {
 
     public Grandma getGrandma() {
         return grandma;
+    }
+
+    public Friend getFriend() {
+        return friend;
     }
 
     public Label getGrandmaLabel() {
