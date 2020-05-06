@@ -1,11 +1,15 @@
 package kifio.leningrib.model.actors.game;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
+import javax.rmi.CORBA.Util;
+
+import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.MovableActor;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
@@ -15,13 +19,13 @@ public class Grandma extends MovableActor {
     private static final String IDLE = "grandma_idle";
     private static final float dialogThreshold = (GameScreen.tileSize * GameScreen.tileSize) * 2;
 
-    private boolean speechesNotStarted = true;
     private boolean giveVodkaSpeechesNotStarted = true;
 
     private Player player = null;
     private int initialPlayerMushroomCount = 0;
+    private Rectangle rectangle;
 
-    private String[] speeches = new String[] {
+    private String[] speeches = new String[]{
             "А я бабка я..",
             "Стою тут старею..",
             "Грибы собираю..",
@@ -29,26 +33,22 @@ public class Grandma extends MovableActor {
             ""
     };
 
-    private String[] giveVodkaSpeeches = new String[]{
-            "Ты гляди че делает!",
-            "Грибы с земли ест!",
-            "На хоть рот пополощи..",
-            "Лесникам не давай!",
-            "Он их ума лишает..",
-            ""
-    };
-
     private Label grandmaLabel;
 
-    public Grandma(float x, float y) {
+    public Grandma(float x, float y, Rectangle rectangle) {
         super(x, y);
-        isPaused = false;
-        grandmaLabel = LabelManager.getInstance().getLabel("", x,
+        this.isPaused = false;
+        this.rectangle = rectangle;
+        this.grandmaLabel = LabelManager.getInstance().getLabel("", x,
                 y + 1.3f * GameScreen.tileSize);
     }
 
     public float getVelocity() {
         return 0f;
+    }
+
+    public Rectangle getRectangle() {
+        return rectangle;
     }
 
     public Player getPlayer() {
@@ -57,9 +57,14 @@ public class Grandma extends MovableActor {
 
     public void setPlayer(Player player) {
         this.player = player;
+        if (player != null) {
+            this.initialPlayerMushroomCount = player.getMushroomsCount();
+            setSpeeches(speeches, null);
+        }
     }
 
-    @Override public void draw(Batch batch, float alpha) {
+    @Override
+    public void draw(Batch batch, float alpha) {
         bounds.set(getX(), getY(), GameScreen.tileSize, GameScreen.tileSize);
         batch.draw(getTextureRegion(), getX(), getY(), getDrawingWidth(), getDrawingHeight());
     }
@@ -67,25 +72,11 @@ public class Grandma extends MovableActor {
     @Override
     public void act(float delta) {
         super.act(delta);
+    }
 
-        if (player != null && speechesNotStarted) {
-            speechesNotStarted = false;
-            initialPlayerMushroomCount = player.getMushroomsCount();
-            setSpeeches(speeches, null);
-        }
-
-        if (player != null && player.getMushroomsCount() != initialPlayerMushroomCount && giveVodkaSpeechesNotStarted) {
-            giveVodkaSpeechesNotStarted = false;
-            grandmaLabel.clearActions();
-            setSpeeches(giveVodkaSpeeches, new Runnable() {
-                @Override
-                public void run() {
-                    if (player != null) {
-                        player.bottlesCount++;
-                    }
-                }
-            });
-        }
+    public void stopTalking() {
+        giveVodkaSpeechesNotStarted = false;
+        grandmaLabel.clearActions();
     }
 
     private void setSpeeches(final String[] texts, Runnable callback) {
@@ -137,5 +128,10 @@ public class Grandma extends MovableActor {
 
     public Label getGrandmaLabel() {
         return grandmaLabel;
+    }
+
+    public boolean shouldStartDialog() {
+        return player != null && player.getMushroomsCount() != initialPlayerMushroomCount
+                && giveVodkaSpeechesNotStarted;
     }
 }

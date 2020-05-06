@@ -40,6 +40,7 @@ public class Player extends MovableActor {
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
     public int bottlesCount = 0;
+    public boolean movable = true;
 
     public Player(float x, float y) {
         super(x, y);
@@ -180,7 +181,7 @@ public class Player extends MovableActor {
     }
 
     public void resetPlayerPath(float x, float y, ForestGraph forestGraph) {
-
+        if (!movable) return;
         float fromX = Utils.mapCoordinate(getX());
         float fromY = Utils.mapCoordinate(getY());
         float toX = Utils.mapCoordinate(x);
@@ -201,7 +202,7 @@ public class Player extends MovableActor {
         }
     }
 
-    private SequenceAction getMoveActionsSequence() {
+    @Override public SequenceAction getMoveActionsSequence() {
         SequenceAction seq = new SequenceAction();
         float fromX = getX();
         float fromY = getY();

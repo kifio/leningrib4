@@ -20,6 +20,7 @@ class Generator {
 
         map.apply {
             val exits = exitsBuilder.getExits(0, 0, Side.TOP, null)
+                    .plus(Exit(4, 0))
 
             addExits(exits)
 

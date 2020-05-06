@@ -16,8 +16,8 @@ import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
-import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
+import kifio.leningrib.model.actors.MovableActor
 import kifio.leningrib.model.actors.Overlay
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.actors.game.*
@@ -44,9 +44,13 @@ class GameScreen(game: LGCGame,
 
     private var blackScreenTime = 0f
     private var screenEnterTime = 0f
+    private var zoomTime = 0f
+
     private var screenOut = false
     private var startGame = false
-
+    private var zoomIn = false
+    private var zoomOut = false
+    private var allowCameraUpdate = false
     private var shouldShowTutorial = true
 
     private var paused = true
@@ -54,6 +58,9 @@ class GameScreen(game: LGCGame,
     private var active = false
 
     private var gameOver = false
+
+    private var initialZoom = 1f
+    private var initialCameraPosition = 0f
 
     // Если позиция игрока больше одной из этих двух координат, н переходит на следующую локацию
     var xLimit: Float = Gdx.graphics.width - tileSize.toFloat()
@@ -71,6 +78,9 @@ class GameScreen(game: LGCGame,
     private var vodkaButton: SquareButton? = null
 
     fun activate() {
+        stage.actors.forEach {
+            if (it is MovableActor) it.isVisible = false
+        }
         pauseGame(false)
         this.active = true
     }
@@ -80,12 +90,13 @@ class GameScreen(game: LGCGame,
     fun getCameraPostion() = game.camera.position
 
     private fun updateCamera() {
-//        game.camera.update()
-//        game.camera.position.y = if (player.y < bottomCameraThreshold) {
-//            bottomCameraThreshold
-//        } else {
-//            player.y.coerceAtMost(topCameraThreshold)
-//        }
+        if (!allowCameraUpdate) return
+        game.camera.update()
+        game.camera.position.y = if (player.y < bottomCameraThreshold) {
+            bottomCameraThreshold
+        } else {
+            player.y.coerceAtMost(topCameraThreshold)
+        }
     }
 
     private fun getNextLevel(x: Int, y: Int): Level {
@@ -132,6 +143,50 @@ class GameScreen(game: LGCGame,
             game.camera.position.y = player.y
             game.camera.zoom = 0.5f
             screenEnterTime = 0f
+            stage.actors.forEach {
+                if (it is MovableActor) it.isVisible = true
+            }
+        } else if (zoomOut) {
+            val y = player.y + (initialCameraPosition - player.y) * zoomTime
+            val zoom = 0.5f + zoomTime
+            game.camera.position?.y = y
+            game.camera.zoom = zoom
+            Gdx.app.log("kifio", "y: $y")
+            Gdx.app.log("kifio", "zoom: $zoom")
+            zoomTime += delta
+            if (zoomTime > 0.5f) {
+                zoomOut = false
+                allowCameraUpdate = true
+                player.movable = true
+                game.camera.zoom = 1f
+                game.camera.position?.y = initialCameraPosition
+            }
+        } else if (zoomIn) {
+            val y = initialCameraPosition + (player.y - initialCameraPosition) * zoomTime
+            val zoom = 1 - zoomTime
+            game.camera.position?.y = y
+            game.camera.zoom = zoom
+            zoomTime += delta
+
+            if (zoomTime >= 0.5f) {
+                zoomIn = false
+                allowCameraUpdate = false
+                player.movable = false
+                game.camera.zoom = 0.5f
+                game.camera.position?.y = player.y
+
+                (level as? FirstLevel)?.let {
+                    val overlay = Overlay(game.camera)
+                    stage.addActor(overlay)
+                    stage.addActor(it.getGrandmaDialog(game.camera) {
+                        stage.actors.first { it is Dialog }.remove()
+                        overlay.remove()
+                        it.moveToExit()
+                        zoomOut = true
+                        zoomTime = 0f
+                    })
+                }
+            }
         }
     }
 
@@ -143,6 +198,13 @@ class GameScreen(game: LGCGame,
         addSpeechesToStage(level.mushroomsSpeeches)
         addSpeechesToStage(level.forestersSpeeches)
         updateWorld(delta)
+
+        if ((level as? FirstLevel)?.shouldStartDialogWithGrandma() == true) {
+            zoomIn = true
+            initialCameraPosition = game.camera.position.y
+            initialZoom = 1f
+            zoomTime = 0f
+        }
     }
 
     private fun updateWorld(delta: Float) {
@@ -318,16 +380,16 @@ class GameScreen(game: LGCGame,
         }
 
         resumeGameButton.onTouchHandler = {
+            if (!isFirstLevelPassed() && shouldShowTutorial) {
+                startGame = true  // Чтобы рисовать черный экран
+            }
+
             if (settings == null) {
                 settingsButton.remove()
                 overlay.remove()
                 resumeGameButton.remove()
                 restartGameButton?.remove()
                 resumeGame()
-            }
-
-            if (!isFirstLevelPassed()) {
-                startGame = true  // Чтобы рисовать черный экран
             }
         }
 
@@ -384,40 +446,15 @@ class GameScreen(game: LGCGame,
             sequence.addAction(Actions.run {
                 val overlay = Overlay(game.camera)
                 (level as? FirstLevel)?.let {
-
-                    val speeches = arrayOf(
-                            "В моих беспокойных снах, я все чаще вижу этот лес..",
-                            "Лол, братан, чу ты несешь вообще? Мы с тобой сюда за грибами шторящими приехали.",
-                            "Только они не хранятся от слова совсем и их надо прямо на месте есть, иначе эффекта не будет.",
-                            "Ладно, ладно. Понял.\nА как их отличить?",
-                            "Да ты все подряд собирай, когда накроет, почувствуешь. Главное лесникам не попадайся.",
-                            "Эти алкаши кайфоломы еще те. Но за бутылку водки сделают вид, что тебя не видели.",
-                            "Где я им здесь водку возьму? Ты бы хоть сказал когда мы собирались!",
-                            "Да я хз. Забыл что-то. Ты иди нпчинай собирать там наверху за деревьями.\nА я в машине кое-что посмотрю и догоню.",
-                            "Слишком далеко только не уходи."
-                    )
-
-                     val characters = arrayOf(
-                             ResourcesManager.PLAYER_DIALOG_FACE,
-                             ResourcesManager.FRIEND_DIALOG_FACE,
-                             ResourcesManager.FRIEND_DIALOG_FACE,
-                             ResourcesManager.PLAYER_DIALOG_FACE,
-                             ResourcesManager.FRIEND_DIALOG_FACE,
-                             ResourcesManager.FRIEND_DIALOG_FACE,
-                             ResourcesManager.PLAYER_DIALOG_FACE,
-                             ResourcesManager.FRIEND_DIALOG_FACE,
-                             ResourcesManager.FRIEND_DIALOG_FACE
-                     )
-
-                    val dialog = Dialog(game.camera, speeches, characters)
                     stage.addActor(overlay)
-                    stage.addActor(dialog)
-                    dialog.disposeHandler = {
-                        dialog.addAction(Actions.run {
-                            dialog.remove()
-                            overlay.remove()
-                        })
-                    }
+                    stage.addActor(it.getFirstDialog(game.camera) {
+                        stage.actors.first { it is Dialog }.remove()
+                        overlay.remove()
+                        it.moveToExit()
+                        zoomOut = true
+                        initialCameraPosition = 0.5f * Gdx.graphics.height
+                        initialZoom = 1f
+                    })
                 }
             })
 
@@ -510,14 +547,17 @@ class GameScreen(game: LGCGame,
         worldRenderer = WorldRenderer(game.camera, spriteBatch)
 
         if (isFirstLevelPassed()) {
+            allowCameraUpdate = true
             val room = levelMap.rooms[1]
             val x = ThreadLocalRandom.current().nextInt(2, LGCGame.getLevelWidth() - 2).toFloat()
             val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
             player = Player(x * tileSize, y * tileSize)
             level = CommonLevel(player, levelMap)
         } else {
-            level = FirstLevel(levelMap)
-            player = (level as FirstLevel).player
+            player = FirstLevel.getPlayer()
+            level = FirstLevel(player, levelMap)
+            player.movable = false
+            allowCameraUpdate = false
         }
         resetStage()
     }

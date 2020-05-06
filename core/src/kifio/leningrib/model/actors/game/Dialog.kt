@@ -91,7 +91,6 @@ class Dialog(private val camera: OrthographicCamera,
 
     }
 
-    // TODO: Animate fade for changing text
     override fun draw(batch: Batch, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
 
@@ -105,7 +104,7 @@ class Dialog(private val camera: OrthographicCamera,
 
         if (accumulatedTime > LGCGame.ANIMATION_DURATION + delay) {
 
-            if (index == 1) {
+            if (index == speeches.size) {
                 hideAnimationStartTime = accumulatedTime
                 index--
             }

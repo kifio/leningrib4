@@ -30,8 +30,9 @@ import model.Room;
 public abstract class Level {
 
     protected ForestersManager forestersManager;
+    protected ForestGraph forestGraph;
+    protected Rectangle[] roomsRectangles;
 
-    private ForestGraph forestGraph;
     private ForestGraph strengthForestGraph;    // Гра, с которым можно гоняться за лесниками
     private ForestGraph dexterityForestGraph;  // Граф, с которым можно ходить за деревьями
     private MushroomsManager mushroomsManager;
@@ -41,9 +42,8 @@ public abstract class Level {
 
     Level(Player player, LevelMap levelMap) {
         Config levelConfig = new Config(LGCGame.Companion.getLevelWidth(), LGCGame.Companion.getLevelHeight());
-        Rectangle[] roomsRectangles = getRoomsRectangles(levelMap, levelConfig);
-        Array<Forester> foresters = initForesters(levelMap,
-                levelConfig, player, roomsRectangles);
+        roomsRectangles = getRoomsRectangles(levelMap, levelConfig);
+        Array<Forester> foresters = initForesters(levelMap, levelConfig, player, roomsRectangles);
 
         bottleManager = new BottleManager();
         forestersManager = new ForestersManager(foresters);

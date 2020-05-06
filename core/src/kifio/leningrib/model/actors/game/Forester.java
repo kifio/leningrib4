@@ -339,28 +339,6 @@ public class Forester extends MovableActor {
         lastKnownPlayerY = py;
     }
 
-    public SequenceAction getMoveActionsSequence() {
-        SequenceAction seq = new SequenceAction();
-        int fromX = (int) Utils.mapCoordinate(getX());
-        int fromY = (int) Utils.mapCoordinate(getY());
-
-        int count = path.getCount();
-        int i = count > 1 ? 1 : 0;
-
-        if (i == 0) {
-            seq.addAction(getDelayAction(getDelayTime()));
-        }
-
-        for (; i < path.getCount(); i++) {
-            Vector2 vec = path.get(i);
-            seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y));
-            fromX = (int) vec.x;
-            fromY = (int) vec.y;
-        }
-
-        return seq;
-    }
-
     public void setPathDirectly(Vector2 vector2) {
         path.clear();
         path.add(vector2);

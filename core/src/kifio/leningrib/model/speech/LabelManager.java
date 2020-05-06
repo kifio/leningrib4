@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 
 import kifio.leningrib.model.ResourcesManager;
+import kifio.leningrib.screens.GameScreen;
 
 import static com.badlogic.gdx.graphics.Texture.TextureFilter.Linear;
 import static com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest;
@@ -148,7 +149,7 @@ public class LabelManager {
 						  Color color) {
 		Label label = new Label(text, labelStyle);
 		label.setColor(color);
-		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
+//		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
 		label.setPosition(x, y);
 		label.setAlignment(Align.center, Align.bottomLeft);
 		return label;

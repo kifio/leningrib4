@@ -13,7 +13,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
+import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.screens.GameScreen;
 
@@ -147,5 +149,27 @@ public abstract class MovableActor extends Actor {
 
 	public GraphPath<Vector2> getPath() {
 		return path;
+	}
+
+	public SequenceAction getMoveActionsSequence() {
+		SequenceAction seq = new SequenceAction();
+		int fromX = (int) Utils.mapCoordinate(getX());
+		int fromY = (int) Utils.mapCoordinate(getY());
+
+		int count = path.getCount();
+		int i = count > 1 ? 1 : 0;
+
+		if (i == 0) {
+			seq.addAction(getDelayAction(getDelayTime()));
+		}
+
+		for (; i < path.getCount(); i++) {
+			Vector2 vec = path.get(i);
+			seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y));
+			fromX = (int) vec.x;
+			fromY = (int) vec.y;
+		}
+
+		return seq;
 	}
 }
