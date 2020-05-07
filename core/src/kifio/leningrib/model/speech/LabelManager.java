@@ -40,6 +40,7 @@ public class LabelManager {
 		smallFont = generateFont(0f, 0);
 		largeFont = generateFont(1f, 1);
 		mediumFont = generateFont(0.4f, 0);
+		xLargeFont = generateFont(2f, 0);
 		labelStyle.font = smallFont;
 //		labelStyle.fontColor = Color.WHITE;
 	}

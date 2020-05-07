@@ -14,7 +14,7 @@ import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.game.Forester
-import kifio.leningrib.model.actors.game.Grandma
+import kifio.leningrib.model.actors.tutorial.Grandma
 import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.screens.GameScreen
 

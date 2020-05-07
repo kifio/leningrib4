@@ -114,12 +114,14 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             ResourcesManager.initializeSpeeches()
             val worldMap = WorldMap()
             val level: LevelMap
-            val config = Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())
             if (LGCGame.isFirstLevelPassed()) {
+                val config = Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())
                 level = worldMap.addLevel(0, 0, config)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             } else {
-                level = worldMap.addFirstLevel(config, cameraHeight  / 2 + 3)
+                val firstRoomHeght = (cameraHeight  / 2) + 1
+                val config = Config(LGCGame.getLevelWidth(), firstRoomHeght + 26)
+                level = worldMap.addFirstLevel(config, firstRoomHeght)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             }
             launchScreen = null

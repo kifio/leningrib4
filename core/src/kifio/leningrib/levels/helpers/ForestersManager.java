@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
+import kifio.leningrib.levels.FirstLevel;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.items.Bottle;
@@ -52,11 +53,15 @@ public class ForestersManager extends ObjectsManager<Forester> {
 					forester.disable(speeches[i]);
 					// TODO: Добавить анимацию драки
 				} else {
-					gameScreen.showGameOver();
-					gameScreen.player.stop();
-					forester.stop();
-					forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
-					forester.addAction(forester.getMoveActionsSequence());
+					if (gameScreen.getLevel() instanceof FirstLevel) {
+						forester.onCatchPlayer();
+					} else {
+						gameScreen.showGameOver();
+						gameScreen.player.stop();
+						forester.stop();
+						forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
+						forester.addAction(forester.getMoveActionsSequence());
+					}
 				}
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();

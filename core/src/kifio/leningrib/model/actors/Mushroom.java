@@ -12,6 +12,9 @@ public class Mushroom extends MovableActor {
 
     private static final float DEFAULT_EFFECT_TIME = 5f;
 
+    private static final float EFFECT_ALERT_TIME = 2f; // Время, спустя котрое персонаж начинает мигать
+    private static final float EFFECT_ALERT_INTERVAL = 0.2f; // Интервал мигания
+
     private Color speechColor = new Color(Effect.NO_EFFECT.color);
 
     public enum Effect {
@@ -31,6 +34,7 @@ public class Mushroom extends MovableActor {
     private Effect effect = Effect.NO_EFFECT;
     private boolean isEaten = false;
     private float scale = 1f;
+    private float effectTime = DEFAULT_EFFECT_TIME;
 
     public Mushroom(int x, int y, boolean hasEffect) {
         super(x, y);
@@ -49,6 +53,11 @@ public class Mushroom extends MovableActor {
         isPaused = false;
         this.effect = effect;
         speechColor.set(effect.color);
+    }
+
+    public Mushroom(int x, int y, Effect effect, float effectTime) {
+        this(x, y, effect);
+        this.effectTime = effectTime;
     }
     
     @Override public void act(float delta) {
@@ -92,7 +101,7 @@ public class Mushroom extends MovableActor {
     }
 
     public float getEffectTime() {
-        if (effect != Effect.NO_EFFECT) return DEFAULT_EFFECT_TIME;
+        if (effect != Effect.NO_EFFECT) return effectTime;
         else return 0;
     }
 
@@ -111,6 +120,18 @@ public class Mushroom extends MovableActor {
 
     public boolean isDexterityMushroom() {
         return effect == Effect.DEXTERITY;
+    }
+
+    public float getEffectAlertTime() {
+        if (effectTime == Float.POSITIVE_INFINITY) {
+            return Float.POSITIVE_INFINITY;
+        } else {
+            return effectTime - 3f;
+        }
+    }
+
+    public static float getEffectAlertInterval() {
+        return EFFECT_ALERT_INTERVAL;
     }
 
     @Override

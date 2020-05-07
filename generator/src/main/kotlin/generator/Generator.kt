@@ -19,7 +19,7 @@ class Generator {
         val exitsBuilder = ExitsBuilder(levelConfig)
 
         map.apply {
-            val exits = exitsBuilder.getExits(0, 0, Side.TOP, null)
+            val exits = mutableListOf(Exit(4, levelConfig.levelHeight - 1))
                     .plus(Exit(4, 0))
 
             addExits(exits)
@@ -31,14 +31,14 @@ class Generator {
             addSegments(bordersBuilder.buildBorder(Side.LEFT, null))
             addSegments(bordersBuilder.buildBorder(Side.RIGHT, null))
 
-            val heights = arrayOf(firstRoomHeight, 7, 7)
+            val heights = arrayOf(firstRoomHeight, 7, 7, 7)
 
             rooms.add(Room(1, heights[0], levelConfig.levelWidth))
     		rooms.add(Room(heights[0] + 1, heights[1], levelConfig.levelWidth))
 	    	rooms.add(Room(heights[0] + 1 + heights[1], heights[2], levelConfig.levelWidth))
-//		    rooms.add(Room(23, 7, levelConfig.levelWidth))
+		    rooms.add(Room(heights[0] + 1 + heights[1] + heights[2], heights[3], levelConfig.levelWidth))
 
-            updateRoomBorders(this)
+            updateRoomBorders(this, arrayOf(4, Int.MAX_VALUE, 2, 2))
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
@@ -51,9 +51,7 @@ class Generator {
             addSegments(additionalSegments)
 
         }
-
         return map
-
     }
 
     fun generateLevel(
@@ -90,7 +88,9 @@ class Generator {
 
             rooms.addAll(RoomsBuilder(levelConfig).buildRooms(roomsSpace, exits))
 
-            updateRoomBorders(this)
+            updateRoomBorders(this, Array<Int?>(rooms.size) { i ->
+                getRandomNotOddNumber(1, rooms[i].treesPositions.size - 1)
+            })
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
@@ -105,16 +105,19 @@ class Generator {
         return map
     }
 
-    private fun updateRoomBorders(map: LevelMap) {
+    private fun updateRoomBorders(map: LevelMap, treesForRemoving: Array<Int?>) {
 
         val roomBordersBuilder = RoomBordersBuilder()
 
-        for (room in map.rooms) {
+        for (index in map.rooms.indices) {
+
+            val room = map.rooms[index]
             if (room.treesPositions.isEmpty()) {
                 continue
             }
 
-            val treeForRemoving = getRandomNotOddNumber(1, room.treesPositions.size - 1)
+            val treeForRemoving = treesForRemoving[index] ?: continue
+//            val treeForRemoving = getRandomNotOddNumber(1, room.treesPositions.size - 1)
 
             for (i in room.treesPositions.indices) {
                 val tx = room.treesPositions[i]

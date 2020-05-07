@@ -32,6 +32,7 @@ public class Utils {
     }
 
     public static boolean isInRoom(Rectangle room, float x, float y) {
+        if (room == null) return false;
 
         int left = 0;
         int top = (int) (room.y + (room.height - 1));

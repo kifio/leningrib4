@@ -24,9 +24,6 @@ public class Player extends MovableActor {
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
 
-    public static final float EFFECT_ALERT_TIME = 2f; // Время, спустя котрое персонаж начинает мигать
-    public static final float EFFECT_ALERT_INTERVAL = 0.2f; // Интервал мигания
-
     private int newColor;
     private Color tmpColor = Color.valueOf("#FDA010");
     private float[] clothesHSV = new float[3];
@@ -104,9 +101,9 @@ public class Player extends MovableActor {
             clearEffectTexture();
             this.mushroom = null;
         } else {
-            if (effectTime >= EFFECT_ALERT_TIME) {
-                float t = effectTime - EFFECT_ALERT_TIME;
-                int intervalIndex = (int) (t / EFFECT_ALERT_INTERVAL);
+            if (effectTime >= mushroom.getEffectAlertTime()) {
+                float t = effectTime - mushroom.getEffectAlertTime();
+                int intervalIndex = (int) (t / Mushroom.getEffectAlertInterval());
                 if (intervalIndex % 2 == 0) {
                     clearEffectTexture();
                 } else {
@@ -146,6 +143,12 @@ public class Player extends MovableActor {
             String packFile = current.getPackFile().replace("_" + effectName, "");
             current.setPackFile(packFile.toLowerCase());
         }
+    }
+
+    public void clearEffect() {
+        if (mushroom == null) return;
+        clearEffectTexture();
+        mushroom = null;
     }
 
     public int getPassedLevelsCount() {

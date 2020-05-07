@@ -4,7 +4,6 @@ import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
@@ -30,8 +29,10 @@ public class Forester extends MovableActor {
     public static Color DEFAULT_SPEECH_COLOR = new Color(249 / 255f, 218 / 255f, 74f / 255f, 1f);
     public static Color AGGRESSIVE_SPEECH_COLOR = Color.valueOf("#FF603B");
 
-    private static int NOTICE_AREA_SIDE = 7;
-    private static int PURSUE_AREA_SIDE = 13;
+    private static int NOTICE_AREA_SIZE = 7;
+    private static int PURSUE_AREA_SIZE = 13;
+    public static int NOTICE_AREA_SIZE_SMALL = 3;
+    public static int PURSUE_AREA_SIZE_SMALL = 7;
 
     private final String running;
     private final String idle;
@@ -45,32 +46,34 @@ public class Forester extends MovableActor {
         int x = (int) Utils.mapCoordinate(getX());
         int y = (int) Utils.mapCoordinate(getY());
 
-        noticeArea.setX(x - ((NOTICE_AREA_SIDE - 1) / 2f) * GameScreen.tileSize);
-        noticeArea.setY(y - ((NOTICE_AREA_SIDE - 1) / 2f) * GameScreen.tileSize);
+        noticeArea.setX(x - ((noticeAreaSize - 1) / 2f) * GameScreen.tileSize);
+        noticeArea.setY(y - ((noticeAreaSize - 1) / 2f) * GameScreen.tileSize);
 
-        pursueArea.setX(x - ((PURSUE_AREA_SIDE - 1) / 2f) * GameScreen.tileSize);
-        pursueArea.setY(y - ((PURSUE_AREA_SIDE - 1) / 2f) * GameScreen.tileSize);
+        pursueArea.setX(x - ((pursueAreaSize - 1) / 2f) * GameScreen.tileSize);
+        pursueArea.setY(y - ((pursueAreaSize - 1) / 2f) * GameScreen.tileSize);
     }
 
+    private boolean playerCatched = false;
     private float speechDuration = 0f;
     private float stopTime = 0f;
-
-    private Rectangle noticeArea = new Rectangle(0F, 0F,
-            NOTICE_AREA_SIDE * GameScreen.tileSize,
-            NOTICE_AREA_SIDE * GameScreen.tileSize);
-
-    private Rectangle pursueArea = new Rectangle(0F, 0F,
-            (PURSUE_AREA_SIDE * GameScreen.tileSize),
-            (PURSUE_AREA_SIDE * GameScreen.tileSize));
-
+    private float velocity = GameScreen.tileSize * 3;;
     private float originalFromX, originalToX;
+    private int noticeAreaSize = NOTICE_AREA_SIZE;
+    private int pursueAreaSize = PURSUE_AREA_SIZE;
     private int toX, toY;
     private int originalBottomLimit, originalTopLimit, originalLeftLimit, originalRightLimit;
     private ForesterStateMachine.MovingState movingState = ForesterStateMachine.MovingState.PATROL;
     private Bottle nearestBottle;
-
     public String speech = "";
     public Color speechColor = DEFAULT_SPEECH_COLOR;
+
+    private Rectangle noticeArea = new Rectangle(0F, 0F,
+            noticeAreaSize * GameScreen.tileSize,
+            noticeAreaSize * GameScreen.tileSize);
+
+    private Rectangle pursueArea = new Rectangle(0F, 0F,
+            (pursueAreaSize * GameScreen.tileSize),
+            (pursueAreaSize * GameScreen.tileSize));
 
     private Comparator<Bottle> bottleComparator = new Comparator<Bottle>() {
         @Override
@@ -97,6 +100,22 @@ public class Forester extends MovableActor {
         this.originalRightLimit = originalRightLimit;
         running = String.format(Locale.getDefault(), "enemy_%d_run", index);
         idle = String.format(Locale.getDefault(), "enemy_%d_idle", index);
+    }
+
+    public Forester(float originalFromX, float originalFromY, float originalToX, int index,
+                    int originalBottomLimit, int originalTopLimit, int originalLeftLimit, int originalRightLimit,
+                    float velocity, int noticeAreaSize, int pursueAreaSize) {
+        this(originalFromX,
+                originalFromY,
+                originalToX,
+                index,
+                originalBottomLimit,
+                originalTopLimit,
+                originalLeftLimit,
+                originalRightLimit);
+        this.noticeAreaSize = noticeAreaSize;
+        this.pursueAreaSize = pursueAreaSize;
+        this.velocity = velocity;
     }
 
     public void initPath(ForestGraph forestGraph) {
@@ -137,6 +156,10 @@ public class Forester extends MovableActor {
 
         if (wasChanged) {
             speechDuration = 3.1f;
+        }
+
+        if (playerCatched) {
+            state = ForesterStateMachine.MovingState.PATROL;
         }
 
         switch (state) {
@@ -320,7 +343,7 @@ public class Forester extends MovableActor {
                 break;
 
             case PURSUE:
-                setPathToPlayer(px, py, fx, fy,  player.isUnderTrees, forestGraph);
+                setPathToPlayer(px, py, fx, fy, player.isUnderTrees, forestGraph);
                 break;
             case STOP:
             case DISABLED:
@@ -391,7 +414,7 @@ public class Forester extends MovableActor {
     }
 
     public float getVelocity() {
-        return GameScreen.tileSize * 3;
+        return velocity;
     }
 
     public float getNewSpeechX(float w) {
@@ -420,5 +443,9 @@ public class Forester extends MovableActor {
     @Override
     public float getFrameDuration() {
         return 0.1f;
+    }
+
+    public void onCatchPlayer() {
+        playerCatched = true;
     }
 }

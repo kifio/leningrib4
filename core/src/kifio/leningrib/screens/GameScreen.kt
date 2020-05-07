@@ -21,6 +21,7 @@ import kifio.leningrib.model.actors.MovableActor
 import kifio.leningrib.model.actors.Overlay
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.actors.game.*
+import kifio.leningrib.model.actors.tutorial.Sign
 import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
@@ -40,11 +41,11 @@ class GameScreen(game: LGCGame,
     private var win = false
     private var nextLevelX = 0
     private var nextLevelY = 0
-    private var level: Level
 
     private var blackScreenTime = 0f
     private var screenEnterTime = 0f
     private var zoomTime = 0f
+    private var cameraOffset = 0
 
     private var screenOut = false
     private var startGame = false
@@ -60,7 +61,9 @@ class GameScreen(game: LGCGame,
     private var gameOver = false
 
     private var initialZoom = 1f
-    private var initialCameraPosition = 0f
+    private var zoomInInitialCameraPosition = 0f
+    private var zoomInTarget = 0f
+    private var activeTutorial: Dialog? = null
 
     // Если позиция игрока больше одной из этих двух координат, н переходит на следующую локацию
     var xLimit: Float = Gdx.graphics.width - tileSize.toFloat()
@@ -73,13 +76,17 @@ class GameScreen(game: LGCGame,
     @JvmField
     var player: Player
 
+    var level: Level
+
     private var settings: Group? = null
 
     private var vodkaButton: SquareButton? = null
 
     fun activate() {
-        stage.actors.forEach {
-            if (it is MovableActor) it.isVisible = false
+        if (level is FirstLevel) {
+            stage.actors.forEach {
+                if (it is MovableActor) it.isVisible = false
+            }
         }
         pauseGame(false)
         this.active = true
@@ -140,51 +147,47 @@ class GameScreen(game: LGCGame,
             worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
             startGame = false
             blackScreenTime = 0f
+            zoomInTarget = player.y
             game.camera.position.y = player.y
             game.camera.zoom = 0.5f
             screenEnterTime = 0f
             stage.actors.forEach {
-                if (it is MovableActor) it.isVisible = true
+                if (it is MovableActor && it !is Sign) it.isVisible = true
             }
         } else if (zoomOut) {
-            val y = player.y + (initialCameraPosition - player.y) * zoomTime
+            val y = zoomInTarget + ((zoomInInitialCameraPosition - zoomInTarget) + (cameraOffset * tileSize)) * zoomTime
             val zoom = 0.5f + zoomTime
             game.camera.position?.y = y
             game.camera.zoom = zoom
-            Gdx.app.log("kifio", "y: $y")
-            Gdx.app.log("kifio", "zoom: $zoom")
-            zoomTime += delta
+            zoomTime = (zoomTime + delta).coerceAtMost(1f)
             if (zoomTime > 0.5f) {
                 zoomOut = false
                 allowCameraUpdate = true
                 player.movable = true
-                game.camera.zoom = 1f
-                game.camera.position?.y = initialCameraPosition
+                game.camera.position?.y = zoomInInitialCameraPosition
             }
         } else if (zoomIn) {
-            val y = initialCameraPosition + (player.y - initialCameraPosition) * zoomTime
+            val y = zoomInInitialCameraPosition + (zoomInTarget - zoomInInitialCameraPosition) * zoomTime
             val zoom = 1 - zoomTime
             game.camera.position?.y = y
             game.camera.zoom = zoom
-            zoomTime += delta
-
+            zoomTime = (zoomTime + delta).coerceAtMost(0.5f)
             if (zoomTime >= 0.5f) {
                 zoomIn = false
                 allowCameraUpdate = false
                 player.movable = false
-                game.camera.zoom = 0.5f
                 game.camera.position?.y = player.y
-
+                cameraOffset = 0
                 (level as? FirstLevel)?.let {
                     val overlay = Overlay(game.camera)
                     stage.addActor(overlay)
-                    stage.addActor(it.getGrandmaDialog(game.camera) {
-                        stage.actors.first { it is Dialog }.remove()
-                        overlay.remove()
-                        it.moveToExit()
-                        zoomOut = true
-                        zoomTime = 0f
-                    })
+//                    stage.addActor(it.getGrandmaDialog(game.camera) {
+//                        stage.actors.first { it is Dialog }.remove()
+//                        overlay.remove()
+//                        it.moveToExit()
+//                        zoomOut = true
+//                        zoomTime = 0f
+//                    })
                 }
             }
         }
@@ -199,12 +202,21 @@ class GameScreen(game: LGCGame,
         addSpeechesToStage(level.forestersSpeeches)
         updateWorld(delta)
 
-        if ((level as? FirstLevel)?.shouldStartDialogWithGrandma() == true) {
-            zoomIn = true
-            initialCameraPosition = game.camera.position.y
-            initialZoom = 1f
-            zoomTime = 0f
-        }
+//        (level as? FirstLevel)?.apply {
+//            if (shouldStartDialogWithGrandma()) {
+//                player.clear()
+//                val target = getGrandmaMushroom()
+//                movePlayerTo(
+//                        Utils.mapCoordinate(target.x),
+//                        Utils.mapCoordinate(target.y), player)
+//                player.movable = false
+//                zoomIn = true
+//                zoomInTarget = target.y
+//                zoomInInitialCameraPosition = game.camera.position.y
+//                initialZoom = 1f
+//                zoomTime = 0f
+//            }
+//        }
     }
 
     private fun updateWorld(delta: Float) {
@@ -252,8 +264,9 @@ class GameScreen(game: LGCGame,
 
         (level as? FirstLevel)?.let {
             stage.addActor(it.friend)
-            stage.addActor(it.grandma)
-            stage.addActor(it.grandmaLabel)
+//            stage.addActor(it.grandma)
+            it.signs?.forEach { stage.addActor(it) }
+//            stage.addActor(it.grandmaLabel)
         }
     }
 
@@ -440,19 +453,25 @@ class GameScreen(game: LGCGame,
 
         if (shouldShowTutorial && !isFirstLevelPassed()) {
             shouldShowTutorial = false
-
+            cameraOffset = 4
             val sequence = SequenceAction()
             sequence.addAction(Actions.delay(ANIMATION_DURATION * 2))
             sequence.addAction(Actions.run {
                 val overlay = Overlay(game.camera)
-                (level as? FirstLevel)?.let {
+                (level as? FirstLevel)?.let { level ->
                     stage.addActor(overlay)
-                    stage.addActor(it.getFirstDialog(game.camera) {
-                        stage.actors.first { it is Dialog }.remove()
+                    stage.addActor(level.getFirstDialog(game.camera) {
+                        stage.actors.forEach { actor ->
+                            if (actor is Dialog) {
+                                actor.remove()
+                            } else if (actor is Sign) {
+                                actor.isVisible = true
+                            }
+                        }
                         overlay.remove()
-                        it.moveToExit()
+                        level.moveToExit()
                         zoomOut = true
-                        initialCameraPosition = 0.5f * Gdx.graphics.height
+                        zoomInInitialCameraPosition = 0.5f * Gdx.graphics.height
                         initialZoom = 1f
                     })
                 }
@@ -540,6 +559,16 @@ class GameScreen(game: LGCGame,
 
     private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
     private fun Int.mapYToLevel(): Float = game.camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
+
+    fun hideSignTutorial() {
+        activeTutorial?.startDispose()
+        activeTutorial = null
+    }
+
+    fun showSignTutorial(index: Int) {
+        activeTutorial = FirstLevel.getDialog(index, game.camera)
+        stage.addActor(activeTutorial)
+    }
 
     init {
         Gdx.input.inputProcessor = gestureDetector

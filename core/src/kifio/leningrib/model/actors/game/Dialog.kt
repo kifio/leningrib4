@@ -1,6 +1,5 @@
 package kifio.leningrib.model.actors.game
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -14,10 +13,10 @@ import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.PLAYER_DIALOG_FACE
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
-import kifio.leningrib.screens.GameScreen
 
 
 class Dialog(private val camera: OrthographicCamera,
+             private val singleScreen: Boolean,
              private val speeches: Array<String>,
              private val characters: Array<String>) : StaticActor(null) {
 
@@ -45,8 +44,9 @@ class Dialog(private val camera: OrthographicCamera,
     private var hideAnimationStartTime = 0f
     private var accumulatedTime = 0f
     private var delay = 0.2f
+    private var disposed = false
     private val halfHeight = (camera.viewportHeight * camera.zoom) / 2
-
+    private val font = if (singleScreen) LabelManager.getInstance().largeFont else LabelManager.getInstance().mediumFont
 
     init {
         renderer.projectionMatrix = camera.combined
@@ -55,7 +55,7 @@ class Dialog(private val camera: OrthographicCamera,
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 touched = true
-                index += 1
+                if (!singleScreen) index += 1
                 return true
             }
 
@@ -78,17 +78,21 @@ class Dialog(private val camera: OrthographicCamera,
         buttonWidth = lm.getTextWidth(next, lm.mediumFont)
         buttonHeight = lm.getTextHeight(next, lm.mediumFont)
 
-        val region = ResourcesManager.getRegion(PLAYER_DIALOG_FACE)
-        val scale = height / region.regionHeight
-        faceWidth = region.regionWidth * scale
-        faceHeight = region.regionHeight * scale
+        if (characters.isEmpty()) {
+            faceWidth = 0f
+            faceHeight = this.height
+        } else {
+            val region = ResourcesManager.getRegion(PLAYER_DIALOG_FACE)
+            val scale = height / region.regionHeight
+            faceWidth = region.regionWidth * scale
+            faceHeight = region.regionHeight * scale
+        }
 
         buttonX = this.x + this.width - buttonWidth - buttonWidth / 4
 
-        labelWidth = (this.width - faceWidth) * 0.6f
+        labelWidth = (this.width - faceWidth) * if (characters.isEmpty()) 0.8f else 0.6f
         labelOffset = labelWidth * 0.1f
         labelX = this.x + faceWidth + labelOffset
-
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
@@ -97,51 +101,55 @@ class Dialog(private val camera: OrthographicCamera,
         renderer.begin(ShapeRenderer.ShapeType.Filled)
         renderer.color = bgColor
         renderer.rect(x, y, width, height)
-
-        renderer.color = Color.RED
-        renderer.rect(this.x , this.y, faceWidth, faceHeight)
         renderer.end()
 
         if (accumulatedTime > LGCGame.ANIMATION_DURATION + delay) {
 
-            if (index == speeches.size) {
-                hideAnimationStartTime = accumulatedTime
+            if (index == speeches.size && hideAnimationStartTime <= 0) {
+                startDispose()
                 index--
             }
 
             if (hideAnimationStartTime > 0) {
                 y = (camera.position.y - halfHeight) - (height * (accumulatedTime - hideAnimationStartTime) / LGCGame.ANIMATION_DURATION)
                 if (accumulatedTime > hideAnimationStartTime + LGCGame.ANIMATION_DURATION) {
+                    disposed = true
                     disposeHandler?.invoke()
                 }
             }
 
             val index = index.coerceAtMost(speeches.size - 1)
-            val region = ResourcesManager.getRegion(characters[index])
-
             this.batch.begin()
 
-            this.batch.draw(region,
-                    this.x + 0.25f * faceWidth,
-                    this.y + 0.25f * faceHeight,
-                    faceWidth / 2,
-                    faceHeight / 2)
+            if (characters.isNotEmpty()) {
+                val region = ResourcesManager.getRegion(characters[index])
+                this.batch.draw(region,
+                        this.x + 0.25f * faceWidth,
+                        this.y + 0.25f * faceHeight,
+                        faceWidth / 2,
+                        faceHeight / 2)
+            }
 
-            LabelManager.getInstance().mediumFont.color = labelColor
-            LabelManager.getInstance().mediumFont.draw(this.batch,
+            font.color = labelColor
+            font.draw(this.batch,
                     speeches[index],
                     labelX,
                     this.y + 0.9f * height,
                     labelWidth, Align.left, true)
 
-            LabelManager.getInstance().mediumFont.draw(this.batch,
+            font.draw(this.batch,
                     next, buttonX, (this.y - 2 * this.height))
 
             this.batch.end()
 
-        } else if (accumulatedTime > delay) {
+        } else if (accumulatedTime > delay && !disposed) {
             y = (camera.position.y - halfHeight - height) + (height * (accumulatedTime - delay) / LGCGame.ANIMATION_DURATION)
         }
+    }
+
+    fun startDispose() {
+        disposed = true
+        hideAnimationStartTime = accumulatedTime
     }
 
     override fun act(delta: Float) {

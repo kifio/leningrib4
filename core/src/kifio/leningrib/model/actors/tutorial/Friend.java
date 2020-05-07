@@ -1,4 +1,4 @@
-package kifio.leningrib.model.actors.game;
+package kifio.leningrib.model.actors.tutorial;
 
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
