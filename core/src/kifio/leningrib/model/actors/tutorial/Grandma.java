@@ -14,8 +14,10 @@ public class Grandma extends TutorialCharacter {
 
     private int initialPlayerMushroomCount = 0;
 
+    private Player player;
+
     private String[] speeches = new String[]{
-            "А я бабка я..",
+            "Подходим, покупаем",
             "Стою тут старею..",
             "Грибы собираю..",
             "Маразмом крепчаю..",
@@ -25,7 +27,6 @@ public class Grandma extends TutorialCharacter {
     public Grandma(float x, float y, Rectangle rectangle) {
         super(x, y);
         this.isPaused = false;
-        this.room = rectangle;
         this.label = LabelManager.getInstance().getLabel("", x,
                 y + 1.3f * GameScreen.tileSize);
     }
@@ -35,7 +36,6 @@ public class Grandma extends TutorialCharacter {
         return 0f;
     }
 
-    @Override
     public void setPlayer(Player player) {
         this.player = player;
         if (player != null) {
@@ -44,10 +44,10 @@ public class Grandma extends TutorialCharacter {
         }
     }
 
-    public void stopTalking() {
-        isDialogActive = true;
-        label.clearActions();
-    }
+//    public void stopTalking() {
+//        isDialogActive = true;
+//        label.clearActions();
+//    }
 
     private void setSpeeches(final String[] texts, Runnable callback) {
         SequenceAction sequenceAction = new SequenceAction();
@@ -94,11 +94,5 @@ public class Grandma extends TutorialCharacter {
     @Override
     protected String getRunningState() {
         return IDLE;
-    }
-
-    @Override
-    public boolean shouldStartDialog() {
-        return player != null && player.getMushroomsCount() != initialPlayerMushroomCount
-                && !isDialogActive;
     }
 }

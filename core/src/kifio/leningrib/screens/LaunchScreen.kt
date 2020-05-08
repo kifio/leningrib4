@@ -119,9 +119,9 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                 level = worldMap.addLevel(0, 0, config)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             } else {
-                val firstRoomHeght = (cameraHeight  / 2) + 1
-                val config = Config(LGCGame.getLevelWidth(), firstRoomHeght + 26)
-                level = worldMap.addFirstLevel(config, firstRoomHeght)
+                val firstRoomHeight = cameraHeight - 2
+                val config = Config(LGCGame.getLevelWidth(), firstRoomHeight + 26)
+                level = worldMap.addFirstLevel(config, firstRoomHeight)
                 launchScreen?.onFirstLevelCreated(worldMap, level)
             }
             launchScreen = null

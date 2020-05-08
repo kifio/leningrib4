@@ -16,11 +16,11 @@ import kifio.leningrib.model.speech.LabelManager
 
 
 class Dialog(private val camera: OrthographicCamera,
-             private val singleScreen: Boolean,
              private val speeches: Array<String>,
              private val characters: Array<String>) : StaticActor(null) {
 
     private val next = "Далее"
+    private val ok = "Ок"
 
     var disposeHandler: (() -> Unit)? = null
 
@@ -41,12 +41,9 @@ class Dialog(private val camera: OrthographicCamera,
     private var faceHeight: Float = 0f
 
     private var index = 0
-    private var hideAnimationStartTime = 0f
     private var accumulatedTime = 0f
-    private var delay = 0.2f
-    private var disposed = false
     private val halfHeight = (camera.viewportHeight * camera.zoom) / 2
-    private val font = if (singleScreen) LabelManager.getInstance().largeFont else LabelManager.getInstance().mediumFont
+    private val font = LabelManager.getInstance().mediumFont
 
     init {
         renderer.projectionMatrix = camera.combined
@@ -55,11 +52,11 @@ class Dialog(private val camera: OrthographicCamera,
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 touched = true
-                if (!singleScreen) index += 1
                 return true
             }
 
             override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                index += 1
                 touched = false
             }
         })
@@ -67,11 +64,11 @@ class Dialog(private val camera: OrthographicCamera,
 
     private fun measure() {
 
-        this.width = (camera.viewportWidth * camera.zoom)
+        this.width = (camera.viewportWidth * camera.zoom) - 0.1f * camera.viewportWidth
         this.height = halfHeight / 2
 
         this.x = camera.position.x - this.width / 2
-        this.y = camera.position.y - halfHeight - height
+        this.y = camera.position.y - (height / 2)
 
         val lm = LabelManager.getInstance()
 
@@ -97,59 +94,45 @@ class Dialog(private val camera: OrthographicCamera,
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
+        this.y = camera.position.y - (height / 2)
 
         renderer.begin(ShapeRenderer.ShapeType.Filled)
         renderer.color = bgColor
         renderer.rect(x, y, width, height)
         renderer.end()
 
-        if (accumulatedTime > LGCGame.ANIMATION_DURATION + delay) {
-
-            if (index == speeches.size && hideAnimationStartTime <= 0) {
-                startDispose()
-                index--
-            }
-
-            if (hideAnimationStartTime > 0) {
-                y = (camera.position.y - halfHeight) - (height * (accumulatedTime - hideAnimationStartTime) / LGCGame.ANIMATION_DURATION)
-                if (accumulatedTime > hideAnimationStartTime + LGCGame.ANIMATION_DURATION) {
-                    disposed = true
-                    disposeHandler?.invoke()
-                }
-            }
-
-            val index = index.coerceAtMost(speeches.size - 1)
-            this.batch.begin()
-
-            if (characters.isNotEmpty()) {
-                val region = ResourcesManager.getRegion(characters[index])
-                this.batch.draw(region,
-                        this.x + 0.25f * faceWidth,
-                        this.y + 0.25f * faceHeight,
-                        faceWidth / 2,
-                        faceHeight / 2)
-            }
-
-            font.color = labelColor
-            font.draw(this.batch,
-                    speeches[index],
-                    labelX,
-                    this.y + 0.9f * height,
-                    labelWidth, Align.left, true)
-
-            font.draw(this.batch,
-                    next, buttonX, (this.y - 2 * this.height))
-
-            this.batch.end()
-
-        } else if (accumulatedTime > delay && !disposed) {
-            y = (camera.position.y - halfHeight - height) + (height * (accumulatedTime - delay) / LGCGame.ANIMATION_DURATION)
+        if (index == speeches.size) {
+            disposeHandler?.invoke()
+            index--
         }
-    }
 
-    fun startDispose() {
-        disposed = true
-        hideAnimationStartTime = accumulatedTime
+        val index = index.coerceAtMost(speeches.size - 1)
+        this.batch.begin()
+
+        if (characters.isNotEmpty()) {
+            val region = ResourcesManager.getRegion(characters[index])
+            this.batch.draw(region,
+                    this.x + 0.25f * faceWidth,
+                    this.y + 0.25f * faceHeight,
+                    faceWidth / 2,
+                    faceHeight / 2)
+        }
+
+        font.color = labelColor
+        font.draw(this.batch,
+                speeches[index],
+                labelX,
+                this.y + 0.9f * height,
+                labelWidth, Align.left, true)
+
+        font.draw(this.batch,
+                if (index == speeches.size - 1) ok else next,
+                buttonX,
+                (this.y + 2f * buttonHeight),
+                buttonWidth,
+                Align.right, false)
+
+        this.batch.end()
     }
 
     override fun act(delta: Float) {

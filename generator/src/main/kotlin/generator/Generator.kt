@@ -20,7 +20,6 @@ class Generator {
 
         map.apply {
             val exits = mutableListOf(Exit(4, levelConfig.levelHeight - 1))
-                    .plus(Exit(4, 0))
 
             addExits(exits)
 
@@ -38,7 +37,7 @@ class Generator {
 	    	rooms.add(Room(heights[0] + 1 + heights[1], heights[2], levelConfig.levelWidth))
 		    rooms.add(Room(heights[0] + 1 + heights[1] + heights[2], heights[3], levelConfig.levelWidth))
 
-            updateRoomBorders(this, arrayOf(4, Int.MAX_VALUE, 2, 2))
+            updateRoomBorders(this, arrayOf(2, Int.MAX_VALUE, 0, 2))
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {

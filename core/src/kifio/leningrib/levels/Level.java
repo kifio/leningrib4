@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,12 +28,12 @@ public abstract class Level {
     protected ForestersManager forestersManager;
     protected ForestGraph forestGraph;
     protected Rectangle[] roomsRectangles;
+    protected BottleManager bottleManager;
 
     private ForestGraph strengthForestGraph;    // Гра, с которым можно гоняться за лесниками
     private ForestGraph dexterityForestGraph;  // Граф, с которым можно ходить за деревьями
     private MushroomsManager mushroomsManager;
     private TreesManager treesManager;
-    private BottleManager bottleManager;
     private boolean isDisposed = false;
 
     Level(Player player, LevelMap levelMap) {
@@ -73,7 +74,7 @@ public abstract class Level {
 
     protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Player player, Rectangle[] roomRectangles);
 
-    public void update(float delta, GameScreen gameScreen) {
+    public void update(float delta, OrthographicCamera camera, GameScreen gameScreen) {
         boolean isPaused = gameScreen.isPaused();
         float cameraY = gameScreen.getCameraPostion().y;
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.Array
 import kifio.leningrib.model.ResourcesManager
+import kifio.leningrib.model.actors.MovableActor
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.screens.GameScreen
 
@@ -22,7 +23,7 @@ class Bottle(x: Float, y: Float) : Actor() {
 
     private var elapsedTime = 0F
     private var animTime = 0F
-    private val drinkers = mutableSetOf<Forester>()
+    private val drinkers = mutableSetOf<MovableActor>()
 
     private val regionSize = GameScreen.tileSize.toFloat()
     private val animations = HashMap<BottleState, Animation<TextureRegion>>()
@@ -100,7 +101,7 @@ class Bottle(x: Float, y: Float) : Actor() {
 
     fun isRemovable() = elapsedTime >= DRINKING_TIME
 
-    fun addDrinker(f: Forester) = drinkers.add(f)
+    fun addDrinker(f: MovableActor) = drinkers.add(f)
 
-    fun hasDrinker(f: Forester) = drinkers.contains(f)
+    fun hasDrinker(f: MovableActor) = drinkers.contains(f)
 }

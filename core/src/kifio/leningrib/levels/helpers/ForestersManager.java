@@ -53,15 +53,11 @@ public class ForestersManager extends ObjectsManager<Forester> {
 					forester.disable(speeches[i]);
 					// TODO: Добавить анимацию драки
 				} else {
-					if (gameScreen.getLevel() instanceof FirstLevel) {
-						forester.onCatchPlayer();
-					} else {
-						gameScreen.showGameOver();
-						gameScreen.player.stop();
-						forester.stop();
-						forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
-						forester.addAction(forester.getMoveActionsSequence());
-					}
+					gameScreen.showGameOver();
+					gameScreen.player.stop();
+					forester.stop();
+					forester.setPathDirectly(new Vector2(gameScreen.player.getX(), gameScreen.player.getY()));
+					forester.addAction(forester.getMoveActionsSequence());
 				}
 			} else if (gameScreen.isGameOver()) {
 				forester.stop();

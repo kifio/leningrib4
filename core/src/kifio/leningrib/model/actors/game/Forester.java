@@ -53,7 +53,6 @@ public class Forester extends MovableActor {
         pursueArea.setY(y - ((pursueAreaSize - 1) / 2f) * GameScreen.tileSize);
     }
 
-    private boolean playerCatched = false;
     private float speechDuration = 0f;
     private float stopTime = 0f;
     private float velocity = GameScreen.tileSize * 3;;
@@ -156,10 +155,6 @@ public class Forester extends MovableActor {
 
         if (wasChanged) {
             speechDuration = 3.1f;
-        }
-
-        if (playerCatched) {
-            state = ForesterStateMachine.MovingState.PATROL;
         }
 
         switch (state) {
@@ -443,9 +438,5 @@ public class Forester extends MovableActor {
     @Override
     public float getFrameDuration() {
         return 0.1f;
-    }
-
-    public void onCatchPlayer() {
-        playerCatched = true;
     }
 }

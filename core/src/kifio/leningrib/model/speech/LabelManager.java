@@ -26,6 +26,7 @@ public class LabelManager {
 	public BitmapFont xLargeFont;
 	private GlyphLayout glyphLayout = new GlyphLayout();
 	private Label.LabelStyle labelStyle = new Label.LabelStyle();
+	private float scale = Gdx.graphics.getDensity() * 0.8f;
 
 	private static LabelManager speechManager;
 
@@ -39,7 +40,7 @@ public class LabelManager {
 	private LabelManager() {
 		smallFont = generateFont(0f, 0);
 		largeFont = generateFont(1f, 1);
-		mediumFont = generateFont(0.4f, 0);
+		mediumFont = generateFont(0.8f, 0);
 		xLargeFont = generateFont(2f, 0);
 		labelStyle.font = smallFont;
 //		labelStyle.fontColor = Color.WHITE;
@@ -140,19 +141,16 @@ public class LabelManager {
 	}
 
 	public Label getLabel(String text, float x, float y, Color color) {
-		return getLabel(text, x, y, 0.8f, color);
+		return getLabel(text, x, y, Align.center, color);
 	}
 
-	public Label getLabel(String text,
-						  float x,
-						  float y,
-						  float scale,
-						  Color color) {
+	public Label getLabel(String text, float x, float y, int align, Color color) {
 		Label label = new Label(text, labelStyle);
 		label.setColor(color);
-//		label.setFontScale(Gdx.graphics.getDensity() * scale, Gdx.graphics.getDensity() * scale);
+		label.setFontScale(scale, scale);
 		label.setPosition(x, y);
-		label.setAlignment(Align.center, Align.bottomLeft);
+		label.setWrap(true);
+		label.setAlignment(align, align);
 		return label;
 	}
 }

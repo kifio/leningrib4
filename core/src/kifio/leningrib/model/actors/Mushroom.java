@@ -2,9 +2,11 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
@@ -19,19 +21,21 @@ public class Mushroom extends MovableActor {
 
     public enum Effect {
         POWER(0xD8390FFF),
-        DEXTERITY(0x106189FF),
-        INVISIBLE(0xF49C37FF),
-        SPEED(0xFFFFFF20),
+        DEXTERITY(0x84e00eFF),
+        INVISIBLE(0xFFFFFF20),
+        SPEED(0x106189FF),
+        PATHFINDER(0x450327FF),
         NO_EFFECT(0xFFFFFFFF);
 
         public final int color;
 
-        private Effect(int color) {
+        Effect(int color) {
             this.color = color;
         }
     };
 
     private Effect effect = Effect.NO_EFFECT;
+    private String stableSpeech = null;
     private boolean isEaten = false;
     private float scale = 1f;
     private float effectTime = DEFAULT_EFFECT_TIME;
@@ -39,13 +43,15 @@ public class Mushroom extends MovableActor {
     public Mushroom(int x, int y, boolean hasEffect) {
         super(x, y);
         isPaused = false;
-        Effect[] effects = Effect.values();
-        int effectIndex = ThreadLocalRandom.current().nextInt(effects.length);
-
         if (hasEffect) {
-            effect = effects[effectIndex];
+            Effect[] effects = Effect.values();
+            effect = effects[ThreadLocalRandom.current().nextInt(effects.length)];
             speechColor.set(effect.color);
         }
+    }
+
+    public Mushroom(int x, int y) {
+        this(x, y, false);
     }
 
     public Mushroom(int x, int y, Effect effect) {
@@ -70,7 +76,8 @@ public class Mushroom extends MovableActor {
         float y = getY();
         float size = GameScreen.tileSize * scale;
         bounds.set(x, y, size, size);
-        batch.draw(getTextureRegion(), x + (GameScreen.tileSize - size) / 2, y, size, size);
+        float offset = (GameScreen.tileSize - size) / 2;
+        batch.draw(getTextureRegion(), x + offset, y - offset, size, size);
     }
 
     @Override
@@ -87,7 +94,9 @@ public class Mushroom extends MovableActor {
     }
 
     public String getSpeech() {
-        if (effect == Mushroom.Effect.POWER) {
+        if (stableSpeech != null) {
+            return stableSpeech;
+        } else if (effect == Mushroom.Effect.POWER) {
             return LabelManager.getInstance().getPowerMushroomSpeech();
         } else if (effect == Mushroom.Effect.SPEED) {
             return LabelManager.getInstance().getSpeedMushroomSpeech();
@@ -134,6 +143,19 @@ public class Mushroom extends MovableActor {
         return EFFECT_ALERT_INTERVAL;
     }
 
+    public void setStableSpeech(String speech) {
+        this.stableSpeech = speech;
+    }
+
+    public String getStableSpeech() {
+        return this.stableSpeech;
+    }
+
+    @Override
+    public boolean hasStableSpeech() {
+        return stableSpeech != null;
+    }
+
     @Override
     protected float getVelocity() {
         return 0;
@@ -157,6 +179,7 @@ public class Mushroom extends MovableActor {
             case SPEED: return "speed_mushroom";
             case DEXTERITY: return "dexterity_mushroom";
             case POWER: return "power_mushroom";
+            case PATHFINDER: return "pathfinder_mushroom";
             default: return "common_mushroom";
         }
     }

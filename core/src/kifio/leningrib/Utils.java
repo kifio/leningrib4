@@ -37,7 +37,7 @@ public class Utils {
         int left = 0;
         int top = (int) (room.y + (room.height - 1));
         int right = (int) room.width;
-        int bottom = (int) room.y - 1;
+        int bottom = (int) room.y;
 
         return x >= left && x <= right && y >= bottom && y <= top;
     }

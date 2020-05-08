@@ -172,4 +172,8 @@ public abstract class MovableActor extends Actor {
 
 		return seq;
 	}
+
+    public boolean hasStableSpeech() {
+		return false;
+	}
 }
