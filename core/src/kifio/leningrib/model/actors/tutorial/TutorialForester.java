@@ -64,7 +64,7 @@ public class TutorialForester extends TutorialCharacter {
     @Override
     public void act(float delta) {
         super.act(delta);
-        label.setX(getX() + (0.5f * GameScreen.tileSize) - (speechWidth / 2));
+        label.setX(getX() - (0.5f * GameScreen.tileSize));
         label.setY(getY() + 1.3f * GameScreen.tileSize);
     }
 

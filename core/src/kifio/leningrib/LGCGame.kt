@@ -19,7 +19,6 @@ class LGCGame(isDebug: Boolean) : Game() {
     companion object {
         private const val LEVEL_WIDTH = 10
         private const val LEVEL_HEIGHT = 46
-        private const val FIRST_LEVEL_HEIGHT = 35
 
         const val ANIMATION_DURATION = 0.3f
         const val PREFERENCES_NAME = "kifio.leningrib"
@@ -28,6 +27,7 @@ class LGCGame(isDebug: Boolean) : Game() {
         var isDebug = false
 
         private var firstLevelPassed = false
+        private var levelHeight = LEVEL_HEIGHT
 
         private var prefs: Preferences? = null
 
@@ -41,7 +41,7 @@ class LGCGame(isDebug: Boolean) : Game() {
 
         fun getPreferences() = prefs
         fun getLevelWidth() = LEVEL_WIDTH
-        fun getLevelHeight() = if (firstLevelPassed) LEVEL_HEIGHT else FIRST_LEVEL_HEIGHT
+        fun getLevelHeight() = if (firstLevelPassed) LEVEL_HEIGHT else levelHeight
     }
 
     val camera: OrthographicCamera = OrthographicCamera()
@@ -61,6 +61,10 @@ class LGCGame(isDebug: Boolean) : Game() {
         ResourcesManager.loadSplash()
         GameScreen.tileSize = Gdx.graphics.width / getLevelWidth()
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        if (!isFirstLevelPassed()) {
+            val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
+            levelHeight = firstRoomHeight + 20
+        }
         showLaunchScreen()
     }
 

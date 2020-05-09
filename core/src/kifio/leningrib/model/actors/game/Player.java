@@ -242,9 +242,9 @@ public class Player extends MovableActor {
 
     public void resetPosition() {
         if (getY() >= (LGCGame.Companion.getLevelHeight() - 1) * GameScreen.tileSize) {
-            setY(0);
+            setY(GameScreen.tileSize);
         } else if (getX() >= (LGCGame.Companion.getLevelWidth() - 1) * GameScreen.tileSize) {
-            setX(0);
+            setX(GameScreen.tileSize);
         }
         passedLevelsCount++;
     }

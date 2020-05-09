@@ -23,10 +23,10 @@ public class LabelManager {
 	public BitmapFont smallFont;
 	public BitmapFont mediumFont;
 	public BitmapFont largeFont;
-	public BitmapFont xLargeFont;
+
 	private GlyphLayout glyphLayout = new GlyphLayout();
 	private Label.LabelStyle labelStyle = new Label.LabelStyle();
-	private float scale = Gdx.graphics.getDensity() * 0.8f;
+	private float scale = 0.9f;
 
 	private static LabelManager speechManager;
 
@@ -38,10 +38,9 @@ public class LabelManager {
 	}
 
 	private LabelManager() {
-		smallFont = generateFont(0f, 0);
-		largeFont = generateFont(1f, 1);
+		smallFont = generateFont(0.6f, 0);
 		mediumFont = generateFont(0.8f, 0);
-		xLargeFont = generateFont(2f, 0);
+		largeFont = generateFont(1f, 1);
 		labelStyle.font = smallFont;
 //		labelStyle.fontColor = Color.WHITE;
 	}
@@ -62,10 +61,7 @@ public class LabelManager {
 		parameter.magFilter = Linear;
 		parameter.spaceY = (int) (2 * Gdx.graphics.getDensity());
 		parameter.shadowOffsetY = shadowOffsetY;
-
-		if (scale > 0) {
-			parameter.size *= (scale * Gdx.graphics.getDensity());
-		}
+		parameter.size *= (scale * Gdx.graphics.getDensity());
 
 		return parameter;
 	}
@@ -147,6 +143,7 @@ public class LabelManager {
 	public Label getLabel(String text, float x, float y, int align, Color color) {
 		Label label = new Label(text, labelStyle);
 		label.setColor(color);
+		label.setWidth(GameScreen.tileSize * 2);
 		label.setFontScale(scale, scale);
 		label.setPosition(x, y);
 		label.setWrap(true);

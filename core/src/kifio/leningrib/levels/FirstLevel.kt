@@ -56,11 +56,10 @@ class FirstLevel(player: Player, levelMap: LevelMap?) : Level(player, levelMap) 
         mushrooms.add(Mushroom(GameScreen.tileSize * 4, GameScreen.tileSize * 7))
         mushrooms.add(Mushroom(GameScreen.tileSize * 5, GameScreen.tileSize * 12))
         mushrooms.add(Mushroom(GameScreen.tileSize * 5, GameScreen.tileSize * 23))
-        mushrooms.add(Mushroom(GameScreen.tileSize * 4,
+        mushrooms.add(Mushroom(GameScreen.tileSize * 5,
                 GameScreen.tileSize * 18,
                 Mushroom.Effect.DEXTERITY,
                 Float.POSITIVE_INFINITY))
-        mushrooms.addAll(Mushroom(GameScreen.tileSize * 5, GameScreen.tileSize * 34, Mushroom.Effect.PATHFINDER))
         return mushrooms
     }
 
