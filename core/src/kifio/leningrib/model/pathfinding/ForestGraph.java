@@ -13,6 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.rmi.CORBA.Util;
 
 import generator.Config;
 import kifio.leningrib.Utils;
@@ -21,240 +24,248 @@ import kotlin.Pair;
 
 public class ForestGraph implements IndexedGraph<Vector2> {
 
-	private Array<Connection<Vector2>> empty = new Array<>();
-	private int nodeSize = GameScreen.tileSize / 4;
-//	private ForestersManager forestersManager;
+    private Array<Connection<Vector2>> empty = new Array<>();
 
-	private int mapWidth;
-	private int mapHeight;
+    private int mapWidth;
+    private int mapHeight;
 
-	// Ссылки на всех актеров на сцене
-	private Array<? extends Actor> actors;
+    // соединениея между нодами
+    private HashMap<Integer, Array<Connection<Vector2>>> connections = new HashMap<>();
 
-	// Массив позиций лесников, чтобы не перестраивать граф, когда ничего не сдвинулся с места.
-	private Vector2[] currentActorsPositions;
+    private Heuristic<Vector2> heuristic = new Heuristic<Vector2>() {
+        @Override
+        public float estimate(Vector2 node, Vector2 endNode) {
+            return node.dst2(endNode);
+        }
+    };
 
-	// соединениея между нодами
-	private HashMap<Integer, Array<Connection<Vector2>>> connections = new HashMap<>();
+    // ноды - прямоугольники. дерево - 4 ноды
+    private Array<Vector2> nodes = new Array<>();
 
-	private Heuristic<Vector2> heuristic = new Heuristic<Vector2>() {
-		@Override public float estimate(Vector2 node, Vector2 endNode) {
-			return node.dst2(endNode);
-		}
-	};
+    // Инициализирует ноды, которые могут использоваться для поиска маршрута
+    public ForestGraph(Config constantsConfig,
+                       Array<? extends Actor> trees) {
+        update(constantsConfig, trees, 0,0);
+    }
 
-	// ноды - прямоугольники. дерево - 4 ноды
-	private Array<Vector2> nodes = new Array<>();
+    public void update(Config constantsConfig,
+                       Array<? extends Actor> trees,
+                       int threshold,
+                       int index) {
 
-	// Инициализирует ноды, которые могут использоваться для поиска маршрута
-	public ForestGraph(Config constantsConfig,
-		Array<? extends Actor> trees,
-		Array<? extends Actor> actors) {
+        this.mapWidth = constantsConfig.getLevelWidth() * GameScreen.tileSize;
+        this.mapHeight = constantsConfig.getLevelHeight() * GameScreen.tileSize * (index + 1);
 
-		this.actors = actors;
-		currentActorsPositions = new Vector2[actors.size];
+        int x, y;
 
-		for (int i = 0; i < actors.size; i++) {
-			currentActorsPositions[i] = new Vector2(actors.get(i).getX(), actors.get(i).getY());
-		}
+        for (int i = 0; i < constantsConfig.getLevelWidth(); i++) {
+            for (int j = 0; j < constantsConfig.getLevelHeight(); j++) {
+                x = GameScreen.tileSize * i;
+                y = index == 0 ?
+                    GameScreen.tileSize * (j + constantsConfig.getLevelHeight() * index)
+                    : GameScreen.tileSize * ((j - 1) + constantsConfig.getLevelHeight() * index);
+                if (!isActor(x, y, trees)) {
+                    nodes.add(new Vector2(x, y));
+                }
+            }
+        }
 
-		this.mapWidth = constantsConfig.getLevelWidth() * GameScreen.tileSize;
-		this.mapHeight = constantsConfig.getLevelHeight() * GameScreen.tileSize;
+        for (int i = 0; i < nodes.size; i++) {
+            addNeighbours(nodes.get(i), trees);
+        }
 
-		int x, y;
+        Gdx.app.log("kifio_size", "nodes: " + nodes.size);
+        Gdx.app.log("kifio_size", "connections: " + connections.keySet().size());
+    }
 
-		for (int i = 0; i < constantsConfig.getLevelWidth(); i++) {
-			for (int j = 0; j < constantsConfig.getLevelHeight(); j++) {
-				x = GameScreen.tileSize * i;
-				y = GameScreen.tileSize * j;
-				if (!isActor(x, y, trees)) {
-					nodes.add(new Vector2(x, y));
-				}
-			}
-		}
+    @Override
+    public int getIndex(Vector2 node) {
+        return nodes.indexOf(node, true);
+    }
 
-		for (int i = 0; i < nodes.size; i++) {
-			addNeighbours(nodes.get(i));
-		}
-	}
+    @Override
+    public int getNodeCount() {
+        return nodes.size;
+    }
 
+    @Override
+    public Array<Connection<Vector2>> getConnections(Vector2 fromVector2) {
+        Vector2 vec = getVector2(fromVector2.x, fromVector2.y);
+        int index = this.nodes.indexOf(vec, false);
+        if (index == -1) {
+            return empty;
+        }
+        return this.connections.get(index);
+    }
 
-	@Override public int getIndex(Vector2 node) {
-		return nodes.indexOf(node, true);
-	}
+    public void updateForestGraph(float cameraPositionY) {
+        Iterator<Vector2> nodesIterator = this.nodes.iterator();
+        while (nodesIterator.hasNext()) {
+            Vector2 from = nodesIterator.next();
+            if (Utils.mapCoordinate(from.y) < cameraPositionY - Gdx.graphics.getHeight()) {
+                int fromIndex = nodes.indexOf(from, true);
+                nodesIterator.remove();
+                Array<Connection<Vector2>> c = connections.get(fromIndex);
+                if (c != null) c.clear();
+                connections.remove(fromIndex);
+            }
+        }
+    }
 
-	@Override public int getNodeCount() {
-		return nodes.size;
-	}
+//    private boolean isGraphChanged(float cameraPositionY, Array<Actor> actors) {
+//        boolean isChanged = false;
+//        int size = currentActorsPositions.size;
+//
+//        for (int i = 0; i < size; i++) {
+//            Actor actor = actors.get(i);
+//            int oldX = (int) currentActorsPositions.get(i).x;
+//            int oldY = (int) currentActorsPositions.get(i).y;
+//            int newX = (int) Utils.mapCoordinate(actor.getX());
+//            int newY = (int) Utils.mapCoordinate(actor.getY());
+//
+//            if (isActorOnScreen(actor, cameraPositionY) && (oldX != newX || oldY != newY)) {
+//                isChanged = true;
+//                currentActorsPositions.get(i).x = newX;
+//                currentActorsPositions.get(i).y = newY;
+//            }
+//        }
+//
+//        return isChanged;
+//    }
 
-	@Override public Array<Connection<Vector2>> getConnections(Vector2 fromVector2) {
-		Vector2 vec = getVector2(fromVector2.x, fromVector2.y);
-		int index = this.nodes.indexOf(vec, false);
-		if (index == -1) { return empty; }
-		return this.connections.get(index);
-	}
+    private boolean isActorOnScreen(Actor actor, float cameraPositionY) {
+        return actor.getY() >= cameraPositionY - (Gdx.graphics.getHeight() / 2f)
+                && actor.getY() <= cameraPositionY + (Gdx.graphics.getHeight() / 2f);
+    }
 
-	public void updateForestGraph(float cameraPositionY) {
-		if (!isGraphChanged(cameraPositionY)) return;
-		for (int i = 0; i < nodes.size; i++) {
-			addNeighbours(nodes.get(i));
-		}
-	}
+    private void addNeighbours(Vector2 origin, Array<? extends Actor> actors) {
 
-	private boolean isGraphChanged(float cameraPositionY) {
-		boolean isChanged = false;
-		int size = currentActorsPositions.length;
+        if (origin.x > 0) {
+            addConnection(origin, origin.x - GameScreen.tileSize, origin.y, actors);
+        }
 
-		for (int i = 0; i < size; i++) {
-			Actor actor = actors.get(i);
-			int oldX = (int) currentActorsPositions[i].x;
-			int oldY = (int) currentActorsPositions[i].y;
-			int newX = (int) Utils.mapCoordinate(actor.getX());
-			int newY = (int) Utils.mapCoordinate(actor.getY());
+        if (origin.x < mapWidth - 1) {
+            addConnection(origin, origin.x + GameScreen.tileSize, origin.y, actors);
+        }
 
-			if (isActorOnScreen(actor, cameraPositionY) && (oldX != newX || oldY != newY)) {
-				isChanged = true;
-				currentActorsPositions[i].x = newX;
-				currentActorsPositions[i].y = newY;
-			}
-		}
+        if (origin.y < mapHeight - 1) {
+            addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors);
+        }
 
-		return isChanged;
-	}
+        if (origin.y > 0) {
+            addConnection(origin, origin.x, origin.y - GameScreen.tileSize, actors);
+        }
+    }
 
-	private boolean isActorOnScreen(Actor actor, float cameraPositionY) {
-		return actor.getY() >= cameraPositionY - (Gdx.graphics.getHeight() / 2f)
-			&& actor.getY() <= cameraPositionY + (Gdx.graphics.getHeight() / 2f);
-	}
+    // Добавление пути между двумя нодами
+    private void addConnection(Vector2 from, float toX, float toY, Array<? extends Actor> actors) {
 
-	private void addNeighbours(Vector2 origin) {
+        Vector2 to = getVector2(toX, toY);
 
-		if (origin.x > 0) {
-			addConnection(origin, origin.x - GameScreen.tileSize, origin.y);
-		}
+        if (to == null || isActor((int) toX, (int) toY, actors)) {
+            return;
+        }
 
-		if (origin.x < mapWidth - 1) {
-			addConnection(origin, origin.x + GameScreen.tileSize, origin.y);
-		}
+        int fromIndex = nodes.indexOf(from, true);
 
-		if (origin.y < mapHeight - 1) {
-			addConnection(origin, origin.x, origin.y + GameScreen.tileSize);
-		}
+        Array<Connection<Vector2>> connections = this.connections.get(fromIndex);
 
-		if (origin.y > 0) {
-			addConnection(origin, origin.x, origin.y - GameScreen.tileSize);
-		}
-	}
+        if (connections == null) {
+            connections = new Array<>();
+            this.connections.put(fromIndex, connections);
+        }
 
-	// Добавление пути между двумя нодами
-	private void addConnection(Vector2 from, float toX, float toY) {
+        for (Connection connection : connections) {
+            Vector2 foo = ((PointsConnection) connection).getFromNode();
+            Vector2 bar = ((PointsConnection) connection).getToNode();
+            if (foo.epsilonEquals(from) && to.epsilonEquals(bar)) {
+                return;
+            }
+        }
 
-		Vector2 to = getVector2(toX, toY);
+        connections.add(new PointsConnection(from, to));
+    }
 
-		if (to == null || isActor((int) toX, (int) toY, actors)) { return; }
+    // Поиск маршрута в графе
+    public void updatePath(float fromX, float fromY, float toX, float toY, GraphPath<Vector2> path) {
+        path.clear();
+        Vector2 f = getVector2(fromX, fromY);
+        Vector2 t = getVector2(toX, toY);
+        if (f != null && t != null) {
+            IndexedAStarPathFinder<Vector2> pathFinder = new IndexedAStarPathFinder<>(this);
+            pathFinder.searchNodePath(f, t, heuristic, path);
+        }
+    }
 
-		int fromIndex = nodes.indexOf(from, true);
+    // Поиск ноды, чтобы не создавать новую.
+    private Vector2 getVector2(float x, float y) {
+        for (int i = 0; i < nodes.size; i++) {
+            Vector2 node = nodes.get(i);
+            if (node.x == x && node.y == y) {
+                return node;
+            }
+        }
+        return null;
+    }
 
-		Array<Connection<Vector2>> connections = this.connections.get(fromIndex);
+    // Нодой может быть только клетка, на которой нет актера
+    private boolean isActor(int x, int y, Array<? extends Actor> actor) {
+        for (int i = 0; i < actor.size; i++) {
+            Actor segment = actor.get(i);
+            if (segment != null && Utils.mapCoordinate(segment.getX()) == x && Utils.mapCoordinate(segment.getY()) == y) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-		if (connections == null) {
-			connections = new Array<>();
-			this.connections.put(fromIndex, connections);
-		}
+    // Проверяем cуществует ли нода с такими координатами
+    public boolean isNodeExists(float x, float y) {
+        for (int i = 0; i < nodes.size; i++) {
+            Vector2 node = nodes.get(i);
+            if (node.x == x && node.y == y) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-		for (Connection connection : connections) {
-			Vector2 foo = ((PointsConnection) connection).getFromNode();
-			Vector2 bar = ((PointsConnection) connection).getToNode();
-			if (foo.epsilonEquals(from) && to.epsilonEquals(bar)) {
-				 return;
-			}
-		}
+    public void dispose() {
+        this.connections.clear();
+        this.nodes.clear();
+        this.connections = null;
+        this.nodes = null;
+    }
 
-		connections.add(new PointsConnection(from, to));
-	}
+    private Array<Vector2> playerNeighbours = new Array<>();
 
-	// Поиск маршрута в графе
-	public void updatePath(float fromX, float fromY, float toX, float toY, GraphPath<Vector2> path) {
-		path.clear();
-		Vector2 f = getVector2(fromX, fromY);
-		Vector2 t = getVector2(toX, toY);
-		if (f != null && t != null) {
-			IndexedAStarPathFinder<Vector2> pathFinder = new IndexedAStarPathFinder<>(this);
-			pathFinder.searchNodePath(f, t, heuristic, path);
-		}
-	}
+    public Vector2 findNearest(int px, int py, int fx, int fy) {
 
-	// Поиск ноды, чтобы не создавать новую.
-	private Vector2 getVector2(float x, float y) {
-		for (int i = 0; i < nodes.size; i++) {
-			Vector2 node = nodes.get(i);
-			if (node.x == x && node.y == y) {
-				return node;
-			}
-		}
-		return null;
-	}
+        playerNeighbours.clear();
 
-	// Нодой может быть только клетка, на которой нет актера
-	private boolean isActor(int x, int y, Array<? extends Actor> actor) {
-		for (int i = 0; i < actor.size; i++) {
-			Actor segment = actor.get(i);
-			if (segment != null && Utils.mapCoordinate(segment.getX()) == x && Utils.mapCoordinate(segment.getY()) == y) {
-				return true;
-			}
-		}
-		return false;
-	}
+        playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py + GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(px, py + GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py + GameScreen.tileSize));
 
-	// Проверяем cуществует ли нода с такими координатами
-	public boolean isNodeExists(float x, float y) {
-		for (int i = 0; i < nodes.size; i++) {
-			Vector2 node = nodes.get(i);
-			if (node.x == x && node.y == y) {
-				return true;
-			}
-		}
-		return false;
-	}
+        playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py));
+        playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py));
 
-	public void dispose() {
-		this.actors.clear();
-		this.actors = null;
-		this.connections.clear();
-		this.nodes.clear();
-		this.connections = null;
-		this.nodes = null;
-	}
+        playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py - GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(px, py - GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py - GameScreen.tileSize));
 
-	private Array<Vector2> playerNeighbours = new Array<>();
+        Vector2 target = new Vector2(px, py);
+        float minL = Float.POSITIVE_INFINITY;
+        float l;
 
-	public Vector2 findNearest(int px, int py, int fx, int fy) {
+        for (Vector2 v : nodes) {
+            l = v.dst2(fx, fy);
+            if (playerNeighbours.contains(v, false) && l < minL) {
+                minL = l;
+                target = v;
+            }
+        }
 
-		playerNeighbours.clear();
-
-		playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py + GameScreen.tileSize));
-		playerNeighbours.add(new Vector2(px, py + GameScreen.tileSize));
-		playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py + GameScreen.tileSize));
-
-		playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py));
-		playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py));
-
-		playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py - GameScreen.tileSize));
-		playerNeighbours.add(new Vector2(px, py - GameScreen.tileSize));
-		playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py - GameScreen.tileSize));
-
-		Vector2 target = new Vector2(px, py);
-		float minL = Float.POSITIVE_INFINITY;
-		float l;
-
-		for (Vector2 v : nodes) {
-			l = v.dst2(fx, fy);
-			if (playerNeighbours.contains(v, false) && l < minL) {
-				minL = l;
-				target = v;
-			}
-		}
-
-		return target;
-	}
+        return target;
+    }
 }

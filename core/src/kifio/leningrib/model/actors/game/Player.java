@@ -32,7 +32,7 @@ public class Player extends MovableActor {
     private int mushroomsCount = 0;
     private float effectTime = 0L;
     private Mushroom mushroom;
-    private int passedLevelsCount;
+//    private int passedLevelsCount;
 
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
@@ -52,15 +52,15 @@ public class Player extends MovableActor {
         updateEffectState(delta);
     }
 
-    private void updateClothesColor(float delta) {
-        if (stateTime > 0 && this.passedLevelsCount == 0 && stateTime > 1 - passedLevelsCount * 0.1f) {
-            updateClothesColor();
-            replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), 0xFDA010FF, newColor);
-            replaceColorInTexture(UIState.obtainUIState(getRunningState(), this), 0xFDA010FF, newColor);
-            stateTime = 0f;
-        }
-        stateTime += delta;
-    }
+//    private void updateClothesColor(float delta) {
+//        if (stateTime > 0 && this.passedLevelsCount == 0 && stateTime > 1 - passedLevelsCount * 0.1f) {
+//            updateClothesColor();
+//            replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), 0xFDA010FF, newColor);
+//            replaceColorInTexture(UIState.obtainUIState(getRunningState(), this), 0xFDA010FF, newColor);
+//            stateTime = 0f;
+//        }
+//        stateTime += delta;
+//    }
 
     private void updateClothesColor() {
         if (clothesHSV[0] >= 360) {
@@ -150,9 +150,9 @@ public class Player extends MovableActor {
         mushroom = null;
     }
 
-    public int getPassedLevelsCount() {
-        return passedLevelsCount;
-    }
+//    public int getPassedLevelsCount() {
+//        return passedLevelsCount;
+//    }
 
     public int getMushroomsCount() {
         return mushroomsCount;
@@ -240,14 +240,14 @@ public class Player extends MovableActor {
         return seq;
     }
 
-    public void resetPosition() {
-        if (getY() >= (LGCGame.Companion.getLevelHeight() - 1) * GameScreen.tileSize) {
-            setY(GameScreen.tileSize);
-        } else if (getX() >= (LGCGame.Companion.getLevelWidth() - 1) * GameScreen.tileSize) {
-            setX(GameScreen.tileSize);
-        }
-        passedLevelsCount++;
-    }
+//    public void resetPosition() {
+//        if (getY() >= (LGCGame.Companion.getLevelHeight() - 1) * GameScreen.tileSize) {
+//            setY(GameScreen.tileSize);
+//        } else if (getX() >= (LGCGame.Companion.LEVEL_WIDTH - 1) * GameScreen.tileSize) {
+//            setX(GameScreen.tileSize);
+//        }
+//        passedLevelsCount++;
+//    }
 
     public boolean isInvisible() {
         return mushroom != null && mushroom.isInvisibilityMushroom();

@@ -2,6 +2,7 @@ package kifio.leningrib.levels.helpers
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Array
+import generator.Config
 import generator.SegmentType
 import kifio.leningrib.LGCGame
 import kifio.leningrib.model.ResourcesManager
@@ -17,10 +18,20 @@ class TreesManager {
     private val topBorderNonObstaclesTrees = Array<TreePart>()
     private val innerBorderTrees = Array<TreePart>()
 
-    fun buildTrees(levelMap: LevelMap) {
+    fun updateTrees(levelMap: LevelMap, config: Config, index: Int) {
+
         for (s in levelMap.getSegments()) {
-            val tree = getActorFromCell(s.getValue(), s.x * GameScreen.tileSize, s.y * GameScreen.tileSize)
+
+            val x = s.x * GameScreen.tileSize
+
+            val y = if (index == 0)
+                (s.y + config.levelHeight * index) * GameScreen.tileSize
+            else
+                (s.y - index + config.levelHeight * index) * GameScreen.tileSize
+            val tree = getActorFromCell(s.getValue(), x, y)
+
             if (tree != null) {
+                if (s.y == 0 && index > 0) continue;
                 val treeType = s.getValue()
 
                 when {
@@ -35,7 +46,7 @@ class TreesManager {
                     }
                 }
 
-                if (s.x == 0 || s.y == 0 || s.x == LGCGame.getLevelWidth() - 1 || s.y == LGCGame.getLevelHeight() - 1) {
+                if (s.x == 0 || s.y == 0 || s.x == LGCGame.LEVEL_WIDTH - 1/* || s.y == LGCGame.getLevelHeight() - 1*/) {
                     outerTrees.add(tree)
                 } else {
                     innerBorderTrees.add(tree)

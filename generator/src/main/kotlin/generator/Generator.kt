@@ -14,16 +14,15 @@ class Generator {
         BOTTOM
     }
 
-    fun getFirstLevel(worldMap: WorldMap, levelConfig: Config, firstRoomHeight: Int): LevelMap {
+    fun getFirstLevel(levelConfig: Config, firstRoomHeight: Int): LevelMap {
         val map = LevelMap(mutableSetOf(), mutableListOf(), levelConfig)
-        val exitsBuilder = ExitsBuilder(levelConfig)
 
         map.apply {
-            val exits = mutableListOf(Exit(4, levelConfig.levelHeight - 1))
+            val exits = listOf(Exit(4, levelConfig.levelHeight - 1))
 
             addExits(exits)
 
-            val bordersBuilder = BordersBuilder(levelConfig, exits)
+            val bordersBuilder = BordersBuilder(levelConfig, exits, true)
 
             addSegments(bordersBuilder.buildBorder(Side.BOTTOM, null))
             addSegments(bordersBuilder.buildBorder(Side.TOP, null))
@@ -69,15 +68,18 @@ class Generator {
             val leftNeighbour = worldMap.getLeftNeighbour(x, y)
             val rightNeighbour = worldMap.getRightNeighbour(x, y)
 
-            val exits = exitsBuilder.getExits(x, y, Side.LEFT, leftNeighbour)
-                .plus(exitsBuilder.getExits(x, y, Side.RIGHT, rightNeighbour))
-                .plus(exitsBuilder.getExits(x, y, Side.TOP, topNeighbour))
+            val exits = exitsBuilder.getExits(x, y, Side.TOP, topNeighbour)
 
             addExits(exits)
 
-            val bordersBuilder = BordersBuilder(levelConfig, exits)
+            val bordersBuilder = BordersBuilder(levelConfig, exits, false)
 
-            addSegments(bordersBuilder.buildBorder(Side.BOTTOM, bottomNeighbour))
+            if (y == 0) {
+                addSegments(bordersBuilder.buildBorder(Side.BOTTOM, bottomNeighbour))
+            } else {
+                addSegment(Segment(0,0, SegmentType.LEFT_COMMON_BOTTOM))
+                addSegment(Segment(levelConfig.levelWidth - 1,0, SegmentType.RIGHT_COMMON_BOTTOM))
+            }
             addSegments(bordersBuilder.buildBorder(Side.TOP, topNeighbour))
             addSegments(bordersBuilder.buildBorder(Side.LEFT, leftNeighbour))
             addSegments(bordersBuilder.buildBorder(Side.RIGHT, rightNeighbour))
@@ -87,14 +89,14 @@ class Generator {
 
             rooms.addAll(RoomsBuilder(levelConfig).buildRooms(roomsSpace, exits))
 
-            updateRoomBorders(this, Array<Int?>(rooms.size) { i ->
+            updateRoomBorders(this, Array(rooms.size) { i ->
                 getRandomNotOddNumber(1, rooms[i].treesPositions.size - 1)
             })
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
                 (it.y == 0 || it.y == levelConfig.levelHeight - 1)
-                        && (it .x > 0 && it.x < levelConfig.levelWidth - 1)
+                        && (it .x >= 0 && it.x < levelConfig.levelWidth)
             }.map {
                 additionalSegmentsMapper.convert(it)
             }
@@ -116,7 +118,6 @@ class Generator {
             }
 
             val treeForRemoving = treesForRemoving[index] ?: continue
-//            val treeForRemoving = getRandomNotOddNumber(1, room.treesPositions.size - 1)
 
             for (i in room.treesPositions.indices) {
                 val tx = room.treesPositions[i]

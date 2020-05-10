@@ -11,7 +11,8 @@ import java.util.*
 
 class BordersBuilder(
         private val levelConfig: Config,
-        private val exits: List<Exit>
+        private val exits: List<Exit>,
+        isTutorial: Boolean
 ) {
 
     private val verticalSideMapper = VerticalSideMapper()
@@ -30,15 +31,27 @@ class BordersBuilder(
             SegmentType.BOTTOM_LEFT_CORNER_OUT_BORDER_BOTTOM,
             SegmentType.BOTTOM_RIGHT_CORNER_OUT_BORDER_BOTTOM)
 
-    private val topSegments = HorizontalSegments(
-            SegmentType.TOP_COMMON_LEFT_TOP,
-            SegmentType.TOP_COMMON_RIGHT_TOP,
-            SegmentType.TOP_ROOM_OUT_LEFT_BORDER_TOP,
-            SegmentType.TOP_ROOM_OUT_RIGHT_BORDER_TOP,
-            SegmentType.TOP_LEFT_CORNER_COMMON_TOP,
-            SegmentType.TOP_RIGHT_CORNER_COMMON_TOP,
-            SegmentType.TOP_LEFT_CORNER_OUT_BORDER_TOP,
-            SegmentType.TOP_RIGHT_CORNER_OUT_BORDER_TOP)
+    private val topSegments = if (isTutorial) {
+        HorizontalSegments(
+                SegmentType.TOP_COMMON_LEFT_TOP,
+                SegmentType.TOP_COMMON_RIGHT_TOP,
+                SegmentType.TOP_ROOM_OUT_LEFT_BORDER_TOP,
+                SegmentType.TOP_ROOM_OUT_RIGHT_BORDER_TOP,
+                SegmentType.TOP_LEFT_CORNER_COMMON_TOP,
+                SegmentType.TOP_RIGHT_CORNER_COMMON_TOP,
+                SegmentType.TOP_LEFT_CORNER_OUT_BORDER_TOP,
+                SegmentType.TOP_RIGHT_CORNER_OUT_BORDER_TOP)
+    } else {
+        HorizontalSegments(
+                SegmentType.ROOM_WALL_COMMON_TOP,
+                SegmentType.ROOM_WALL_COMMON_TOP,
+                SegmentType.ROOM_WALL_END_TOP,
+                SegmentType.ROOM_WALL_START_TOP,
+                SegmentType.ROOM_WALL_COMMON_TOP,
+                SegmentType.ROOM_WALL_COMMON_TOP,
+                SegmentType.ROOM_WALL_COMMON_TOP,
+                SegmentType.ROOM_WALL_COMMON_TOP)
+    }
 
     internal fun buildBorder(side: Side, neighbour: LevelMap?): List<Segment> =
             if (neighbour != null) {
@@ -110,13 +123,13 @@ class BordersBuilder(
                 if (segment.x == exitsBorderLeft) {
                     horizontalSide[i].setValue(segments.exitLeftCornerBorder)
                 } else {
-                    horizontalSide[i].setValue(segments.commonLeftConrer)
+                    horizontalSide[i].setValue(segments.commonLeftCorner)
                 }
             } else if (segment.x == horizontalSide.size + exitSize - 1) {
                 if (segment.x == exitsBorderRight) {
                     horizontalSide[i].setValue(segments.exitRightCornerBorder)
                 } else {
-                    horizontalSide[i].setValue(segments.commonRightConrer)
+                    horizontalSide[i].setValue(segments.commonRightCorner)
                 }
             } else {
                 if (segment.x == exitsBorderLeft) {
@@ -132,7 +145,6 @@ class BordersBuilder(
 
     private fun buildLeftSide() {
         verticalSide.clear()
-
         verticalSide.add(Segment(0, 1, SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP))
 
         // Generate begin of the wall
@@ -140,12 +152,10 @@ class BordersBuilder(
         verticalSide.add(Segment(0, 3, SegmentType.LEFT_BEGIN_TOP))
 
         // Generate main part of the wall
-        for (i in 4 until levelConfig.levelHeight - 2) {
+        for (i in 4 until levelConfig.levelHeight) {
             verticalSide.add(Segment(0, i,
                     if (i % 2 == 0) SegmentType.LEFT_COMMON_BOTTOM else SegmentType.LEFT_COMMON_TOP))
         }
-
-        verticalSide.add(Segment(0, levelConfig.levelHeight - 2, SegmentType.TOP_LEFT_CORNER_COMMON_BOTTOM))
     }
 
     private fun buildRightSide() {
@@ -156,43 +166,10 @@ class BordersBuilder(
         verticalSide.add(Segment(x, 1, SegmentType.BOTTOM_RIGHT_CORNER_COMMON_TOP))
 
         // Generate main part of the wall
-        for (i in 2 until levelConfig.levelHeight - 2) {
+        for (i in 2 until levelConfig.levelHeight) {
             verticalSide.add(Segment(x, i,
                     if (i % 2 == 0) SegmentType.RIGHT_COMMON_BOTTOM else SegmentType.RIGHT_COMMON_TOP))
         }
-
-        val rightSideExits = exits.getExitsOnSide(Side.RIGHT)
-        val exitsBorders = mutableListOf<Int>()
-
-        // TODO: Do it in one loop
-        // Just do not add this coordinates in list
-        verticalSide.forEach {
-            if (rightSideExits.contains(x, it.y)) {
-                exitsBorders.add(it.y - 2)
-                exitsBorders.add(it.y + 1)
-            }
-        }
-
-        // Remove exits and one segment below exit to make wall more consistent
-        verticalSide.removeIf { rightSideExits.contains(x, it.y) || rightSideExits.contains(x, it.y + 1) }
-
-        for (i in verticalSide.indices) {
-            val segment = verticalSide[i]
-            if (exitsBorders.contains(segment.y)) {
-                if (segment.y != 1) {
-                    if (exitsBorders.size % 2 == 0) {
-                        segment.setValue(SegmentType.RIGHT_END_TOP)
-                    } else {
-                        segment.setValue(SegmentType.RIGHT_BEGIN_BOTTOM)
-                    }
-                }
-                exitsBorders.removeAt(0)
-            }
-        }
-
-//        // Generate top corner
-        verticalSide.add(
-                Segment(x, levelConfig.levelHeight - 2, SegmentType.TOP_RIGHT_CORNER_COMMON_BOTTOM))
     }
 
     private fun buildHorizontalSide(y: Int, segments: HorizontalSegments) {
@@ -224,8 +201,8 @@ class BordersBuilder(
             val commonRight: SegmentType,
             val roomLeftBorder: SegmentType,
             val roomRightBorder: SegmentType,
-            val commonLeftConrer: SegmentType,
-            val commonRightConrer: SegmentType,
+            val commonLeftCorner: SegmentType,
+            val commonRightCorner: SegmentType,
             val exitLeftCornerBorder: SegmentType,
             val exitRightCornerBorder: SegmentType
     )

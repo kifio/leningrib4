@@ -50,7 +50,6 @@ class Bottle(x: Float, y: Float) : Actor() {
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
-        Gdx.app.log("kifio", "elapsedTime: $elapsedTime")
         if (elapsedTime >= (DRINKING_TIME - 1F)) {
             val animTime = DRINKING_TIME - elapsedTime
             batch.color.apply { setColor(r, g, b, 1f - (animTime)) }

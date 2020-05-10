@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -13,13 +14,13 @@ import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class LGCGame(isDebug: Boolean) : Game() {
 
     companion object {
-        private const val LEVEL_WIDTH = 10
-        private const val LEVEL_HEIGHT = 46
-
+        const val LEVEL_WIDTH = 10
         const val ANIMATION_DURATION = 0.3f
         const val PREFERENCES_NAME = "kifio.leningrib"
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
@@ -27,7 +28,6 @@ class LGCGame(isDebug: Boolean) : Game() {
         var isDebug = false
 
         private var firstLevelPassed = false
-        private var levelHeight = LEVEL_HEIGHT
 
         private var prefs: Preferences? = null
 
@@ -40,11 +40,10 @@ class LGCGame(isDebug: Boolean) : Game() {
         }
 
         fun getPreferences() = prefs
-        fun getLevelWidth() = LEVEL_WIDTH
-        fun getLevelHeight() = if (firstLevelPassed) LEVEL_HEIGHT else levelHeight
     }
 
     val camera: OrthographicCamera = OrthographicCamera()
+    val executor = Executors.newSingleThreadExecutor()
 
     private var halfWidth = 0f
     private var halfHeight = 0f
@@ -55,16 +54,12 @@ class LGCGame(isDebug: Boolean) : Game() {
 
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
-        firstLevelPassed = false // prefs?.getBoolean(FIRST_LEVEL_PASSED) ?: false
+        firstLevelPassed = prefs?.getBoolean(FIRST_LEVEL_PASSED) ?: false
         halfWidth = Gdx.graphics.width / 2f
         halfHeight = Gdx.graphics.height / 2f
         ResourcesManager.loadSplash()
-        GameScreen.tileSize = Gdx.graphics.width / getLevelWidth()
+        GameScreen.tileSize = Gdx.graphics.width / LEVEL_WIDTH
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        if (!isFirstLevelPassed()) {
-            val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
-            levelHeight = firstRoomHeight + 20
-        }
         showLaunchScreen()
     }
 

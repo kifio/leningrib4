@@ -15,4 +15,14 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useImmersiveMode = true;
 		initialize(new LGCGame(BuildConfig.DEBUG), config);
 	}
+
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+	}
+
+	@Override
+	public void onTrimMemory(int level) {
+		super.onTrimMemory(level);
+	}
 }

@@ -2,13 +2,19 @@ package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData
 import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.launch.LaunchProgressBar
 import kifio.leningrib.model.actors.launch.LaunchScreenLogo
 import kifio.leningrib.model.actors.launch.LaunchScreenTree
+import kifio.leningrib.model.speech.LabelManager
+import kifio.leningrib.screens.GameScreen.Companion.tileSize
 import model.LevelMap
 import model.WorldMap
 
@@ -27,36 +33,56 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             LaunchProgressBar(),
 
             LaunchScreenTree(
-                    GameScreen.tileSize.toFloat(),
-                    Gdx.graphics.height - GameScreen.tileSize * 3F
+                    tileSize.toFloat(),
+                    Gdx.graphics.height - tileSize * 3F
             ),
 
             LaunchScreenTree(
-                    Gdx.graphics.width - GameScreen.tileSize * 3F,
-                    GameScreen.tileSize * 2F
+                    Gdx.graphics.width - tileSize * 3F,
+                    tileSize * 2F
             ),
 
 
-            Mushroom(Gdx.graphics.width - GameScreen.tileSize * 3,
-                    Gdx.graphics.height - (GameScreen.tileSize * 3.5f).toInt(),
+            Mushroom(Gdx.graphics.width - tileSize * 3,
+                    Gdx.graphics.height - (tileSize * 3.5f).toInt(),
                     Mushroom.Effect.DEXTERITY),
 
-            Mushroom(GameScreen.tileSize,
-                    GameScreen.tileSize * 2,
+            Mushroom(tileSize,
+                    tileSize * 2,
                     Mushroom.Effect.SPEED)
     )
 
     init {
         for (actor in actors) {
-            if (actor is Mushroom || actor is LaunchScreenTree) { actor.setScale(0F) }
+            if (actor is Mushroom || actor is LaunchScreenTree) {
+                actor.setScale(0F)
+            }
             stage.addActor(actor)
         }
     }
 
     override fun show() {
         ResourcesManager.loadAssets()
-        val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize)
-        LevelGenerationThread(this, firstRoomHeight).start()
+        game.executor.submit {
+            prepare()
+        }
+    }
+
+    private fun prepare() {
+        ResourcesManager.buildRegions()
+        ResourcesManager.initializeSpeeches()
+        val worldMap = WorldMap()
+        val level: LevelMap
+        level = if (LGCGame.isFirstLevelPassed()) {
+            val config = Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
+            worldMap.addLevel(0, 0, config)
+        } else {
+            val firstRoomHeight = (Gdx.graphics.height / tileSize) - 2
+            val config = Config(LGCGame.LEVEL_WIDTH, firstRoomHeight + 26)
+            worldMap.addFirstLevel(config, firstRoomHeight)
+        }
+        LabelManager.getInstance()
+        Gdx.app.postRunnable { onFirstLevelCreated(worldMap, level) }
     }
 
     override fun render(delta: Float) {
@@ -105,26 +131,12 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
     private class LevelGenerationThread(
             private var launchScreen: LaunchScreen?,
+            private var game: LGCGame?,
             private val cameraHeight: Int
     ) : Thread() {
 
         override fun run() {
-            super.run()
-            ResourcesManager.buildRegions()
-            ResourcesManager.initializeSpeeches()
-            val worldMap = WorldMap()
-            val level: LevelMap
-            if (LGCGame.isFirstLevelPassed()) {
-                val config = Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())
-                level = worldMap.addLevel(0, 0, config)
-                launchScreen?.onFirstLevelCreated(worldMap, level)
-            } else {
-                val firstRoomHeight = cameraHeight - 2
-                val config = Config(LGCGame.getLevelWidth(), firstRoomHeight + 26)
-                level = worldMap.addFirstLevel(config, firstRoomHeight)
-                launchScreen?.onFirstLevelCreated(worldMap, level)
-            }
-            launchScreen = null
+
         }
     }
 }

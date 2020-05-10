@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class ObjectsManager<T extends Actor> {
 
-	public Array<T> gameObjects;
+	public Array<T> gameObjects = new Array<>();
 	public Label[] speeches;
 
 	public void dispose() {

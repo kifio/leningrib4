@@ -1,22 +1,22 @@
 package kifio.leningrib.view
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
 import kifio.leningrib.LGCGame
+import kifio.leningrib.Utils
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.game.Forester
-import kifio.leningrib.model.actors.tutorial.Grandma
 import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.actors.tutorial.Grandma
 import kifio.leningrib.screens.GameScreen
+
 
 class WorldRenderer(private var camera: OrthographicCamera?,
                     private val batch: SpriteBatch) {
@@ -27,7 +27,6 @@ class WorldRenderer(private var camera: OrthographicCamera?,
     private val foresterDebugColor = Color(1f, 0f, 0f, 0.5f)
     private val grass0 = ResourcesManager.getRegion(ResourcesManager.GRASS_0)
     private val grass2 = ResourcesManager.getRegion(ResourcesManager.GRASS_2)
-
     var isChessBoard: Boolean = false
 
     fun renderBlackScreen(currentTime: Float,
@@ -145,26 +144,26 @@ class WorldRenderer(private var camera: OrthographicCamera?,
 //        renderer.rect(r.x, r.y, r.width, r.height)
 //    }
 
+    private val grassSize = GameScreen.tileSize * 2
+    private val halfHeight = Gdx.graphics.height / 2
+
     private fun drawGrass() {
         camera?.let {
-            val grassSize = GameScreen.tileSize * 2
-            val height = Gdx.graphics.height
-            val bottom = it.position.y - (height / 2) - grassSize
-            val top = it.position.y + (height / 2)
+
+            val bottom = (it.position.y - halfHeight).toInt() / grassSize
+            val top = (it.position.y + halfHeight).toInt() / grassSize
 
             batch.projectionMatrix = camera!!.combined
             batch.begin()
 
-            for (x in 0 until (LGCGame.getLevelWidth() * GameScreen.tileSize) step grassSize) {
-                for (y in 0 until  (LGCGame.getLevelHeight() * GameScreen.tileSize) step grassSize) {
-                    if (y.toFloat() in bottom..top) {
-                        batch.draw(
-                                if (isChessBoard) getRegion(x, y, (grassSize* 2)) else grass2,
-                                x.toFloat(),
-                                y.toFloat(),
-                                grassSize.toFloat(),
-                                grassSize.toFloat())
-                    }
+            for (x in 0 until Gdx.graphics.width step grassSize) {
+                for (y in bottom .. top) {
+                    batch.draw(
+                            if (isChessBoard) getRegion(x, y, (grassSize* 2)) else grass2,
+                            x.toFloat(),
+                            y.toFloat() * grassSize,
+                            grassSize.toFloat(),
+                            grassSize.toFloat())
                 }
             }
             batch.end()

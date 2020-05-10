@@ -26,7 +26,9 @@ public class LabelManager {
 
 	private GlyphLayout glyphLayout = new GlyphLayout();
 	private Label.LabelStyle labelStyle = new Label.LabelStyle();
-	private float scale = 0.9f;
+
+	private static final float SCALE = 0.9f;
+	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?'+-*/()[]={}@";
 
 	private static LabelManager speechManager;
 
@@ -38,31 +40,23 @@ public class LabelManager {
 	}
 
 	private LabelManager() {
-		smallFont = generateFont(0.6f, 0);
-		mediumFont = generateFont(0.8f, 0);
-		largeFont = generateFont(1f, 1);
-		labelStyle.font = smallFont;
-//		labelStyle.fontColor = Color.WHITE;
-	}
-
-	private BitmapFont generateFont(float scale, int shadowOffsetY) {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
-		BitmapFont font = generator.generateFont(getFontParameters(scale, shadowOffsetY));
+		smallFont = generator.generateFont(getFontParameters(0.6f, 0));
+		mediumFont = generator.generateFont(getFontParameters(0.8f, 0));
+		largeFont = generator.generateFont(getFontParameters(1f, 1));
+		labelStyle.font = smallFont;
 		generator.dispose();
-		return font;
 	}
 
 	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameters(float scale, int shadowOffsetY) {
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		parameter.characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" +
-			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?\"'+-*/()[]={}@";
+		parameter.characters = CHARACTERS;
 		parameter.color = Color.WHITE;
 		parameter.minFilter = Nearest;
 		parameter.magFilter = Linear;
 		parameter.spaceY = (int) (2 * Gdx.graphics.getDensity());
 		parameter.shadowOffsetY = shadowOffsetY;
 		parameter.size *= (scale * Gdx.graphics.getDensity());
-
 		return parameter;
 	}
 
@@ -144,7 +138,7 @@ public class LabelManager {
 		Label label = new Label(text, labelStyle);
 		label.setColor(color);
 		label.setWidth(GameScreen.tileSize * 2);
-		label.setFontScale(scale, scale);
+		label.setFontScale(SCALE, SCALE);
 		label.setPosition(x, y);
 		label.setWrap(true);
 		label.setAlignment(align, align);

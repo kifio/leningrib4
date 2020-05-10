@@ -37,49 +37,29 @@ class GameScreen(game: LGCGame,
     private val gestureListener: LInputListener? = LInputListener(this)
     private val gestureDetector: LGestureDetector? = LGestureDetector(gestureListener, this)
     private var worldRenderer: WorldRenderer?
-    private var win = false
-    private var nextLevelX = 0
-    private var nextLevelY = 0
 
     private var blackScreenTime = 0f
     private var screenEnterTime = 0f
-    private var zoomTime = 0f
-    private var cameraOffset = 0
 
     private var screenOut = false
     private var startGame = false
-    private var zoomIn = false
-    private var zoomOut = false
-//    private var allowCameraUpdate = false
     private var shouldShowTutorial = true
 
     private var paused = true
-
     private var active = false
-
-    private var gameOver = false
-
-    private var initialZoom = 1f
-    private var zoomInInitialCameraPosition = 0f
-    private var zoomInTarget = 0f
-    private var activeTutorial: Dialog? = null
-
-    // Если позиция игрока больше одной из этих двух координат, н переходит на следующую локацию
-    var xLimit: Float = Gdx.graphics.width - tileSize.toFloat()
-    var yLimit: Float = (LGCGame.getLevelHeight() - 1) * tileSize.toFloat()
-
-    // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
-    var bottomCameraThreshold: Float = Gdx.graphics.height / 2f
-    var topCameraThreshold: Float = LGCGame.getLevelHeight() * tileSize - Gdx.graphics.height / 2f
 
     @JvmField
     var player: Player
 
     var level: Level
 
+    var gameOver = false
+
     private var settings: Group? = null
 
     private var vodkaButton: SquareButton? = null
+
+    private val levelSize = CommonLevel.LEVEL_HEIGHT * tileSize
 
     fun activate() {
         if (level is FirstLevel) {
@@ -94,19 +74,7 @@ class GameScreen(game: LGCGame,
     fun getCameraPostion() = game.camera.position
 
     private fun updateCamera() {
-        game.camera.update()
-        game.camera.position.y = if (player.y < bottomCameraThreshold) {
-            bottomCameraThreshold
-        } else {
-            player.y.coerceAtMost(topCameraThreshold)
-        }
-    }
-
-    private fun getNextLevel(x: Int, y: Int): Level {
-        LGCGame.setFirstLevelPassed(true)
-        val levelMap = worldMap.addLevel(x, y,
-                Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight()))
-        return CommonLevel(player, levelMap)
+        level.updateCamera(game.camera, player)
     }
 
     /*
@@ -126,24 +94,13 @@ class GameScreen(game: LGCGame,
         if (screenEnterTime < ANIMATION_DURATION) {
             screenEnterTime += delta
             worldRenderer?.renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
-        } else if (blackScreenTime < ANIMATION_DURATION && (startGame || screenOut || win)) {
+        } else if (blackScreenTime < ANIMATION_DURATION && (startGame || screenOut /*|| win*/)) {
             blackScreenTime += delta
             worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
-        } else if (win && blackScreenTime >= ANIMATION_DURATION) {
-            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
-            player.resetPosition()
-            level = getNextLevel(nextLevelX, nextLevelY)
-            resetStage()
-            resumeGame()
-            worldRenderer?.isChessBoard = player.mushroomsCount > 5 && ThreadLocalRandom.current().nextBoolean()
-            blackScreenTime = 0f
-            screenEnterTime = 0f
-            win = false
         } else if (startGame && blackScreenTime >= ANIMATION_DURATION) {
             worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
             startGame = false
             blackScreenTime = 0f
-            zoomInTarget = player.y
             screenEnterTime = 0f
             makeActorsVisible(true)
         }
@@ -160,21 +117,37 @@ class GameScreen(game: LGCGame,
     }
 
     private fun updateWorld(delta: Float) {
-        if (!isGameOver() && player.y >= yLimit) {
-            nextLevelY++
-            win = true
-            return
-        } else if (!isGameOver() && player.x >= xLimit) {
-            nextLevelX++
-            win = true
-            return
-        }
-        game.camera.position.y.let {
-            level.update(delta, game.camera, this)
+        game.camera.let { camera ->
+            level.update(delta, camera, this)
+            (level as? CommonLevel)?.let { level ->
+                val passedLevelsCount = game.camera.position.y.toInt() / levelSize
+                val positionAtLevel = game.camera.position.y % levelSize
+
+                if (level.generatedLevelsCount == passedLevelsCount &&  positionAtLevel > levelSize / 2) {
+                    level.generatedLevelsCount += 1
+                    val config = Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
+                    val threshold = level.clearLevelPartially(player, config)
+                    game.executor.submit {
+                        val start = System.nanoTime()
+                        val newLevel = CommonLevel(level)
+                        val levelMap = worldMap.addLevel(0, level.generatedLevelsCount + 1, config)
+                        Gdx.app.log("kifio_time", "Generate level took: ${(System.nanoTime() - start) / 1_000_000}")
+                        newLevel.addLevelMapIfNeeded(levelMap, player, config, threshold)
+
+                        Gdx.app.postRunnable {
+                            this.level.dispose()
+                            this.level = newLevel
+                            updateStage()
+                            val finish = System.nanoTime()
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun addSpeechesToStage(speeches: Array<Label?>) {
+    private fun addSpeechesToStage(speeches: Array<Label?>?) {
+        if (speeches == null) return
         for (speech in speeches) {
             if (speech != null && speech.stage == null) {
                 stage.addActor(speech)
@@ -200,6 +173,50 @@ class GameScreen(game: LGCGame,
         }
         for (i in 0 until level.foresters.size) {
             stage.addActor(level.foresters[i])
+        }
+
+        (level as? FirstLevel)?.let { it ->
+            it.guards?.forEach {
+                stage.addActor(it)
+                stage.addActor(it.label)
+            }
+        }
+    }
+
+    private fun updateStage() {
+
+        for (mushroom in level.mushrooms) {
+            if (mushroom != null && mushroom.stage != this.stage) {
+                stage.addActor(mushroom)
+            }
+        }
+
+        val treesManager = level.treesManager
+
+        for (tree in treesManager.getObstacleTrees()) {
+            if (tree.stage != this.stage) {
+                stage.addActor(tree)
+            }
+        }
+
+        for (tree in treesManager.getTopBorderNonObstaclesTrees()) {
+            if (tree.stage != this.stage) {
+                stage.addActor(tree)
+            }
+        }
+
+        stage.addActor(player)
+
+        for (tree in treesManager.getBottomBorderNonObstaclesTrees()) {
+            if (tree.stage != this.stage) {
+                stage.addActor(tree)
+            }
+        }
+
+        for (i in 0 until level.foresters.size) {
+            if (level.foresters[i].stage != this.stage) {
+                stage.addActor(level.foresters[i])
+            }
         }
 
         (level as? FirstLevel)?.let { it ->
@@ -357,11 +374,6 @@ class GameScreen(game: LGCGame,
 
     private fun resumeGame() {
         paused = false
-        bottomCameraThreshold = Gdx.graphics.height / 2f
-        topCameraThreshold = LGCGame.getLevelHeight() * tileSize - Gdx.graphics.height / 2f
-
-        xLimit = Gdx.graphics.width - tileSize.toFloat()
-        yLimit = (LGCGame.getLevelHeight() - 1) * tileSize.toFloat()
 
         val pauseButton = SquareButton(
                 getRegion(PAUSE_PRESSED),
@@ -412,7 +424,7 @@ class GameScreen(game: LGCGame,
         screenOut = true  // Чтобы рисовать черный экран
         val worldMap = WorldMap()
         game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
-                Config(LGCGame.getLevelWidth(), LGCGame.getLevelHeight())), worldMap))
+                Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)), worldMap))
         stage.addAction(Actions.delay(ANIMATION_DURATION - 0.1f))
         stage.addAction(Actions.run { stage.actors.forEach { it.remove() } })
     }
@@ -430,7 +442,7 @@ class GameScreen(game: LGCGame,
         })
     }
 
-    fun isGameOver() = gameOver || win
+//    fun isGameOver() = gameOver || win
 
     companion object {
         @JvmField
@@ -480,7 +492,7 @@ class GameScreen(game: LGCGame,
             return true
         }
 
-        if (!isGameOver()) {
+        if (!gameOver) {
             level.movePlayerTo(x.toFloat(), y.mapYToLevel(), player)
         }
 
@@ -503,7 +515,7 @@ class GameScreen(game: LGCGame,
 
         if (isFirstLevelPassed()) {
             val room = levelMap.rooms[1]
-            val x = ThreadLocalRandom.current().nextInt(2, LGCGame.getLevelWidth() - 2).toFloat()
+            val x = ThreadLocalRandom.current().nextInt(2, LGCGame.LEVEL_WIDTH - 2).toFloat()
             val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
             player = Player(x * tileSize, y * tileSize)
             level = CommonLevel(player, levelMap)

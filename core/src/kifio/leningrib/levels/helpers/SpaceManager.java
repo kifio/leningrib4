@@ -19,7 +19,7 @@ public class SpaceManager {
 
 //		if (player.getMushroomsCount() >= 0) {
 //			int levelHeight = config.getLevelHeight();
-//			int levelWidth = config.getLevelWidth();
+//			int levelWidth = config.LEVEL_WIDTH;
 //
 //			for (int i = 1; i < levelHeight; i++) {
 //				int x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2));
