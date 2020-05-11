@@ -11,7 +11,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -25,9 +27,6 @@ import kotlin.Pair;
 public class ForestGraph implements IndexedGraph<Vector2> {
 
     private Array<Connection<Vector2>> empty = new Array<>();
-
-    private int mapWidth;
-    private int mapHeight;
 
     // соединениея между нодами
     private HashMap<Integer, Array<Connection<Vector2>>> connections = new HashMap<>();
@@ -43,39 +42,53 @@ public class ForestGraph implements IndexedGraph<Vector2> {
     private Array<Vector2> nodes = new Array<>();
 
     // Инициализирует ноды, которые могут использоваться для поиска маршрута
-    public ForestGraph(Config constantsConfig,
-                       Array<? extends Actor> trees) {
-        update(constantsConfig, trees, 0,0);
-    }
+    public ForestGraph(Array<? extends Actor> trees) {
 
-    public void update(Config constantsConfig,
-                       Array<? extends Actor> trees,
-                       int threshold,
-                       int index) {
+        int xMin = 0;
+        int xMax = Gdx.graphics.getWidth();
 
-        this.mapWidth = constantsConfig.getLevelWidth() * GameScreen.tileSize;
-        this.mapHeight = constantsConfig.getLevelHeight() * GameScreen.tileSize * (index + 1);
+        int yMin = (int) trees.get(0).getY();
+        int yMax = (int) trees.get(0).getY();
+
+        long start = System.nanoTime();
+
+        for (Actor tree : trees) {
+            int y = (int) tree.getY();
+            if (y > yMax) {
+                yMax = y;
+            }
+
+            if (y < yMin) {
+                yMin = y;
+            }
+        }
+
+        long finish = System.nanoTime();
+        Gdx.app.log("kifio_time", "Searching for min max took: " + (finish - start) / 1000000);
 
         int x, y;
 
-        for (int i = 0; i < constantsConfig.getLevelWidth(); i++) {
-            for (int j = 0; j < constantsConfig.getLevelHeight(); j++) {
-                x = GameScreen.tileSize * i;
-                y = index == 0 ?
-                    GameScreen.tileSize * (j + constantsConfig.getLevelHeight() * index)
-                    : GameScreen.tileSize * ((j - 1) + constantsConfig.getLevelHeight() * index);
+        start = System.nanoTime();
+        for (int i = xMin; i < xMax; i+=GameScreen.tileSize) {
+            for (int j = yMin; j < yMax; j+=GameScreen.tileSize) {
+                x = i;
+                y = j;
                 if (!isActor(x, y, trees)) {
                     nodes.add(new Vector2(x, y));
                 }
             }
         }
+        finish = System.nanoTime();
 
+        Gdx.app.log("kifio_time", "Adding nodes took: " + (finish - start) / 1000000);
+
+        start = System.nanoTime();
         for (int i = 0; i < nodes.size; i++) {
             addNeighbours(nodes.get(i), trees);
         }
 
-        Gdx.app.log("kifio_size", "nodes: " + nodes.size);
-        Gdx.app.log("kifio_size", "connections: " + connections.keySet().size());
+        finish = System.nanoTime();
+        Gdx.app.log("kifio_time", "Adding connections took: " + (finish - start) / 1000000);
     }
 
     @Override
@@ -100,6 +113,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
     public void updateForestGraph(float cameraPositionY) {
         Iterator<Vector2> nodesIterator = this.nodes.iterator();
+
         while (nodesIterator.hasNext()) {
             Vector2 from = nodesIterator.next();
             if (Utils.mapCoordinate(from.y) < cameraPositionY - Gdx.graphics.getHeight()) {
@@ -108,6 +122,18 @@ public class ForestGraph implements IndexedGraph<Vector2> {
                 Array<Connection<Vector2>> c = connections.get(fromIndex);
                 if (c != null) c.clear();
                 connections.remove(fromIndex);
+            }
+        }
+
+        for (Array<Connection<Vector2>> connections : this.connections.values()) {
+            Iterator<Connection<Vector2>> cIterator = connections.iterator();
+            while (cIterator.hasNext()) {
+                Connection<Vector2> connection = cIterator.next();
+                if (!this.nodes.contains(connection.getToNode(), false)) {
+                    cIterator.remove();
+                } else  if (!this.nodes.contains(connection.getFromNode(), false)) {
+                    cIterator.remove();
+                }
             }
         }
     }
@@ -144,13 +170,13 @@ public class ForestGraph implements IndexedGraph<Vector2> {
             addConnection(origin, origin.x - GameScreen.tileSize, origin.y, actors);
         }
 
-        if (origin.x < mapWidth - 1) {
+        if (origin.x < Gdx.graphics.getWidth() - GameScreen.tileSize) {
             addConnection(origin, origin.x + GameScreen.tileSize, origin.y, actors);
         }
 
-        if (origin.y < mapHeight - 1) {
+//        if (origin.y < mapHeight - 1) {
             addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors);
-        }
+//        }
 
         if (origin.y > 0) {
             addConnection(origin, origin.x, origin.y - GameScreen.tileSize, actors);

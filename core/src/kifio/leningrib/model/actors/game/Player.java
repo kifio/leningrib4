@@ -240,14 +240,9 @@ public class Player extends MovableActor {
         return seq;
     }
 
-//    public void resetPosition() {
-//        if (getY() >= (LGCGame.Companion.getLevelHeight() - 1) * GameScreen.tileSize) {
-//            setY(GameScreen.tileSize);
-//        } else if (getX() >= (LGCGame.Companion.LEVEL_WIDTH - 1) * GameScreen.tileSize) {
-//            setX(GameScreen.tileSize);
-//        }
-//        passedLevelsCount++;
-//    }
+    public void resetPosition() {
+        setY(GameScreen.tileSize);
+    }
 
     public boolean isInvisible() {
         return mushroom != null && mushroom.isInvisibilityMushroom();

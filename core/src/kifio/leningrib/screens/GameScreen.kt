@@ -55,6 +55,8 @@ class GameScreen(game: LGCGame,
 
     var gameOver = false
 
+    private var win = false
+
     private var settings: Group? = null
 
     private var vodkaButton: SquareButton? = null
@@ -64,6 +66,8 @@ class GameScreen(game: LGCGame,
     fun activate() {
         if (level is FirstLevel) {
             makeActorsVisible(false)
+        } else {
+            makeActorsVisible(true)
         }
         pauseGame(false)
         this.active = true
@@ -94,9 +98,18 @@ class GameScreen(game: LGCGame,
         if (screenEnterTime < ANIMATION_DURATION) {
             screenEnterTime += delta
             worldRenderer?.renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
-        } else if (blackScreenTime < ANIMATION_DURATION && (startGame || screenOut /*|| win*/)) {
+        } else if (blackScreenTime < ANIMATION_DURATION && (startGame || screenOut || win)) {
             blackScreenTime += delta
             worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
+        } else if (win && blackScreenTime >= ANIMATION_DURATION) {
+            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
+            player.resetPosition()
+            level = getNextLevel(0, 1)
+            resetStage()
+            resumeGame()
+            blackScreenTime = 0f
+            screenEnterTime = 0f
+            win = false
         } else if (startGame && blackScreenTime >= ANIMATION_DURATION) {
             worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
             startGame = false
@@ -104,6 +117,13 @@ class GameScreen(game: LGCGame,
             screenEnterTime = 0f
             makeActorsVisible(true)
         }
+    }
+
+    private fun getNextLevel(x: Int, y: Int): Level {
+        LGCGame.setFirstLevelPassed(true)
+        game.camera.position.y = Gdx.graphics.height / 2f
+        return CommonLevel(player, worldMap.addLevel(x, y,
+                Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
 
     private fun update(delta: Float) {
@@ -119,26 +139,37 @@ class GameScreen(game: LGCGame,
     private fun updateWorld(delta: Float) {
         game.camera.let { camera ->
             level.update(delta, camera, this)
+
+            (level as? FirstLevel)?.let {
+                win = it.passed
+            }
+
             (level as? CommonLevel)?.let { level ->
-                val passedLevelsCount = game.camera.position.y.toInt() / levelSize
+                val currentLevel = game.camera.position.y.toInt() / levelSize
                 val positionAtLevel = game.camera.position.y % levelSize
 
-                if (level.generatedLevelsCount == passedLevelsCount &&  positionAtLevel > levelSize / 2) {
-                    level.generatedLevelsCount += 1
+                if (level.nextLevel == currentLevel) {
+                    level.nextLevel += 1
+                    Gdx.app.log("kifio_level", "positionAtLevel: $positionAtLevel")
+
                     val config = Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
-                    val threshold = level.clearLevelPartially(player, config)
+                    level.clearPassedLevels(currentLevel)
+
                     game.executor.submit {
-                        val start = System.nanoTime()
+                        var start = System.nanoTime()
                         val newLevel = CommonLevel(level)
-                        val levelMap = worldMap.addLevel(0, level.generatedLevelsCount + 1, config)
+                        val levelMap = worldMap.addLevel(0, level.nextLevel + 1, config)
                         Gdx.app.log("kifio_time", "Generate level took: ${(System.nanoTime() - start) / 1_000_000}")
-                        newLevel.addLevelMapIfNeeded(levelMap, player, config, threshold)
+                        start = System.nanoTime()
+                        newLevel.addLevelMapIfNeeded(levelMap, player, config)
+                        Gdx.app.log("kifio_time", "Adding level took: ${(System.nanoTime() - start) / 1_000_000}")
+
 
                         Gdx.app.postRunnable {
                             this.level.dispose()
                             this.level = newLevel
                             updateStage()
-                            val finish = System.nanoTime()
+                            stage.actors.sortedBy { it.zIndex }
                         }
                     }
                 }
@@ -251,6 +282,8 @@ class GameScreen(game: LGCGame,
                 getRegion(SETTINGS),
                 game.camera
         )
+
+        settingsButton.zIndex = Int.MAX_VALUE
 
         val restartGameButton = StartGameButton(
                 3,
@@ -423,6 +456,7 @@ class GameScreen(game: LGCGame,
         LGCGame.setFirstLevelPassed(true)
         screenOut = true  // Чтобы рисовать черный экран
         val worldMap = WorldMap()
+        game.camera.position.y = Gdx.graphics.height / 2f
         game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
                 Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)), worldMap))
         stage.addAction(Actions.delay(ANIMATION_DURATION - 0.1f))
@@ -514,7 +548,7 @@ class GameScreen(game: LGCGame,
         worldRenderer = WorldRenderer(game.camera, spriteBatch)
 
         if (isFirstLevelPassed()) {
-            val room = levelMap.rooms[1]
+            val room = levelMap.rooms[0]
             val x = ThreadLocalRandom.current().nextInt(2, LGCGame.LEVEL_WIDTH - 2).toFloat()
             val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
             player = Player(x * tileSize, y * tileSize)

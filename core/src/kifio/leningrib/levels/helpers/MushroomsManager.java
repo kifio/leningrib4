@@ -98,14 +98,6 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         }
     }
 
-    public Array<Mushroom> getMushrooms() {
-        return gameObjects;
-    }
-
-    public Label[] getSpeeches() {
-        return speeches;
-    }
-
     private SequenceAction getSpeechAction(float duration, final int speechIndex) {
         SequenceAction seq = new SequenceAction();
         seq.addAction(Actions.delay(duration));

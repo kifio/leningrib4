@@ -19,6 +19,7 @@ class CommonLevel() : Level() {
 
     constructor(player: Player, levelMap: LevelMap) : this() {
         super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
+        lastKnownCameraPosition = Gdx.graphics.height / 2f
     }
 
     constructor(level: CommonLevel) : this() {
@@ -34,7 +35,7 @@ class CommonLevel() : Level() {
     }
 
     override fun getActors(): com.badlogic.gdx.utils.Array<out Actor?> {
-        return forestersManager.foresters
+        return forestersManager.gameObjects
     }
 
     override fun initMushrooms(config: Config,

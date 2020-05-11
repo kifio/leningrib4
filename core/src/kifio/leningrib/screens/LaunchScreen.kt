@@ -81,8 +81,10 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             val config = Config(LGCGame.LEVEL_WIDTH, firstRoomHeight + 26)
             worldMap.addFirstLevel(config, firstRoomHeight)
         }
-        LabelManager.getInstance()
-        Gdx.app.postRunnable { onFirstLevelCreated(worldMap, level) }
+        Gdx.app.postRunnable {
+            LabelManager.getInstance()
+            gameScreen = GameScreen(game, level, worldMap)
+        }
     }
 
     override fun render(delta: Float) {
@@ -122,21 +124,6 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
     private fun onFirstLevelCreated(worldMap: WorldMap, levelMap: LevelMap) {
         Gdx.app.postRunnable {
-            val start = System.nanoTime()
-            gameScreen = GameScreen(game, levelMap, worldMap)
-            val finish = System.nanoTime()
-            Gdx.app.log("kifio", "Create game screen took: ${(finish - start) / 1_000_000}")
-        }
-    }
-
-    private class LevelGenerationThread(
-            private var launchScreen: LaunchScreen?,
-            private var game: LGCGame?,
-            private val cameraHeight: Int
-    ) : Thread() {
-
-        override fun run() {
-
         }
     }
 }

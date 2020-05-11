@@ -49,10 +49,6 @@ public class ForestersManager extends ObjectsManager<Forester> {
 //		}
 	}
 
-	public Array<Forester> getForesters() {
-		return gameObjects;
-	}
-
 	public void updateForesters(GameScreen gameScreen, float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph) {
 		for (int i = 0; i < gameObjects.size; i++) {
 			Forester forester = gameObjects.get(i);
