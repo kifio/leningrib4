@@ -24,7 +24,6 @@ public class Mushroom extends MovableActor {
         DEXTERITY(0x84e00eFF),
         INVISIBLE(0xFFFFFF20),
         SPEED(0x106189FF),
-        PATHFINDER(0x450327FF),
         NO_EFFECT(0xFFFFFFFF);
 
         public final int color;
@@ -179,7 +178,6 @@ public class Mushroom extends MovableActor {
             case SPEED: return "speed_mushroom";
             case DEXTERITY: return "dexterity_mushroom";
             case POWER: return "power_mushroom";
-            case PATHFINDER: return "pathfinder_mushroom";
             default: return "common_mushroom";
         }
     }

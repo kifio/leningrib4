@@ -67,7 +67,7 @@ public abstract class Level {
         mushroomsManager = new MushroomsManager();
 
         treesManager.updateTrees(levelMap, levelConfig, nextLevel);
-        mushroomsManager.initMushrooms(initMushrooms(levelConfig,
+        mushroomsManager.addMushrooms(initMushrooms(levelConfig,
                 treesManager,
                 player == null ? 0 : player.getMushroomsCount()));
 
@@ -108,28 +108,17 @@ public abstract class Level {
     public void addLevelMapIfNeeded(LevelMap levelMap,
                                     Player player,
                                     Config levelConfig) {
-
         Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
         Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles);
         roomsRectangles.addAll(rectangles);
-
         forestersManager.addForesters(foresters);
         treesManager.updateTrees(levelMap, levelConfig, nextLevel);
+        mushroomsManager.addMushrooms(initMushrooms(levelConfig,
+                treesManager,
+                player == null ? 0 : player.getMushroomsCount()));
         forestGraph = new ForestGraph(treesManager.getObstacleTrees());
-
-//        start = System.nanoTime();
-//        dexterityForestGraph.update(levelConfig,
-//                treesManager.getOuterBordersTrees(),
-//                threshold,
-//                generatedLevelsCount);
-//        Gdx.app.log("kifio_time", "Update dexterityGraph took: " + (System.nanoTime() - start) / 1_000_000);
-
-//        start = System.nanoTime();
-//        strengthForestGraph.update(levelConfig,
-//                treesManager.getObstacleTrees(),
-//                threshold,
-//                generatedLevelsCount);
-//        Gdx.app.log("kifio_time", "Update strength graph: " + (System.nanoTime() - start) / 1_000_000);
+        dexterityForestGraph= new ForestGraph(treesManager.getOuterBordersTrees());
+        strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
     }
 
     private void removeActorsFrom(Array<? extends Actor> actors, float threshold) {

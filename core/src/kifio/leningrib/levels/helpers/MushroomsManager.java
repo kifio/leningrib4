@@ -24,9 +24,17 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         gameObjects = new Array<>();
     }
 
-    public void initMushrooms(Array<Mushroom> mushrooms) {
+    public void addMushrooms(Array<Mushroom> mushrooms) {
         gameObjects.addAll(mushrooms);
+        Label[] oldSpeeches = speeches;
         speeches = new Label[gameObjects.size];
+
+        for (int i = 0; i < gameObjects.size; i++) {
+            if (oldSpeeches != null && i < oldSpeeches.length) {
+                speeches[i] = oldSpeeches[i];
+                oldSpeeches[i] = null;
+            }
+        }
     }
 
     public void updateMushrooms(Player p, float cameraPositionY, boolean isPaused) {

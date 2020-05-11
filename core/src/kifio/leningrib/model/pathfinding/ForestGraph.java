@@ -138,32 +138,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         }
     }
 
-//    private boolean isGraphChanged(float cameraPositionY, Array<Actor> actors) {
-//        boolean isChanged = false;
-//        int size = currentActorsPositions.size;
-//
-//        for (int i = 0; i < size; i++) {
-//            Actor actor = actors.get(i);
-//            int oldX = (int) currentActorsPositions.get(i).x;
-//            int oldY = (int) currentActorsPositions.get(i).y;
-//            int newX = (int) Utils.mapCoordinate(actor.getX());
-//            int newY = (int) Utils.mapCoordinate(actor.getY());
-//
-//            if (isActorOnScreen(actor, cameraPositionY) && (oldX != newX || oldY != newY)) {
-//                isChanged = true;
-//                currentActorsPositions.get(i).x = newX;
-//                currentActorsPositions.get(i).y = newY;
-//            }
-//        }
-//
-//        return isChanged;
-//    }
-
-    private boolean isActorOnScreen(Actor actor, float cameraPositionY) {
-        return actor.getY() >= cameraPositionY - (Gdx.graphics.getHeight() / 2f)
-                && actor.getY() <= cameraPositionY + (Gdx.graphics.getHeight() / 2f);
-    }
-
     private void addNeighbours(Vector2 origin, Array<? extends Actor> actors) {
 
         if (origin.x > 0) {
@@ -174,9 +148,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
             addConnection(origin, origin.x + GameScreen.tileSize, origin.y, actors);
         }
 
-//        if (origin.y < mapHeight - 1) {
-            addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors);
-//        }
+        addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors);
 
         if (origin.y > 0) {
             addConnection(origin, origin.x, origin.y - GameScreen.tileSize, actors);

@@ -26,27 +26,26 @@ public class ForestersManager extends ObjectsManager<Forester> {
 	}
 
 	public void addForesters(Array<Forester> foresters) {
-		return;
-//		gameObjects.addAll(foresters);
-//		Label[] oldSpeeches = speeches;
-//
-//		speeches = new Label[gameObjects.size];
-//
-//		for (int i = 0; i < gameObjects.size; i++) {
-//			if (oldSpeeches != null && i < oldSpeeches.length) {
-//				speeches[i] = oldSpeeches[i];
-//				oldSpeeches[i] = null;
-//			} else {
-//				Forester f = gameObjects.get(i);
-//				String speech = "";
-//
-//				float w = 0;
-//				float x = f.getNewSpeechX(w);
-//				float y = f.getNewSpeechY();
-//
-//				speeches[i] = LabelManager.getInstance().getLabel(speech, x, y, Forester.DEFAULT_SPEECH_COLOR);
-//			}
-//		}
+		gameObjects.addAll(foresters);
+		Label[] oldSpeeches = speeches;
+
+		speeches = new Label[gameObjects.size];
+
+		for (int i = 0; i < gameObjects.size; i++) {
+			if (oldSpeeches != null && i < oldSpeeches.length) {
+				speeches[i] = oldSpeeches[i];
+				oldSpeeches[i] = null;
+			} else {
+				Forester f = gameObjects.get(i);
+				String speech = "";
+
+				float w = 0;
+				float x = f.getNewSpeechX(w);
+				float y = f.getNewSpeechY();
+
+				speeches[i] = LabelManager.getInstance().getLabel(speech, x, y, Forester.DEFAULT_SPEECH_COLOR);
+			}
+		}
 	}
 
 	public void updateForesters(GameScreen gameScreen, float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph) {

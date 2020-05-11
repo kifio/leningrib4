@@ -48,7 +48,7 @@ class CommonLevel() : Level() {
         var i = 1
         while (i < levelHeight - 1) {
             val x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2))
-            val y = GameScreen.tileSize * i
+            val y = GameScreen.tileSize * (i + getLevelHeight() * nextLevel)
             if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
                 val hasEffect = ThreadLocalRandom.current().nextInt(256) % 8 == 0
                 mushrooms.add(Mushroom(x, y, mushroomsCount > 0 && hasEffect))
