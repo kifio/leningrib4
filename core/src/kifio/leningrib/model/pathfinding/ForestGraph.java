@@ -50,8 +50,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         int yMin = (int) trees.get(0).getY();
         int yMax = (int) trees.get(0).getY();
 
-        long start = System.nanoTime();
-
         for (Actor tree : trees) {
             int y = (int) tree.getY();
             if (y > yMax) {
@@ -63,12 +61,8 @@ public class ForestGraph implements IndexedGraph<Vector2> {
             }
         }
 
-        long finish = System.nanoTime();
-        Gdx.app.log("kifio_time", "Searching for min max took: " + (finish - start) / 1000000);
-
         int x, y;
 
-        start = System.nanoTime();
         for (int i = xMin; i < xMax; i+=GameScreen.tileSize) {
             for (int j = yMin; j < yMax; j+=GameScreen.tileSize) {
                 x = i;
@@ -78,17 +72,10 @@ public class ForestGraph implements IndexedGraph<Vector2> {
                 }
             }
         }
-        finish = System.nanoTime();
 
-        Gdx.app.log("kifio_time", "Adding nodes took: " + (finish - start) / 1000000);
-
-        start = System.nanoTime();
         for (int i = 0; i < nodes.size; i++) {
             addNeighbours(nodes.get(i), trees);
         }
-
-        finish = System.nanoTime();
-        Gdx.app.log("kifio_time", "Adding connections took: " + (finish - start) / 1000000);
     }
 
     @Override

@@ -53,6 +53,9 @@ class RoomsBuilder(private val Config: Config) {
 
             rooms.add(room)
         }
+
+        val y = rooms.last().y + rooms.last().height
+        rooms.add(Room(y, levelHeight - y, Config.levelWidth))
         return rooms
     }
 }

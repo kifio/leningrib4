@@ -95,7 +95,11 @@ public class ForestersManager extends ObjectsManager<Forester> {
 			float w = LabelManager.getInstance().getTextWidth(forester.speech, LabelManager.getInstance().smallFont);
 			float x = forester.getNewSpeechX(w);
 			float y = forester.getNewSpeechY();
-			speeches[index].remove();
+
+			if (speeches[index] != null) {
+				speeches[index].remove();
+			}
+
 			speeches[index] = LabelManager.getInstance().getLabel(forester.speech, x, y, forester.speechColor);
 		} else {
 			speeches[index].setX(forester.getNewSpeechX(speeches[index].getWidth()));

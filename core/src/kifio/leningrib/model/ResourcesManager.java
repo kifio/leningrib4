@@ -66,17 +66,14 @@ public class ResourcesManager {
     private static final int TILE_SIZE = 16; // Размер тайла который мы вырезаем из png в пикселя
     private static AssetManager am = new AssetManager();
     private static HashMap<String, TextureRegion> regions = new HashMap<>();
+    private static boolean loadingStarted = false;
 
     public static void loadSplash() {
         am.load(LENIN_GRIB, Texture.class);
         am.load(LAUNCH_TREES, Texture.class);
         am.load(LAUNCH_PROGRESS_BACKGROUND, Texture.class);
         am.load(LAUNCH_PROGRESS_FOREGROUND, Texture.class);
-
-        am.finishLoadingAsset(LENIN_GRIB);
-        am.finishLoadingAsset(LAUNCH_TREES);
-        am.finishLoadingAsset(LAUNCH_PROGRESS_BACKGROUND);
-        am.finishLoadingAsset(LAUNCH_PROGRESS_FOREGROUND);
+        am.finishLoading();
 
         putTexture(LENIN_GRIB);
         putTexture(LAUNCH_TREES);
@@ -110,8 +107,12 @@ public class ResourcesManager {
         return am.get(name.contains(".png") ? name : name.concat(".png"));
     }
 
-    public static void loadAssets() {
+    public static boolean isLoaded() {
+        return loadingStarted && am.update();
+    }
 
+    public static void loadAssets() {
+        loadingStarted = true;
         TextureLoader.TextureParameter param = new TextureLoader.TextureParameter();
         param.minFilter = Texture.TextureFilter.Linear;
         param.magFilter = Texture.TextureFilter.Linear;
@@ -166,7 +167,7 @@ public class ResourcesManager {
         am.load("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
         am.load("i18n/grandma_speeches", I18NBundle.class);
 
-        am.finishLoading();
+//        am.finishLoading();
     }
 
     public static void buildRegions() {

@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import generator.Config;
+import kifio.leningrib.LGCGame;
 import kifio.leningrib.levels.helpers.BottleManager;
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
@@ -30,7 +31,6 @@ public abstract class Level {
 
     // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
     protected float bottomCameraThreshold = Gdx.graphics.getHeight() / 2f;
-    protected float lastKnownCameraPosition = Gdx.graphics.getHeight() / 2f;
 
     protected ForestersManager forestersManager;
     protected ForestGraph forestGraph;
@@ -72,12 +72,8 @@ public abstract class Level {
                 player == null ? 0 : player.getMushroomsCount()));
 
         forestGraph = new ForestGraph(treesManager.getObstacleTrees());
-//
-//        dexterityForestGraph = new ForestGraph(levelConfig,
-//                treesManager.getOuterBordersTrees());
-//
-//        strengthForestGraph = new ForestGraph(levelConfig,
-//                treesManager.getObstacleTrees());
+        dexterityForestGraph = new ForestGraph(treesManager.getOuterBordersTrees());
+        strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
 
         for (Forester f : forestersManager.gameObjects) {
             f.initPath(forestGraph);
@@ -136,9 +132,9 @@ public abstract class Level {
     }
 
     public void updateCamera(OrthographicCamera camera, Player player) {
-        if (camera.position.y > lastKnownCameraPosition) {
-            lastKnownCameraPosition = camera.position.y;
-            bottomCameraThreshold = lastKnownCameraPosition - Gdx.graphics.getHeight() / 2f;
+        if (camera.position.y > LGCGame.Companion.getLastKnownCameraPosition()) {
+            LGCGame.Companion.setLastKnownCameraPosition(camera.position.y);
+//            bottomCameraThreshold = lastKnownCameraPosition - Gdx.graphics.getHeight() / 2f;
         }
     }
 
@@ -156,9 +152,17 @@ public abstract class Level {
 
         gameScreen.player.isPaused = gameScreen.isPaused();
         gameScreen.player.checkStuckUnderTrees(gameScreen, treesManager);
-        bottleManager.updateBottles();
-        forestersManager.updateForesters(gameScreen, delta, bottleManager.getBottles(), forestGraph);
-        mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
+
+        if (bottleManager != null) {
+            bottleManager.updateBottles();
+            if (forestersManager != null) {
+                forestersManager.updateForesters(gameScreen, delta, bottleManager.getBottles(), forestGraph);
+            }
+        }
+
+        if (mushroomsManager != null) {
+            mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
+        }
     }
 
     public void addBottle(Bottle bottle) {
@@ -188,10 +192,12 @@ public abstract class Level {
     }
 
     public Label[] getForestersSpeeches() {
+        if (forestersManager == null) return null;
         return forestersManager.speeches;
     }
 
     public Label[] getMushroomsSpeeches() {
+        if (mushroomsManager == null) return null;
         return mushroomsManager.speeches;
     }
 

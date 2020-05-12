@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
+import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION_LONG
 import kifio.leningrib.LGCGame.Companion.isFirstLevelPassed
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
@@ -28,9 +29,11 @@ import kifio.leningrib.view.WorldRenderer
 import model.LevelMap
 import model.WorldMap
 import java.util.concurrent.ThreadLocalRandom
+import javax.rmi.CORBA.Util
 
 class GameScreen(game: LGCGame,
-                 levelMap: LevelMap,
+                 private var level: Level,
+                 @JvmField var player: Player,
                  private var worldMap: WorldMap    // Уровень конструируется с координатами 0,0. Карта уровня долго генерируется первый раз, передаем ее снаружи.
 ) : BaseScreen(game) {
 
@@ -48,14 +51,7 @@ class GameScreen(game: LGCGame,
     private var paused = true
     private var active = false
 
-    @JvmField
-    var player: Player
-
-    var level: Level
-
     var gameOver = false
-
-    private var win = false
 
     private var settings: Group? = null
 
@@ -87,6 +83,7 @@ class GameScreen(game: LGCGame,
         I/kifio: Delta: 0.015999753
     */
     override fun render(delta: Float) {
+        transitionActor?.setOrigin(game.camera.position.x, game.camera.position.y)
 
         if (active) {
             update(delta)
@@ -95,13 +92,13 @@ class GameScreen(game: LGCGame,
             worldRenderer?.render(level, stage)
         }
 
-        if (screenEnterTime < ANIMATION_DURATION) {
+        if (active && screenEnterTime < ANIMATION_DURATION) {
             screenEnterTime += delta
             worldRenderer?.renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
-        } else if (blackScreenTime < ANIMATION_DURATION && (startGame || screenOut || win)) {
+        } else if ((blackScreenTime < ANIMATION_DURATION_LONG && startGame) || screenOut) {
             blackScreenTime += delta
-            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
-        } else if (win && blackScreenTime >= ANIMATION_DURATION) {
+            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
+        } else if ((level as? FirstLevel)?.passed == true && blackScreenTime >= ANIMATION_DURATION) {
             worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
             player.resetPosition()
             level = getNextLevel(0, 1)
@@ -109,9 +106,8 @@ class GameScreen(game: LGCGame,
             resumeGame()
             blackScreenTime = 0f
             screenEnterTime = 0f
-            win = false
-        } else if (startGame && blackScreenTime >= ANIMATION_DURATION) {
-            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
+        } else if (startGame && blackScreenTime >= ANIMATION_DURATION_LONG) {
+            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
             startGame = false
             blackScreenTime = 0f
             screenEnterTime = 0f
@@ -121,9 +117,8 @@ class GameScreen(game: LGCGame,
 
     private fun getNextLevel(x: Int, y: Int): Level {
         LGCGame.setFirstLevelPassed(true)
-        game.camera.position.y = Gdx.graphics.height / 2f
-        return CommonLevel(player, worldMap.addLevel(x, y,
-                Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
+        return CommonLevel(player,
+                worldMap.addLevel(x, y, Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
 
     private fun update(delta: Float) {
@@ -131,8 +126,8 @@ class GameScreen(game: LGCGame,
             vodkaButton?.isVisible = true
         }
 
-        addSpeechesToStage(level.mushroomsSpeeches)
-        addSpeechesToStage(level.forestersSpeeches)
+        level.mushroomsSpeeches?.let { addSpeechesToStage(it) }
+        level.forestersSpeeches?.let { addSpeechesToStage(it) }
         updateWorld(delta)
     }
 
@@ -140,30 +135,19 @@ class GameScreen(game: LGCGame,
         game.camera.let { camera ->
             level.update(delta, camera, this)
 
-            (level as? FirstLevel)?.let {
-                win = it.passed
-            }
-
             (level as? CommonLevel)?.let { level ->
                 val currentLevel = game.camera.position.y.toInt() / levelSize
-                val positionAtLevel = game.camera.position.y % levelSize
 
                 if (level.nextLevel == currentLevel) {
                     level.nextLevel += 1
-                    Gdx.app.log("kifio_level", "positionAtLevel: $positionAtLevel")
 
                     val config = Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
                     level.clearPassedLevels(currentLevel)
 
                     game.executor.submit {
-                        var start = System.nanoTime()
                         val newLevel = CommonLevel(level)
                         val levelMap = worldMap.addLevel(0, level.nextLevel + 1, config)
-                        Gdx.app.log("kifio_time", "Generate level took: ${(System.nanoTime() - start) / 1_000_000}")
-                        start = System.nanoTime()
                         newLevel.addLevelMapIfNeeded(levelMap, player, config)
-                        Gdx.app.log("kifio_time", "Adding level took: ${(System.nanoTime() - start) / 1_000_000}")
-
 
                         Gdx.app.postRunnable {
                             this.level.dispose()
@@ -274,6 +258,8 @@ class GameScreen(game: LGCGame,
     fun showGameOver() {
         if (gameOver) return
         gameOver = true;
+
+        transitionActor = Group()
         val overlay = Overlay(game.camera)
 
         val gameOverLogo = GameOverLogo(game.camera)
@@ -315,11 +301,13 @@ class GameScreen(game: LGCGame,
             }
         }
 
-        stage.addActor(overlay)
-        stage.addActor(settingsButton)
-        stage.addActor(gameOverLogo)
-        stage.addActor(MushroomsCountView(game.camera, player.mushroomsCount))
-        stage.addActor(restartGameButton)
+        transitionActor?.addActor(overlay)
+        transitionActor?.addActor(settingsButton)
+        transitionActor?.addActor(gameOverLogo)
+        transitionActor?.addActor(MushroomsCountView(game.camera, player.mushroomsCount))
+        transitionActor?.addActor(restartGameButton)
+
+        stage.addActor(transitionActor)
     }
 
     private fun pauseGame(withRestartOption: Boolean) {
@@ -412,11 +400,12 @@ class GameScreen(game: LGCGame,
                 getRegion(PAUSE_PRESSED),
                 getRegion(PAUSE),
                 game.camera
-        )
-
-        pauseButton.onTouchHandler = {
-            pauseButton.remove()
-            pauseGame(true)
+        ).apply {
+            zIndex = Int.MAX_VALUE
+            onTouchHandler = {
+                remove()
+                pauseGame(true)
+            }
         }
 
         if (vodkaButton == null) {
@@ -452,15 +441,32 @@ class GameScreen(game: LGCGame,
         }
     }
 
+    private var transitionActor: Group? = null
+    override fun getTransitionActor(): Group = if (transitionActor == null) stage.root else transitionActor!!
+
     private fun restartGame() {
         LGCGame.setFirstLevelPassed(true)
+        blackScreenTime = 0f
         screenOut = true  // Чтобы рисовать черный экран
+
         val worldMap = WorldMap()
-        game.camera.position.y = Gdx.graphics.height / 2f
-        game.showGameScreen(GameScreen(game, worldMap.addLevel(0, 0,
-                Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)), worldMap))
-        stage.addAction(Actions.delay(ANIMATION_DURATION - 0.1f))
-        stage.addAction(Actions.run { stage.actors.forEach { it.remove() } })
+        val levelMap = worldMap.addLevel(0, 0,
+                Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT))
+        val level: Level
+        val player: Player
+
+        if (isFirstLevelPassed()) {
+            val room = levelMap.rooms[0]
+            val x = ThreadLocalRandom.current().nextInt(2, LGCGame.LEVEL_WIDTH - 2).toFloat()
+            val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
+            player = Player(x * tileSize, y * tileSize)
+            level = CommonLevel(player, levelMap)
+        } else {
+            player = FirstLevel.getPlayer()
+            level = FirstLevel(player, levelMap)
+        }
+
+        game.showGameScreen(GameScreen(game, level, player, worldMap))
     }
 
     private fun setupVodka() {
@@ -547,16 +553,7 @@ class GameScreen(game: LGCGame,
         Gdx.input.isCatchBackKey = true
         worldRenderer = WorldRenderer(game.camera, spriteBatch)
 
-        if (isFirstLevelPassed()) {
-            val room = levelMap.rooms[0]
-            val x = ThreadLocalRandom.current().nextInt(2, LGCGame.LEVEL_WIDTH - 2).toFloat()
-            val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
-            player = Player(x * tileSize, y * tileSize)
-            level = CommonLevel(player, levelMap)
-        } else {
-            player = FirstLevel.getPlayer()
-            level = FirstLevel(player, levelMap)
-        }
+
         resetStage()
     }
 }

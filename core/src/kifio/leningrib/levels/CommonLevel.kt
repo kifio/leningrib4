@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Actor
 import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.LGCGame.Companion.lastKnownCameraPosition
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.helpers.TreesManager
 import kifio.leningrib.model.actors.Mushroom
@@ -19,7 +20,6 @@ class CommonLevel() : Level() {
 
     constructor(player: Player, levelMap: LevelMap) : this() {
         super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
-        lastKnownCameraPosition = Gdx.graphics.height / 2f
     }
 
     constructor(level: CommonLevel) : this() {

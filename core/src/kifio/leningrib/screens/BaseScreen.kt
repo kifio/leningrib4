@@ -2,6 +2,8 @@ package kifio.leningrib.screens
 
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import kifio.leningrib.LGCGame
@@ -21,4 +23,6 @@ abstract class BaseScreen(var game: LGCGame) : Screen {
         stage.dispose()
         spriteBatch.dispose()
     }
+
+    open fun getTransitionActor(): Group = stage.root
 }
