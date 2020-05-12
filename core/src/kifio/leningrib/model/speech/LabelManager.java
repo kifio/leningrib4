@@ -137,7 +137,7 @@ public class LabelManager {
 	public Label getLabel(String text, float x, float y, int align, Color color) {
 		Label label = new Label(text, labelStyle);
 		label.setColor(color);
-		label.setWidth(GameScreen.tileSize * 2);
+		label.setWidth(GameScreen.tileSize * 2.7f);
 		label.setFontScale(SCALE, SCALE);
 		label.setPosition(x, y);
 		label.setWrap(true);

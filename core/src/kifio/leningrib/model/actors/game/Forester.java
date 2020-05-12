@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
@@ -31,8 +32,6 @@ public class Forester extends MovableActor {
 
     private static int NOTICE_AREA_SIZE = 7;
     private static int PURSUE_AREA_SIZE = 13;
-    public static int NOTICE_AREA_SIZE_SMALL = 3;
-    public static int PURSUE_AREA_SIZE_SMALL = 7;
 
     private final String running;
     private final String idle;
@@ -101,24 +100,10 @@ public class Forester extends MovableActor {
         idle = String.format(Locale.getDefault(), "enemy_%d_idle", index);
     }
 
-    public Forester(float originalFromX, float originalFromY, float originalToX, int index,
-                    int originalBottomLimit, int originalTopLimit, int originalLeftLimit, int originalRightLimit,
-                    float velocity, int noticeAreaSize, int pursueAreaSize) {
-        this(originalFromX,
-                originalFromY,
-                originalToX,
-                index,
-                originalBottomLimit,
-                originalTopLimit,
-                originalLeftLimit,
-                originalRightLimit);
-        this.noticeAreaSize = noticeAreaSize;
-        this.pursueAreaSize = pursueAreaSize;
-        this.velocity = velocity;
-    }
-
     public void initPath(ForestGraph forestGraph) {
-        setNewPath(forestGraph);
+        if (toX == 0 && toY == 0) {
+            setNewPath(forestGraph);
+        }
     }
 
     public void updateMovementState(Player player,
@@ -150,7 +135,6 @@ public class Forester extends MovableActor {
                 nearestBottle != null && nearestBottle.hasDrinker(this), stopTime
         );
 
-//        Gdx.app.log("kifio", state.name());
         boolean wasChanged = !state.equals(movingState);
 
         if (wasChanged) {
@@ -326,6 +310,10 @@ public class Forester extends MovableActor {
 
         int fx = (int) Utils.mapCoordinate(getX());
         int fy = (int) Utils.mapCoordinate(getY());
+
+        if (fy < py - Gdx.graphics.getHeight() || fy > py + Gdx.graphics.getHeight()) {
+            return;
+        }
 
         switch (movingState) {
             case PATROL:

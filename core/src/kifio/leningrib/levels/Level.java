@@ -115,6 +115,10 @@ public abstract class Level {
         forestGraph = new ForestGraph(treesManager.getObstacleTrees());
         dexterityForestGraph= new ForestGraph(treesManager.getOuterBordersTrees());
         strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
+
+        for (Forester f : forestersManager.gameObjects) {
+            f.initPath(forestGraph);
+        }
     }
 
     private void removeActorsFrom(Array<? extends Actor> actors, float threshold) {

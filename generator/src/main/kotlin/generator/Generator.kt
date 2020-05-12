@@ -110,7 +110,7 @@ class Generator {
 
         val roomBordersBuilder = RoomBordersBuilder()
 
-        for (index in map.rooms.indices) {
+        for (index in 0 until map.rooms.size - 1) {
 
             val room = map.rooms[index]
             if (room.treesPositions.isEmpty()) {

@@ -88,7 +88,6 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
             float yOffset = 1f * GameScreen.tileSize;
             float y = m.getY() + yOffset;
             speeches[index] = LabelManager.getInstance().getLabel(speech, x, y, m.getSpeechColor());
-
             if (!m.hasStableSpeech()) {
                 speeches[index].addAction(
                         getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index)

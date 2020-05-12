@@ -76,7 +76,7 @@ public class Mushroom extends MovableActor {
         float size = GameScreen.tileSize * scale;
         bounds.set(x, y, size, size);
         float offset = (GameScreen.tileSize - size) / 2;
-        batch.draw(getTextureRegion(), x + offset, y - offset, size, size);
+        batch.draw(getTextureRegion(), x + offset, (y + GameScreen.tileSize / 3f) - offset, size, size);
     }
 
     @Override
