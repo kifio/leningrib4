@@ -97,11 +97,11 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
     }
 
     private boolean shouldAddSpeech(Player player) {
-        int var1 = player.getMushroomsCount() / 3;
-        if (var1 == 0) {
+        int count = player.getMushroomsCount();
+        if (count < 1) {
             return false;
         } else {
-            return ThreadLocalRandom.current().nextInt(Math.max(256, SPEECH_SEED / var1)) / 8 == 0;
+            return ThreadLocalRandom.current().nextInt(Math.max(256, SPEECH_SEED / count)) / 8 == 0;
         }
     }
 

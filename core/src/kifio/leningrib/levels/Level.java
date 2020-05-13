@@ -151,7 +151,7 @@ public abstract class Level {
     protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Player player, Rectangle[] roomRectangles);
 
     public void update(float delta, OrthographicCamera camera, GameScreen gameScreen) {
-        boolean isPaused = gameScreen.isPaused();
+        boolean isPaused = gameScreen.isPaused() || gameScreen.getGameOver();
         float cameraY = gameScreen.getCameraPostion().y;
 
         gameScreen.player.isPaused = gameScreen.isPaused();

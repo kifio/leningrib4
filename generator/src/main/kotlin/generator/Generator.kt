@@ -89,9 +89,19 @@ class Generator {
 
             rooms.addAll(RoomsBuilder(levelConfig).buildRooms(roomsSpace, exits))
 
-            updateRoomBorders(this, Array(rooms.size) { i ->
-                getRandomNotOddNumber(1, rooms[i].treesPositions.size - 1)
-            })
+            val treesForRemoving = arrayOfNulls<Int?>(rooms.size)
+            for (i in 0 until rooms.size) {
+                if (i == 0) {
+                    treesForRemoving[i] = getRandomNotOddNumber(1, rooms[i].treesPositions.size - 1)
+                } else {
+                    do {
+                        treesForRemoving[i] = getRandomNotOddNumber(1, rooms[i].treesPositions.size - 1)
+                    } while (treesForRemoving[i - 1] == treesForRemoving[i])
+                }
+            }
+
+
+            updateRoomBorders(this,  treesForRemoving)
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
