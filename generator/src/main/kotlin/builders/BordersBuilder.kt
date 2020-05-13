@@ -49,8 +49,8 @@ class BordersBuilder(
                 SegmentType.ROOM_WALL_START_TOP,
                 SegmentType.ROOM_WALL_COMMON_TOP,
                 SegmentType.ROOM_WALL_COMMON_TOP,
-                SegmentType.ROOM_WALL_COMMON_TOP,
-                SegmentType.ROOM_WALL_COMMON_TOP)
+                SegmentType.ROOM_WALL_END_TOP,
+                SegmentType.ROOM_WALL_START_TOP)
     }
 
     internal fun buildBorder(side: Side, neighbour: LevelMap?): List<Segment> =

@@ -14,8 +14,6 @@ class TreesManager {
 
     private val outerTrees = Array<TreePart>()
     private val obstacleTrees = Array<TreePart>()
-    private val bottomBorderNonObstaclesTrees = Array<TreePart>()
-    private val topBorderNonObstaclesTrees = Array<TreePart>()
     private val innerBorderTrees = Array<TreePart>()
 
     fun updateTrees(levelMap: LevelMap, config: Config, index: Int) {
@@ -46,10 +44,6 @@ class TreesManager {
 
     fun getObstacleTrees() = obstacleTrees
 
-//    fun getBottomBorderNonObstaclesTrees() = bottomBorderNonObstaclesTrees
-//
-//    fun getTopBorderNonObstaclesTrees() = topBorderNonObstaclesTrees
-
     fun getOuterBordersTrees() = outerTrees
 
     fun getInnerBordersTrees() = innerBorderTrees
@@ -58,19 +52,7 @@ class TreesManager {
 
         private fun getActorFromCell(segmentType: SegmentType, x: Int, y: Int): TreePart? {
             val region: TextureRegion = ResourcesManager.getRegion(segmentType.name) ?: return null
-            return TreePart(region, x.toFloat(), y.toFloat(), GameScreen.tileSize)
-        }
-
-        private fun isBottomLineIgnoredTree(value: SegmentType): Boolean {
-            return value == SegmentType.BOTTOM_COMMON_LEFT_TOP
-                    || value == SegmentType.BOTTOM_COMMON_RIGHT_TOP
-                    || value == SegmentType.BOTTOM_LEFT_CORNER_COMMON_TOP
-                    || value == SegmentType.BOTTOM_RIGHT_CORNER_COMMON_TOP
-        }
-
-        private fun isTopLineIgnoredTree(value: SegmentType): Boolean {
-            return value == SegmentType.TOP_COMMON_LEFT_BOTTOM
-                    || value == SegmentType.TOP_COMMON_RIGHT_BOTTOM
+            return TreePart(region, 1f, x.toFloat(), y.toFloat(), GameScreen.tileSize)
         }
     }
 }

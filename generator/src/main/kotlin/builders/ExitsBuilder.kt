@@ -27,7 +27,7 @@ class ExitsBuilder(private val levelConfig: Config) {
                 return
             }
             1 -> {
-                exitsOnSide.add(Random.nextInt(1, sideSize - 1))
+                exitsOnSide.add(Random.nextInt(1, sideSize))
 //                exitsOnSide.add(1)
             }
             else -> {

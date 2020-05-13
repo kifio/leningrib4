@@ -19,7 +19,7 @@ internal val levelConfig = Config(
 fun main(args: Array<String>) {
     val worldMap = WorldMap()
     for (x in 0..0) {
-        for (y in 0..10) {
+        for (y in 0..15) {
             worldMap.addLevel(x, y, null, levelConfig)
         }
     }

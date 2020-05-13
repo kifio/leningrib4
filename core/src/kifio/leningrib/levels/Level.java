@@ -16,6 +16,7 @@ import kifio.leningrib.levels.helpers.BottleManager;
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.TreesManager;
+import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.game.Player;
@@ -138,7 +139,6 @@ public abstract class Level {
     public void updateCamera(OrthographicCamera camera, Player player) {
         if (camera.position.y > LGCGame.Companion.getLastKnownCameraPosition()) {
             LGCGame.Companion.setLastKnownCameraPosition(camera.position.y);
-//            bottomCameraThreshold = lastKnownCameraPosition - Gdx.graphics.getHeight() / 2f;
         }
     }
 
@@ -166,6 +166,16 @@ public abstract class Level {
 
         if (mushroomsManager != null) {
             mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
+        }
+
+        if (gameScreen.player.isDexterous()) {
+            for (TreePart treePart : treesManager.getInnerBordersTrees()) {
+                treePart.setAlpha(0.2f);
+            }
+        } else {
+            for (TreePart treePart : treesManager.getInnerBordersTrees()) {
+                treePart.setAlpha(1f);
+            }
         }
     }
 

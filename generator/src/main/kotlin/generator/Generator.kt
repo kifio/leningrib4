@@ -69,6 +69,7 @@ class Generator {
             val rightNeighbour = worldMap.getRightNeighbour(x, y)
 
             val exits = exitsBuilder.getExits(x, y, Side.TOP, topNeighbour)
+//            val exits = listOf<Exit>(Exit(levelConfig.levelWidth - 3, levelConfig.levelHeight - 1, false))
 
             if (enterX != null) {
                 exits.add(Exit(enterX, 0, false))
@@ -103,7 +104,6 @@ class Generator {
                     } while (treesForRemoving[i - 1] == treesForRemoving[i])
                 }
             }
-
 
             updateRoomBorders(this, treesForRemoving)
 
