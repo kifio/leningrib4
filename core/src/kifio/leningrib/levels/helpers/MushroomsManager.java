@@ -84,7 +84,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         // С некоторой вероятностью добавляем новую речь
         if ((shouldAddSpeech(player) || m.hasStableSpeech()) && speeches[index] == null) {
             String speech = m.getSpeech();
-            float x = m.getX() + (0.5f * GameScreen.tileSize) - GameScreen.tileSize;
+            float x = m.getX() + (0.5f * GameScreen.tileSize) - (1.3f * GameScreen.tileSize);
             float yOffset = 1f * GameScreen.tileSize;
             float y = m.getY() + yOffset;
             speeches[index] = LabelManager.getInstance().getLabel(speech, x, y, m.getSpeechColor());

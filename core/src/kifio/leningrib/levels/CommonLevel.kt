@@ -34,10 +34,6 @@ class CommonLevel() : Level() {
         camera.update()
     }
 
-    override fun getActors(): com.badlogic.gdx.utils.Array<out Actor?> {
-        return forestersManager.gameObjects
-    }
-
     override fun initMushrooms(config: Config,
                                treesManager: TreesManager,
                                mushroomsCount: Int): com.badlogic.gdx.utils.Array<Mushroom> {
@@ -50,8 +46,9 @@ class CommonLevel() : Level() {
             val x = GameScreen.tileSize * (1 + ThreadLocalRandom.current().nextInt(levelWidth - 2))
             val y = GameScreen.tileSize * (i + getLevelHeight() * nextLevel)
             if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
-                val hasEffect = ThreadLocalRandom.current().nextInt(128) % 8 == 0
-                mushrooms.add(Mushroom(x, y, mushroomsCount > 0 && hasEffect))
+                val foo = ThreadLocalRandom.current().nextInt(64)
+                val hasEffect = foo % 4 == 0
+                mushrooms.add(Mushroom(x, y, hasEffect))
             }
             i += step
         }

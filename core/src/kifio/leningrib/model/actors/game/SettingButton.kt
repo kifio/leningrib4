@@ -1,7 +1,6 @@
 package kifio.leningrib.model.actors.game
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LGCGame
-import kifio.leningrib.LGCGame.Companion.PREFERENCES_NAME
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
@@ -20,15 +18,15 @@ class SettingButton(
         private val unpressedState: TextureRegion = getRegion(SETTING)
 ) : StaticActor(unpressedState) {
 
-    private val MUSIC = "music"
-    private val SOUNDS = "sounds"
+    private val MUSIC_OFF = "music_off"
+    private val SOUNDS_OFF = "sounds_off"
 
     var onTouchHandler: (() -> Unit)? = null
 
     private val key = when (index) {
-        0 -> MUSIC
-        1 -> SOUNDS
-        else -> LGCGame.FIRST_LEVEL_PASSED
+        0 -> MUSIC_OFF
+        1 -> SOUNDS_OFF
+        else -> LGCGame.FIRST_LEVEL_PASSED  // TUTORIAL_OFF
     }
 
     private val enabledIcon = getRegion(SETTING_ENABLED)
@@ -60,7 +58,7 @@ class SettingButton(
             this.x = 2 * offset
         }
 
-        enabled = prefs?.getBoolean(key) ?: false
+        enabled = prefs?.getBoolean(key) != true
         switchIcon = if (enabled) enabledIcon else disabledIcon
 
         iconWidth = this.height - (16 * Gdx.graphics.density)

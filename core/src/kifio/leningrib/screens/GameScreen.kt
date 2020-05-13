@@ -186,13 +186,9 @@ class GameScreen(game: LGCGame,
         for (tree in treesManager.getObstacleTrees()) {
             stage.addActor(tree)
         }
-//        for (tree in treesManager.getTopBorderNonObstaclesTrees()) {
-//            stage.addActor(tree)
-//        }
+
         stage.addActor(player)
-//        for (tree in treesManager.getBottomBorderNonObstaclesTrees()) {
-//            stage.addActor(tree)
-//        }
+
         for (i in 0 until level.foresters.size) {
             stage.addActor(level.foresters[i])
         }
@@ -411,6 +407,7 @@ class GameScreen(game: LGCGame,
                     SquareButton.LEFT)
 
             vodkaButton?.isVisible = false
+            vodkaButton?.zIndex = Int.MAX_VALUE - 1
             vodkaButton?.onTouchHandler = {
 
                 if (vodkaButton?.isVisible == true) {
@@ -461,8 +458,6 @@ class GameScreen(game: LGCGame,
             Actions.moveTo(playerX, playerY, 0.5f, Interpolation.circle)
         })
     }
-
-//    fun isGameOver() = gameOver || win
 
     companion object {
         @JvmField

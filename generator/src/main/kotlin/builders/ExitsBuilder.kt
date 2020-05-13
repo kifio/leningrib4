@@ -27,11 +27,9 @@ class ExitsBuilder(private val levelConfig: Config) {
                 return
             }
             1 -> {
-                exitsOnSide.add(Random.nextInt(1, sideSize))
-//                exitsOnSide.add(1)
+                exitsOnSide.add(Random.nextInt(1, sideSize - 1))
             }
             else -> {
-//                exitsOnSide.add(Generator.getRandomNotOddNumber(2, sideSize / 2))
                 exitsOnSide.add(3)
                 exitsOnSide.add(Generator.getRandomNotOddNumber(sideSize / 2, sideSize - 1))
                 exitsOnSide.sort()

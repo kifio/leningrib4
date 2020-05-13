@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.actors.game.Forester;
@@ -20,20 +22,43 @@ public class TutorialForester extends TutorialCharacter {
     private String idle;
     private String run;
     private Bottle targetBottle = null;
-    private float speechWidth;
+    private float accumulatedTime = 0f;
+    private int speechIndex = 0;
+    private boolean isDrinking = false;
+
+    private String[] labels = new String[] {
+            "Я за тобой бегать не буду",
+            "Не пущу и все",
+            "Нет покоя в наших лесах",
+            "Я на посту всегда",
+            "Тут проход в лес запрещен"
+    };
+
+    private String[] drinkingLabels = new String[] {
+            "Грех за такое не выпить! ",
+            "За честь и отвагу!",
+            "Ну, за Веру, Царя и Отечество!",
+            "За красоту!",
+            "За природу!"
+    };
+
+    private String[] drunkLabels = new String[] {
+            "Постою тут пожалуй, потрезвею.",
+            "Без водки вообще бы плохо было...",
+            "Я как стекло трезвый...",
+            "Хоспади, я в говнину просто...",
+            "Не, работать я так точно не смогу..."
+    };
 
     public TutorialForester(float x, float y,
-                            String texture,
-                            String label
+                            String texture
     ) {
         super(x, y);
         this.idle = texture + "_idle";
         this.run = texture + "_run";
         this.isPaused = false;
-        this.speechWidth = LabelManager.getInstance()
-                .getTextWidth(label, LabelManager.getInstance().smallFont);
-
-        this.label = LabelManager.getInstance().getLabel(label, x - 0.5f * GameScreen.tileSize,
+        this.labels = labels;
+        this.label = LabelManager.getInstance().getLabel(labels[0], x - 0.5f * GameScreen.tileSize,
                 y + 1.3f * GameScreen.tileSize, Forester.DEFAULT_SPEECH_COLOR);
     }
 
@@ -64,14 +89,35 @@ public class TutorialForester extends TutorialCharacter {
     @Override
     public void act(float delta) {
         super.act(delta);
-        label.setX(getX() - (0.5f * GameScreen.tileSize));
+        accumulatedTime += delta;
+        label.setX(getX() - (GameScreen.tileSize));
         label.setY(getY() + 1.3f * GameScreen.tileSize);
+
+        if ((int) accumulatedTime > 1) {
+            int i;
+            do {
+                i = ThreadLocalRandom.current().nextInt(0, labels.length);
+            } while (i == speechIndex);
+            speechIndex = i;
+            accumulatedTime = 0;
+            if (targetBottle == null) {
+                label.setText(labels[i]);
+            } else {
+                if (isDrinking) {
+                    if (targetBottle.isEmpty()) {
+                        label.setText(drunkLabels[i]);
+                    } else {
+                        label.setText(drinkingLabels[i]);
+                    }
+                }
+            }
+        }
     }
 
     public void runToBottle(Bottle bottle, ForestGraph forestGraph) {
         if (targetBottle != null) return;
         targetBottle = bottle;
-//        label.setText("БОЖЕ МОЙ, ЭТО ОНА!");
+        label.setText("Опа, водочку подвезли!");
 
         float fromX = Utils.mapCoordinate(getX());
         float fromY = Utils.mapCoordinate(getY());
@@ -86,7 +132,14 @@ public class TutorialForester extends TutorialCharacter {
 
         if (path.getCount() > 0 && current != null) {
             current = UIState.obtainUIState(getRunningState(), this);
-            addAction(getMoveActionsSequence());
+            SequenceAction sequenceAction = getMoveActionsSequence();
+            sequenceAction.addAction(Actions.run(new Runnable() {
+                @Override
+                public void run() {
+                    isDrinking = true;
+                }
+            }));
+            addAction(sequenceAction);
         }
     }
 

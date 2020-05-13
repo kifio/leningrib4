@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Action
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
@@ -30,35 +29,24 @@ class FirstLevel() : Level() {
 
     constructor(player: Player, levelMap: LevelMap): this() {
         super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, levelHeight))
-    }
-
-    var guards: Array<TutorialForester>? = null
-        private set
-
-    private val characters = arrayOf(
-            ResourcesManager.PLAYER_DIALOG_FACE,
-            ResourcesManager.PLAYER_DIALOG_FACE,
-            ResourcesManager.PLAYER_DIALOG_FACE
-    )
-
-    private var shownDialogs = arrayOf(
-            false, false, false, false, false
-    )
-
-    override fun getActors(): Array<out Actor> {
-        val arr = Array<Actor>()
-
         if (guards == null) {
             guards = Array<TutorialForester>()
             guards?.add(TutorialForester(
                     GameScreen.tileSize * 1f,
                     GameScreen.tileSize * 28f,
-                    "enemy_3",
-                    "Проход в лес запрещен"))
+                    "enemy_3")
+            )
         }
-        arr.addAll(guards)
-        return arr
     }
+
+    var guards: Array<TutorialForester>? = null
+        private set
+
+    private var shownDialogs = arrayOf(
+            false, false, false, false, false
+    )
+
+    private var isLastRoomAvailable = false
 
     override fun initMushrooms(config: Config, treesManager: TreesManager, mushroomsCount: Int): Array<Mushroom> {
         val mushrooms = Array<Mushroom>()
@@ -69,6 +57,9 @@ class FirstLevel() : Level() {
                 GameScreen.tileSize * 18,
                 Mushroom.Effect.DEXTERITY,
                 Float.POSITIVE_INFINITY))
+        mushrooms.add(Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * (levelHeight - 1)))
+        mushrooms.add(Mushroom(GameScreen.tileSize * 4, GameScreen.tileSize * (levelHeight - 1)))
+
         return mushrooms
     }
 
@@ -115,16 +106,18 @@ class FirstLevel() : Level() {
 
             guards?.get(0)?.apply {
                 if (!bottle.hasDrinker(this)) {
-                    val fx = Utils.mapCoordinate(this.x).toInt()
-                    val fy = Utils.mapCoordinate(this.y).toInt()
+
+                    val fx = Utils.mapCoordinate(this.x)
+                    val fy = Utils.mapCoordinate(this.y)
 
                     val bx = Utils.mapCoordinate(bottle.x).toInt()
                     val by = Utils.mapCoordinate(bottle.y).toInt()
 
-                    if (fx == bx && fy == by) {
+                    isLastRoomAvailable = Utils.isInRoom(roomsRectangles[2], fx / GameScreen.tileSize, fy / GameScreen.tileSize)
+
+                    if (fx.toInt() == bx && fy.toInt() == by) {
                         bottle.addDrinker(this)
                         this.setIdleState()
-                        this.label.setText("Грех за такое не выпить!")
                     }
                 }
             }
@@ -148,10 +141,11 @@ class FirstLevel() : Level() {
 
         val speeches = arrayOf(
                 "Привет!\nМеня зовут Lenin.",
-                "В этот лес я приехал расширять свое сознание."
+                "В этот лес я приехал за чудо-грибами расширяющими сознание.",
+                "Итак, для начала стоит осмотреться."
         )
 
-        return Dialog(camera, speeches, characters).apply {
+        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[0].stableSpeech = "Нажми на меня"
                 disposeHandler.invoke()
@@ -163,12 +157,12 @@ class FirstLevel() : Level() {
                                 disposeHandler: () -> Unit): Dialog {
 
         val speeches = arrayOf(
-                "Отлично!",
-                "Ты можешь отправить меня в любую точку экрана, указав на нее!.",
+                "Отлично!\nГрибы здесь сами говорят куда идти.",
+                "А ты можешь отправить меня в любую точку экрана, указав на нее!.",
                 "Давай посмотрим, что там на соседней поляне."
         )
 
-        return Dialog(camera, speeches, characters).apply {
+        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[2].stableSpeech = PROVOCATION_0
                 disposeHandler.invoke()
@@ -183,9 +177,9 @@ class FirstLevel() : Level() {
 
         val speeches = arrayOf(
                 "Здесь мне просто так не пройти!",
-                "Хорошо, что есть грибы убеждающие меня в обратном..")
+                "Хорошо, что этот гриб убеждает меня в обратном..")
 
-        return Dialog(camera, speeches, characters).apply {
+        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[3].stableSpeech = "Со мной ты тут пролезешь!"
                 disposeHandler.invoke()
@@ -197,12 +191,14 @@ class FirstLevel() : Level() {
                                 disposeHandler: () -> Unit): Dialog {
 
         val speeches = arrayOf(
-                "В зарослях нашлась бутылка водки.",
+                "Некоторые грибы дают мне сверхспобосности",
+                "Ну или мне так кажется..",
+                "Так или иначе, в зарослях нашлась бутылка водки.",
                 "Если бросить такую перед лесником, он ошалеет и забудет обо мне.",
-                "Думаю это отличный способ отвлечь тех двух ребят."
+                "Думаю, это отличный способ отвлечь того громилу."
         )
 
-        return Dialog(camera, speeches, characters).apply {
+        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 disposeHandler.invoke()
             }
@@ -211,14 +207,13 @@ class FirstLevel() : Level() {
 
     private fun getLastDialog(camera: OrthographicCamera,
                               disposeHandler: () -> Unit): Dialog {
-
         val speeches = arrayOf(
-                "Получилось! Этим ребятам лучше не попадаться.",
+                "Получилось! По этой тропинке я смогу пройти дальше!",
                 "Дальше начинается настоящий лес.",
-                "А этот гриб поможет мне найти дорогу к следующей опушке с грибами."
+                "А этот грибы помогут мне найти дорогу к следующей опушке с грибами."
         )
 
-        return Dialog(camera, speeches, characters).apply {
+        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 disposeHandler.invoke()
             }
@@ -300,8 +295,9 @@ class FirstLevel() : Level() {
                 super.movePlayerTo(x, y, player)
             }
         } else {
-            Gdx.app.log("kifio_path", "eLimit: $yLimit; to y: ${Utils.mapCoordinate(y)}")
-            super.movePlayerTo(x, y, player)
+            if (isLastRoomAvailable || (roomsRectangles[2].y + roomsRectangles[2].height) > y / GameScreen.tileSize) {
+                super.movePlayerTo(x, y, player)
+            }
         }
     }
 

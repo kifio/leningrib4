@@ -71,7 +71,6 @@ public abstract class Level {
         mushroomsManager.addMushrooms(initMushrooms(levelConfig,
                 treesManager,
                 player == null ? 0 : player.getMushroomsCount()));
-
         forestGraph = new ForestGraph(treesManager.getObstacleTrees());
         dexterityForestGraph = new ForestGraph(treesManager.getOuterBordersTrees());
         strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
@@ -97,8 +96,6 @@ public abstract class Level {
         removeActorsFrom(mushroomsManager.gameObjects, threshold);
         removeActorsFrom(treesManager.getOuterBordersTrees(), threshold);
         removeActorsFrom(treesManager.getObstacleTrees(), threshold);
-//        removeActorsFrom(treesManager.getBottomBorderNonObstaclesTrees(), threshold);
-//        removeActorsFrom(treesManager.getTopBorderNonObstaclesTrees(), threshold);
         removeActorsFrom(treesManager.getInnerBordersTrees(), threshold);
     }
 
@@ -143,8 +140,6 @@ public abstract class Level {
     }
 
     public abstract int getLevelHeight();
-
-    protected abstract Array<? extends Actor> getActors();
 
     protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager, int mushroomsCount);
 
