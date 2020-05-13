@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
     val worldMap = WorldMap()
     for (x in 0..0) {
         for (y in 0..10) {
-            worldMap.addLevel(x, y, levelConfig)
+            worldMap.addLevel(x, y, null, levelConfig)
         }
     }
     saveMap(worldMap)

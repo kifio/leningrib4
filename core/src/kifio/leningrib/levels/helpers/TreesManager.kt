@@ -32,19 +32,8 @@ class TreesManager {
 
             if (tree != null) {
                 if (s.y == 0 && index > 0) continue;
-                val treeType = s.getValue()
 
-                when {
-                    isTopLineIgnoredTree(treeType) -> {
-                        topBorderNonObstaclesTrees.add(tree)
-                    }
-                    isBottomLineIgnoredTree(treeType) -> {
-                        bottomBorderNonObstaclesTrees.add(tree)
-                    }
-                    else -> {
-                        obstacleTrees.add(tree)
-                    }
-                }
+                obstacleTrees.add(tree)
 
                 if (s.x == 0 || s.y == 0 || s.x == LGCGame.LEVEL_WIDTH - 1/* || s.y == LGCGame.getLevelHeight() - 1*/) {
                     outerTrees.add(tree)
@@ -57,9 +46,9 @@ class TreesManager {
 
     fun getObstacleTrees() = obstacleTrees
 
-    fun getBottomBorderNonObstaclesTrees() = bottomBorderNonObstaclesTrees
-
-    fun getTopBorderNonObstaclesTrees() = topBorderNonObstaclesTrees
+//    fun getBottomBorderNonObstaclesTrees() = bottomBorderNonObstaclesTrees
+//
+//    fun getTopBorderNonObstaclesTrees() = topBorderNonObstaclesTrees
 
     fun getOuterBordersTrees() = outerTrees
 

@@ -12,13 +12,21 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.FloatAction
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.utils.Align
+import generator.Config
+import kifio.leningrib.levels.CommonLevel
+import kifio.leningrib.levels.FirstLevel
+import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
+import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
+import model.LevelMap
+import model.WorldMap
 import java.lang.reflect.Array.set
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.ThreadLocalRandom
 
 class LGCGame(isDebug: Boolean) : Game() {
 
@@ -47,6 +55,28 @@ class LGCGame(isDebug: Boolean) : Game() {
         }
 
         fun getPreferences() = prefs
+
+        fun getLevelAndPlayer(worldMap: WorldMap): Pair<Player, Level> {
+            val levelMap: LevelMap
+            val level: Level
+            val player: Player
+            if (isFirstLevelPassed()) {
+                val config = Config(LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
+                levelMap = worldMap.addLevel(0, 0, null, config)
+                val room = levelMap.rooms[0]
+                val x = ThreadLocalRandom.current().nextInt(2, LEVEL_WIDTH - 2).toFloat()
+                val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
+                player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize)
+                level = CommonLevel(player, levelMap)
+            } else {
+                val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
+                val config = Config(LEVEL_WIDTH, firstRoomHeight + 20)
+                levelMap = worldMap.addFirstLevel(config, firstRoomHeight)
+                player = FirstLevel.getPlayer()
+                level = FirstLevel(player, levelMap)
+            }
+            return Pair(player, level)
+        }
     }
 
     val camera: OrthographicCamera = OrthographicCamera()

@@ -22,7 +22,7 @@ class CommonLevel() : Level() {
         super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
     }
 
-    constructor(level: CommonLevel) : this() {
+    constructor(level: Level) : this() {
         super.copy(level)
     }
 

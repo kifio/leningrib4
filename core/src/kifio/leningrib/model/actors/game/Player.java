@@ -241,7 +241,7 @@ public class Player extends MovableActor {
     }
 
     public void resetPosition() {
-        setY(GameScreen.tileSize);
+        setY(GameScreen.tileSize + 1);
     }
 
     public boolean isInvisible() {

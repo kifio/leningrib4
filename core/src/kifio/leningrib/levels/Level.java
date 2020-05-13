@@ -96,8 +96,8 @@ public abstract class Level {
         removeActorsFrom(mushroomsManager.gameObjects, threshold);
         removeActorsFrom(treesManager.getOuterBordersTrees(), threshold);
         removeActorsFrom(treesManager.getObstacleTrees(), threshold);
-        removeActorsFrom(treesManager.getBottomBorderNonObstaclesTrees(), threshold);
-        removeActorsFrom(treesManager.getTopBorderNonObstaclesTrees(), threshold);
+//        removeActorsFrom(treesManager.getBottomBorderNonObstaclesTrees(), threshold);
+//        removeActorsFrom(treesManager.getTopBorderNonObstaclesTrees(), threshold);
         removeActorsFrom(treesManager.getInnerBordersTrees(), threshold);
     }
 

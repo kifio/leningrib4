@@ -20,8 +20,11 @@ class WorldMap {
         return level
     }
 
-    fun addLevel(x: Int, y: Int, Config: Config): LevelMap {
-        val level = generator.generateLevel(x, y, this, Config)
+    fun addLevel(x: Int,
+                 y: Int,
+                 enterX: Int?,
+                 Config: Config): LevelMap {
+        val level = generator.generateLevel(x, y, enterX,this, Config)
         levels[Pair(x, y)] = level
         return level
     }

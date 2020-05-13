@@ -32,16 +32,16 @@ class Generator {
             val heights = arrayOf(firstRoomHeight, 7, 7, 7)
 
             rooms.add(Room(1, heights[0], levelConfig.levelWidth))
-    		rooms.add(Room(heights[0] + 1, heights[1], levelConfig.levelWidth))
-	    	rooms.add(Room(heights[0] + 1 + heights[1], heights[2], levelConfig.levelWidth))
-		    rooms.add(Room(heights[0] + 1 + heights[1] + heights[2], heights[3], levelConfig.levelWidth))
+            rooms.add(Room(heights[0] + 1, heights[1], levelConfig.levelWidth))
+            rooms.add(Room(heights[0] + 1 + heights[1], heights[2], levelConfig.levelWidth))
+            rooms.add(Room(heights[0] + 1 + heights[1] + heights[2], heights[3], levelConfig.levelWidth))
 
             updateRoomBorders(this, arrayOf(2, Int.MAX_VALUE, 0, 2))
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
                 (it.y == 0 || it.y == levelConfig.levelHeight - 1)
-                        && (it .x > 0 && it.x < levelConfig.levelWidth - 1)
+                        && (it.x > 0 && it.x < levelConfig.levelWidth - 1)
             }.map {
                 additionalSegmentsMapper.convert(it)
             }
@@ -53,9 +53,9 @@ class Generator {
     }
 
     fun generateLevel(
-        x: Int, y: Int,
-        worldMap: WorldMap,
-        levelConfig: Config
+            x: Int, y: Int, enterX: Int?,
+            worldMap: WorldMap,
+            levelConfig: Config
     ): LevelMap {
 
         val map = LevelMap(mutableSetOf(), mutableListOf(), levelConfig)
@@ -70,6 +70,10 @@ class Generator {
 
             val exits = exitsBuilder.getExits(x, y, Side.TOP, topNeighbour)
 
+            if (enterX != null) {
+                exits.add(Exit(enterX, 0, false))
+            }
+
             addExits(exits)
 
             val bordersBuilder = BordersBuilder(levelConfig, exits, false)
@@ -77,8 +81,8 @@ class Generator {
             if (y == 0) {
                 addSegments(bordersBuilder.buildBorder(Side.BOTTOM, bottomNeighbour))
             } else {
-                addSegment(Segment(0,0, SegmentType.LEFT_COMMON_BOTTOM))
-                addSegment(Segment(levelConfig.levelWidth - 1,0, SegmentType.RIGHT_COMMON_BOTTOM))
+                addSegment(Segment(0, 0, SegmentType.LEFT_COMMON_BOTTOM))
+                addSegment(Segment(levelConfig.levelWidth - 1, 0, SegmentType.RIGHT_COMMON_BOTTOM))
             }
             addSegments(bordersBuilder.buildBorder(Side.TOP, topNeighbour))
             addSegments(bordersBuilder.buildBorder(Side.LEFT, leftNeighbour))
@@ -101,12 +105,12 @@ class Generator {
             }
 
 
-            updateRoomBorders(this,  treesForRemoving)
+            updateRoomBorders(this, treesForRemoving)
 
             val additionalSegmentsMapper = AdditionalSegmentsMapper(levelConfig)
             val additionalSegments = getSegments().filter {
                 (it.y == 0 || it.y == levelConfig.levelHeight - 1)
-                        && (it .x >= 0 && it.x < levelConfig.levelWidth)
+                        && (it.x >= 0 && it.x < levelConfig.levelWidth)
             }.map {
                 additionalSegmentsMapper.convert(it)
             }

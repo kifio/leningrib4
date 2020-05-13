@@ -76,6 +76,9 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
     private var foo = false
     private var bar = false
 
+    private var startTime: Long = 0L
+    private var finishTime: Long = 0L
+
     override fun render(delta: Float) {
         stage.root.setOrigin(game.camera.position.x, game.camera.position.y)
         Gdx.gl.glClearColor(49 / 255f, 129 / 255f, 54f / 255f, 1f)
@@ -83,44 +86,30 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
         if (accumulatedTime >= 0.1f && !foo) {
             foo = true
+            startTime = System.nanoTime()
             ResourcesManager.loadAssets()
         }
 
         if (ResourcesManager.isLoaded() && !bar) {
             bar = true
+            finishTime = System.nanoTime()
+            Gdx.app.log("kifio_time", "Loading assets took: ${(finishTime - startTime) / 1000000}")
             LabelManager.getInstance()
 
-            game.executor.submit {
+//            game.executor.submit {
+                startTime = System.nanoTime()
                 ResourcesManager.buildRegions()
                 ResourcesManager.initializeSpeeches()
-
                 val worldMap = WorldMap()
-                val levelMap: LevelMap
-                val level: Level
-                val player: Player
-
-                if (LGCGame.isFirstLevelPassed()) {
-                    val config = Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
-                    levelMap = worldMap.addLevel(0, 0, config)
-                    val room = levelMap.rooms[0]
-                    val x = ThreadLocalRandom.current().nextInt(2, LGCGame.LEVEL_WIDTH - 2).toFloat()
-                    val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
-                    player = Player(x * tileSize, y * tileSize)
-                    level = CommonLevel(player, levelMap)
-                } else {
-                    val firstRoomHeight = (Gdx.graphics.height / tileSize) - 2
-                    val config = Config(LGCGame.LEVEL_WIDTH, firstRoomHeight + 26)
-                    levelMap = worldMap.addFirstLevel(config, firstRoomHeight)
-                    player = FirstLevel.getPlayer()
-                    level = FirstLevel(player, levelMap)
-                }
-
-                Gdx.app.postRunnable {
-                    val start = System.nanoTime()
+                val levelAndPlayer = LGCGame.getLevelAndPlayer(worldMap)
+                val level = levelAndPlayer.second
+                val player = levelAndPlayer.first
+//                Gdx.app.postRunnable {
                     this.gameScreen = GameScreen(game, level, player, worldMap)
-                    Gdx.app.log("kifio_time", "create gameScreen: ${(System.nanoTime() - start) / 1000000}")
-                }
-            }
+                    finishTime = System.nanoTime()
+                    Gdx.app.log("kifio_time", "Init first level took: ${(finishTime - startTime) / 1000000}")
+//                }
+//            }
         }
 
         for (actor in actors) {
@@ -130,7 +119,6 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                     val start = System.nanoTime()
                     game.showGameScreen(gameScreen)
                     val finish = System.nanoTime()
-                    Gdx.app.log("kifio", "Show game screen took: ${(finish - start) / 1_000_000}")
                     this.gameScreen = null
                     finished = true
                 }

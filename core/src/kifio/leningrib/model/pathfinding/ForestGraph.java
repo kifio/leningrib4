@@ -29,7 +29,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
     private Array<Connection<Vector2>> empty = new Array<>();
 
     // соединениея между нодами
-    private HashMap<Integer, Array<Connection<Vector2>>> connections = new HashMap<>();
+    private Array<Array<Connection<Vector2>>> connections;
 
     private Heuristic<Vector2> heuristic = new Heuristic<Vector2>() {
         @Override
@@ -63,8 +63,8 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
         int x, y;
 
-        for (int i = xMin; i < xMax; i+=GameScreen.tileSize) {
-            for (int j = yMin; j < yMax; j+=GameScreen.tileSize) {
+        for (int i = xMin; i <= xMax; i+=GameScreen.tileSize) {
+            for (int j = yMin; j <= yMax; j+=GameScreen.tileSize) {
                 x = i;
                 y = j;
                 if (!isActor(x, y, trees)) {
@@ -73,7 +73,10 @@ public class ForestGraph implements IndexedGraph<Vector2> {
             }
         }
 
+        this.connections = new Array<>(nodes.size);
+
         for (int i = 0; i < nodes.size; i++) {
+            this.connections.add(new Array<Connection<Vector2>>());
             addNeighbours(nodes.get(i), trees);
         }
     }
@@ -96,33 +99,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
             return empty;
         }
         return this.connections.get(index);
-    }
-
-    public void updateForestGraph(float cameraPositionY) {
-        Iterator<Vector2> nodesIterator = this.nodes.iterator();
-
-        while (nodesIterator.hasNext()) {
-            Vector2 from = nodesIterator.next();
-            if (Utils.mapCoordinate(from.y) < cameraPositionY - Gdx.graphics.getHeight()) {
-                int fromIndex = nodes.indexOf(from, true);
-                nodesIterator.remove();
-                Array<Connection<Vector2>> c = connections.get(fromIndex);
-                if (c != null) c.clear();
-                connections.remove(fromIndex);
-            }
-        }
-
-        for (Array<Connection<Vector2>> connections : this.connections.values()) {
-            Iterator<Connection<Vector2>> cIterator = connections.iterator();
-            while (cIterator.hasNext()) {
-                Connection<Vector2> connection = cIterator.next();
-                if (!this.nodes.contains(connection.getToNode(), false)) {
-                    cIterator.remove();
-                } else  if (!this.nodes.contains(connection.getFromNode(), false)) {
-                    cIterator.remove();
-                }
-            }
-        }
     }
 
     private void addNeighbours(Vector2 origin, Array<? extends Actor> actors) {
@@ -154,11 +130,6 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         int fromIndex = nodes.indexOf(from, true);
 
         Array<Connection<Vector2>> connections = this.connections.get(fromIndex);
-
-        if (connections == null) {
-            connections = new Array<>();
-            this.connections.put(fromIndex, connections);
-        }
 
         for (Connection connection : connections) {
             Vector2 foo = ((PointsConnection) connection).getFromNode();

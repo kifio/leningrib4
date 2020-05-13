@@ -24,8 +24,8 @@ import model.LevelMap
 
 class FirstLevel() : Level() {
 
-    private val topCameraThreshold = levelHeight.toFloat() * GameScreen.tileSize - Gdx.graphics.height / 2f
-    private var yLimit: Float = (FirstLevel.getLevelHeight() - 2) * GameScreen.tileSize.toFloat()
+    private val topCameraThreshold = levelHeight * GameScreen.tileSize - Gdx.graphics.height / 2f
+    private var yLimit = ((levelHeight - 1) * GameScreen.tileSize) - 1
     var passed = false
 
     constructor(player: Player, levelMap: LevelMap): this() {
@@ -136,7 +136,7 @@ class FirstLevel() : Level() {
             gameScreen.stage.addAction(showDialog(4, camera, gameScreen.stage, gameScreen.player, false))
         }
 
-        passed = gameScreen.player.y > yLimit
+        passed = Utils.mapCoordinate(gameScreen.player.y) >= yLimit
     }
 
     private fun shouldUpdateProvocation(): Boolean {
@@ -300,6 +300,7 @@ class FirstLevel() : Level() {
                 super.movePlayerTo(x, y, player)
             }
         } else {
+            Gdx.app.log("kifio_path", "eLimit: $yLimit; to y: ${Utils.mapCoordinate(y)}")
             super.movePlayerTo(x, y, player)
         }
     }

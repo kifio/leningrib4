@@ -26,8 +26,6 @@ public class ResourcesManager {
     public static final String SETTINGS = "settings_unpressed.png";
     public static final String SETTINGS_PRESSED = "settings_pressed.png";
     public static final String HUD_BACKGROUND = "background_hud.png";
-    public static final String BACK = "back.png";
-    public static final String RESTART = "restart.png";
     public static final String LENIN_GRIB = "lenin_grib.png";
     public static final String LAUNCH_TREES = "launch_trees.png";
     public static final String LAUNCH_PROGRESS_BACKGROUND = "launch_progress_background.png";
@@ -131,8 +129,6 @@ public class ResourcesManager {
         am.load(SETTINGS, Texture.class, param);
         am.load(SETTINGS_PRESSED, Texture.class, param);
         am.load(HUD_BACKGROUND, Texture.class, param);
-        am.load(BACK, Texture.class, param);
-        am.load(RESTART, Texture.class, param);
         am.load(START_GAME, Texture.class, param);
         am.load(START_GAME_PRESSED, Texture.class, param);
         am.load(SETTING, Texture.class, param);
@@ -150,7 +146,7 @@ public class ResourcesManager {
         param.magFilter = Texture.TextureFilter.Nearest;
         am.load(PLAYER_DIALOG_FACE, Texture.class, param);
         am.load(GRANDMA_DIALOG_FACE, Texture.class, param);
-        am.load(TARGET, Texture.class, param);
+//        am.load(TARGET, Texture.class, param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -181,8 +177,6 @@ public class ResourcesManager {
         putTexture(SETTINGS_PRESSED);
         putTexture(PAUSE_PRESSED);
         putTexture(HUD_BACKGROUND);
-        putTexture(BACK);
-        putTexture(RESTART);
         putTexture(SETTING);
         putTexture(SETTINGS_BACKGROUND);
         putTexture(SETTING_ENABLED);
@@ -197,7 +191,7 @@ public class ResourcesManager {
         putTexture(RESULT_MUSHROOM);
         putTexture(PLAYER_DIALOG_FACE);
         putTexture(GRANDMA_DIALOG_FACE);
-        putTexture(TARGET);
+//        putTexture(TARGET);
         putTexture(GRASS_0, TILE_SIZE * 2, TILE_SIZE * 2);
         putTexture(GRASS_2, TILE_SIZE * 2, TILE_SIZE * 2);
     }

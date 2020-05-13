@@ -12,11 +12,11 @@ class ExitsBuilder(private val levelConfig: Config) {
     private val exitsOnSide = mutableListOf<Int>()
 
     // Returns all exits on current side
-    internal fun getExits(x: Int, y: Int, side: Side, neighbour: LevelMap?): List<Exit> {
+    internal fun getExits(x: Int, y: Int, side: Side, neighbour: LevelMap?): MutableList<Exit> {
         val enters = neighbour?.getEnters(side)
-        if (enters != null) return mapEntersToExits(enters, side)
+        if (enters != null) return mapEntersToExits(enters, side).toMutableList()
         generateSide(getExitsCount(side, x, y), getSideSize(side))
-        return createExitsFromLine(side)
+        return createExitsFromLine(side).toMutableList()
     }
 
     // Generate exits positions on the line by some rules
