@@ -2,13 +2,9 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import kifio.leningrib.LGCGame;
-import kifio.leningrib.LUTController;
-import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 

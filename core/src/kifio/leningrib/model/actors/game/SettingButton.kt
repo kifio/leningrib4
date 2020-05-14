@@ -1,7 +1,6 @@
 package kifio.leningrib.model.actors.game
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -9,15 +8,17 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LGCGame
+import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 
 class SettingButton(
         camera: OrthographicCamera,
+        lutController: LUTController,
         private val index: Int,
         private val unpressedState: TextureRegion = getRegion(SETTING)
-) : StaticActor(unpressedState, camera) {
+) : StaticActor(unpressedState, camera, lutController) {
 
     private val MUSIC_OFF = "music_off"
     private val SOUNDS_OFF = "sounds_off"
@@ -116,7 +117,9 @@ class SettingButton(
         batch.draw(switchIcon, iconX, iconY, iconWidth, iconHeight)
         LabelManager.getInstance().largeFont.color = labelColor
         LabelManager.getInstance().largeFont.draw(batch, label, labelX, this.y + (0.6f * this.height))
-        batch.shader = LGCGame.lutController.shader
+        if (lutController?.lutTexture != null) {
+            batch.shader = lutController.shader
+        }
     }
 
     private fun isSwitchTouched(x: Float, y: Float): Boolean {

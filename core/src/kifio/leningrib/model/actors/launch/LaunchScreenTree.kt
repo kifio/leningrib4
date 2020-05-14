@@ -2,12 +2,13 @@ package kifio.leningrib.model.actors.launch
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
+import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.screens.GameScreen
 
 class LaunchScreenTree(x: Float, y: Float, camera: OrthographicCamera) : StaticActor(
-        ResourcesManager.getRegion(ResourcesManager.LAUNCH_TREES), camera
+        ResourcesManager.getRegion(ResourcesManager.LAUNCH_TREES), camera, null
 ) {
 
     private var regionScale = 1F

@@ -1,23 +1,24 @@
 package kifio.leningrib.model.actors.game
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
+import kifio.leningrib.LUTController
 import kifio.leningrib.model.actors.WideAssetActor
 import kifio.leningrib.model.speech.LabelManager
 
 class StartGameButton(
         private val offsetsCount: Int,
         private val title: String,
+        lutController: LUTController,
         camera: OrthographicCamera,
         private val pressedState: TextureRegion,
         private val unpressedState: TextureRegion,
         private val labelColor: Color
-) : WideAssetActor(unpressedState, camera   ) {
+) : WideAssetActor(unpressedState, camera, lutController) {
 
     var onTouchHandler: (() -> Unit)? = null
 

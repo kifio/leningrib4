@@ -1,6 +1,5 @@
 package kifio.leningrib.levels;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -11,14 +10,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import generator.Config;
-import kifio.leningrib.LGCGame;
 import kifio.leningrib.levels.helpers.BottleManager;
 import kifio.leningrib.levels.helpers.ForestersManager;
 import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;
-import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
@@ -29,9 +27,6 @@ import model.Room;
 public abstract class Level {
 
     // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
-    protected float bottomCameraThreshold = Gdx.graphics.getHeight() / 2f;
-    protected float accumulatedTime = 0f;
-
     protected ForestersManager forestersManager;
     protected ForestGraph forestGraph;
     protected Array<Rectangle> roomsRectangles;
@@ -52,8 +47,6 @@ public abstract class Level {
         this.mushroomsManager = level.mushroomsManager;
         this.treesManager = level.treesManager;
         this.nextLevel = level.nextLevel;
-        this.bottomCameraThreshold = level.bottomCameraThreshold;
-        this.accumulatedTime = level.accumulatedTime;
     }
 
     protected void setup(Player player, LevelMap levelMap, Config levelConfig) {
@@ -130,12 +123,6 @@ public abstract class Level {
                 next.remove();
                 iterator.remove();
             }
-        }
-    }
-
-    public void updateCamera(OrthographicCamera camera, Player player) {
-        if (camera.position.y > LGCGame.Companion.getLastKnownCameraPosition()) {
-            LGCGame.Companion.setLastKnownCameraPosition(camera.position.y);
         }
     }
 

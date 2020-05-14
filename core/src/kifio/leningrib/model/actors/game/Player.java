@@ -8,9 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.Array;
 
-import generator.Config;
-import kifio.leningrib.LGCGame;
-import kifio.leningrib.LUTController;
 import kifio.leningrib.Utils;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;

@@ -1,7 +1,5 @@
 package kifio.leningrib.model.actors
 
-import com.sun.org.apache.xpath.internal.operations.Bool
-
 class ForesterStateMachine {
 
     companion object {

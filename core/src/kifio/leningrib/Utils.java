@@ -1,11 +1,9 @@
 package kifio.leningrib;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import java.util.List;
+
 import kifio.leningrib.screens.GameScreen;
 
 public class Utils {

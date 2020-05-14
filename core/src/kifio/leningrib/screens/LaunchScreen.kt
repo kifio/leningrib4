@@ -2,26 +2,16 @@ package kifio.leningrib.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.glutils.PixmapTextureData
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import generator.Config
 import kifio.leningrib.LGCGame
-import kifio.leningrib.levels.CommonLevel
-import kifio.leningrib.levels.FirstLevel
-import kifio.leningrib.levels.Level
+import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
-import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.actors.launch.LaunchProgressBar
 import kifio.leningrib.model.actors.launch.LaunchScreenLogo
 import kifio.leningrib.model.actors.launch.LaunchScreenTree
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen.Companion.tileSize
-import model.LevelMap
 import model.WorldMap
-import java.util.concurrent.ThreadLocalRandom
 
 class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
@@ -34,19 +24,19 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
     private var gameScreen: GameScreen? = null
 
     private val actors = arrayOf(
-            LaunchScreenLogo(game.camera),
-            LaunchProgressBar(game.camera),
+            LaunchScreenLogo(camera),
+            LaunchProgressBar(camera),
 
             LaunchScreenTree(
                     tileSize.toFloat(),
                     Gdx.graphics.height - tileSize * 3F,
-                    game.camera
+                    camera
             ),
 
             LaunchScreenTree(
                     Gdx.graphics.width - tileSize * 3F,
                     tileSize * 2F,
-                    game.camera
+                    camera
             ),
 
 
@@ -59,17 +49,14 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                     Mushroom.Effect.SPEED)
     )
 
-    init {
+    override fun show() {
+        super.show()
         for (actor in actors) {
             if (actor is Mushroom || actor is LaunchScreenTree) {
                 actor.setScale(0F)
             }
             stage.addActor(actor)
         }
-    }
-
-    override fun show() {
-
     }
 
     private var foo = false
@@ -79,7 +66,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
     private var finishTime: Long = 0L
 
     override fun render(delta: Float) {
-        stage.root.setOrigin(game.camera.position.x, game.camera.position.y)
+        stage.root.setOrigin(camera.position.x, camera.position.y)
         Gdx.gl.glClearColor(49 / 255f, 129 / 255f, 54f / 255f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 

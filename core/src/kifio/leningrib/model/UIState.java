@@ -1,13 +1,16 @@
 package kifio.leningrib.model;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import kifio.leningrib.model.actors.MovableActor;
-import org.jetbrains.annotations.NotNull;
 
 public class UIState {
 

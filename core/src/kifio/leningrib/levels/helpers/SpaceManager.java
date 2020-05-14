@@ -3,9 +3,10 @@ package kifio.leningrib.levels.helpers;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+
 import generator.Config;
-import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.actors.Space;
+import kifio.leningrib.model.actors.game.Player;
 
 public class SpaceManager {
 

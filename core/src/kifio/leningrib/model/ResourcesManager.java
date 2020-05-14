@@ -8,8 +8,6 @@ import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.HashMap;
 
-import javax.xml.soap.Text;
-
 import generator.SegmentType;
 
 public class ResourcesManager {

@@ -5,11 +5,15 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.Viewport
-import kifio.leningrib.LGCGame.Companion.lutController
+import kifio.leningrib.LUTController
+
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.screens.GameScreen
 
-class ShaderStage(viewport: Viewport, batch: Batch) : Stage(viewport, batch) {
+class ShaderStage(
+        viewport: Viewport,
+        batch: Batch,
+        var lutController: LUTController) : Stage(viewport, batch) {
 
     private var isChessBoard: Boolean = false
     private val grass0 = ResourcesManager.getRegion(ResourcesManager.GRASS_0)

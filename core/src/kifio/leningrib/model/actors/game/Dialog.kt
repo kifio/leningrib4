@@ -3,12 +3,11 @@ package kifio.leningrib.model.actors.game
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.utils.Align
-import kifio.leningrib.LGCGame
+import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.PLAYER_DIALOG_FACE
 import kifio.leningrib.model.actors.StaticActor
@@ -16,8 +15,9 @@ import kifio.leningrib.model.speech.LabelManager
 
 
 class Dialog(camera: OrthographicCamera,
+             lutController: LUTController,
              private val speeches: Array<String>,
-             private val characters: Array<String>) : StaticActor(null, camera) {
+             private val characters: Array<String>) : StaticActor(null, camera, lutController) {
 
     private val next = "Далее"
     private val ok = "Ок"

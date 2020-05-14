@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
-import kifio.leningrib.levels.FirstLevel;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.items.Bottle;

@@ -15,7 +15,7 @@ import kifio.leningrib.LGCGame
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION_LONG
 import kifio.leningrib.LGCGame.Companion.isFirstLevelPassed
-import kifio.leningrib.LGCGame.Companion.lutController
+import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
@@ -28,7 +28,6 @@ import kifio.leningrib.model.actors.game.*
 import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
-import kifio.leningrib.view.WorldRenderer
 import model.WorldMap
 
 class GameScreen(game: LGCGame,
@@ -39,41 +38,58 @@ class GameScreen(game: LGCGame,
 
     private val gestureListener: LInputListener? = LInputListener(this)
     private val gestureDetector: LGestureDetector? = LGestureDetector(gestureListener, this)
-
+    private val topCameraThreshold = FirstLevel.getLevelHeight() * tileSize - Gdx.graphics.height / 2f
+    private var bottomCameraThreshold = Gdx.graphics.height / 2f
     private var blackScreenTime = 0f
     private var screenEnterTime = 0f
-
     private var screenOut = false
     private var startGame = false
     private var shouldShowTutorial = true
-
     private var paused = true
     private var active = false
-
-    var gameOver = false
-
+    private var lastKnownCameraPosition = 0f
     private var settings: Group? = null
-
     private var vodkaButton: SquareButton? = null
-
     private val levelSize = CommonLevel.LEVEL_HEIGHT * tileSize
 
-    fun activate() {
+    val lutController = LUTController()
+    var gameOver = false
+
+    override fun show() {
+        super.show()
+        resetStage()
         if (level is FirstLevel) {
             makeActorsVisible(false)
         } else {
             makeActorsVisible(true)
         }
         pauseGame(false)
+    }
+
+    fun activate() {
         this.active = true
     }
 
     fun isPaused() = paused
 
-    fun getCameraPostion() = game.camera.position
+    fun getCameraPostion() = camera.position
 
     private fun updateCamera() {
-        level.updateCamera(game.camera, player)
+        if (!isFirstLevelPassed()) {
+            camera.position.y = if (player.y < bottomCameraThreshold) {
+                bottomCameraThreshold
+            } else {
+                player.y.coerceAtMost(topCameraThreshold)
+            }
+            camera.update()
+        } else {
+            if (camera.position.y > lastKnownCameraPosition) {
+                lastKnownCameraPosition = camera.position.y
+            }
+            camera.position.y = player.y.coerceAtLeast(lastKnownCameraPosition)
+            camera.update()
+        }
+
     }
 
     /*
@@ -85,7 +101,7 @@ class GameScreen(game: LGCGame,
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        transitionActor?.setOrigin(game.camera.position.x, game.camera.position.y)
+        transitionActor?.setOrigin(camera.position.x, camera.position.y)
 
         if (active) {
             update(delta)
@@ -110,8 +126,8 @@ class GameScreen(game: LGCGame,
             level = getNextLevel(0, 0)
             resetStage()
             resumeGame()
-            LGCGame.lastKnownCameraPosition = Gdx.graphics.height / 2f
-            game.camera.position.y = player?.y ?: Gdx.graphics.height / 2f
+            lastKnownCameraPosition = Gdx.graphics.height / 2f
+            camera.position.y = player.y
             blackScreenTime = 0f
             screenEnterTime = 0f
         } else if (startGame && blackScreenTime >= ANIMATION_DURATION_LONG) {
@@ -126,12 +142,16 @@ class GameScreen(game: LGCGame,
     private fun getNextLevel(x: Int, y: Int): Level {
         LGCGame.setFirstLevelPassed(true)
         return CommonLevel(player,
-                worldMap.addLevel(x, y, (player.x / GameScreen.tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
+                worldMap.addLevel(x, y, (player.x / tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
 
     private fun update(delta: Float) {
         if (player.bottlesCount > 0) {
             vodkaButton?.isVisible = true
+        }
+
+        if (isFirstLevelPassed() && player.mushroomsCount > 0) {
+            lutController.updateLut(delta);
         }
 
         level.mushroomsSpeeches?.let { addSpeechesToStage(it) }
@@ -140,12 +160,12 @@ class GameScreen(game: LGCGame,
     }
 
     private fun updateWorld(delta: Float) {
-        game.camera.let { camera ->
+        camera.let { camera ->
             level.update(delta, camera, this)
 
             if (level is CommonLevel) {
 
-                val currentLevel = game.camera.position.y.toInt() / levelSize
+                val currentLevel = camera.position.y.toInt() / levelSize
 
                 if (level.nextLevel == currentLevel) {
                     level.nextLevel += 1
@@ -248,13 +268,14 @@ class GameScreen(game: LGCGame,
         gameOver = true;
 
         transitionActor = Group()
-        val overlay = Overlay(game.camera)
+        val overlay = Overlay(camera, 0f, lutController)
 
-        val gameOverLogo = GameOverLogo(game.camera)
+        val gameOverLogo = GameOverLogo(camera, lutController)
         val settingsButton = SquareButton(
                 getRegion(SETTINGS_PRESSED),
                 getRegion(SETTINGS),
-                game.camera
+                camera,
+                lutController
         )
 
         settingsButton.zIndex = Int.MAX_VALUE
@@ -262,7 +283,8 @@ class GameScreen(game: LGCGame,
         val restartGameButton = StartGameButton(
                 3,
                 "НАЧАТЬ СНАЧАЛА",
-                game.camera,
+                lutController,
+                camera,
                 getRegion(START_GAME_PRESSED),
                 getRegion(START_GAME),
                 Color(110 / 255f, 56 / 255f, 22 / 255f, 1f)
@@ -272,10 +294,10 @@ class GameScreen(game: LGCGame,
             if (settings == null) {
                 settings = Group().apply {
                     x = Gdx.graphics.width.toFloat()
-                    addActor(Overlay(game.camera, 40 * Gdx.graphics.density, getRegion(SETTINGS_BACKGROUND)))
-                    addActor(SettingButton(game.camera, 0))
-                    addActor(SettingButton(game.camera, 1))
-                    addActor(SettingButton(game.camera, 2))
+                    addActor(Overlay(camera, 40 * Gdx.graphics.density, lutController, getRegion(SETTINGS_BACKGROUND)))
+                    addActor(SettingButton(camera, lutController, 0))
+                    addActor(SettingButton(camera, lutController, 1))
+                    addActor(SettingButton(camera, lutController, 2))
                     addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
                 }
 
@@ -292,7 +314,7 @@ class GameScreen(game: LGCGame,
         transitionActor?.addActor(overlay)
         transitionActor?.addActor(settingsButton)
         transitionActor?.addActor(gameOverLogo)
-        transitionActor?.addActor(MushroomsCountView(game.camera, player.mushroomsCount))
+        transitionActor?.addActor(MushroomsCountView(camera, player.mushroomsCount, lutController))
         transitionActor?.addActor(restartGameButton)
 
         stage.addActor(transitionActor)
@@ -301,7 +323,7 @@ class GameScreen(game: LGCGame,
     private fun pauseGame(withRestartOption: Boolean) {
         paused = true
         vodkaButton?.isVisible = false
-        val overlay = Overlay(game.camera)
+        val overlay = Overlay(camera, 0f, lutController)
 
         var resumeOffsetsCount = 0
         var restartOffsetsCount = 0
@@ -314,7 +336,8 @@ class GameScreen(game: LGCGame,
         val resumeGameButton = StartGameButton(
                 resumeOffsetsCount,
                 if (withRestartOption) "ПРОДОЛЖИТЬ ИГРУ" else "НАЧАТЬ ИГРУ",
-                game.camera,
+                lutController,
+                camera,
                 getRegion(START_GAME_PRESSED),
                 getRegion(START_GAME),
                 Color(110 / 255f, 56 / 255f, 22 / 255f, 1f)
@@ -326,7 +349,8 @@ class GameScreen(game: LGCGame,
             restartGameButton = StartGameButton(
                     restartOffsetsCount,
                     "НАЧАТЬ СНАЧАЛА",
-                    game.camera,
+                    lutController,
+                    camera,
                     getRegion(RESTART_BUTTON_PRESSED),
                     getRegion(RESTART_BUTTON),
                     Color(249 / 255f, 218 / 255f, 74f / 255f, 1f)
@@ -340,17 +364,18 @@ class GameScreen(game: LGCGame,
         val settingsButton = SquareButton(
                 getRegion(SETTINGS_PRESSED),
                 getRegion(SETTINGS),
-                game.camera
+                camera, lutController
         )
 
         settingsButton.onTouchHandler = {
             if (settings == null) {
                 settings = Group().apply {
                     x = Gdx.graphics.width.toFloat()
-                    addActor(Overlay(game.camera, 40 * Gdx.graphics.density, getRegion(SETTINGS_BACKGROUND)))
-                    addActor(SettingButton(game.camera, 0))
-                    addActor(SettingButton(game.camera, 1))
-                    addActor(SettingButton(game.camera, 2))
+                    addActor(Overlay(camera, 40 * Gdx.graphics.density, lutController,
+                            getRegion(SETTINGS_BACKGROUND)))
+                    addActor(SettingButton(camera, lutController, 0))
+                    addActor(SettingButton(camera, lutController, 1))
+                    addActor(SettingButton(camera, lutController, 2))
                     addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
                 }
 
@@ -387,7 +412,8 @@ class GameScreen(game: LGCGame,
         val pauseButton = SquareButton(
                 getRegion(PAUSE_PRESSED),
                 getRegion(PAUSE),
-                game.camera
+                camera,
+                lutController
         ).apply {
             zIndex = Int.MAX_VALUE
             onTouchHandler = {
@@ -400,7 +426,8 @@ class GameScreen(game: LGCGame,
             vodkaButton = SquareButton(
                     getRegion(HUD_BOTTLE_PRESSED),
                     getRegion(HUD_BOTTLE),
-                    game.camera,
+                    camera, lutController,
+
                     SquareButton.LEFT)
 
             vodkaButton?.isVisible = false
@@ -425,7 +452,7 @@ class GameScreen(game: LGCGame,
         if (shouldShowTutorial && !isFirstLevelPassed()) {
             shouldShowTutorial = false
             (level as? FirstLevel)?.let {
-               stage.addAction(it.showDialog(0, game.camera, stage, player,true))
+                stage.addAction(it.showDialog(0, camera, stage, player, true))
             }
         }
     }
@@ -436,6 +463,7 @@ class GameScreen(game: LGCGame,
     private fun restartGame() {
         LGCGame.setFirstLevelPassed(true)
         blackScreenTime = 0f
+        lutController.stop()
         screenOut = true  // Чтобы рисовать черный экран
         val levelAndPlayer = LGCGame.getLevelAndPlayer(worldMap)
         val level = levelAndPlayer.second
@@ -512,7 +540,7 @@ class GameScreen(game: LGCGame,
     }
 
     private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
-    private fun Int.mapYToLevel(): Float = game.camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
+    private fun Int.mapYToLevel(): Float = camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
 
     private fun makeActorsVisible(isVisible: Boolean) {
         stage.actors.forEach {
@@ -529,10 +557,10 @@ class GameScreen(game: LGCGame,
         if (inverted) alpha = 1f - alpha
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-        renderer.projectionMatrix = game.camera.combined
+        renderer.projectionMatrix = camera.combined
         renderer.begin(ShapeRenderer.ShapeType.Filled)
         renderer.setColor(0f, 0f, 0f, alpha)
-        renderer.rect(0f, game.camera.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        renderer.rect(0f, camera.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         renderer.end()
     }
 
@@ -540,8 +568,7 @@ class GameScreen(game: LGCGame,
         Gdx.input.inputProcessor = gestureDetector
         Gdx.input.isCatchBackKey = true
         lutController.setup()
-        resetStage()
+        lastKnownCameraPosition = Gdx.graphics.height / 2f
+        camera.position.y = player.y
     }
-
-
 }

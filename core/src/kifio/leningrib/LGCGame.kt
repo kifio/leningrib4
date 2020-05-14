@@ -4,15 +4,10 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.actions.FloatAction
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
-import com.badlogic.gdx.utils.Align
 import generator.Config
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
@@ -24,7 +19,6 @@ import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
 import model.LevelMap
 import model.WorldMap
-import java.lang.reflect.Array.set
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
@@ -41,14 +35,9 @@ class LGCGame(isDebug: Boolean) : Game() {
 
         var isDebug = false
 
-        @JvmStatic
-        var lastKnownCameraPosition = 0f
-
         private var firstLevelPassed = false
 
         private var prefs: Preferences? = null
-
-        val lutController = LUTController()
 
         fun isFirstLevelPassed() = firstLevelPassed
 
@@ -83,7 +72,6 @@ class LGCGame(isDebug: Boolean) : Game() {
         }
     }
 
-    val camera: OrthographicCamera = OrthographicCamera()
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
 
     init {
@@ -93,10 +81,8 @@ class LGCGame(isDebug: Boolean) : Game() {
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
         firstLevelPassed = prefs?.getBoolean(FIRST_LEVEL_PASSED) ?: false
-        lastKnownCameraPosition = Gdx.graphics.height / 2f
         ResourcesManager.loadSplash()
         GameScreen.tileSize = Gdx.graphics.width / LEVEL_WIDTH
-        camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         showLaunchScreen()
     }
 
@@ -137,8 +123,6 @@ class LGCGame(isDebug: Boolean) : Game() {
         val actor: Actor = (screen as BaseScreen).stage.root
         actor.setOrigin(Gdx.graphics.width / 2f, Gdx.graphics.height / 2f)
         actor.color.a = 0f
-        lastKnownCameraPosition = Gdx.graphics.height / 2f
-        camera.position.y = (screen as? GameScreen)?.player?.y ?: Gdx.graphics.height / 2f
         val sequenceAction = SequenceAction()
         sequenceAction.addAction(Actions.scaleTo(1.5f, 1.5f, 0f))
         sequenceAction.addAction(Actions.parallel(Actions.alpha(1f, ANIMATION_DURATION_LONG), Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION_LONG, Interpolation.exp5)))

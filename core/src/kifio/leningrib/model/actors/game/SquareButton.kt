@@ -1,22 +1,22 @@
 package kifio.leningrib.model.actors.game
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
+import kifio.leningrib.LUTController
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.screens.GameScreen
-import java.awt.ComponentOrientation
 
 class SquareButton(
         private val pressedState: TextureRegion,
         private val unpressedState: TextureRegion,
         camera: OrthographicCamera,
+        lutController: LUTController,
         private val orientation: Int = 1
-) : StaticActor(unpressedState, camera) {
+) : StaticActor(unpressedState, camera, lutController) {
 
     companion object {
         const val LEFT = 0

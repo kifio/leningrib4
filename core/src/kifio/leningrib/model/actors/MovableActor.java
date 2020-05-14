@@ -14,10 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 
-import kifio.leningrib.LGCGame;
-import kifio.leningrib.LUTController;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.screens.GameScreen;

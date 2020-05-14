@@ -3,7 +3,6 @@ package kifio.leningrib
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import kifio.leningrib.model.ResourcesManager
 import java.util.concurrent.ThreadLocalRandom
@@ -16,7 +15,10 @@ class LUTController {
         private const val FRAGMENT_PATH = "shaders/lookup_fragment.glsl"
     }
 
+//    private var active = true
+    private var intensity = 0f
     private var increaseIntensity = true
+    private var accumulatedTime: Float = 0f
 
     var shader: ShaderProgram? = null
     var lutTexture: Texture? = null
@@ -32,27 +34,37 @@ class LUTController {
         shader = ShaderProgram(vertexShader, fragmentShader)
     }
 
-    fun updateLut(accumulatedTime: Float) {
-        if (accumulatedTime.toInt() % 5 == 0) {
+    fun updateLut(delta: Float) {
+//         if (!active) return
+        accumulatedTime += delta
+
+        if (accumulatedTime > 5) {
+            accumulatedTime = 0f
             increaseIntensity = !increaseIntensity
             val index = ThreadLocalRandom.current().nextInt(0, 5)
             lutTexture = ResourcesManager.getTexture("lut_$index")
-//            lutTexture = Texture("lut_2.png")
         }
 
-        var intensity = (accumulatedTime % 5) / 5
-        if (!increaseIntensity) {
-            intensity = 1f - intensity
+        if (lutTexture != null) {
+            intensity = (accumulatedTime % 5) / 5
+            if (!increaseIntensity) {
+                intensity = 1f - intensity
+            }
         }
 
         Gdx.app.log("kifio_shader", "intensity: $intensity")
-        shader?.setUniformf(INTENSITY, intensity)
     }
 
     fun onDraw() {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1)
         lutTexture?.bind()
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
+        shader?.setUniformf(INTENSITY, intensity)
         shader?.setUniformi("u_texture2", 1)
+    }
+
+    fun stop() {
+        lutTexture = null
+//        active = false
     }
 }

@@ -10,10 +10,12 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.utils.Array
 import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.helpers.TreesManager
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
+import kifio.leningrib.model.actors.ShaderStage
 import kifio.leningrib.model.actors.game.Dialog
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Player
@@ -23,7 +25,6 @@ import model.LevelMap
 
 class FirstLevel() : Level() {
 
-    private val topCameraThreshold = levelHeight * GameScreen.tileSize - Gdx.graphics.height / 2f
     private var yLimit = ((levelHeight - 1) * GameScreen.tileSize) - 1
     var passed = false
 
@@ -137,6 +138,7 @@ class FirstLevel() : Level() {
     }
 
     private fun getFirstDialog(camera: OrthographicCamera,
+                               lutController: LUTController,
                                disposeHandler: () -> Unit): Dialog {
 
         val speeches = arrayOf(
@@ -145,7 +147,7 @@ class FirstLevel() : Level() {
                 "Итак, для начала стоит осмотреться."
         )
 
-        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[0].stableSpeech = "Нажми на меня"
                 disposeHandler.invoke()
@@ -154,6 +156,7 @@ class FirstLevel() : Level() {
     }
 
     private fun getSecondDialog(camera: OrthographicCamera,
+                                lutController: LUTController,
                                 disposeHandler: () -> Unit): Dialog {
 
         val speeches = arrayOf(
@@ -162,7 +165,7 @@ class FirstLevel() : Level() {
                 "Давай посмотрим, что там на соседней поляне."
         )
 
-        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[2].stableSpeech = PROVOCATION_0
                 disposeHandler.invoke()
@@ -171,6 +174,7 @@ class FirstLevel() : Level() {
     }
 
     private fun getThirdDialog(camera: OrthographicCamera,
+                               lutController: LUTController,
                                disposeHandler: () -> Unit): Dialog {
 
         shownDialogs[2] = true
@@ -179,7 +183,7 @@ class FirstLevel() : Level() {
                 "Здесь мне просто так не пройти!",
                 "Хорошо, что этот гриб убеждает меня в обратном..")
 
-        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[3].stableSpeech = "Со мной ты тут пролезешь!"
                 disposeHandler.invoke()
@@ -188,6 +192,7 @@ class FirstLevel() : Level() {
     }
 
     private fun getFourthDialog(camera: OrthographicCamera,
+                                lutController: LUTController,
                                 disposeHandler: () -> Unit): Dialog {
 
         val speeches = arrayOf(
@@ -198,7 +203,7 @@ class FirstLevel() : Level() {
                 "Думаю, это отличный способ отвлечь того громилу."
         )
 
-        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 disposeHandler.invoke()
             }
@@ -206,6 +211,7 @@ class FirstLevel() : Level() {
     }
 
     private fun getLastDialog(camera: OrthographicCamera,
+                              lutController: LUTController,
                               disposeHandler: () -> Unit): Dialog {
         val speeches = arrayOf(
                 "Получилось! По этой тропинке я смогу пройти дальше!",
@@ -213,7 +219,7 @@ class FirstLevel() : Level() {
                 "А этот грибы помогут мне найти дорогу к следующей опушке с грибами."
         )
 
-        return Dialog(camera, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 disposeHandler.invoke()
             }
@@ -226,6 +232,8 @@ class FirstLevel() : Level() {
                    player: Player,
                    withDelay: Boolean): Action? {
 
+        if (stage !is ShaderStage) return null
+
         player.clearActions()
         shownDialogs[i] = true
         val sequence = SequenceAction()
@@ -237,7 +245,7 @@ class FirstLevel() : Level() {
         sequence.addAction(Actions.run {
             stage.addActor(
                     if (i == 0) {
-                        getFirstDialog(camera) {
+                        getFirstDialog(camera, stage.lutController) {
                             stage.actors.forEach { actor ->
                                 if (actor is Dialog) {
                                     actor.remove()
@@ -245,7 +253,7 @@ class FirstLevel() : Level() {
                             }
                         }
                     } else if (i == 1) {
-                        getSecondDialog(camera) {
+                        getSecondDialog(camera, stage.lutController) {
                             stage.actors.forEach { actor ->
                                 if (actor is Dialog) {
                                     actor.remove()
@@ -253,7 +261,7 @@ class FirstLevel() : Level() {
                             }
                         }
                     } else if (i == 2) {
-                        getThirdDialog(camera) {
+                        getThirdDialog(camera, stage.lutController) {
                             stage.actors.forEach { actor ->
                                 if (actor is Dialog) {
                                     actor.remove()
@@ -261,7 +269,7 @@ class FirstLevel() : Level() {
                             }
                         }
                     } else if (i == 3) {
-                        getFourthDialog(camera) {
+                        getFourthDialog(camera, stage.lutController) {
                             stage.actors.forEach { actor ->
                                 if (actor is Dialog) {
                                     actor.remove()
@@ -272,7 +280,7 @@ class FirstLevel() : Level() {
                             }
                         }
                     } else {
-                        getLastDialog(camera) {
+                        getLastDialog(camera, stage.lutController) {
                             stage.actors.forEach { actor ->
                                 if (actor is Dialog) {
                                     actor.remove()
@@ -299,16 +307,6 @@ class FirstLevel() : Level() {
                 super.movePlayerTo(x, y, player)
             }
         }
-    }
-
-    override fun updateCamera(camera: OrthographicCamera, player: Player) {
-        super.updateCamera(camera, player)
-        camera.position.y = if (player.y < bottomCameraThreshold) {
-            bottomCameraThreshold
-        } else {
-            player.y.coerceAtMost(topCameraThreshold)
-        }
-        camera.update()
     }
 
     override fun initForesters(levelMap: LevelMap?, config: Config?, player: Player?, roomRectangles: kotlin.Array<out Rectangle>?): Array<Forester> {

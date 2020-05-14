@@ -3,8 +3,8 @@ package kifio.leningrib.levels.helpers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
+
 import java.util.Iterator;
-import java.util.Random;
 
 public class ObjectsManager<T extends Actor> {
 

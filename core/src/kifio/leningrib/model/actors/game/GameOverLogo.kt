@@ -1,15 +1,13 @@
 package kifio.leningrib.model.actors.game
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
-import kifio.leningrib.Utils
+import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.actors.WideAssetActor
-import kifio.leningrib.screens.GameScreen
 
-class GameOverLogo(camera: OrthographicCamera) : WideAssetActor(ResourcesManager.getRegion(ResourcesManager.GAME_OVER), camera) {
+class GameOverLogo(camera: OrthographicCamera, lutController: LUTController
+) : WideAssetActor(ResourcesManager.getRegion(ResourcesManager.GAME_OVER), camera, lutController) {
 
     init {
         region?.let { region ->

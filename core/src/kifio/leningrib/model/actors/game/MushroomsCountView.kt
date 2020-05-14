@@ -1,23 +1,18 @@
 package kifio.leningrib.model.actors.game
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Preferences
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
-import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.ResourcesManager.*
+import kifio.leningrib.LUTController
+import kifio.leningrib.model.ResourcesManager.RESULT_MUSHROOM
+import kifio.leningrib.model.ResourcesManager.getRegion
 import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
 
-class MushroomsCountView(camera: OrthographicCamera, count: Int
-) : StaticActor(getRegion(RESULT_MUSHROOM), camera) {
+class MushroomsCountView(camera: OrthographicCamera, count: Int, lutController: LUTController
+) : StaticActor(getRegion(RESULT_MUSHROOM), camera, lutController) {
 
     private val labelColor = Color.WHITE
     private val label = "х $count"
