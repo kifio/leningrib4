@@ -7,11 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import kifio.leningrib.LGCGame
+import kifio.leningrib.model.actors.ShaderStage
 
 abstract class BaseScreen(var game: LGCGame) : Screen {
 
     val spriteBatch = SpriteBatch()
-    var stage: Stage = Stage(ScreenViewport(game.camera), spriteBatch)
+    var stage: Stage = if (this is GameScreen) ShaderStage(ScreenViewport(game.camera), spriteBatch) else Stage(ScreenViewport(game.camera), spriteBatch)
 
     override fun resize(width: Int, height: Int) {}
     override fun show() {}

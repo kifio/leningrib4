@@ -2,6 +2,7 @@ package kifio.leningrib.model.actors.game
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -13,9 +14,9 @@ import java.awt.ComponentOrientation
 class SquareButton(
         private val pressedState: TextureRegion,
         private val unpressedState: TextureRegion,
-        private val camera: Camera,
+        camera: OrthographicCamera,
         private val orientation: Int = 1
-) : StaticActor(unpressedState) {
+) : StaticActor(unpressedState, camera) {
 
     companion object {
         const val LEFT = 0
@@ -55,6 +56,6 @@ class SquareButton(
         }
         val y = camera.position.y + (Gdx.graphics.height / 2f) - (height + 16 * Gdx.graphics.density)
         setBounds(x, y, width, height)
-        batch.draw(region, x, y, width, height)
+        super.draw(batch, parentAlpha)
     }
 }

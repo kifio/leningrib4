@@ -3,6 +3,8 @@ package kifio.leningrib.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -13,6 +15,7 @@ import kifio.leningrib.LGCGame
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION_LONG
 import kifio.leningrib.LGCGame.Companion.isFirstLevelPassed
+import kifio.leningrib.LGCGame.Companion.lutController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
@@ -26,10 +29,7 @@ import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
 import kifio.leningrib.view.WorldRenderer
-import model.LevelMap
 import model.WorldMap
-import java.util.concurrent.ThreadLocalRandom
-import javax.rmi.CORBA.Util
 
 class GameScreen(game: LGCGame,
                  private var level: Level,
@@ -39,7 +39,6 @@ class GameScreen(game: LGCGame,
 
     private val gestureListener: LInputListener? = LInputListener(this)
     private val gestureDetector: LGestureDetector? = LGestureDetector(gestureListener, this)
-    private var worldRenderer: WorldRenderer?
 
     private var blackScreenTime = 0f
     private var screenEnterTime = 0f
@@ -83,27 +82,30 @@ class GameScreen(game: LGCGame,
         I/kifio: Delta: 0.015999753
     */
     override fun render(delta: Float) {
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
         transitionActor?.setOrigin(game.camera.position.x, game.camera.position.y)
 
         if (active) {
             update(delta)
             updateCamera()
             stage.act(delta)
-            worldRenderer?.render(level, stage)
+            stage.draw()
         }
 
         val isTutorialPassed = (level as? FirstLevel)?.passed == true
 
         if (active && screenEnterTime < ANIMATION_DURATION) {
             screenEnterTime += delta
-            worldRenderer?.renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
+            renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
         } else if ((blackScreenTime < ANIMATION_DURATION_LONG && startGame)
                 || screenOut
                 || (blackScreenTime < ANIMATION_DURATION_LONG && isTutorialPassed)) {
             blackScreenTime += delta
-            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
+            renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
         } else if (isTutorialPassed && blackScreenTime >= ANIMATION_DURATION) {
-            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
+            renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
             player.resetPosition()
             level = getNextLevel(0, 0)
             resetStage()
@@ -113,7 +115,7 @@ class GameScreen(game: LGCGame,
             blackScreenTime = 0f
             screenEnterTime = 0f
         } else if (startGame && blackScreenTime >= ANIMATION_DURATION_LONG) {
-            worldRenderer?.renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
+            renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
             startGame = false
             blackScreenTime = 0f
             screenEnterTime = 0f
@@ -234,11 +236,6 @@ class GameScreen(game: LGCGame,
     }
 
     override fun dispose() {
-        if (worldRenderer != null) {
-            worldRenderer!!.dispose()
-            worldRenderer = null
-        }
-
         level.dispose()
         stage.dispose()
 
@@ -523,12 +520,28 @@ class GameScreen(game: LGCGame,
         }
     }
 
+    private val renderer: ShapeRenderer = ShapeRenderer()
+
+    fun renderBlackScreen(currentTime: Float,
+                          maximumTime: Float,
+                          inverted: Boolean) {
+        var alpha = (currentTime / maximumTime).coerceAtMost(1f)
+        if (inverted) alpha = 1f - alpha
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        renderer.projectionMatrix = game.camera.combined
+        renderer.begin(ShapeRenderer.ShapeType.Filled)
+        renderer.setColor(0f, 0f, 0f, alpha)
+        renderer.rect(0f, game.camera.position.y - Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        renderer.end()
+    }
+
     init {
         Gdx.input.inputProcessor = gestureDetector
         Gdx.input.isCatchBackKey = true
-        worldRenderer = WorldRenderer(game.camera, spriteBatch)
-
-
+        lutController.setup()
         resetStage()
     }
+
+
 }

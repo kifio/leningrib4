@@ -15,9 +15,9 @@ import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 
 
-class Dialog(private val camera: OrthographicCamera,
+class Dialog(camera: OrthographicCamera,
              private val speeches: Array<String>,
-             private val characters: Array<String>) : StaticActor(null) {
+             private val characters: Array<String>) : StaticActor(null, camera) {
 
     private val next = "Далее"
     private val ok = "Ок"
@@ -27,7 +27,6 @@ class Dialog(private val camera: OrthographicCamera,
     private val labelColor = Color(249 / 255f, 218 / 255f, 74f / 255f, 1f)
     private val bgColor = Color.valueOf("#3C3C3C")
     private val renderer = ShapeRenderer()
-    private val batch = SpriteBatch()
 
     private var labelX: Float = 0f
     private var labelOffset: Float = 0f
@@ -46,8 +45,6 @@ class Dialog(private val camera: OrthographicCamera,
     private val font = LabelManager.getInstance().mediumFont
 
     init {
-        renderer.projectionMatrix = camera.combined
-        batch.projectionMatrix = camera.combined
         measure()
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
@@ -93,9 +90,8 @@ class Dialog(private val camera: OrthographicCamera,
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        super.draw(batch, parentAlpha)
         this.y = camera.position.y - (height / 2)
-
+        renderer.projectionMatrix = camera.combined
         renderer.begin(ShapeRenderer.ShapeType.Filled)
         renderer.color = bgColor
         renderer.rect(x, y, width, height)
@@ -107,11 +103,12 @@ class Dialog(private val camera: OrthographicCamera,
         }
 
         val index = index.coerceAtMost(speeches.size - 1)
-        this.batch.begin()
+        batch.projectionMatrix = camera.combined
+        batch.begin()
 
         if (characters.isNotEmpty()) {
             val region = ResourcesManager.getRegion(characters[index])
-            this.batch.draw(region,
+            batch.draw(region,
                     this.x + 0.25f * faceWidth,
                     this.y + 0.25f * faceHeight,
                     faceWidth / 2,
@@ -119,20 +116,20 @@ class Dialog(private val camera: OrthographicCamera,
         }
 
         font.color = labelColor
-        font.draw(this.batch,
+        font.draw(batch,
                 speeches[index],
                 labelX,
                 this.y + 0.9f * height,
                 labelWidth, Align.left, true)
 
-        font.draw(this.batch,
+        font.draw(batch,
                 if (index == speeches.size - 1) ok else next,
                 buttonX,
                 (this.y + 2f * buttonHeight),
                 buttonWidth,
                 Align.right, false)
 
-        this.batch.end()
+        batch.end()
     }
 
     override fun act(delta: Float) {

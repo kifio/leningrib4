@@ -32,8 +32,8 @@ class Bottle(x: Float, y: Float) : Actor() {
         setX(x)
         setY(y + GameScreen.tileSize / 2f)
 
-        val bottleTexture = ResourcesManager.getTexture("bottle")
-        val bottleSmolTexture = ResourcesManager.getTexture("bottle_smol")
+        val bottleTexture = ResourcesManager.getTexture(ResourcesManager.BOTTLE)
+        val bottleSmolTexture = ResourcesManager.getTexture(ResourcesManager.BOTTLE_SMOL)
         val regions = Array<TextureRegion>()
         val values = BottleState.values()
 

@@ -46,6 +46,12 @@ public class ResourcesManager {
     public static final String GRANDMA_DIALOG_FACE = "grandma_dialog_face.png";
     public static final String TARGET = "target.png";
 
+    public static final String LUT_0 = "lut_0.png";
+    public static final String LUT_1 = "lut_1.png";
+    public static final String LUT_2 = "lut_2.png";
+    public static final String LUT_3 = "lut_3.png";
+    public static final String LUT_4 = "lut_4.png";
+
     public static I18NBundle commonMushroomsSpeechBundle;
     public static I18NBundle powerMushroomsSpeechBundle;
     public static I18NBundle dexterityMushroomsSpeechBundle;
@@ -64,6 +70,7 @@ public class ResourcesManager {
     private static final int TILE_SIZE = 16; // Размер тайла который мы вырезаем из png в пикселя
     private static AssetManager am = new AssetManager();
     private static HashMap<String, TextureRegion> regions = new HashMap<>();
+    private static HashMap<String, Texture> colorTables = new HashMap<>();
     private static boolean loadingStarted = false;
 
     public static void loadSplash() {
@@ -147,6 +154,11 @@ public class ResourcesManager {
         am.load(PLAYER_DIALOG_FACE, Texture.class, param);
         am.load(GRANDMA_DIALOG_FACE, Texture.class, param);
 //        am.load(TARGET, Texture.class, param);
+        am.load(LUT_0, Texture.class, param);
+        am.load(LUT_1, Texture.class, param);
+        am.load(LUT_2, Texture.class, param);
+        am.load(LUT_3, Texture.class, param);
+        am.load(LUT_4, Texture.class, param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);

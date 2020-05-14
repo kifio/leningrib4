@@ -1,14 +1,14 @@
 package kifio.leningrib.levels
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.scenes.scene2d.Actor
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.LGCGame.Companion.lastKnownCameraPosition
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.helpers.TreesManager
+import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Player
@@ -83,6 +83,14 @@ class CommonLevel() : Level() {
             }
         }
         return gameObjects
+    }
+
+    override fun update(delta: Float, camera: OrthographicCamera, gameScreen: GameScreen) {
+        accumulatedTime += delta
+        if (gameScreen.player.mushroomsCount > 0) {
+            LGCGame.lutController.updateLut(accumulatedTime);
+        }
+        super.update(delta, camera, gameScreen)
     }
 
     companion object {

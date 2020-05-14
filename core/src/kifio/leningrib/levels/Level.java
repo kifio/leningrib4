@@ -28,10 +28,9 @@ import model.Room;
 
 public abstract class Level {
 
-    private static final Array<Actor> emptyArr = new Array<Actor>();
-
     // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
     protected float bottomCameraThreshold = Gdx.graphics.getHeight() / 2f;
+    protected float accumulatedTime = 0f;
 
     protected ForestersManager forestersManager;
     protected ForestGraph forestGraph;
@@ -54,6 +53,7 @@ public abstract class Level {
         this.treesManager = level.treesManager;
         this.nextLevel = level.nextLevel;
         this.bottomCameraThreshold = level.bottomCameraThreshold;
+        this.accumulatedTime = level.accumulatedTime;
     }
 
     protected void setup(Player player, LevelMap levelMap, Config levelConfig) {
@@ -163,14 +163,8 @@ public abstract class Level {
             mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
         }
 
-        if (gameScreen.player.isDexterous()) {
-            for (TreePart treePart : treesManager.getInnerBordersTrees()) {
-                treePart.setAlpha(0.2f);
-            }
-        } else {
-            for (TreePart treePart : treesManager.getInnerBordersTrees()) {
-                treePart.setAlpha(1f);
-            }
+        for (TreePart treePart : treesManager.getInnerBordersTrees()) {
+            treePart.setAlpha(gameScreen.player.isDexterous() ? 0.2f : 1f);
         }
     }
 

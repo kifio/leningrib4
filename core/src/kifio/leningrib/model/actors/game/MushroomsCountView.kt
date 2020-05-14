@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Actor
@@ -15,13 +16,10 @@ import kifio.leningrib.model.actors.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
 
-class MushroomsCountView(
-        private val camera: Camera,
-        private val count: Int
-) : Actor() {
+class MushroomsCountView(camera: OrthographicCamera, count: Int
+) : StaticActor(getRegion(RESULT_MUSHROOM), camera) {
 
     private val labelColor = Color.WHITE
-    private val mushroom = ResourcesManager.getRegion(RESULT_MUSHROOM)
     private val label = "х $count"
 
     private val labelX: Float
@@ -41,7 +39,6 @@ class MushroomsCountView(
     override fun draw(batch: Batch, parentAlpha: Float) {
         y = camera.position.y - 2 * GameScreen.tileSize
         super.draw(batch, parentAlpha)
-        batch.draw(mushroom, this.x, this.y, this.height, this.height)
         LabelManager.getInstance().largeFont.color = labelColor
         LabelManager.getInstance().largeFont.draw(batch, label, labelX, this.y + labelYOffset)
     }

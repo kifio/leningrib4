@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import kifio.leningrib.LGCGame;
+import kifio.leningrib.LUTController;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
@@ -71,6 +73,10 @@ public class Mushroom extends MovableActor {
 
     @Override public void draw(Batch batch, float alpha) {
         if (isEaten) return;
+        draw(batch);
+    }
+
+    private void draw(Batch batch) {
         float x = getX();
         float y = getY();
         float size = GameScreen.tileSize * scale;

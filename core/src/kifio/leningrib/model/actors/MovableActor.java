@@ -14,7 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.utils.compression.lzma.Base;
 
+import kifio.leningrib.LGCGame;
+import kifio.leningrib.LUTController;
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.screens.GameScreen;
@@ -65,7 +68,10 @@ public abstract class MovableActor extends Actor {
 	@Override public void draw(Batch batch, float alpha) {
 		float x = getX();
 		bounds.set(x, getY(), GameScreen.tileSize, GameScreen.tileSize);
+		drawActor(batch, x);
+	}
 
+	private void drawActor(Batch batch, float x) {
 		if (!goLeft) {
 			batch.draw(getTextureRegion(), x, getY(), getDrawingWidth(), getDrawingHeight());
 		} else {
@@ -116,6 +122,7 @@ public abstract class MovableActor extends Actor {
 		// texture.dispose();
 		pixmap.dispose();
 	}
+
 	// Color for replacement already settled in Pixmap
 	protected void updatePixmap(Pixmap pixmap, int pixelColor, int newColor) {
 		for (int i = 0; i < pixmap.getWidth(); i++) {

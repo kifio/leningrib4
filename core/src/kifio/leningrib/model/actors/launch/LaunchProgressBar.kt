@@ -1,13 +1,14 @@
 package kifio.leningrib.model.actors.launch
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.WideAssetActor
 
-class LaunchProgressBar: WideAssetActor(
-        ResourcesManager.getRegion(ResourcesManager.LAUNCH_PROGRESS_BACKGROUND)
+class LaunchProgressBar(camera: OrthographicCamera): WideAssetActor(
+        ResourcesManager.getRegion(ResourcesManager.LAUNCH_PROGRESS_BACKGROUND), camera
 ) {
 
     private val progressForegroundTexture = ResourcesManager.getTexture(ResourcesManager.LAUNCH_PROGRESS_FOREGROUND)
@@ -26,7 +27,6 @@ class LaunchProgressBar: WideAssetActor(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        super.draw(batch, parentAlpha)
         this.progressForegroundRegion?.let {
             batch.draw(it, x, y, width * progress, height)
         }

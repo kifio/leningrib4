@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.levels.CommonLevel
@@ -33,17 +34,19 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
     private var gameScreen: GameScreen? = null
 
     private val actors = arrayOf(
-            LaunchScreenLogo(),
-            LaunchProgressBar(),
+            LaunchScreenLogo(game.camera),
+            LaunchProgressBar(game.camera),
 
             LaunchScreenTree(
                     tileSize.toFloat(),
-                    Gdx.graphics.height - tileSize * 3F
+                    Gdx.graphics.height - tileSize * 3F,
+                    game.camera
             ),
 
             LaunchScreenTree(
                     Gdx.graphics.width - tileSize * 3F,
-                    tileSize * 2F
+                    tileSize * 2F,
+                    game.camera
             ),
 
 
@@ -66,10 +69,6 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
     }
 
     override fun show() {
-
-    }
-
-    private fun prepare() {
 
     }
 
@@ -96,7 +95,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             Gdx.app.log("kifio_time", "Loading assets took: ${(finishTime - startTime) / 1000000}")
             LabelManager.getInstance()
 
-//            game.executor.submit {
+            game.executor.submit {
                 startTime = System.nanoTime()
                 ResourcesManager.buildRegions()
                 ResourcesManager.initializeSpeeches()
@@ -104,21 +103,19 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                 val levelAndPlayer = LGCGame.getLevelAndPlayer(worldMap)
                 val level = levelAndPlayer.second
                 val player = levelAndPlayer.first
-//                Gdx.app.postRunnable {
+                Gdx.app.postRunnable {
                     this.gameScreen = GameScreen(game, level, player, worldMap)
                     finishTime = System.nanoTime()
                     Gdx.app.log("kifio_time", "Init first level took: ${(finishTime - startTime) / 1000000}")
-//                }
-//            }
+                }
+            }
         }
 
         for (actor in actors) {
             if (actor is LaunchProgressBar) {
 
                 if (accumulatedTime >= launchTime && gameScreen != null && !finished) {
-                    val start = System.nanoTime()
                     game.showGameScreen(gameScreen)
-                    val finish = System.nanoTime()
                     this.gameScreen = null
                     finished = true
                 }
@@ -140,11 +137,5 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
         accumulatedTime += delta
         stage.act(delta)
         stage.draw()
-
-
-
-        if (finished) {
-
-        }
     }
 }
