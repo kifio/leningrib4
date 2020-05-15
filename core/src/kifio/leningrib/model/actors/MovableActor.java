@@ -23,6 +23,7 @@ public abstract class MovableActor extends Actor {
 
 	// Путь в который будет записываться найденный путь
 	protected DefaultGraphPath<Vector2> path = new DefaultGraphPath<>();
+	public float velocityMultiplier = 2f;
 
 	private float elapsedTime = 0;
 	private float previousX = -1;
@@ -84,10 +85,6 @@ public abstract class MovableActor extends Actor {
 		return Actions.moveTo(targetX, targetY, calculatedDuration);
 	}
 
-	protected Action getDelayAction(float duration) {
-		return Actions.delay(duration);
-	}
-
 	protected abstract float getVelocity();
 
 	protected abstract float getDelayTime();
@@ -96,40 +93,6 @@ public abstract class MovableActor extends Actor {
 
 	protected abstract String getRunningState();
 
-	// pixelColor - color to change. if pixelColor == -1, apply to all pixels.
-	// newColor - changing color.
-	protected void replaceColorInTexture(UIState uiState, int pixelColor, int newColor) {
-
-		Pixmap pixmap;
-		TextureData textureData = uiState.getTexture().getTextureData();
-		TextureRegion[] regions = new TextureRegion[uiState.getRegionsCount()];
-
-		textureData.prepare();
-		pixmap = textureData.consumePixmap();
-		updatePixmap(pixmap, pixelColor, newColor);
-
-		Texture texture = new Texture(pixmap);
-
-		for (int i = 0; i < uiState.getRegionsCount(); i++) {
-			regions[i] = new TextureRegion(texture, x * i, y, w, h);
-		}
-
-		uiState.setTextureRegions(regions);
-
-		// texture.dispose();
-		pixmap.dispose();
-	}
-
-	// Color for replacement already settled in Pixmap
-	protected void updatePixmap(Pixmap pixmap, int pixelColor, int newColor) {
-		for (int i = 0; i < pixmap.getWidth(); i++) {
-			for (int j = 0; j < pixmap.getHeight(); j++) {
-				if (pixmap.getPixel(i, j) == pixelColor) {
-					pixmap.drawPixel(i, j, newColor);
-				}
-			}
-		}
-	}
 
 	protected float getDrawingWidth() {
 		return drawingWidth;
@@ -162,10 +125,6 @@ public abstract class MovableActor extends Actor {
 
 		int count = path.getCount();
 		int i = count > 1 ? 1 : 0;
-
-		if (i == 0) {
-			seq.addAction(getDelayAction(getDelayTime()));
-		}
 
 		for (; i < path.getCount(); i++) {
 			Vector2 vec = path.get(i);

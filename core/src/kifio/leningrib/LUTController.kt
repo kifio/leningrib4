@@ -49,6 +49,8 @@ class LUTController {
                 this.mushroomsCount = mushroomsCount
                 val index = ThreadLocalRandom.current().nextInt(0, 5)
                 lutTexture = ResourcesManager.getTexture("lut_$index")
+                accumulatedTime = (effectTime / 2f) - delta
+                intensity = 0.5f
             }
 
             accumulatedTime += delta

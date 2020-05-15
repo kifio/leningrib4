@@ -1,6 +1,7 @@
 package kifio.leningrib.levels.helpers
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import generator.Config
 import generator.SegmentType
@@ -9,6 +10,7 @@ import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.TreePart
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
+import java.util.*
 
 class TreesManager {
 
@@ -47,6 +49,16 @@ class TreesManager {
     fun getOuterBordersTrees() = outerTrees
 
     fun getInnerBordersTrees() = innerBorderTrees
+
+    fun getFreeNeighbour(x: Float, y: Float): Vector2? {
+        return if (obstacleTrees.find {
+                    it.position.epsilonEquals(x, y)
+                } != null) {
+            null
+        } else {
+            Vector2(x, y)
+        }
+    }
 
     companion object {
 

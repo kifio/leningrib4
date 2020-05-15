@@ -1,6 +1,7 @@
 package kifio.leningrib.levels
 
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
@@ -45,12 +46,23 @@ class CommonLevel() : Level() {
             val y = GameScreen.tileSize * (i + getLevelHeight() * nextLevel)
             if (!Utils.isOverlapsWithActors(treesManager.getInnerBordersTrees(), x, y)) {
                 val foo = ThreadLocalRandom.current().nextInt(64)
-                val hasEffect = foo % 4 == 0
-                mushrooms.add(Mushroom(x, y, hasEffect))
+                val hasEffect = foo % 4 == 0 && mushroomsCount > 5
+                val movable = mushroomsCount > 5 && ThreadLocalRandom.current().nextBoolean()
+                mushrooms.add(Mushroom(x, y, hasEffect, movable,
+                        if (movable) getNeighbours(x.toFloat(), y.toFloat(), treesManager) else null))
             }
             i += step
         }
         return mushrooms
+    }
+
+    private fun getNeighbours(x: Float, y: Float, treesManager: TreesManager): Array<Vector2?> {
+        val arr = arrayOfNulls<Vector2>(4)
+        arr[0] = treesManager.getFreeNeighbour(x - GameScreen.tileSize, y)
+        arr[1] = treesManager.getFreeNeighbour(x + GameScreen.tileSize, y)
+        arr[2] = treesManager.getFreeNeighbour(x, y - GameScreen.tileSize)
+        arr[3] = treesManager.getFreeNeighbour(x, y + GameScreen.tileSize)
+        return arr
     }
 
     override fun initForesters(levelMap: LevelMap,

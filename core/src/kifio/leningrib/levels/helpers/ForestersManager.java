@@ -19,13 +19,23 @@ public class ForestersManager extends ObjectsManager<Forester> {
 
     private Rectangle result = new Rectangle();
     private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
+    private float foresterVelocityMultiplier = 2;
 
     public ForestersManager(Array<Forester> foresters) {
-        addForesters(foresters);
+        addForesters(foresters, false);
     }
 
-    public void addForesters(Array<Forester> foresters) {
-        gameObjects.addAll(foresters);
+    public void addForesters(Array<Forester> foresters, boolean toAllRooms) {
+        if (!toAllRooms) {
+            for (int i = 0; i < foresters.size; i++) {
+                if (i % 2 != 0) {
+                    gameObjects.add(foresters.get(i));
+                }
+            }
+        } else {
+            gameObjects.addAll(foresters);
+        }
+
         Label[] oldSpeeches = speeches;
 
         speeches = new Label[gameObjects.size];
@@ -48,9 +58,17 @@ public class ForestersManager extends ObjectsManager<Forester> {
     }
 
     public void updateForesters(GameScreen gameScreen, float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph) {
+        if (gameScreen.player.getMushroomsCount() > 5) foresterVelocityMultiplier = 2.5f;
+        if (gameScreen.player.getMushroomsCount() > 15) foresterVelocityMultiplier = 3f;
+        if (gameScreen.player.getMushroomsCount() > 25) foresterVelocityMultiplier = 3.5f;
+        if (gameScreen.player.getMushroomsCount() > 35) foresterVelocityMultiplier = 4f;
+        if (gameScreen.player.getMushroomsCount() > 45) foresterVelocityMultiplier = 4.5f;
+        if (gameScreen.player.getMushroomsCount() > 60) foresterVelocityMultiplier = 5f;
+
         for (int i = 0; i < gameObjects.size; i++) {
             Forester forester = gameObjects.get(i);
             result.set(0f, 0f, 0f, 0f);
+            forester.velocityMultiplier = foresterVelocityMultiplier;
             if (isPlayerCaught(forester, gameScreen.player)) {
                 if (gameScreen.player.isStrong()) {
                     forester.disable(speeches[i]);

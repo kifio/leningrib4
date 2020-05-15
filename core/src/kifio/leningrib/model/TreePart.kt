@@ -16,7 +16,6 @@ class TreePart(private val treeTexture: TextureRegion,
     @JvmField
 	var position: Vector2 = Vector2(x, y)
 
-
     init {
         setX(x)
         setY(y)

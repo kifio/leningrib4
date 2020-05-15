@@ -2,6 +2,8 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -12,7 +14,7 @@ public class Mushroom extends MovableActor {
 
     private static final float DEFAULT_EFFECT_TIME = 5f;
 
-    private static final float EFFECT_ALERT_TIME = 2f; // Время, спустя котрое персонаж начинает мигать
+    private static final float MOVE_TIME_MAX = 2f; // Время, спустя котрое гриб меняет позицию
     private static final float EFFECT_ALERT_INTERVAL = 0.2f; // Интервал мигания
 
     private Color speechColor = new Color(Effect.NO_EFFECT.color);
@@ -34,12 +36,27 @@ public class Mushroom extends MovableActor {
     private Effect effect = Effect.NO_EFFECT;
     private String stableSpeech = null;
     private boolean isEaten = false;
+    private boolean movable = false;
     private float scale = 1f;
     private float effectTime = DEFAULT_EFFECT_TIME;
+    private float onPlaceTime = 0f;
+    private Vector2[] neighbours;
 
-    public Mushroom(int x, int y, boolean hasEffect) {
+    public Mushroom(int x, int y, boolean hasEffect, boolean movable, Vector2[] neighbours) {
         super(x, y);
         isPaused = false;
+        this.movable = movable;
+
+        if (neighbours != null) {
+            boolean foo = false;
+            for (Vector2 v : neighbours) {
+                if (v != null) {
+                    foo = true;
+                    break;
+                }
+            }
+            if (foo) this.neighbours = neighbours;
+        }
         if (hasEffect) {
             Effect[] effects = Effect.values();
             effect = effects[ThreadLocalRandom.current().nextInt(effects.length)];
@@ -48,7 +65,7 @@ public class Mushroom extends MovableActor {
     }
 
     public Mushroom(int x, int y) {
-        this(x, y, false);
+        this(x, y, false, false, null);
     }
 
     public Mushroom(int x, int y, Effect effect) {
@@ -65,6 +82,17 @@ public class Mushroom extends MovableActor {
     
     @Override public void act(float delta) {
         super.act(delta);
+        if (movable) {
+            onPlaceTime += delta;
+            if (onPlaceTime > 2 && neighbours != null) {
+                onPlaceTime = 0;
+                Vector2 neighbour;
+                do {
+                    neighbour = neighbours[ThreadLocalRandom.current().nextInt(0, neighbours.length)];
+                } while (neighbour == null);
+                addAction(getMoveAction(bounds.x, bounds.y, neighbour.x, neighbour.y));
+            }
+        }
     }
 
     @Override public void draw(Batch batch, float alpha) {
@@ -159,7 +187,7 @@ public class Mushroom extends MovableActor {
 
     @Override
     protected float getVelocity() {
-        return 0;
+        return GameScreen.tileSize * (velocityMultiplier - 1);
     }
 
     @Override

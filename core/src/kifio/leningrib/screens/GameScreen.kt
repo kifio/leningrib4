@@ -31,6 +31,7 @@ import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
 import model.WorldMap
+import java.util.*
 import javax.rmi.CORBA.Util
 
 class GameScreen(game: LGCGame,
@@ -187,7 +188,7 @@ class GameScreen(game: LGCGame,
                             this.level.dispose()
                             this.level = newLevel
                             updateStage()
-                            stage.actors.sortedBy { it.zIndex }
+                            stage.actors.sort { actor, actor2 -> actor.zIndex.compareTo(actor2.zIndex) }
                         }
                     }
                 }
@@ -473,6 +474,7 @@ class GameScreen(game: LGCGame,
         blackScreenTime = 0f
         lutController.stop()
         screenOut = true  // Чтобы рисовать черный экран
+        val worldMap = WorldMap()
         val levelAndPlayer = LGCGame.getLevelAndPlayer(worldMap)
         val level = levelAndPlayer.second
         val player = levelAndPlayer.first

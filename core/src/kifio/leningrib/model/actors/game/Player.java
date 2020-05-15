@@ -217,7 +217,6 @@ public class Player extends MovableActor {
                     current = UIState.obtainUIState(getRunningState(), Player.this);
                 }
             }));
-            seq.addAction(getDelayAction(getDelayTime()));
         }
 
         int count = path.getCount();
@@ -226,7 +225,6 @@ public class Player extends MovableActor {
         for (; i < count; i++) {
             Vector2 vec = path.get(i);
             seq.addAction(getMoveAction(fromX, fromY, vec.x, vec.y));
-            seq.addAction(getDelayAction(getDelayTime()));
 
             fromX = vec.x;
             fromY = vec.y;
@@ -238,7 +236,6 @@ public class Player extends MovableActor {
                 current = UIState.obtainUIState(getIdlingState(), Player.this);
             }
         }));
-        seq.addAction(getDelayAction(getDelayTime()));
         return seq;
     }
 

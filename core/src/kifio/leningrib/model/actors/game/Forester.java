@@ -54,7 +54,7 @@ public class Forester extends MovableActor {
 
     private float speechDuration = 0f;
     private float stopTime = 0f;
-    private float velocity = GameScreen.tileSize * 3;;
+    private float velocity = GameScreen.tileSize;
     private float originalFromX, originalToX;
     private int noticeAreaSize = NOTICE_AREA_SIZE;
     private int pursueAreaSize = PURSUE_AREA_SIZE;
@@ -397,7 +397,7 @@ public class Forester extends MovableActor {
     }
 
     public float getVelocity() {
-        return velocity;
+        return velocity * velocityMultiplier;
     }
 
     public float getNewSpeechX(float w) {

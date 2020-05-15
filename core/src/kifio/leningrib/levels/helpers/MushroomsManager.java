@@ -16,6 +16,7 @@ import kifio.leningrib.screens.GameScreen;
 public class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private static int SPEECH_SEED = 768;
+    private float velocityMultiplier = 1;
 
     private Array<Integer> removedMushrooms = new Array<>(4);
 
@@ -40,11 +41,19 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         if (isPaused) return;
         int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
+        if (p.getMushroomsCount() > 5) velocityMultiplier = 2.5f;
+        if (p.getMushroomsCount() > 15) velocityMultiplier = 3f;
+        if (p.getMushroomsCount() > 25) velocityMultiplier = 3.5f;
+        if (p.getMushroomsCount() > 35) velocityMultiplier = 4f;
+        if (p.getMushroomsCount() > 45) velocityMultiplier = 4.5f;
+        if (p.getMushroomsCount() > 60) velocityMultiplier = 5f;
+
         // Удаляем съеденные грибы, несъеденным добавляем реплики
         for (int index = 0; index < gameObjects.size; index++) {
             Mushroom m = gameObjects.get(index);
 
             if (m != null) {
+                m.velocityMultiplier = velocityMultiplier;
                 if (m.getY() >= cameraPositionY - halfScreenHeight
                         && m.getY() <= cameraPositionY + halfScreenHeight) {
 
