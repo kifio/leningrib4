@@ -29,7 +29,7 @@ class FirstLevel() : Level() {
     var passed = false
 
     constructor(player: Player, levelMap: LevelMap): this() {
-        super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, levelHeight))
+        super.setup(player, null, levelMap, Config(LGCGame.LEVEL_WIDTH, levelHeight))
         if (guards == null) {
             guards = Array<TutorialForester>()
             guards?.add(TutorialForester(

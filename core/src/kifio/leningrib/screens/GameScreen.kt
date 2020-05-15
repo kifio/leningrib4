@@ -24,11 +24,14 @@ import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.MovableActor
 import kifio.leningrib.model.actors.Overlay
 import kifio.leningrib.model.actors.StaticActor
+import kifio.leningrib.model.actors.Store
 import kifio.leningrib.model.actors.game.*
+import kifio.leningrib.model.actors.tutorial.Grandma
 import kifio.leningrib.model.items.Bottle
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
 import model.WorldMap
+import javax.rmi.CORBA.Util
 
 class GameScreen(game: LGCGame,
                  private var level: Level,
@@ -46,6 +49,7 @@ class GameScreen(game: LGCGame,
     private var startGame = false
     private var shouldShowTutorial = true
     private var paused = true
+    private var storeOpened = false
     private var active = false
     private var lastKnownCameraPosition = 0f
     private var settings: Group? = null
@@ -70,7 +74,7 @@ class GameScreen(game: LGCGame,
         this.active = true
     }
 
-    fun isPaused() = paused
+    fun isPaused() = paused || storeOpened
 
     fun getCameraPostion() = camera.position
 
@@ -103,16 +107,16 @@ class GameScreen(game: LGCGame,
 
         transitionActor?.setOrigin(camera.position.x, camera.position.y)
 
-        if (active) {
-            update(delta)
-            updateCamera()
-            stage.act(delta)
-            stage.draw()
-        }
+//        if (active) {
+        update(delta)
+        updateCamera()
+        stage.act(delta)
+        stage.draw()
+//        }
 
         val isTutorialPassed = (level as? FirstLevel)?.passed == true
 
-        if (active && screenEnterTime < ANIMATION_DURATION) {
+        if (screenEnterTime < ANIMATION_DURATION) {
             screenEnterTime += delta
             renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
         } else if ((blackScreenTime < ANIMATION_DURATION_LONG && startGame)
@@ -142,6 +146,7 @@ class GameScreen(game: LGCGame,
     private fun getNextLevel(x: Int, y: Int): Level {
         LGCGame.setFirstLevelPassed(true)
         return CommonLevel(player,
+                null,
                 worldMap.addLevel(x, y, (player.x / tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
 
@@ -151,7 +156,7 @@ class GameScreen(game: LGCGame,
         }
 
         if (isFirstLevelPassed() && player.mushroomsCount > 0) {
-            lutController.updateLut(delta);
+            lutController.updateLut(delta, player.mushroomsCount);
         }
 
         level.mushroomsSpeeches?.let { addSpeechesToStage(it) }
@@ -215,11 +220,14 @@ class GameScreen(game: LGCGame,
             stage.addActor(level.foresters[i])
         }
 
-        (level as? FirstLevel)?.let { it ->
-            it.guards?.forEach {
-                stage.addActor(it)
-                stage.addActor(it.label)
-            }
+        (level as? FirstLevel)?.guards?.forEach {
+            stage.addActor(it)
+            stage.addActor(it.label)
+        }
+
+        (level as? CommonLevel)?.let {
+            stage.addActor(it.grandma)
+            stage.addActor(it.grandma?.label)
         }
     }
 
@@ -505,16 +513,18 @@ class GameScreen(game: LGCGame,
         sequenceAction.addAction(Actions.run {
             settings?.remove()
             settings = null
+            storeOpened = false
         })
 
         settings?.addAction(sequenceAction)
     }
 
     internal fun handleTouchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean {
-        return stage.touchDown(x, y, pointer, button)
+        return isStageInitialized() && stage.touchDown(x, y, pointer, button)
     }
 
     internal fun handleTouchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
+        if (!isStageInitialized()) return false
         val actorIsTouched = stage.actors
                 .filterIsInstance<StaticActor>()
                 .find { it.touched } != null
@@ -533,10 +543,36 @@ class GameScreen(game: LGCGame,
         }
 
         if (!gameOver) {
-            level.movePlayerTo(x.toFloat(), y.mapYToLevel(), player)
+            val targetY = y.mapYToLevel()
+            level.movePlayerTo(x.toFloat(), targetY, player, getCallback(targetY))
         }
 
         return true
+    }
+
+    private fun getCallback(y: Float): Runnable? {
+        val level = this.level
+        return if (level is CommonLevel) {
+            var yGrandma = level.grandma?.y ?: return null
+            yGrandma = Utils.mapCoordinate(yGrandma)
+            if (yGrandma == Utils.mapCoordinate(y)) {
+                Runnable {
+                    storeOpened = true
+                    if (settings == null) {
+                        settings = Group().apply {
+                            x = Gdx.graphics.width.toFloat()
+                            addActor(Store(camera, lutController))
+                            addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
+                        }
+                        stage.addActor(settings)
+                    }
+                }
+            } else {
+                null
+            }
+        } else {
+            null
+        }
     }
 
     private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;

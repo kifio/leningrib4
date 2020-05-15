@@ -18,8 +18,6 @@ public class TutorialForester extends TutorialCharacter {
     private String idle;
     private String run;
     private Bottle targetBottle = null;
-    private float accumulatedTime = 0f;
-    private int speechIndex = 0;
     private boolean isDrinking = false;
 
     private String[] labels = new String[] {
@@ -53,7 +51,6 @@ public class TutorialForester extends TutorialCharacter {
         this.idle = texture + "_idle";
         this.run = texture + "_run";
         this.isPaused = false;
-        this.labels = labels;
         this.label = LabelManager.getInstance().getLabel(labels[0], x - 0.5f * GameScreen.tileSize,
                 y + 1.3f * GameScreen.tileSize, Forester.DEFAULT_SPEECH_COLOR);
     }
@@ -85,26 +82,19 @@ public class TutorialForester extends TutorialCharacter {
     @Override
     public void act(float delta) {
         super.act(delta);
-        accumulatedTime += delta;
-        label.setX(getX() - (GameScreen.tileSize));
-        label.setY(getY() + 1.3f * GameScreen.tileSize);
 
-        if ((int) accumulatedTime > 1) {
-            int i;
-            do {
-                i = ThreadLocalRandom.current().nextInt(0, labels.length);
-            } while (i == speechIndex);
-            speechIndex = i;
-            accumulatedTime = 0;
-            if (targetBottle == null) {
-                label.setText(labels[i]);
-            } else {
-                if (isDrinking) {
-                    if (targetBottle.isEmpty()) {
-                        label.setText(drunkLabels[i]);
-                    } else {
-                        label.setText(drinkingLabels[i]);
-                    }
+    }
+
+    @Override
+    void setSpeech() {
+        if (targetBottle == null) {
+            label.setText(labels[speechIndex]);
+        } else {
+            if (isDrinking) {
+                if (targetBottle.isEmpty()) {
+                    label.setText(drunkLabels[speechIndex]);
+                } else {
+                    label.setText(drinkingLabels[speechIndex]);
                 }
             }
         }

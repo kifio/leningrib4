@@ -32,9 +32,14 @@ class MushroomsCountView(camera: OrthographicCamera, count: Int, lutController: 
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
+        batch.projectionMatrix = camera.combined
         y = camera.position.y - 2 * GameScreen.tileSize
-        super.draw(batch, parentAlpha)
+        batch.shader = null
+        batch.draw(region, this.x, this.y, this.height, this.height)
         LabelManager.getInstance().largeFont.color = labelColor
         LabelManager.getInstance().largeFont.draw(batch, label, labelX, this.y + labelYOffset)
+        if (lutController?.lutTexture != null) {
+            batch.shader = lutController.shader
+        }
     }
 }

@@ -12,19 +12,15 @@ public class Grandma extends TutorialCharacter {
 
     private static final String IDLE = "grandma_idle";
 
-    private int initialPlayerMushroomCount = 0;
-
-    private Player player;
-
     private String[] speeches = new String[]{
             "Подходим, покупаем",
-            "Стою тут старею..",
-            "Грибы собираю..",
-            "Маразмом крепчаю..",
-            ""
+            "Берем грибочки, недорого",
+            "Все по низкой цене",
+            "Налетай торопись",
+            "Напитки, грибы, всякое-разное"
     };
 
-    public Grandma(float x, float y, Rectangle rectangle) {
+    public Grandma(float x, float y) {
         super(x, y);
         this.isPaused = false;
         this.label = LabelManager.getInstance().getLabel("", x,
@@ -32,48 +28,17 @@ public class Grandma extends TutorialCharacter {
     }
 
     @Override
+    void setSpeech() {
+        label.setText(speeches[speechIndex]);
+    }
+
+    @Override
     public float getVelocity() {
         return 0f;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
-        if (player != null) {
-            this.initialPlayerMushroomCount = player.getMushroomsCount();
-            setSpeeches(speeches, null);
-        }
-    }
-
-//    public void stopTalking() {
-//        isDialogActive = true;
-//        label.clearActions();
-//    }
-
-    private void setSpeeches(final String[] texts, Runnable callback) {
-        SequenceAction sequenceAction = new SequenceAction();
-
-        for (int i = 0; i < texts.length; i++) {
-            final int index = i;
-            sequenceAction.addAction(Actions.run(new Runnable() {
-                @Override
-                public void run() {
-                    LabelManager lm = LabelManager.getInstance();
-                    float w = lm.getTextWidth(texts[index], lm.smallFont);
-                    label.setX(getX() - (w * 0.5f) + (GameScreen.tileSize * 0.5f));
-                    label.setText(texts[index]);
-                }
-            }));
-
-            if (index == texts.length - 3 && callback != null) {
-                sequenceAction.addAction(Actions.run(callback));
-            }
-
-            if (index < texts.length - 1) {
-                sequenceAction.addAction(Actions.delay(1.5f));
-            }
-        }
-
-        label.addAction(sequenceAction);
+    public void stopTalking() {
+        label.clearActions();
     }
 
     @Override

@@ -38,4 +38,6 @@ abstract class BaseScreen(var game: LGCGame) : Screen {
     }
 
     open fun getTransitionActor(): Group = stage.root
+
+    protected fun isStageInitialized() = ::stage.isInitialized
 }

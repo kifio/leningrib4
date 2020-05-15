@@ -28,6 +28,7 @@ class LaunchProgressBar(camera: OrthographicCamera): WideAssetActor(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
+        if (region != null) batch.draw(region, x, y, width, height)
         this.progressForegroundRegion?.let {
             batch.draw(it, x, y, width * progress, height)
         }

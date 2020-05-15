@@ -103,8 +103,9 @@ class Dialog(camera: OrthographicCamera,
         }
 
         val index = index.coerceAtMost(speeches.size - 1)
+        val shader = batch.shader
+        batch.shader = null
         batch.projectionMatrix = camera.combined
-        batch.begin()
 
         if (characters.isNotEmpty()) {
             val region = ResourcesManager.getRegion(characters[index])
@@ -128,8 +129,7 @@ class Dialog(camera: OrthographicCamera,
                 (this.y + 2f * buttonHeight),
                 buttonWidth,
                 Align.right, false)
-
-        batch.end()
+        batch.shader = shader
     }
 
     override fun act(delta: Float) {

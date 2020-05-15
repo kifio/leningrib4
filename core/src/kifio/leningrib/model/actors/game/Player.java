@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.Array;
 
+import org.jetbrains.annotations.Nullable;
+
 import kifio.leningrib.Utils;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;
@@ -180,7 +182,7 @@ public class Player extends MovableActor {
         return RUNING + "_" + m.getEffectName();
     }
 
-    public void resetPlayerPath(float x, float y, ForestGraph forestGraph) {
+    public void resetPlayerPath(float x, float y, ForestGraph forestGraph, @Nullable Runnable callback) {
         float fromX = Utils.mapCoordinate(getX());
         float fromY = Utils.mapCoordinate(getY());
         float toX = Utils.mapCoordinate(x);
@@ -197,7 +199,9 @@ public class Player extends MovableActor {
         forestGraph.updatePath(fromX, fromY, toX, toY, path);
 
         if (path.getCount() > 0 && current != null) {
-            addAction(getMoveActionsSequence());
+            SequenceAction action = getMoveActionsSequence();
+            if (callback != null) action.addAction(Actions.run(callback));
+            addAction(action);
         }
     }
 

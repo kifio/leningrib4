@@ -10,7 +10,7 @@ import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.OVERLAY
 
-class Overlay(camera: OrthographicCamera, offset: Float = 0F,
+open class Overlay(camera: OrthographicCamera, var offset: Float = 0F,
               lutController: LUTController,
               region: TextureRegion = ResourcesManager.getRegion(OVERLAY)) : StaticActor(region, camera, lutController) {
 

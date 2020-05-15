@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import kifio.leningrib.model.ResourcesManager
+import java.util.Collections.min
 import java.util.concurrent.ThreadLocalRandom
 
 class LUTController {
@@ -15,13 +16,15 @@ class LUTController {
         private const val FRAGMENT_PATH = "shaders/lookup_fragment.glsl"
     }
 
-//    private var active = true
     private var intensity = 0f
-    private var increaseIntensity = true
+    var lutTexture: Texture? = null
+
+    private var active = false
+    private var mushroomsCount = 0
     private var accumulatedTime: Float = 0f
+    private var effectTime = 5
 
     var shader: ShaderProgram? = null
-    var lutTexture: Texture? = null
 
     fun setup() {
         val vertexShader = Gdx.files.internal(VERTEX_PATH).readString()
@@ -34,25 +37,28 @@ class LUTController {
         shader = ShaderProgram(vertexShader, fragmentShader)
     }
 
-    fun updateLut(delta: Float) {
-//         if (!active) return
-        accumulatedTime += delta
+    fun updateLut(delta: Float, mushroomsCount: Int) {
 
-        if (accumulatedTime > 5) {
-            accumulatedTime = 0f
-            increaseIntensity = !increaseIntensity
+        if (!active) {
+            active = true
             val index = ThreadLocalRandom.current().nextInt(0, 5)
             lutTexture = ResourcesManager.getTexture("lut_$index")
-        }
+        } else {
 
-        if (lutTexture != null) {
-            intensity = (accumulatedTime % 5) / 5
-            if (!increaseIntensity) {
-                intensity = 1f - intensity
+            if (mushroomsCount - this.mushroomsCount == 3) {
+                this.mushroomsCount = mushroomsCount
+                val index = ThreadLocalRandom.current().nextInt(0, 5)
+                lutTexture = ResourcesManager.getTexture("lut_$index")
             }
-        }
 
-        Gdx.app.log("kifio_shader", "intensity: $intensity")
+            accumulatedTime += delta
+
+            if (lutTexture == null || intensity >= 1f) {
+                return
+            }
+
+            intensity = accumulatedTime / effectTime
+        }
     }
 
     fun onDraw() {
@@ -65,6 +71,5 @@ class LUTController {
 
     fun stop() {
         lutTexture = null
-//        active = false
     }
 }

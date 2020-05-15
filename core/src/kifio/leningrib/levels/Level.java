@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Player;
+import kifio.leningrib.model.actors.tutorial.Grandma;
 import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
@@ -49,7 +52,7 @@ public abstract class Level {
         this.nextLevel = level.nextLevel;
     }
 
-    protected void setup(Player player, LevelMap levelMap, Config levelConfig) {
+    protected void setup(Player player, Grandma grandma, LevelMap levelMap, Config levelConfig) {
         roomsRectangles = new Array<>();
         Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
         Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles);
@@ -64,9 +67,10 @@ public abstract class Level {
         mushroomsManager.addMushrooms(initMushrooms(levelConfig,
                 treesManager,
                 player == null ? 0 : player.getMushroomsCount()));
-        forestGraph = new ForestGraph(treesManager.getObstacleTrees());
-        dexterityForestGraph = new ForestGraph(treesManager.getOuterBordersTrees());
-        strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
+
+        forestGraph = new ForestGraph(grandma, treesManager.getObstacleTrees());
+        dexterityForestGraph = new ForestGraph(grandma, treesManager.getOuterBordersTrees());
+        strengthForestGraph = new ForestGraph(grandma, treesManager.getObstacleTrees());
 
         for (Forester f : forestersManager.gameObjects) {
             f.initPath(forestGraph);
@@ -103,9 +107,10 @@ public abstract class Level {
         mushroomsManager.addMushrooms(initMushrooms(levelConfig,
                 treesManager,
                 player == null ? 0 : player.getMushroomsCount()));
-        forestGraph = new ForestGraph(treesManager.getObstacleTrees());
-        dexterityForestGraph= new ForestGraph(treesManager.getOuterBordersTrees());
-        strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
+
+        forestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
+        dexterityForestGraph= new ForestGraph(null, treesManager.getOuterBordersTrees());
+        strengthForestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
 
         for (Forester f : forestersManager.gameObjects) {
             f.initPath(forestGraph);
@@ -164,12 +169,16 @@ public abstract class Level {
     }
 
     public void movePlayerTo(float x, float y, Player player) {
+        this.movePlayerTo(x, y, player, null);
+    }
+
+    public void movePlayerTo(float x, float y, Player player, @Nullable Runnable onFinish) {
         if (player.isDexterous()) {
-            player.resetPlayerPath(x, y, dexterityForestGraph);
+            player.resetPlayerPath(x, y, dexterityForestGraph, onFinish);
         } else if (player.isStrong()) {
-            player.resetPlayerPath(x, y, strengthForestGraph);
+            player.resetPlayerPath(x, y, strengthForestGraph, onFinish);
         } else {
-            player.resetPlayerPath(x, y, forestGraph);
+            player.resetPlayerPath(x, y, forestGraph, onFinish);
         }
     }
 

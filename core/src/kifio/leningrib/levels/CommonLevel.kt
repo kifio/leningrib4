@@ -8,18 +8,25 @@ import kifio.leningrib.levels.helpers.TreesManager
 import kifio.leningrib.model.actors.Mushroom
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.actors.tutorial.Grandma
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
 import java.util.concurrent.ThreadLocalRandom
 
 class CommonLevel() : Level() {
 
-    constructor(player: Player, levelMap: LevelMap) : this() {
-        super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
+    var grandma: Grandma? = null
+
+    constructor(player: Player, grandma: Grandma?, levelMap: LevelMap) : this() {
+        super.setup(player, grandma, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
+        this.grandma = grandma
     }
 
     constructor(level: Level) : this() {
         super.copy(level)
+        if (level is CommonLevel) {
+            this.grandma = level.grandma
+        }
     }
 
     override fun getLevelHeight() = LEVEL_HEIGHT
@@ -74,6 +81,32 @@ class CommonLevel() : Level() {
             }
         }
         return gameObjects
+    }
+
+    override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
+        val grandma = this.grandma
+        if (grandma == null) {
+            super.movePlayerTo(x, y, player)
+            return
+        }
+
+        val px = player.onLevelMapX
+        val py = player.onLevelMapY
+
+        val tx = Utils.mapCoordinate(x).toInt()
+        val ty = Utils.mapCoordinate(y).toInt()
+
+        val gx = Utils.mapCoordinate(grandma.x).toInt()
+        val gy = Utils.mapCoordinate(grandma.y).toInt()
+
+        forestGraph?.let {
+            if (gx == tx && gy == ty) {
+                val nearest = it.findNearest(tx, ty, px, py)
+                super.movePlayerTo(nearest.x, nearest.y, player, callback)
+            } else {
+                super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, null)
+            }
+        }
     }
 
     companion object {

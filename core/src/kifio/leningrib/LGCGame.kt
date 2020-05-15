@@ -14,6 +14,7 @@ import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.actors.tutorial.Grandma
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
@@ -57,10 +58,14 @@ class LGCGame(isDebug: Boolean) : Game() {
                 val config = Config(LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
                 levelMap = worldMap.addLevel(0, 0, null, config)
                 val room = levelMap.rooms[0]
-                val x = ThreadLocalRandom.current().nextInt(2, LEVEL_WIDTH - 2).toFloat()
-                val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 2).toFloat()
+                val x = 3f
+                val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 4).toFloat()
                 player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize)
-                level = CommonLevel(player, levelMap)
+                val xPlayer = Utils.mapCoordinate(player.x)
+                val yPlayer = Utils.mapCoordinate(player.y)
+                val xGrandma = xPlayer + (GameScreen.tileSize * 3)
+                val grandma = Grandma(xGrandma, yPlayer)
+                level = CommonLevel(player, grandma, levelMap)
             } else {
                 val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
                 val config = Config(LEVEL_WIDTH, firstRoomHeight + 20)

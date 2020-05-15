@@ -10,7 +10,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
+import javax.rmi.CORBA.Util;
+
 import kifio.leningrib.Utils;
+import kifio.leningrib.model.actors.tutorial.Grandma;
 import kifio.leningrib.screens.GameScreen;
 
 public class ForestGraph implements IndexedGraph<Vector2> {
@@ -31,14 +34,13 @@ public class ForestGraph implements IndexedGraph<Vector2> {
     private Array<Vector2> nodes = new Array<>();
 
     // Инициализирует ноды, которые могут использоваться для поиска маршрута
-    public ForestGraph(Array<? extends Actor> trees) {
+    public ForestGraph(Grandma grandma, Array<? extends Actor> trees) {
 
         int xMin = 0;
         int xMax = Gdx.graphics.getWidth();
 
         int yMin = (int) trees.get(0).getY();
         int yMax = (int) trees.get(0).getY();
-
         for (Actor tree : trees) {
             int y = (int) tree.getY();
             if (y > yMax) {
@@ -56,7 +58,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
             for (int j = yMin; j <= yMax; j+=GameScreen.tileSize) {
                 x = i;
                 y = j;
-                if (!isActor(x, y, trees)) {
+                if (!isActor(x, y, trees, grandma)) {
                     nodes.add(new Vector2(x, y));
                 }
             }
@@ -66,7 +68,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
         for (int i = 0; i < nodes.size; i++) {
             this.connections.add(new Array<Connection<Vector2>>());
-            addNeighbours(nodes.get(i), trees);
+            addNeighbours(nodes.get(i), trees, grandma);
         }
     }
 
@@ -90,29 +92,29 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         return this.connections.get(index);
     }
 
-    private void addNeighbours(Vector2 origin, Array<? extends Actor> actors) {
+    private void addNeighbours(Vector2 origin, Array<? extends Actor> actors, Grandma grandma) {
 
         if (origin.x > 0) {
-            addConnection(origin, origin.x - GameScreen.tileSize, origin.y, actors);
+            addConnection(origin, origin.x - GameScreen.tileSize, origin.y, actors, grandma);
         }
 
         if (origin.x < Gdx.graphics.getWidth() - GameScreen.tileSize) {
-            addConnection(origin, origin.x + GameScreen.tileSize, origin.y, actors);
+            addConnection(origin, origin.x + GameScreen.tileSize, origin.y, actors, grandma);
         }
 
-        addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors);
+        addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors, grandma);
 
         if (origin.y > 0) {
-            addConnection(origin, origin.x, origin.y - GameScreen.tileSize, actors);
+            addConnection(origin, origin.x, origin.y - GameScreen.tileSize, actors, grandma);
         }
     }
 
     // Добавление пути между двумя нодами
-    private void addConnection(Vector2 from, float toX, float toY, Array<? extends Actor> actors) {
+    private void addConnection(Vector2 from, float toX, float toY, Array<? extends Actor> actors, Grandma grandma) {
 
         Vector2 to = getVector2(toX, toY);
 
-        if (to == null || isActor((int) toX, (int) toY, actors)) {
+        if (to == null || isActor((int) toX, (int) toY, actors, grandma)) {
             return;
         }
 
@@ -154,15 +156,24 @@ public class ForestGraph implements IndexedGraph<Vector2> {
     }
 
     // Нодой может быть только клетка, на которой нет актера
-    private boolean isActor(int x, int y, Array<? extends Actor> actor) {
+    private boolean isActor(int x, int y, Array<? extends Actor> actor, Grandma grandma) {
         for (int i = 0; i < actor.size; i++) {
             Actor segment = actor.get(i);
             if (segment != null && Utils.mapCoordinate(segment.getX()) == x && Utils.mapCoordinate(segment.getY()) == y) {
                 return true;
             }
         }
-        return false;
+
+        int xGrandma = grandma == null ? 0 : (int) Utils.mapCoordinate(grandma.getX());
+        int yGrandma = grandma == null ? 0 : (int) Utils.mapCoordinate(grandma.getY());
+
+        return grandma != null && isGrandma(xGrandma, yGrandma, x, y);
     }
+
+    private boolean isGrandma(int xGrandma, int yGrandma, int x, int y) {
+        return xGrandma == x && yGrandma == y;
+    }
+
 
     // Проверяем cуществует ли нода с такими координатами
     public boolean isNodeExists(float x, float y) {
@@ -184,27 +195,27 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
     private Array<Vector2> playerNeighbours = new Array<>();
 
-    public Vector2 findNearest(int px, int py, int fx, int fy) {
+    public Vector2 findNearest(int xTo, int yTo, int xFrom, int yFrom) {
 
         playerNeighbours.clear();
 
-        playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py + GameScreen.tileSize));
-        playerNeighbours.add(new Vector2(px, py + GameScreen.tileSize));
-        playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py + GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(xTo + GameScreen.tileSize, yTo + GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(xTo, yTo + GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(xTo - GameScreen.tileSize, yTo + GameScreen.tileSize));
 
-        playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py));
-        playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py));
+        playerNeighbours.add(new Vector2(xTo + GameScreen.tileSize, yTo));
+        playerNeighbours.add(new Vector2(xTo - GameScreen.tileSize, yTo));
 
-        playerNeighbours.add(new Vector2(px + GameScreen.tileSize, py - GameScreen.tileSize));
-        playerNeighbours.add(new Vector2(px, py - GameScreen.tileSize));
-        playerNeighbours.add(new Vector2(px - GameScreen.tileSize, py - GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(xTo + GameScreen.tileSize, yTo - GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(xTo, yTo - GameScreen.tileSize));
+        playerNeighbours.add(new Vector2(xTo - GameScreen.tileSize, yTo - GameScreen.tileSize));
 
-        Vector2 target = new Vector2(px, py);
+        Vector2 target = new Vector2(xTo, yTo);
         float minL = Float.POSITIVE_INFINITY;
         float l;
 
         for (Vector2 v : nodes) {
-            l = v.dst2(fx, fy);
+            l = v.dst2(xFrom, yFrom);
             if (playerNeighbours.contains(v, false) && l < minL) {
                 minL = l;
                 target = v;
