@@ -41,7 +41,7 @@ class ForesterStateMachine {
                 } else if (isPlayerStrong) {
                     MovingState.SCARED
                 } else if (isPlayerInvisible || !isPlayerPursued) {
-                    MovingState.STOP
+                    MovingState.PATROL
                 } else {
                     MovingState.PURSUE
                 }

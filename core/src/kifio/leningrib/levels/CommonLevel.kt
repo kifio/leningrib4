@@ -98,7 +98,7 @@ class CommonLevel() : Level() {
     override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
         val grandma = this.grandma
         if (grandma == null) {
-            super.movePlayerTo(x, y, player)
+            super.movePlayerTo(x, y, player, null)
             return
         }
 

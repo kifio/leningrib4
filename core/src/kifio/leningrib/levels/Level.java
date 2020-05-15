@@ -102,7 +102,7 @@ public abstract class Level {
         Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
         Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles);
         roomsRectangles.addAll(rectangles);
-        forestersManager.addForesters(foresters, player != null && player.getMushroomsCount() > 5);
+        forestersManager.addForesters(foresters, player != null);
         treesManager.updateTrees(levelMap, levelConfig, nextLevel);
         mushroomsManager.addMushrooms(initMushrooms(levelConfig,
                 treesManager,
@@ -166,10 +166,6 @@ public abstract class Level {
 
     public Array<Mushroom> getMushrooms() {
         return mushroomsManager.gameObjects;
-    }
-
-    public void movePlayerTo(float x, float y, Player player) {
-        this.movePlayerTo(x, y, player, null);
     }
 
     public void movePlayerTo(float x, float y, Player player, @Nullable Runnable onFinish) {

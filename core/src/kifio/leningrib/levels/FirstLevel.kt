@@ -293,18 +293,18 @@ class FirstLevel() : Level() {
         return sequence
     }
 
-    override fun movePlayerTo(x: Float, y: Float, player: Player) {
+    override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
         if (mushrooms[0] != null) {
             if (isMushroomTouched(mushrooms[0], x, y)) {
-                super.movePlayerTo(x, y, player)
+                super.movePlayerTo(x, y, player, callback)
             }
         } else if (mushrooms[1] != null) {
             if (isMushroomTouched(mushrooms[1], x, y)) {
-                super.movePlayerTo(x, y, player)
+                super.movePlayerTo(x, y, player, callback)
             }
         } else {
             if (isLastRoomAvailable || (roomsRectangles[2].y + roomsRectangles[2].height) > y / GameScreen.tileSize) {
-                super.movePlayerTo(x, y, player)
+                super.movePlayerTo(x, y, player, callback)
             }
         }
     }

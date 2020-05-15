@@ -146,8 +146,11 @@ class GameScreen(game: LGCGame,
 
     private fun getNextLevel(x: Int, y: Int): Level {
         LGCGame.setFirstLevelPassed(true)
+        val xPlayer = Utils.mapCoordinate(player.x)
+        val yPlayer = Utils.mapCoordinate(player.y)
+        val xGrandma = xPlayer + (tileSize * 3)
         return CommonLevel(player,
-                null,
+                Grandma(xGrandma, yPlayer),
                 worldMap.addLevel(x, y, (player.x / tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
 
@@ -287,7 +290,7 @@ class GameScreen(game: LGCGame,
                 lutController
         )
 
-        settingsButton.zIndex = Int.MAX_VALUE
+        settingsButton.zIndex = 1_000_0000
 
         val restartGameButton = StartGameButton(
                 3,
@@ -424,7 +427,7 @@ class GameScreen(game: LGCGame,
                 camera,
                 lutController
         ).apply {
-            zIndex = Int.MAX_VALUE
+            zIndex = 1_000_0000
             onTouchHandler = {
                 remove()
                 pauseGame(true)
@@ -440,7 +443,7 @@ class GameScreen(game: LGCGame,
                     SquareButton.LEFT)
 
             vodkaButton?.isVisible = false
-            vodkaButton?.zIndex = Int.MAX_VALUE - 1
+            vodkaButton?.zIndex = 1_000_0000
             vodkaButton?.onTouchHandler = {
 
                 if (vodkaButton?.isVisible == true) {
