@@ -122,6 +122,10 @@ public class LabelManager {
 		return ResourcesManager.forestersSpeechesRunToBottle.get(String.valueOf(random(1, 6)));
 	}
 
+	public String getWonderingSpeech() {
+		return ResourcesManager.playerWonderingSpeeches.get(String.valueOf(random(1, 6)));
+	}
+
 	public String getGrandmaSpeech(int i) {
 		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
 	}

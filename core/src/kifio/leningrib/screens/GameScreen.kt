@@ -160,7 +160,7 @@ class GameScreen(game: LGCGame,
         }
 
         if (isFirstLevelPassed() && player.mushroomsCount > 0) {
-            lutController.updateLut(delta, player.mushroomsCount);
+            player.updateLabel(lutController.updateLut(delta, player.mushroomsCount))
         }
 
         level.mushroomsSpeeches?.let { addSpeechesToStage(it) }
@@ -232,6 +232,8 @@ class GameScreen(game: LGCGame,
         (level as? CommonLevel)?.let {
             stage.addActor(it.grandma)
             stage.addActor(it.grandma?.label)
+
+            stage.addActor(player.label)
         }
     }
 

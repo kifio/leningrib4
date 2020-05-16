@@ -37,18 +37,17 @@ class LUTController {
         shader = ShaderProgram(vertexShader, fragmentShader)
     }
 
-    fun updateLut(delta: Float, mushroomsCount: Int) {
+    fun updateLut(delta: Float, mushroomsCount: Int): Int {
 
         if (!active) {
             active = true
-            val index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
-            lutTexture = ResourcesManager.getTexture(ResourcesManager.getLutName(index))
+            return setNextLut(mushroomsCount)
         } else {
 
+            val index = -1
             if (mushroomsCount - this.mushroomsCount == 3) {
                 this.mushroomsCount = mushroomsCount
-                val index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
-                lutTexture = ResourcesManager.getTexture(ResourcesManager.getLutName(index))
+                setNextLut(mushroomsCount)
                 accumulatedTime = (effectTime / 2f) - delta
                 intensity = 0.5f
             }
@@ -56,11 +55,27 @@ class LUTController {
             accumulatedTime += delta
 
             if (lutTexture == null || intensity >= 1f) {
-                return
+                return index
             }
 
             intensity = accumulatedTime / effectTime
+            return index
         }
+    }
+
+    private fun setNextLut(mushroomsCount: Int): Int {
+        var index = 0
+
+        if (mushroomsCount < 5) {
+            do {
+                index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
+            } while (index == 10 || index == 19 || index == 20)
+        } else {
+            index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
+        }
+
+        lutTexture = ResourcesManager.getTexture(ResourcesManager.getLutName(index))
+        return index
     }
 
     fun onDraw() {

@@ -59,6 +59,7 @@ public class ResourcesManager {
     public static I18NBundle forestersSpeechesDrinking;
     public static I18NBundle forestersSpeechesDrunk;
     public static I18NBundle forestersSpeechesRunToBottle;
+    public static I18NBundle playerWonderingSpeeches;
     public static I18NBundle grandmaSpeechesBundle;
 
     private static final int TILE_SIZE = 16; // Размер тайла который мы вырезаем из png в пикселя
@@ -164,6 +165,7 @@ public class ResourcesManager {
         am.load("i18n/foresters_speeches_drunk", I18NBundle.class);
         am.load("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
         am.load("i18n/grandma_speeches", I18NBundle.class);
+        am.load("i18n/player_wondering_speeches", I18NBundle.class);
     }
 
     public static String getLutName(int i) {
@@ -221,6 +223,7 @@ public class ResourcesManager {
         forestersSpeechesDrinking = am.get("i18n/foresters_speeches_drinking", I18NBundle.class);
         forestersSpeechesDrunk = am.get("i18n/foresters_speeches_drunk", I18NBundle.class);
         forestersSpeechesRunToBottle = am.get("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
+        playerWonderingSpeeches = am.get("i18n/player_wondering_speeches", I18NBundle.class);
     }
 
     private static void putTrees(Texture treesMap) {

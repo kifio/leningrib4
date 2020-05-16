@@ -12,14 +12,6 @@ public class Grandma extends TutorialCharacter {
 
     private static final String IDLE = "grandma_idle";
 
-    private String[] speeches = new String[]{
-            "Подходим, покупаем",
-            "Берем грибочки, недорого",
-            "Все по низкой цене",
-            "Налетай торопись",
-            "Напитки, грибы, всякое-разное"
-    };
-
     public Grandma(float x, float y) {
         super(x, y);
         this.isPaused = false;
@@ -29,7 +21,7 @@ public class Grandma extends TutorialCharacter {
 
     @Override
     void setSpeech() {
-        label.setText(speeches[speechIndex]);
+        label.setText(LabelManager.getInstance().getGrandmaSpeech(speechIndex + 1));
     }
 
     @Override

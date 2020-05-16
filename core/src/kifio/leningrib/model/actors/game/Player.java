@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +18,7 @@ import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.actors.MovableActor;
 import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.pathfinding.ForestGraph;
+import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
 public class Player extends MovableActor {
@@ -32,15 +34,19 @@ public class Player extends MovableActor {
     private int mushroomsCount = 0;
     private float effectTime = 0L;
     private Mushroom mushroom;
-//    private int passedLevelsCount;
+    private float speechTime = 0f;
 
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
     public int bottlesCount = 0;
 
+    public Label label;
+
     public Player(float x, float y) {
         super(x, y);
         clothesHSV = tmpColor.toHsv(clothesHSV);
+        label = LabelManager.getInstance().getLabel(null, x,
+                y + 1.3f * GameScreen.tileSize);
     }
 
     private float stateTime = 0f;
@@ -49,6 +55,16 @@ public class Player extends MovableActor {
     public void act(float delta) {
         if (isPaused) return;
         super.act(delta);
+        if (!label.textEquals("")) {
+            label.setX(getX() - (GameScreen.tileSize));
+            label.setY(getY() + 1.3f * GameScreen.tileSize);
+            if (speechTime > 2f) {
+                label.setText(null);
+                speechTime = 0f;
+            } else {
+                speechTime += delta;
+            }
+        }
         updateEffectState(delta);
     }
 
@@ -83,6 +99,9 @@ public class Player extends MovableActor {
 
     public void increaseMushroomCount() {
         this.mushroomsCount++;
+        if (mushroomsCount == 1) {
+            label.setText(LabelManager.getInstance().getWonderingSpeech());
+        }
     }
 
     public void onEffectiveMushroomTake(Mushroom mushroom) {
@@ -243,12 +262,23 @@ public class Player extends MovableActor {
         setY(GameScreen.tileSize + 1);
     }
 
+    public void updateLabel(int lutIndex) {
+        if (!label.textEquals("")) return;
+
+        if (lutIndex == 10) {
+            label.setText("ЭТО ЧЕ ХОТЬ ТАКОЕ-ТО");
+        }
+
+        if (lutIndex == 19 || lutIndex == 20) {
+            label.setText("Смеркалось..");
+        }
+    }
+
     public boolean isInvisible() {
         return mushroom != null && mushroom.isInvisibilityMushroom();
     }
 
     public boolean isStrong() {
-//        return true;
         return mushroom != null && mushroom.isStrengthMushroom();
     }
 
