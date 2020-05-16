@@ -24,10 +24,16 @@ import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.game.MovableActor
 import kifio.leningrib.model.actors.ui.Overlay
 import kifio.leningrib.model.actors.ui.StaticActor
-import kifio.leningrib.model.actors.ui.Store
+import kifio.leningrib.model.actors.ui.StoreActor
 import kifio.leningrib.model.actors.game.*
 import kifio.leningrib.model.actors.fixed.Grandma
 import kifio.leningrib.model.actors.fixed.Bottle
+import kifio.leningrib.model.actors.ui.Dialog
+import kifio.leningrib.model.actors.ui.GameOverLogo
+import kifio.leningrib.model.actors.ui.MushroomsCountView
+import kifio.leningrib.model.actors.ui.SettingButton
+import kifio.leningrib.model.actors.ui.SquareButton
+import kifio.leningrib.model.actors.ui.StartGameButton
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
 import model.WorldMap
@@ -530,9 +536,10 @@ class GameScreen(game: LGCGame,
 
     internal fun handleTouchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
         if (!isStageInitialized()) return false
-        val actorIsTouched = stage.actors
+        val actorIsTouched = settings != null || stage.actors
                 .filterIsInstance<StaticActor>()
                 .find { it.touched } != null
+
 
         val haveDialogs = stage.actors
                 .filterIsInstance<Dialog>()
@@ -566,7 +573,12 @@ class GameScreen(game: LGCGame,
                     if (settings == null) {
                         settings = Group().apply {
                             x = Gdx.graphics.width.toFloat()
-                            addActor(Store(camera, lutController))
+                            val storeActor = StoreActor(camera, lutController, game.store)
+                            storeActor.onTouchHandler = {
+                                player.bottlesCount++
+                                removeSettings()
+                            }
+                            addActor(storeActor)
                             addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
                         }
                         stage.addActor(settings)

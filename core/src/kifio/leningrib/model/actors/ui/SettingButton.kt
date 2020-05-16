@@ -1,4 +1,4 @@
-package kifio.leningrib.model.actors.game
+package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LGCGame
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager.*
-import kifio.leningrib.model.actors.ui.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 
 class SettingButton(

@@ -11,7 +11,7 @@ class LInputListener(private var gameScreen: GameScreen?) : GestureDetector.Gest
         if (abs(velocityX) > abs(velocityY) && velocityX > 0) {
             gameScreen?.handleFling()
         }
-        return false
+        return true
     }
 
     override fun zoom(initialDistance: Float, distance: Float): Boolean {

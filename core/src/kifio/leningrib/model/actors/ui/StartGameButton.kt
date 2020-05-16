@@ -1,4 +1,5 @@
-package kifio.leningrib.model.actors.game
+
+package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera

@@ -1,8 +1,8 @@
-package kifio.leningrib.model.items
+package kifio.leningrib.platform.items
 
 import com.badlogic.gdx.graphics.Texture
 
-data class StoreItem(val texture: Texture,
+data class StoreItem(val id: Int,
                      val price: String,
                      val description: String
 )

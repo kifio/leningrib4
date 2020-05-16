@@ -2,6 +2,7 @@ package kifio.leningrib.levels
 
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
@@ -105,8 +106,8 @@ class CommonLevel() : Level() {
         val px = player.onLevelMapX
         val py = player.onLevelMapY
 
-        val tx = Utils.mapCoordinate(x).toInt()
-        val ty = Utils.mapCoordinate(y).toInt()
+        var tx = Utils.mapCoordinate(x).toInt()
+        var ty = Utils.mapCoordinate(y).toInt()
 
         val gx = Utils.mapCoordinate(grandma.x).toInt()
         val gy = Utils.mapCoordinate(grandma.y).toInt()
@@ -114,7 +115,13 @@ class CommonLevel() : Level() {
         forestGraph?.let {
             if (gx == tx && gy == ty) {
                 val nearest = it.findNearest(tx, ty, px, py)
-                super.movePlayerTo(nearest.x, nearest.y, player, callback)
+                tx = nearest.x.toInt()
+                ty = nearest.y.toInt()
+                if (tx == px && ty == py) {
+                    player.addAction(Actions.run(callback))
+                } else {
+                    super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, callback)
+                }
             } else {
                 super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, null)
             }

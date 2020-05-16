@@ -15,6 +15,7 @@ import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.actors.fixed.Grandma
+import kifio.leningrib.platform.StoreInterface
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
@@ -24,7 +25,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
 
-class LGCGame(isDebug: Boolean) : Game() {
+class LGCGame(val store: StoreInterface) : Game() {
 
     companion object {
 
@@ -33,8 +34,6 @@ class LGCGame(isDebug: Boolean) : Game() {
         const val ANIMATION_DURATION_LONG = 0.6f
         const val PREFERENCES_NAME = "kifio.leningrib"
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
-
-        var isDebug = false
 
         private var firstLevelPassed = false
 
@@ -78,10 +77,6 @@ class LGCGame(isDebug: Boolean) : Game() {
     }
 
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
-
-    init {
-        LGCGame.isDebug = isDebug
-    }
 
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)

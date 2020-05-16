@@ -1,4 +1,4 @@
-package kifio.leningrib.model.actors.game
+package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Align
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.PLAYER_DIALOG_FACE
-import kifio.leningrib.model.actors.ui.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 
 
