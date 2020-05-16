@@ -15,12 +15,16 @@ class SquareButton(
         private val unpressedState: TextureRegion,
         camera: OrthographicCamera,
         lutController: LUTController,
-        private val orientation: Int = 1
+        private var order: Int = BUTTON,
+        private val orientation: Int = RIGHT
 ) : StaticActor(unpressedState, camera, lutController) {
 
     companion object {
         const val LEFT = 0
         const val RIGHT = 1
+
+        const val BUTTON = 1
+        const val VODKA = 2
     }
 
     var onTouchHandler: (() -> Unit)? = null
@@ -54,7 +58,8 @@ class SquareButton(
         } else {
             Gdx.graphics.width - (width + 16 * Gdx.graphics.density)
         }
-        val y = camera.position.y + (Gdx.graphics.height / 2f) - (height + 16 * Gdx.graphics.density)
+        val offset = order * height + (order * (16 * Gdx.graphics.density))
+        val y = camera.position.y + (Gdx.graphics.height / 2f) - offset
         setBounds(x, y, width, height)
         super.draw(batch, parentAlpha)
     }

@@ -439,8 +439,8 @@ class GameScreen(game: LGCGame,
                     getRegion(HUD_BOTTLE_PRESSED),
                     getRegion(HUD_BOTTLE),
                     camera, lutController,
-
-                    SquareButton.LEFT)
+                    SquareButton.VODKA,
+                    SquareButton.RIGHT)
 
             vodkaButton?.isVisible = false
             vodkaButton?.zIndex = 1_000_0000
