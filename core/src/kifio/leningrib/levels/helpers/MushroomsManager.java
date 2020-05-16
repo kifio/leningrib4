@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.game.Mushroom;
 import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.speech.LabelManager;
@@ -58,6 +59,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
                         && m.getY() <= cameraPositionY + halfScreenHeight) {
 
                     if (m.bounds.overlaps(p.bounds)) {
+                        ResourcesManager.getMushroomTakeSoundEffect().play(0.5f);
                         m.setEaten();
                         m.clear();
                         m.remove();

@@ -69,8 +69,9 @@ class LUTController {
         if (mushroomsCount < 5) {
             do {
                 index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
-            } while (index == 10 || index == 19 || index == 20)
+            } while (index == 10 || index == 19 || index == 20 || index == 6 || index == 18)
         } else {
+            Gdx.app.log("kifio_lut", "lut: $index")
             index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
         }
 

@@ -112,12 +112,10 @@ class GameScreen(game: LGCGame,
 
         transitionActor?.setOrigin(camera.position.x, camera.position.y)
 
-//        if (active) {
         update(delta)
         updateCamera()
         stage.act(delta)
         stage.draw()
-//        }
 
         val isTutorialPassed = (level as? FirstLevel)?.passed == true
 

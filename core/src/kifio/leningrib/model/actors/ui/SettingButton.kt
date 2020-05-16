@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LGCGame
 import kifio.leningrib.LUTController
+import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.speech.LabelManager
 
@@ -76,6 +77,7 @@ class SettingButton(
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 touched = true
                 if (isSwitchTouched(x, y)) {
+                    getClickSound()?.play()
                     if (switchIcon == enabledIcon) {
                         switchIcon = enabledIconPressed
                     } else if (switchIcon == disabledIcon) {

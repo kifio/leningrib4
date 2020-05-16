@@ -1,14 +1,21 @@
 package kifio.leningrib.model;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.I18NBundle;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 import generator.SegmentType;
+import kifio.leningrib.model.actors.game.Mushroom;
 
 public class ResourcesManager {
 
@@ -44,7 +51,11 @@ public class ResourcesManager {
     public static final String RESULT_MUSHROOM = "result_mushroom.png";
     public static final String PLAYER_DIALOG_FACE = "player_dialog_face.png";
     public static final String GRANDMA_DIALOG_FACE = "grandma_dialog_face.png";
-    public static final String TARGET = "target.png";
+    public static final String TRACK_1 = "sounds/track_1.ogg";
+    public static final String TRACK_2 = "sounds/track_2.ogg";
+    public static final String CLICK = "sounds/click.ogg";
+    public static final String GAMEOVER = "sounds/gameover.wav";
+
 
     public static I18NBundle commonMushroomsSpeechBundle;
     public static I18NBundle powerMushroomsSpeechBundle;
@@ -65,7 +76,9 @@ public class ResourcesManager {
     private static final int TILE_SIZE = 16; // Размер тайла который мы вырезаем из png в пикселя
     private static AssetManager am = new AssetManager();
     private static HashMap<String, TextureRegion> regions = new HashMap<>();
-    private static HashMap<String, Texture> colorTables = new HashMap<>();
+    private static float[] audioLength = new float[] {
+            71f, 107f
+    };
     private static boolean loadingStarted = false;
 
     public static void loadSplash() {
@@ -143,6 +156,14 @@ public class ResourcesManager {
         am.load(RESTART_BUTTON_PRESSED, Texture.class, param);
         am.load(GAME_OVER, Texture.class, param);
         am.load(RESULT_MUSHROOM, Texture.class, param);
+        am.load(TRACK_1, Music.class);
+        am.load(TRACK_2, Music.class);
+        am.load("sounds/pop_1.wav", Sound.class);
+        am.load("sounds/pop_2.wav", Sound.class);
+        am.load("sounds/pop_3.wav", Sound.class);
+        am.load("sounds/pop_4.wav", Sound.class);
+        am.load(CLICK, Sound.class);
+        am.load(GAMEOVER, Sound.class);
 
         param.minFilter = Texture.TextureFilter.Nearest;
         param.magFilter = Texture.TextureFilter.Nearest;
@@ -275,5 +296,25 @@ public class ResourcesManager {
         regions.put(SegmentType.ROOM_WALL_COMMON_BOTTOM.name(), new TextureRegion(treesMap, 80, 48, TILE_SIZE, TILE_SIZE));
         regions.put(SegmentType.ROOM_WALL_END_TOP.name(), new TextureRegion(treesMap, 80, 32, -TILE_SIZE, TILE_SIZE));
         regions.put(SegmentType.ROOM_WALL_END_BOTTOM.name(), new TextureRegion(treesMap, 80, 48, -TILE_SIZE, TILE_SIZE));
+    }
+
+    public static@Nullable Music getNextMusic() {
+        int next = ThreadLocalRandom.current().nextBoolean() ? 1 : 2;
+        return am.get("sounds/track_" + next + ".ogg", Music.class);
+    }
+
+    public static @Nullable Sound getMushroomTakeSoundEffect() {
+        int next = ThreadLocalRandom.current().nextInt(1, 4);
+        String effect = "sounds/pop_" + next + ".wav";
+        Gdx.app.log("kifio_sound", effect);
+        return am.get(effect, Sound.class);
+    }
+
+    public static @Nullable Sound getClickSound() {
+        return am.get(CLICK, Sound.class);
+    }
+
+    public static @Nullable Sound getGameOverSound() {
+        return am.get(GAMEOVER, Sound.class);
     }
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LUTController
+import kifio.leningrib.model.ResourcesManager.getClickSound
 import kifio.leningrib.screens.GameScreen
 
 class SquareButton(
@@ -38,6 +39,7 @@ class SquareButton(
 
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                getClickSound()?.play()
                 region = pressedState
                 touched = true
                 return true

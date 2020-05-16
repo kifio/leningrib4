@@ -1,5 +1,6 @@
 package kifio.leningrib.levels.helpers;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
+import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.fixed.Bottle;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Player;
@@ -18,6 +20,7 @@ import kifio.leningrib.screens.GameScreen;
 public class ForestersManager extends ObjectsManager<Forester> {
 
     private Rectangle result = new Rectangle();
+    private Sound gameOverSound = null;
     private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
     private float foresterVelocityMultiplier = 2;
 
@@ -74,6 +77,12 @@ public class ForestersManager extends ObjectsManager<Forester> {
                     forester.disable(speeches[i]);
                     // TODO: Добавить анимацию драки
                 } else {
+                    if (gameOverSound == null) {
+                        gameOverSound = ResourcesManager.getGameOverSound();
+                        if (gameOverSound != null) {
+                            gameOverSound.play();
+                        }
+                    }
                     gameScreen.showGameOver();
                     gameScreen.player.stop();
                     forester.stop();

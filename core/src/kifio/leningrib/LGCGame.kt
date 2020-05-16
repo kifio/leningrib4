@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -13,8 +14,8 @@ import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.actors.fixed.Grandma
+import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.platform.StoreInterface
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
@@ -77,6 +78,10 @@ class LGCGame(val store: StoreInterface) : Game() {
     }
 
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private var sound: Music? = null
+    private  val onCompleteListener: Music.OnCompletionListener = Music.OnCompletionListener { setMusic() }
+//    private var duration: Float? = null
+//    private var accumulatedTime: Float = 0f
 
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
@@ -90,15 +95,37 @@ class LGCGame(val store: StoreInterface) : Game() {
         getScreen()?.dispose()
     }
 
+//    fun updateAudio(delta: Float) {
+//        val d = duration ?: return
+//        if (accumulatedTime > d - 2f) {
+//            sound?.stop()
+//            setMusic()
+//            accumulatedTime = 0f
+//        }
+//        accumulatedTime += delta
+//    }
+
     private fun showLaunchScreen() {
         ResourcesManager.loadSplash()
         setScreen(LaunchScreen(this))
     }
 
     fun showGameScreen(gameScreen: GameScreen?) {
+        if (sound == null) {
+            setMusic()
+        }
+
         if (gameScreen == null) return
         gameScreen.activate()
         showScreen(gameScreen)
+    }
+
+    private fun setMusic() {
+        sound?.setOnCompletionListener(null)
+        sound?.dispose()
+        sound = ResourcesManager.getNextMusic()
+        sound?.setOnCompletionListener(onCompleteListener)
+        sound?.play()
     }
 
     private fun showScreen(screen: Screen) {

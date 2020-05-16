@@ -18,7 +18,7 @@ import kifio.leningrib.screens.GameScreen
 
 class StoreActor(camera: OrthographicCamera,
                  lutController: LUTController,
-                 private val store: StoreInterface
+                 store: StoreInterface
 ) : Overlay(camera, 40 * Gdx.graphics.density, lutController, ResourcesManager.getRegion(SETTINGS_BACKGROUND)) {
 
     companion object {
