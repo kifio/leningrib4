@@ -41,14 +41,14 @@ class LUTController {
 
         if (!active) {
             active = true
-            val index = ThreadLocalRandom.current().nextInt(0, 5)
-            lutTexture = ResourcesManager.getTexture("lut_$index")
+            val index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
+            lutTexture = ResourcesManager.getTexture(ResourcesManager.getLutName(index))
         } else {
 
             if (mushroomsCount - this.mushroomsCount == 3) {
                 this.mushroomsCount = mushroomsCount
-                val index = ThreadLocalRandom.current().nextInt(0, 5)
-                lutTexture = ResourcesManager.getTexture("lut_$index")
+                val index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
+                lutTexture = ResourcesManager.getTexture(ResourcesManager.getLutName(index))
                 accumulatedTime = (effectTime / 2f) - delta
                 intensity = 0.5f
             }

@@ -12,6 +12,8 @@ import generator.SegmentType;
 
 public class ResourcesManager {
 
+    public static final int LUTS_COUNT = 34;
+
     public static final String GRASS_2 = "grass_2.png";
     public static final String GRASS_0 = "grass_0.png";
     public static final String OVERLAY = "overlay.png";
@@ -43,12 +45,6 @@ public class ResourcesManager {
     public static final String PLAYER_DIALOG_FACE = "player_dialog_face.png";
     public static final String GRANDMA_DIALOG_FACE = "grandma_dialog_face.png";
     public static final String TARGET = "target.png";
-
-    public static final String LUT_0 = "lut_0.png";
-    public static final String LUT_1 = "lut_1.png";
-    public static final String LUT_2 = "lut_2.png";
-    public static final String LUT_3 = "lut_3.png";
-    public static final String LUT_4 = "lut_4.png";
 
     public static I18NBundle commonMushroomsSpeechBundle;
     public static I18NBundle powerMushroomsSpeechBundle;
@@ -152,11 +148,7 @@ public class ResourcesManager {
         am.load(PLAYER_DIALOG_FACE, Texture.class, param);
         am.load(GRANDMA_DIALOG_FACE, Texture.class, param);
 //        am.load(TARGET, Texture.class, param);
-        am.load(LUT_0, Texture.class, param);
-        am.load(LUT_1, Texture.class, param);
-        am.load(LUT_2, Texture.class, param);
-        am.load(LUT_3, Texture.class, param);
-        am.load(LUT_4, Texture.class, param);
+        loadLut(param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -172,8 +164,16 @@ public class ResourcesManager {
         am.load("i18n/foresters_speeches_drunk", I18NBundle.class);
         am.load("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
         am.load("i18n/grandma_speeches", I18NBundle.class);
+    }
 
-//        am.finishLoading();
+    public static String getLutName(int i) {
+        return "lut/lut_" + i + ".png";
+    }
+
+    private static void loadLut(TextureLoader.TextureParameter param) {
+        for (int i = 0; i < LUTS_COUNT; i++) {
+            am.load(getLutName(i), Texture.class, param);
+        }
     }
 
     public static void buildRegions() {
