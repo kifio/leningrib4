@@ -10,10 +10,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
-import javax.rmi.CORBA.Util;
-
 import kifio.leningrib.Utils;
-import kifio.leningrib.model.actors.tutorial.Grandma;
+import kifio.leningrib.model.actors.fixed.Grandma;
 import kifio.leningrib.screens.GameScreen;
 
 public class ForestGraph implements IndexedGraph<Vector2> {

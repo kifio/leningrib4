@@ -1,10 +1,5 @@
-package kifio.leningrib.model.actors.tutorial;
+package kifio.leningrib.model.actors.fixed;
 
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-
-import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 

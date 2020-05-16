@@ -1,11 +1,11 @@
-package kifio.leningrib.model.actors.tutorial;
+package kifio.leningrib.model.actors.fixed;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import kifio.leningrib.model.actors.MovableActor;
+import kifio.leningrib.model.actors.game.MovableActor;
 import kifio.leningrib.screens.GameScreen;
 
 abstract class TutorialCharacter extends MovableActor {

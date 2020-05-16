@@ -2,6 +2,7 @@ package kifio.leningrib.model.actors;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import kifio.leningrib.model.actors.game.MovableActor;
 import kifio.leningrib.screens.GameScreen;
 
 public class Space extends MovableActor {

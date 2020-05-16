@@ -4,9 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.WideAssetActor
+import kifio.leningrib.model.actors.ui.WideAssetActor
 
 class LaunchProgressBar(camera: OrthographicCamera): WideAssetActor(
         ResourcesManager.getRegion(ResourcesManager.LAUNCH_PROGRESS_BACKGROUND), camera, null

@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Align
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.PLAYER_DIALOG_FACE
-import kifio.leningrib.model.actors.StaticActor
+import kifio.leningrib.model.actors.ui.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 
 

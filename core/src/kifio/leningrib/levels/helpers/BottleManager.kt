@@ -1,6 +1,6 @@
 package kifio.leningrib.levels.helpers
 
-import kifio.leningrib.model.items.Bottle
+import kifio.leningrib.model.actors.fixed.Bottle
 
 class BottleManager {
 

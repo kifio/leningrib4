@@ -1,9 +1,10 @@
-package kifio.leningrib.model.actors
+package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import kifio.leningrib.LUTController
+import kifio.leningrib.model.actors.ui.StaticActor
 
 abstract class WideAssetActor(region: TextureRegion,
                               camera: OrthographicCamera,

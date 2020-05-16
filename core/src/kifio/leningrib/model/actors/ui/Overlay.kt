@@ -1,4 +1,4 @@
-package kifio.leningrib.model.actors
+package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera

@@ -1,4 +1,4 @@
-package kifio.leningrib.model.actors;
+package kifio.leningrib.model.actors.game;
 
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;

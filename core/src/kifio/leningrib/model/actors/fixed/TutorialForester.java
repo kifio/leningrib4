@@ -1,14 +1,11 @@
-package kifio.leningrib.model.actors.tutorial;
+package kifio.leningrib.model.actors.fixed;
 
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.UIState;
 import kifio.leningrib.model.actors.game.Forester;
-import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;

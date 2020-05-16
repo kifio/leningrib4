@@ -1,16 +1,13 @@
-package kifio.leningrib.model.actors
+package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.utils.Align
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.ResourcesManager.OVERLAY
 import kifio.leningrib.model.ResourcesManager.SETTINGS_BACKGROUND
+import kifio.leningrib.model.items.StoreItem
 import kifio.leningrib.model.speech.LabelManager
 
 class Store(camera: OrthographicCamera,
@@ -22,6 +19,8 @@ class Store(camera: OrthographicCamera,
 
     private val font = LabelManager.getInstance().mediumFont
     private val labelWidth = LabelManager.getInstance().getTextWidth(DESCRIPTION, font)
+
+    private val items = mutableListOf<StoreItem>()
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         y = camera.position.y - Gdx.graphics.height / 2f

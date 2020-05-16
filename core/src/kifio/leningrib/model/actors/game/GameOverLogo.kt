@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.WideAssetActor
+import kifio.leningrib.model.actors.ui.WideAssetActor
 
 class GameOverLogo(camera: OrthographicCamera, lutController: LUTController
 ) : WideAssetActor(ResourcesManager.getRegion(ResourcesManager.GAME_OVER), camera, lutController) {

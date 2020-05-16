@@ -6,10 +6,10 @@ import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.helpers.TreesManager
-import kifio.leningrib.model.actors.Mushroom
+import kifio.leningrib.model.actors.game.Mushroom
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Player
-import kifio.leningrib.model.actors.tutorial.Grandma
+import kifio.leningrib.model.actors.fixed.Grandma
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
 import java.util.concurrent.ThreadLocalRandom

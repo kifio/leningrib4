@@ -21,18 +21,16 @@ import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager.*
-import kifio.leningrib.model.actors.MovableActor
-import kifio.leningrib.model.actors.Overlay
-import kifio.leningrib.model.actors.StaticActor
-import kifio.leningrib.model.actors.Store
+import kifio.leningrib.model.actors.game.MovableActor
+import kifio.leningrib.model.actors.ui.Overlay
+import kifio.leningrib.model.actors.ui.StaticActor
+import kifio.leningrib.model.actors.ui.Store
 import kifio.leningrib.model.actors.game.*
-import kifio.leningrib.model.actors.tutorial.Grandma
-import kifio.leningrib.model.items.Bottle
+import kifio.leningrib.model.actors.fixed.Grandma
+import kifio.leningrib.model.actors.fixed.Bottle
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
 import model.WorldMap
-import java.util.*
-import javax.rmi.CORBA.Util
 
 class GameScreen(game: LGCGame,
                  private var level: Level,

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
-import kifio.leningrib.model.actors.MovableActor;
+import kifio.leningrib.model.actors.game.MovableActor;
 
 public class UIState {
 

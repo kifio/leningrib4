@@ -2,9 +2,8 @@ package kifio.leningrib.model.actors.launch
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
-import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.WideAssetActor
+import kifio.leningrib.model.actors.ui.WideAssetActor
 
 class LaunchScreenLogo(camera: OrthographicCamera) : WideAssetActor(ResourcesManager.getRegion(ResourcesManager.LENIN_GRIB), camera, null) {
 

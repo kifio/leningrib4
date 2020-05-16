@@ -3,9 +3,8 @@ package kifio.leningrib.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import kifio.leningrib.LGCGame
-import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.Mushroom
+import kifio.leningrib.model.actors.game.Mushroom
 import kifio.leningrib.model.actors.launch.LaunchProgressBar
 import kifio.leningrib.model.actors.launch.LaunchScreenLogo
 import kifio.leningrib.model.actors.launch.LaunchScreenTree

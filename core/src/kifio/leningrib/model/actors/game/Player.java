@@ -15,8 +15,6 @@ import kifio.leningrib.Utils;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.UIState;
-import kifio.leningrib.model.actors.MovableActor;
-import kifio.leningrib.model.actors.Mushroom;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;

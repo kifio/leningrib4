@@ -14,12 +14,12 @@ import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.helpers.TreesManager
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.Mushroom
+import kifio.leningrib.model.actors.game.Mushroom
 import kifio.leningrib.model.actors.ShaderStage
 import kifio.leningrib.model.actors.game.Dialog
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Player
-import kifio.leningrib.model.actors.tutorial.TutorialForester
+import kifio.leningrib.model.actors.fixed.TutorialForester
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
 

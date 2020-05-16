@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import kifio.leningrib.model.actors.Mushroom;
+import kifio.leningrib.model.actors.game.Mushroom;
 import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;

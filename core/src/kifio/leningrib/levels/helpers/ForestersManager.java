@@ -8,9 +8,9 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
+import kifio.leningrib.model.actors.fixed.Bottle;
 import kifio.leningrib.model.actors.game.Forester;
 import kifio.leningrib.model.actors.game.Player;
-import kifio.leningrib.model.items.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;

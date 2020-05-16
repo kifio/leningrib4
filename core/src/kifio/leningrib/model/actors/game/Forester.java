@@ -16,8 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import kifio.leningrib.Utils;
 import kifio.leningrib.model.actors.ForesterStateMachine;
-import kifio.leningrib.model.actors.MovableActor;
-import kifio.leningrib.model.items.Bottle;
+import kifio.leningrib.model.actors.fixed.Bottle;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LUTController
-import kifio.leningrib.model.actors.StaticActor
+import kifio.leningrib.model.actors.ui.StaticActor
 import kifio.leningrib.screens.GameScreen
 
 class SquareButton(
