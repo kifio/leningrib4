@@ -1,6 +1,7 @@
 package kifio.leningrib.levels.helpers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -59,7 +60,8 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
                         && m.getY() <= cameraPositionY + halfScreenHeight) {
 
                     if (m.bounds.overlaps(p.bounds)) {
-                        ResourcesManager.getMushroomTakeSoundEffect().play(0.5f);
+                        Sound sound = ResourcesManager.getMushroomTakeSoundEffect();
+                        if (sound != null) sound.play(0.5f);
                         m.setEaten();
                         m.clear();
                         m.remove();

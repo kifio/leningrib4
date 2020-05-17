@@ -172,12 +172,11 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         return xGrandma == x && yGrandma == y;
     }
 
-
     // Проверяем cуществует ли нода с такими координатами
     public boolean isNodeExists(float x, float y) {
         for (int i = 0; i < nodes.size; i++) {
             Vector2 node = nodes.get(i);
-            if (node.x == x && node.y == y) {
+            if (node.epsilonEquals(x, y)) {
                 return true;
             }
         }

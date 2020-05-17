@@ -15,7 +15,7 @@ import model.WorldMap
 class LaunchScreen(game: LGCGame) : BaseScreen(game) {
 
     private var accumulatedTime = 0f
-    private var launchTime = 1f
+    private var launchTime = 2f
     private var halfLaunchTime = launchTime / 2
     private var finished: Boolean = false
 
@@ -106,7 +106,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                     finished = true
                 }
 
-                actor.setProgress((accumulatedTime / launchTime).coerceAtMost(launchTime))
+                actor.setProgress((accumulatedTime / launchTime).coerceAtMost(1f))
             } else if (actor is Mushroom) {
                 if (accumulatedTime > halfLaunchTime) {
                     val scaleBasedOnTime = ((accumulatedTime - halfLaunchTime) / launchTime).coerceAtMost(0.3F)

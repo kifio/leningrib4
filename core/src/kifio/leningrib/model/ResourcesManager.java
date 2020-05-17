@@ -170,7 +170,7 @@ public class ResourcesManager {
         am.load(PLAYER_DIALOG_FACE, Texture.class, param);
         am.load(GRANDMA_DIALOG_FACE, Texture.class, param);
 //        am.load(TARGET, Texture.class, param);
-        loadLut(param);
+//        loadLut(param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -193,10 +193,12 @@ public class ResourcesManager {
         return "lut/lut_" + i + ".png";
     }
 
-    private static void loadLut(TextureLoader.TextureParameter param) {
-        for (int i = 0; i < LUTS_COUNT; i++) {
-            am.load(getLutName(i), Texture.class, param);
+    public static Texture getLut(String lutName) {
+        if (!am.contains(lutName)) {
+            am.load(lutName, Texture.class);
+            am.finishLoadingAsset(lutName);
         }
+        return am.get(lutName, Texture.class);
     }
 
     public static void buildRegions() {

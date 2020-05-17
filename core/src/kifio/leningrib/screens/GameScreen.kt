@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
@@ -116,6 +117,7 @@ class GameScreen(game: LGCGame,
         updateCamera()
         stage.act(delta)
         stage.draw()
+//        drawRooms()
 
         val isTutorialPassed = (level as? FirstLevel)?.passed == true
 
@@ -269,6 +271,9 @@ class GameScreen(game: LGCGame,
                 stage.addActor(it.label)
             }
         }
+
+        stage.actors.filter { it is SquareButton }
+                .forEach { it.zIndex = stage.actors.count() - 1 }
     }
 
     override fun dispose() {
@@ -281,7 +286,15 @@ class GameScreen(game: LGCGame,
 
     fun showGameOver() {
         if (gameOver) return
-        gameOver = true;
+        gameOver = true
+
+        stage.actors
+                .filterIsInstance<SquareButton>()
+                .forEach {
+                    it.clear()
+                    it.remove()
+                    vodkaButton = null
+                }
 
         transitionActor = Group()
         val overlay = Overlay(camera, 0f, lutController)
@@ -307,18 +320,7 @@ class GameScreen(game: LGCGame,
         )
 
         settingsButton.onTouchHandler = {
-            if (settings == null) {
-                settings = Group().apply {
-                    x = Gdx.graphics.width.toFloat()
-                    addActor(Overlay(camera, 40 * Gdx.graphics.density, lutController, getRegion(SETTINGS_BACKGROUND)))
-                    addActor(SettingButton(camera, lutController, 0))
-                    addActor(SettingButton(camera, lutController, 1))
-                    addActor(SettingButton(camera, lutController, 2))
-                    addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
-                }
-
-                stage.addActor(settings)
-            }
+            openSettings()
         }
 
         restartGameButton.onTouchHandler = {
@@ -384,19 +386,7 @@ class GameScreen(game: LGCGame,
         )
 
         settingsButton.onTouchHandler = {
-            if (settings == null) {
-                settings = Group().apply {
-                    x = Gdx.graphics.width.toFloat()
-                    addActor(Overlay(camera, 40 * Gdx.graphics.density, lutController,
-                            getRegion(SETTINGS_BACKGROUND)))
-                    addActor(SettingButton(camera, lutController, 0))
-                    addActor(SettingButton(camera, lutController, 1))
-                    addActor(SettingButton(camera, lutController, 2))
-                    addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
-                }
-
-                stage.addActor(settings)
-            }
+            openSettings()
         }
 
         resumeGameButton.onTouchHandler = {
@@ -422,6 +412,22 @@ class GameScreen(game: LGCGame,
         }
     }
 
+    private fun openSettings() {
+        if (settings == null) {
+            settings = Group().apply {
+                x = Gdx.graphics.width.toFloat()
+                addActor(Overlay(camera, 40 * Gdx.graphics.density, lutController,
+                        getRegion(SETTINGS_BACKGROUND)))
+                addActor(SettingButton(camera, lutController, game, 0))
+                addActor(SettingButton(camera, lutController, game, 1))
+                addActor(SettingButton(camera, lutController, game, 2))
+                addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
+            }
+
+            stage.addActor(settings)
+        }
+    }
+
     private fun resumeGame() {
         paused = false
 
@@ -431,7 +437,6 @@ class GameScreen(game: LGCGame,
                 camera,
                 lutController
         ).apply {
-            zIndex = 1_000_0000
             onTouchHandler = {
                 remove()
                 pauseGame(true)
@@ -447,7 +452,6 @@ class GameScreen(game: LGCGame,
                     SquareButton.RIGHT)
 
             vodkaButton?.isVisible = false
-            vodkaButton?.zIndex = 1_000_0000
             vodkaButton?.onTouchHandler = {
 
                 if (vodkaButton?.isVisible == true) {
@@ -464,6 +468,9 @@ class GameScreen(game: LGCGame,
         }
         stage.addActor(pauseButton)
         stage.addActor(vodkaButton)
+
+        pauseButton.zIndex = stage.actors.count() - 1
+        vodkaButton?.zIndex = stage.actors.count() - 1
 
         if (shouldShowTutorial && !isFirstLevelPassed()) {
             shouldShowTutorial = false

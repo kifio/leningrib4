@@ -20,6 +20,7 @@ import kifio.leningrib.model.actors.ui.Dialog
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.actors.fixed.TutorialForester
+import kifio.leningrib.model.pathfinding.ForestGraph
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
 
@@ -28,7 +29,7 @@ class FirstLevel() : Level() {
     private var yLimit = ((levelHeight - 1) * GameScreen.tileSize) - 1
     var passed = false
 
-    constructor(player: Player, levelMap: LevelMap): this() {
+    constructor(player: Player, levelMap: LevelMap) : this() {
         super.setup(player, null, levelMap, Config(LGCGame.LEVEL_WIDTH, levelHeight))
         if (guards == null) {
             guards = Array<TutorialForester>()
@@ -49,7 +50,8 @@ class FirstLevel() : Level() {
 
     private var isLastRoomAvailable = false
 
-    override fun initMushrooms(config: Config, treesManager: TreesManager, mushroomsCount: Int): Array<Mushroom> {
+    override fun initMushrooms(config: Config, treesManager: TreesManager, mushroomsCount: Int,
+                               roomsRectangles: kotlin.Array<Rectangle>): Array<Mushroom> {
         val mushrooms = Array<Mushroom>()
         mushrooms.add(Mushroom(GameScreen.tileSize * 4, GameScreen.tileSize * 7))
         mushrooms.add(Mushroom(GameScreen.tileSize * 5, GameScreen.tileSize * 12))
@@ -309,7 +311,7 @@ class FirstLevel() : Level() {
         }
     }
 
-    override fun initForesters(levelMap: LevelMap?, config: Config?, player: Player?, roomRectangles: kotlin.Array<out Rectangle>?): Array<Forester> {
+    override fun initForesters(levelMap: LevelMap?, config: Config?, player: Player?, roomRectangles: kotlin.Array<out Rectangle>?, forestGraph: ForestGraph): Array<Forester> {
         return Array<Forester>(0)
     }
 

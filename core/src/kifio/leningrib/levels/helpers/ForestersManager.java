@@ -4,6 +4,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
@@ -134,6 +135,10 @@ public class ForestersManager extends ObjectsManager<Forester> {
             speeches[index].setX(forester.getNewSpeechX(speeches[index].getWidth()));
             speeches[index].setY(forester.getNewSpeechY());
         }
+    }
+
+    public Array<Forester> getForesters() {
+        return gameObjects;
     }
 
     @Override

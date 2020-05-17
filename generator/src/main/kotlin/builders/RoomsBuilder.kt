@@ -1,19 +1,21 @@
 package builders
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import generator.Config
 import model.Exit
 import model.Room
 import kotlin.random.Random
 
 private const val LOOP_STEP = 2
-private const val ROOMS_COUNT = 5
+private const val ROOMS_COUNT = 6
 
 class RoomsBuilder(private val Config: Config) {
 
     // rooms count should not be odd
     internal fun buildRooms(
         levelHeight: Int,
-        outs: List<Exit>
+        outs: List<Exit>,
+        isFirst: Boolean
     ): MutableList<Room> {
         val initialRoomSize = levelHeight / ROOMS_COUNT
         val heights = IntArray(ROOMS_COUNT) { initialRoomSize }
@@ -29,33 +31,33 @@ class RoomsBuilder(private val Config: Config) {
             }
         }
 
+//        if (Random.nextBoolean()) {
+//            heights[ROOMS_COUNT - 1] -= 1
+//            heights[ROOMS_COUNT - 2] += 2
+//        } else {
+//            heights[ROOMS_COUNT - 1] += 1
+//        }
+
         val rooms = ArrayList<Room>(ROOMS_COUNT)
 
         for (i in 0 until ROOMS_COUNT) {
-            val y = if (i == 0) { 1 } else {
-                rooms[i - 1].borderY + 2
+            val y: Int
+
+            if (i == 0) {
+                if (isFirst) {
+                    y = 2
+                    heights[0] -= 2
+                } else {
+                    y = 0
+                }
+            } else {
+                y = rooms[i - 1].y + rooms[i - 1].height
             }
 
             val room = Room(y, heights[i], Config.levelWidth)
-
-            for (out in outs) {
-                if (room.borderY == out.y) {
-                    room.borderY += 1
-                    break
-                } else if (room.borderY == out.y - 1) {
-                    room.borderY -= 2
-                    break
-                } else if (room.borderY == out.y - 2) {
-                    room.borderY -= 1
-                    break
-                }
-            }
-
             rooms.add(room)
         }
 
-        val y = rooms.last().y + rooms.last().height
-        rooms.add(Room(y, levelHeight - y, Config.levelWidth))
         return rooms
     }
 }

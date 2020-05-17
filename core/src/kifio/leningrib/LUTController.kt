@@ -66,16 +66,16 @@ class LUTController {
     private fun setNextLut(mushroomsCount: Int): Int {
         var index = 0
 
-        if (mushroomsCount < 5) {
+        if (mushroomsCount < 15) {
             do {
                 index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
             } while (index == 10 || index == 19 || index == 20 || index == 6 || index == 18)
         } else {
-            Gdx.app.log("kifio_lut", "lut: $index")
             index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
         }
 
-        lutTexture = ResourcesManager.getTexture(ResourcesManager.getLutName(index))
+        Gdx.app.log("kifio_lut", "lut: $index")
+        lutTexture = ResourcesManager.getLut(ResourcesManager.getLutName(index))
         return index
     }
 

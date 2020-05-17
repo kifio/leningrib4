@@ -34,7 +34,10 @@ class LGCGame(val store: StoreInterface) : Game() {
         const val ANIMATION_DURATION = 0.3f
         const val ANIMATION_DURATION_LONG = 0.6f
         const val PREFERENCES_NAME = "kifio.leningrib"
+
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
+        const val MUSIC_OFF = "music_off"
+        const val SOUNDS_OFF = "sounds_off"
 
         private var firstLevelPassed = false
 
@@ -59,7 +62,7 @@ class LGCGame(val store: StoreInterface) : Game() {
                 levelMap = worldMap.addLevel(0, 0, null, config)
                 val room = levelMap.rooms[0]
                 val x = 3f
-                val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 4).toFloat()
+                val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 3).toFloat()
                 player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize)
                 val xPlayer = Utils.mapCoordinate(player.x)
                 val yPlayer = Utils.mapCoordinate(player.y)
@@ -78,10 +81,12 @@ class LGCGame(val store: StoreInterface) : Game() {
     }
 
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
-    private var sound: Music? = null
-    private  val onCompleteListener: Music.OnCompletionListener = Music.OnCompletionListener { setMusic() }
-//    private var duration: Float? = null
-//    private var accumulatedTime: Float = 0f
+    private var music: Music? = null
+    private val onCompleteListener: Music.OnCompletionListener = Music.OnCompletionListener {
+        if (prefs?.getBoolean(MUSIC_OFF) != true) {
+            setMusic()
+        }
+    }
 
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
@@ -95,23 +100,13 @@ class LGCGame(val store: StoreInterface) : Game() {
         getScreen()?.dispose()
     }
 
-//    fun updateAudio(delta: Float) {
-//        val d = duration ?: return
-//        if (accumulatedTime > d - 2f) {
-//            sound?.stop()
-//            setMusic()
-//            accumulatedTime = 0f
-//        }
-//        accumulatedTime += delta
-//    }
-
     private fun showLaunchScreen() {
         ResourcesManager.loadSplash()
         setScreen(LaunchScreen(this))
     }
 
     fun showGameScreen(gameScreen: GameScreen?) {
-        if (sound == null) {
+        if (music == null && prefs?.getBoolean(MUSIC_OFF) != true) {
             setMusic()
         }
 
@@ -121,11 +116,21 @@ class LGCGame(val store: StoreInterface) : Game() {
     }
 
     private fun setMusic() {
-        sound?.setOnCompletionListener(null)
-        sound?.dispose()
-        sound = ResourcesManager.getNextMusic()
-        sound?.setOnCompletionListener(onCompleteListener)
-        sound?.play()
+        music?.setOnCompletionListener(null)
+        music?.dispose()
+        music = ResourcesManager.getNextMusic()
+        music?.setOnCompletionListener(onCompleteListener)
+        music?.play()
+    }
+
+    fun resetMusic() {
+        if (prefs?.getBoolean(MUSIC_OFF) != true) {
+            setMusic()
+        } else {
+            music?.setOnCompletionListener(null)
+            music?.stop()
+            music?.dispose()
+        }
     }
 
     private fun showScreen(screen: Screen) {

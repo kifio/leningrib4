@@ -1,5 +1,6 @@
 package kifio.leningrib.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,13 +27,14 @@ import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
 import model.Room;
+import model.Segment;
 
 public abstract class Level {
 
     // Если позиция камеры выходит за рамки этих значений, камера перестает двигаться
     protected ForestersManager forestersManager;
     protected ForestGraph forestGraph;
-    protected Array<Rectangle> roomsRectangles;
+    public Array<Rectangle> roomsRectangles;
     protected BottleManager bottleManager;
     private ForestGraph strengthForestGraph;    // Граф, с которым можно гоняться за лесниками
     private ForestGraph dexterityForestGraph;  // Граф, с которым можно ходить за деревьями
@@ -54,23 +56,24 @@ public abstract class Level {
 
     protected void setup(Player player, Grandma grandma, LevelMap levelMap, Config levelConfig) {
         roomsRectangles = new Array<>();
-        Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
-        Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles);
-        roomsRectangles.addAll(rectangles);
-
-        bottleManager = new BottleManager();
-        forestersManager = new ForestersManager(foresters);
         treesManager = new TreesManager();
-        mushroomsManager = new MushroomsManager();
-
         treesManager.updateTrees(levelMap, levelConfig, nextLevel);
-        mushroomsManager.addMushrooms(initMushrooms(levelConfig,
-                treesManager,
-                player == null ? 0 : player.getMushroomsCount()));
 
         forestGraph = new ForestGraph(grandma, treesManager.getObstacleTrees());
         dexterityForestGraph = new ForestGraph(grandma, treesManager.getOuterBordersTrees());
         strengthForestGraph = new ForestGraph(grandma, treesManager.getObstacleTrees());
+
+        Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
+        Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles, forestGraph);
+        roomsRectangles.addAll(rectangles);
+
+        bottleManager = new BottleManager();
+        forestersManager = new ForestersManager(foresters);
+        mushroomsManager = new MushroomsManager();
+
+        mushroomsManager.addMushrooms(initMushrooms(levelConfig,
+                treesManager,
+                player == null ? 0 : player.getMushroomsCount(), rectangles));
 
         for (Forester f : forestersManager.gameObjects) {
             f.initPath(forestGraph);
@@ -99,22 +102,26 @@ public abstract class Level {
     public void addLevelMapIfNeeded(LevelMap levelMap,
                                     Player player,
                                     Config levelConfig) {
+
+        treesManager.updateTrees(levelMap, levelConfig, nextLevel);
+        forestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
+        dexterityForestGraph = new ForestGraph(null, treesManager.getOuterBordersTrees());
+        strengthForestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
+
         Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
-        Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles);
+        Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles, forestGraph);
         roomsRectangles.addAll(rectangles);
         forestersManager.addForesters(foresters, player != null);
-        treesManager.updateTrees(levelMap, levelConfig, nextLevel);
         mushroomsManager.addMushrooms(initMushrooms(levelConfig,
                 treesManager,
-                player == null ? 0 : player.getMushroomsCount()));
-
-        forestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
-        dexterityForestGraph= new ForestGraph(null, treesManager.getOuterBordersTrees());
-        strengthForestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
+                player == null ? 0 : player.getMushroomsCount(), rectangles));
 
         for (Forester f : forestersManager.gameObjects) {
             f.initPath(forestGraph);
         }
+
+        Gdx.app.log("kifio_level", "trees.count: " + treesManager.getObstacleTrees());
+        Gdx.app.log("kifio_level", "foresters.count: " + forestersManager.getForesters());
     }
 
     private void removeActorsFrom(Array<? extends Actor> actors, float threshold) {
@@ -133,9 +140,16 @@ public abstract class Level {
 
     public abstract int getLevelHeight();
 
-    protected abstract Array<Mushroom> initMushrooms(Config config, TreesManager treesManager, int mushroomsCount);
+    protected abstract Array<Mushroom> initMushrooms(Config config,
+                                                     TreesManager treesManager,
+                                                     int mushroomsCount,
+                                                     Rectangle[] roomRectangles);
 
-    protected abstract Array<Forester> initForesters(LevelMap levelMap, Config config, Player player, Rectangle[] roomRectangles);
+    protected abstract Array<Forester> initForesters(LevelMap levelMap,
+                                                     Config config,
+                                                     Player player,
+                                                     Rectangle[] roomRectangles,
+                                                     ForestGraph forestGraph);
 
     public void update(float delta, OrthographicCamera camera, GameScreen gameScreen) {
         boolean isPaused = gameScreen.isPaused() || gameScreen.getGameOver();
@@ -203,10 +217,26 @@ public abstract class Level {
 
         for (int i = 0; i < size; i++) {
             Room room = rooms.get(i);
-            rectangles[i] = new Rectangle(0,
-                    room.getY() + config.getLevelHeight() * index,
-                    config.getLevelWidth(),
-                    room.getHeight() - 2);
+
+            int offset = (config.getLevelHeight() * index) - index;
+            int height = room.getHeight() - 2;
+
+            if (index > 0 && i == 0) {
+                offset += 1;
+                height -= 1;
+            } else if (i == 0) {
+                offset -= 1;
+                height += 1;
+            }
+
+            if (i == size - 1) {
+//                height -= 1;
+            }
+
+            rectangles[i] = new Rectangle(1,
+                    room.getY() + offset,
+                    config.getLevelWidth() - 2,
+                    height);
         }
 
         return rectangles;
