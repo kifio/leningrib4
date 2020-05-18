@@ -117,7 +117,6 @@ class GameScreen(game: LGCGame,
         updateCamera()
         stage.act(delta)
         stage.draw()
-//        drawRooms()
 
         val isTutorialPassed = (level as? FirstLevel)?.passed == true
 
@@ -420,7 +419,7 @@ class GameScreen(game: LGCGame,
                         getRegion(SETTINGS_BACKGROUND)))
                 addActor(SettingButton(camera, lutController, game, 0))
                 addActor(SettingButton(camera, lutController, game, 1))
-                addActor(SettingButton(camera, lutController, game, 2))
+//                addActor(SettingButton(camera, lutController, game, 2))
                 addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
             }
 
@@ -492,7 +491,12 @@ class GameScreen(game: LGCGame,
         val levelAndPlayer = LGCGame.getLevelAndPlayer(worldMap)
         val level = levelAndPlayer.second
         val player = levelAndPlayer.first
-        game.showGameScreen(GameScreen(game, level, player, worldMap))
+        stage.actors
+                .filterIsInstance<Overlay>()
+                .forEach { it.remove() }
+        stage.addAction(Actions.run {
+            game.showGameScreen(GameScreen(game, level, player, worldMap))
+        })
     }
 
     private fun setupVodka() {

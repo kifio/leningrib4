@@ -1,6 +1,7 @@
 package kifio.leningrib.model;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.audio.Music;
@@ -15,11 +16,12 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import generator.SegmentType;
+import kifio.leningrib.LGCGame;
 import kifio.leningrib.model.actors.game.Mushroom;
 
 public class ResourcesManager {
 
-    public static final int LUTS_COUNT = 34;
+    public static final int LUTS_COUNT = 30;
 
     public static final String GRASS_2 = "grass_2.png";
     public static final String GRASS_0 = "grass_0.png";
@@ -306,17 +308,24 @@ public class ResourcesManager {
     }
 
     public static @Nullable Sound getMushroomTakeSoundEffect() {
-        int next = ThreadLocalRandom.current().nextInt(1, 4);
-        String effect = "sounds/pop_" + next + ".wav";
-        Gdx.app.log("kifio_sound", effect);
-        return am.get(effect, Sound.class);
+        String effect = "sounds/pop_" + ThreadLocalRandom.current().nextInt(1, 4) + ".wav";
+        return getSound(effect);
     }
 
     public static @Nullable Sound getClickSound() {
-        return am.get(CLICK, Sound.class);
+        return getSound(CLICK);
     }
 
     public static @Nullable Sound getGameOverSound() {
-        return am.get(GAMEOVER, Sound.class);
+        return getSound(GAMEOVER);
+    }
+
+    private static @Nullable Sound getSound(String name) {
+        Preferences preferences = LGCGame.Companion.getPreferences();
+        if (preferences != null && preferences.getBoolean(LGCGame.SOUNDS)) {
+            return am.get(name, Sound.class);
+        } else {
+            return null;
+        }
     }
 }

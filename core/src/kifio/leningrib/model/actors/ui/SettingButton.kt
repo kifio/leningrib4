@@ -9,10 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LGCGame
 import kifio.leningrib.LGCGame.Companion.FIRST_LEVEL_PASSED
-import kifio.leningrib.LGCGame.Companion.MUSIC_OFF
-import kifio.leningrib.LGCGame.Companion.SOUNDS_OFF
+import kifio.leningrib.LGCGame.Companion.MUSIC
+import kifio.leningrib.LGCGame.Companion.SOUNDS
 import kifio.leningrib.LUTController
-import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.speech.LabelManager
 
@@ -27,9 +26,8 @@ class SettingButton(
     var onTouchHandler: (() -> Unit)? = null
 
     private val key = when (index) {
-        0 -> MUSIC_OFF
-        1 -> SOUNDS_OFF
-        else -> FIRST_LEVEL_PASSED  // TUTORIAL_OFF
+        0 -> MUSIC
+        else -> SOUNDS
     }
 
     private val enabledIcon = getRegion(SETTING_ENABLED)
@@ -61,7 +59,8 @@ class SettingButton(
             this.x = 2 * offset
         }
 
-        enabled = prefs?.getBoolean(key) != true
+        enabled = prefs?.getBoolean(key) == true
+
         switchIcon = if (enabled) enabledIcon else disabledIcon
 
         iconWidth = this.height - (16 * Gdx.graphics.density)
@@ -100,12 +99,13 @@ class SettingButton(
                     disabledIcon
                 }
 
-                if (key == MUSIC_OFF) {
+                prefs?.putBoolean(key, enabled)
+                prefs?.flush()
+
+                if (key == MUSIC) {
                     game.resetMusic()
                 }
 
-                prefs?.putBoolean(key, enabled)
-                prefs?.flush()
                 onTouchHandler?.invoke()
             }
         })

@@ -19,7 +19,7 @@ class LUTController {
     private var intensity = 0f
     var lutTexture: Texture? = null
 
-    private var active = false
+    private var index = -1
     private var mushroomsCount = 0
     private var accumulatedTime: Float = 0f
     private var effectTime = 5
@@ -38,16 +38,13 @@ class LUTController {
     }
 
     fun updateLut(delta: Float, mushroomsCount: Int): Int {
+        index = -1
+        if (mushroomsCount > 0) {
+            val foo: Boolean = mushroomsCount - this.mushroomsCount == 1
 
-        if (!active) {
-            active = true
-            return setNextLut(mushroomsCount)
-        } else {
-
-            val index = -1
-            if (mushroomsCount - this.mushroomsCount == 3) {
+            if (foo) {
                 this.mushroomsCount = mushroomsCount
-                setNextLut(mushroomsCount)
+                index = setNextLut()
                 accumulatedTime = (effectTime / 2f) - delta
                 intensity = 0.5f
             }
@@ -60,18 +57,16 @@ class LUTController {
 
             intensity = accumulatedTime / effectTime
             return index
+        } else {
+            return index
         }
     }
 
-    private fun setNextLut(mushroomsCount: Int): Int {
-        var index = 0
+    private fun setNextLut(): Int {
+        var index = mushroomsCount
 
-        if (mushroomsCount < 15) {
-            do {
-                index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
-            } while (index == 10 || index == 19 || index == 20 || index == 6 || index == 18)
-        } else {
-            index = ThreadLocalRandom.current().nextInt(0, ResourcesManager.LUTS_COUNT)
+        if (index >= 29) {
+            index = 29 + ThreadLocalRandom.current().nextInt(0, 2)
         }
 
         Gdx.app.log("kifio_lut", "lut: $index")

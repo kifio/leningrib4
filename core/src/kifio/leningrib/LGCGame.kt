@@ -36,8 +36,9 @@ class LGCGame(val store: StoreInterface) : Game() {
         const val PREFERENCES_NAME = "kifio.leningrib"
 
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
-        const val MUSIC_OFF = "music_off"
-        const val SOUNDS_OFF = "sounds_off"
+        const val MUSIC = "music"
+        const val SOUNDS = "sounds"
+        private const val WAS_LAUNCHED = "is_first_launch"
 
         private var firstLevelPassed = false
 
@@ -83,7 +84,7 @@ class LGCGame(val store: StoreInterface) : Game() {
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
     private var music: Music? = null
     private val onCompleteListener: Music.OnCompletionListener = Music.OnCompletionListener {
-        if (prefs?.getBoolean(MUSIC_OFF) != true) {
+        if (prefs?.getBoolean(MUSIC) == true) {
             setMusic()
         }
     }
@@ -91,6 +92,14 @@ class LGCGame(val store: StoreInterface) : Game() {
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
         firstLevelPassed = prefs?.getBoolean(FIRST_LEVEL_PASSED) ?: false
+
+        if (prefs?.getBoolean(WAS_LAUNCHED) != true) {
+            prefs?.putBoolean(MUSIC, true)
+            prefs?.putBoolean(SOUNDS, true)
+            prefs?.putBoolean(WAS_LAUNCHED, true)
+            prefs?.flush()
+        }
+
         ResourcesManager.loadSplash()
         GameScreen.tileSize = Gdx.graphics.width / LEVEL_WIDTH
         showLaunchScreen()
@@ -106,7 +115,7 @@ class LGCGame(val store: StoreInterface) : Game() {
     }
 
     fun showGameScreen(gameScreen: GameScreen?) {
-        if (music == null && prefs?.getBoolean(MUSIC_OFF) != true) {
+        if (music == null && prefs?.getBoolean(MUSIC) == true) {
             setMusic()
         }
 
@@ -117,14 +126,13 @@ class LGCGame(val store: StoreInterface) : Game() {
 
     private fun setMusic() {
         music?.setOnCompletionListener(null)
-        music?.dispose()
         music = ResourcesManager.getNextMusic()
         music?.setOnCompletionListener(onCompleteListener)
         music?.play()
     }
 
     fun resetMusic() {
-        if (prefs?.getBoolean(MUSIC_OFF) != true) {
+        if (prefs?.getBoolean(MUSIC) == true) {
             setMusic()
         } else {
             music?.setOnCompletionListener(null)

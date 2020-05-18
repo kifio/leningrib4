@@ -132,6 +132,10 @@ class FirstLevel() : Level() {
             gameScreen.stage.addAction(showDialog(4, camera, gameScreen.stage, gameScreen.player, false))
         }
 
+
+        mushrooms[4]?.stableSpeech = ""
+        mushrooms[5]?.stableSpeech = ""
+
         passed = Utils.mapCoordinate(gameScreen.player.y) >= yLimit
     }
 

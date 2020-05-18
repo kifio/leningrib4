@@ -53,6 +53,7 @@ class Dialog(camera: OrthographicCamera,
 
             override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                 index += 1
+                ResourcesManager.getClickSound()?.play()
                 touched = false
             }
         })

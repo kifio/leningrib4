@@ -39,6 +39,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
         } else {
             gameObjects.addAll(foresters);
         }
+        gameObjects.clear();
 
         Label[] oldSpeeches = speeches;
 
