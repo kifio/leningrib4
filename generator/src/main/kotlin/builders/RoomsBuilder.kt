@@ -31,13 +31,6 @@ class RoomsBuilder(private val Config: Config) {
             }
         }
 
-//        if (Random.nextBoolean()) {
-//            heights[ROOMS_COUNT - 1] -= 1
-//            heights[ROOMS_COUNT - 2] += 2
-//        } else {
-//            heights[ROOMS_COUNT - 1] += 1
-//        }
-
         val rooms = ArrayList<Room>(ROOMS_COUNT)
 
         for (i in 0 until ROOMS_COUNT) {

@@ -28,7 +28,7 @@ public class Player extends MovableActor {
     private Color tmpColor = Color.valueOf("#FDA010");
     private float[] clothesHSV = new float[3];
 
-    private float velocity = GameScreen.tileSize * 6;
+    private float velocity = GameScreen.tileSize * 6 + (getMushroomsCount() / VELOCITY_DELIMETER);
     private int mushroomsCount = 0;
     private float effectTime = 0L;
     private Mushroom mushroom;

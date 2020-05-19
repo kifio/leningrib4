@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.fixed.Bottle;
 import kifio.leningrib.model.actors.game.Forester;
+import kifio.leningrib.model.actors.game.MovableActor;
 import kifio.leningrib.model.actors.game.Player;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.model.speech.LabelManager;
@@ -39,7 +40,6 @@ public class ForestersManager extends ObjectsManager<Forester> {
         } else {
             gameObjects.addAll(foresters);
         }
-        gameObjects.clear();
 
         Label[] oldSpeeches = speeches;
 
@@ -63,12 +63,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
     }
 
     public void updateForesters(GameScreen gameScreen, float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph) {
-        if (gameScreen.player.getMushroomsCount() > 5) foresterVelocityMultiplier = 2.5f;
-        if (gameScreen.player.getMushroomsCount() > 15) foresterVelocityMultiplier = 3f;
-        if (gameScreen.player.getMushroomsCount() > 25) foresterVelocityMultiplier = 3.5f;
-        if (gameScreen.player.getMushroomsCount() > 35) foresterVelocityMultiplier = 4f;
-        if (gameScreen.player.getMushroomsCount() > 45) foresterVelocityMultiplier = 4.5f;
-        if (gameScreen.player.getMushroomsCount() > 60) foresterVelocityMultiplier = 5f;
+        foresterVelocityMultiplier = 2.5f + (gameScreen.player.getMushroomsCount() / MovableActor.VELOCITY_DELIMETER);
 
         for (int i = 0; i < gameObjects.size; i++) {
             Forester forester = gameObjects.get(i);

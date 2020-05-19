@@ -6,11 +6,11 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.utils.Align
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.ResourcesManager.HUD_BOTTLE
-import kifio.leningrib.model.ResourcesManager.SETTINGS_BACKGROUND
+import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.platform.StoreInterface
 import kifio.leningrib.platform.items.StoreItem
@@ -19,11 +19,7 @@ import kifio.leningrib.screens.GameScreen
 class StoreActor(camera: OrthographicCamera,
                  lutController: LUTController,
                  store: StoreInterface
-) : Overlay(camera, 40 * Gdx.graphics.density, lutController, ResourcesManager.getRegion(SETTINGS_BACKGROUND)) {
-
-    companion object {
-        private const val DESCRIPTION = "List of in app purchases"
-    }
+) : Overlay(camera, 0f, lutController, getRegion(SETTINGS_BACKGROUND)) {
 
     var onTouchHandler: (() -> Unit)? = null
 
@@ -33,9 +29,20 @@ class StoreActor(camera: OrthographicCamera,
     private val textOffset = offset + (innerOffset * 2f) + imageSize
     private val textWidth = Gdx.graphics.width - (offset + (innerOffset * 3f) + imageSize)
 
+    private val topTexture = getTexture(STORE_TOP)
+    private val topTextureWidth: Float
+    private val topTextureHeight: Float
     private var items: List<StoreItem>? = null
+    private var storeLabel = "МАГАЗИН"
+    private var storeLabelHeight = LabelManager.getInstance().getTextHeight("МАГАЗИН", LabelManager.getInstance().mediumFont)
+    private var storeLabelWidth = LabelManager.getInstance().getTextWidth("МАГАЗИН", LabelManager.getInstance().mediumFont)
+    private var xStoreLabel = (Gdx.graphics.width - storeLabelWidth) / 2
 
     init {
+        val scale = Gdx.graphics.width.toFloat() / topTexture.width.toFloat()
+        topTextureWidth = topTexture.width * scale
+        topTextureHeight = topTexture.height * scale
+
         if (items == null) {
             store.loadPurchases {
                 this.items = it
@@ -60,12 +67,17 @@ class StoreActor(camera: OrthographicCamera,
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         y = camera.position.y - Gdx.graphics.height / 2f
+
+        val top = camera.position.y + (Gdx.graphics.height / 2f) - topTextureHeight
+
         batch.shader = null
         if (region != null) batch.draw(region, x, y, width, height)
 
+        batch.draw(topTexture, offset, top, topTextureWidth,  topTextureHeight)
+
         items?.let {
             for (index in it.indices) {
-                drawItem(batch, index, it[index])
+                drawItem(batch, index, it[index], top)
             }
         }
 
@@ -74,31 +86,31 @@ class StoreActor(camera: OrthographicCamera,
         }
     }
 
-    private fun drawItem(batch: Batch, index: Int, item: StoreItem) {
+    private fun drawItem(batch: Batch, index: Int, item: StoreItem, top: Float) {
         val texture = getTexture(item.id)
         val xImage = offset + innerOffset
 
         batch.draw(texture,
                 xImage,
-                (height - imageSize - 2 * innerOffset) + (imageSize * index),
+                top - (imageSize + 2 * innerOffset) * (index + 1),
                 imageSize,
                 imageSize)
 
         LabelManager.getInstance().smallFont.draw(batch,
                 item.price,
                 xImage,
-                (height - imageSize - 3 * innerOffset) + (imageSize * index),
+                top - (imageSize + 3 * innerOffset) * (index + 1) + (innerOffset * index),
                 imageSize, Align.center, true)
 
         LabelManager.getInstance().smallFont.draw(batch,
                 item.description,
                 textOffset,
-                (height - 2 * innerOffset - (imageSize / 2)) + (imageSize * index),
+                top - (imageSize + 2 * innerOffset) * (index + 1) + (imageSize / 1.8f),
                 textWidth, Align.left, true)
     }
 
     private fun getTexture(id: Int): Texture {
-        return ResourcesManager.getTexture(HUD_BOTTLE)
+        return getTexture(HUD_BOTTLE)
     }
 
     private fun getTouchedItem(x: Float, y: Float): StoreItem? {

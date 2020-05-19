@@ -89,9 +89,6 @@ class Generator {
             addSegments(bordersBuilder.buildBorder(Side.LEFT, leftNeighbour))
             addSegments(bordersBuilder.buildBorder(Side.RIGHT, rightNeighbour))
 
-//            val outerBordersHeight = 2  // height of top and bottom borders on screen
-//            val roomsSpace = if (y == 0) levelConfig.levelHeight - 2 else levelConfig.levelHeight
-
             rooms.addAll(RoomsBuilder(levelConfig).buildRooms(levelConfig.levelHeight, exits, y == 0))
 
             val treesForRemoving = arrayOfNulls<Int?>(rooms.size)

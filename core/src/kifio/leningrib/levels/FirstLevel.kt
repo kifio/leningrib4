@@ -149,8 +149,8 @@ class FirstLevel() : Level() {
 
         val speeches = arrayOf(
                 "Привет!\nМеня зовут Lenin.",
-                "В этот лес я приехал за чудо-грибами расширяющими сознание.",
-                "Итак, для начала стоит осмотреться."
+                "Я приехал в лес за грибами расширяющими сознание.",
+                "Для начала осмотримся."
         )
 
         return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
@@ -167,8 +167,8 @@ class FirstLevel() : Level() {
 
         val speeches = arrayOf(
                 "Отлично!\nГрибы здесь сами говорят куда идти.",
-                "А ты можешь отправить меня в любую точку экрана, указав на нее!.",
-                "Давай посмотрим, что там на соседней поляне."
+                "Отправь меня в любую точку экрана, указав на нее.",
+                "Что там на соседней поляне?"
         )
 
         return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
@@ -204,9 +204,7 @@ class FirstLevel() : Level() {
         val speeches = arrayOf(
                 "Некоторые грибы дают мне сверхспобосности",
                 "Ну или мне так кажется..",
-                "Так или иначе, в зарослях нашлась бутылка водки.",
-                "Если бросить такую перед лесником, он ошалеет и забудет обо мне.",
-                "Думаю, это отличный способ отвлечь того громилу."
+                "Нажми на кнопку с бутылкой, чтобы отвлечь ей лесника."
         )
 
         return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
@@ -220,9 +218,10 @@ class FirstLevel() : Level() {
                               lutController: LUTController,
                               disposeHandler: () -> Unit): Dialog {
         val speeches = arrayOf(
-                "Получилось! По этой тропинке я смогу пройти дальше!",
+                "Получилось! " +
+                "По этой тропинке я смогу пройти дальше!",
                 "Дальше начинается настоящий лес.",
-                "А этот грибы помогут мне найти дорогу к следующей опушке с грибами."
+                "А эти грибы помогут мне найти дорогу к следующей опушкеz."
         )
 
         return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
@@ -282,7 +281,6 @@ class FirstLevel() : Level() {
                                 } else if (actor is Player) {
                                     actor.bottlesCount += 1
                                 }
-
                             }
                         }
                     } else {

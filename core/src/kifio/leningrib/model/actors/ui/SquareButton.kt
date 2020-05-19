@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
+import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager.getClickSound
 import kifio.leningrib.screens.GameScreen
@@ -28,6 +31,9 @@ class SquareButton(
     }
 
     var onTouchHandler: (() -> Unit)? = null
+    private var hiddenOffset = 0
+    private var animationStartTime = 0f
+    private var animationTime = 0f
 
     init {
 
@@ -54,14 +60,31 @@ class SquareButton(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
+        val w = width * scaleX
+        val h = height * scaleY
+
+        val wOffset = ((width - w) / 2)
+        val hOffset = ((height - h) / 2)
+
         val x: Float = if (orientation == LEFT) {
-            8 * Gdx.graphics.density
+            16 * Gdx.graphics.density + wOffset
         } else {
-            Gdx.graphics.width - (width + 16 * Gdx.graphics.density)
+            Gdx.graphics.width - (width + 16 * Gdx.graphics.density) + wOffset
         }
+
         val offset = order * height + (order * (16 * Gdx.graphics.density))
-        val y = camera.position.y + (Gdx.graphics.height / 2f) - offset
+
+        if (hiddenOffset != 0) {
+            animationTime += Gdx.app.graphics.deltaTime
+        }
+
+        val y = camera.position.y + (Gdx.graphics.height / 2f) - offset + hOffset
+
         setBounds(x, y, width, height)
-        super.draw(batch, parentAlpha)
+        batch.shader = null
+        if (region != null) batch.draw(region, x, y, w, h)
+        if (lutController?.lutTexture != null) {
+            batch.shader = lutController.shader
+        }
     }
 }

@@ -21,6 +21,7 @@ import kifio.leningrib.screens.GameScreen;
 
 public abstract class MovableActor extends Actor {
 
+	public static float VELOCITY_DELIMETER = 25f;
 	// Путь в который будет записываться найденный путь
 	protected DefaultGraphPath<Vector2> path = new DefaultGraphPath<>();
 	public float velocityMultiplier = 2f;

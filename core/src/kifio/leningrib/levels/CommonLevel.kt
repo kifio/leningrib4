@@ -1,18 +1,21 @@
 package kifio.leningrib.levels
 
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import generator.Config
 import kifio.leningrib.LGCGame
+import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
-import kifio.leningrib.levels.helpers.ForestersManager
 import kifio.leningrib.levels.helpers.TreesManager
-import kifio.leningrib.model.actors.game.Mushroom
-import kifio.leningrib.model.actors.game.Forester
-import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.fixed.Grandma
+import kifio.leningrib.model.actors.game.Forester
+import kifio.leningrib.model.actors.game.Mushroom
+import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.actors.ui.Dialog
 import kifio.leningrib.model.pathfinding.ForestGraph
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
@@ -20,18 +23,12 @@ import java.util.concurrent.ThreadLocalRandom
 
 class CommonLevel() : Level() {
 
-    var grandma: Grandma? = null
-
     constructor(player: Player, grandma: Grandma?, levelMap: LevelMap) : this() {
         super.setup(player, grandma, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
-        this.grandma = grandma
     }
 
     constructor(level: Level) : this() {
         super.copy(level)
-        if (level is CommonLevel) {
-            this.grandma = level.grandma
-        }
     }
 
     override fun getLevelHeight() = LEVEL_HEIGHT
@@ -125,37 +122,62 @@ class CommonLevel() : Level() {
         return gameObjects
     }
 
-    override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
-        val grandma = this.grandma
-        if (grandma == null) {
-            super.movePlayerTo(x, y, player, null)
-            return
-        }
-
-        val px = player.onLevelMapX
-        val py = player.onLevelMapY
-
-        var tx = Utils.mapCoordinate(x).toInt()
-        var ty = Utils.mapCoordinate(y).toInt()
-
-        val gx = Utils.mapCoordinate(grandma.x).toInt()
-        val gy = Utils.mapCoordinate(grandma.y).toInt()
-
-        forestGraph?.let {
-            if (gx == tx && gy == ty) {
-                val nearest = it.findNearest(tx, ty, px, py)
-                tx = nearest.x.toInt()
-                ty = nearest.y.toInt()
-                if (tx == px && ty == py) {
-                    player.addAction(Actions.run(callback))
-                } else {
-                    super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, callback)
-                }
-            } else {
-                super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, null)
-            }
-        }
-    }
+//    override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
+//        val grandma = this.grandma
+//        if (grandma == null) {
+//            super.movePlayerTo(x, y, player, null)
+//            return
+//        }
+//
+//        val px = player.onLevelMapX
+//        val py = player.onLevelMapY
+//
+//        var tx = Utils.mapCoordinate(x).toInt()
+//        var ty = Utils.mapCoordinate(y).toInt()
+//
+//        val gx = Utils.mapCoordinate(grandma.x).toInt()
+//        val gy = Utils.mapCoordinate(grandma.y).toInt()
+//
+//        forestGraph?.let {
+//            if (gx == tx && gy == ty) {
+//                val nearest = it.findNearest(tx, ty, px, py)
+//                tx = nearest.x.toInt()
+//                ty = nearest.y.toInt()
+//                if (tx == px && ty == py) {
+//                    player.addAction(Actions.run(callback))
+//                } else {
+//                    super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, callback)
+//                }
+//            } else {
+//                super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, null)
+//            }
+//        }
+//    }
+//
+//    fun showGrandmaDialogIfNeeded(camera: OrthographicCamera,
+//                          lutController: LUTController,
+//                          stage: Stage) {
+//
+//        if (LGCGame.getPreferences()?.getBoolean(LGCGame.WAS_GRANDMA_DIALOG_SHOWN) == true) {
+//            return
+//        }
+//
+//        LGCGame.getPreferences()?.putBoolean(LGCGame.WAS_GRANDMA_DIALOG_SHOWN, true)
+//
+//        val speeches = arrayOf(
+//                "Подходи, милок, не бойся.",
+//                "У меня есть все что тебе нужно."
+//        )
+//
+//        stage.addAction(Actions.delay(0.5f,
+//        Actions.run {
+//            stage.addActor(Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.GRANDMA_DIALOG_FACE }).apply {
+//                this.disposeHandler = {
+//                    remove()
+//                }
+//            })
+//        }))
+//    }
 
     companion object {
         private const val MIN = 1

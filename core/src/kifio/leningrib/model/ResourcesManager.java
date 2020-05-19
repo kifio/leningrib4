@@ -1,6 +1,5 @@
 package kifio.leningrib.model;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
@@ -17,7 +16,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import generator.SegmentType;
 import kifio.leningrib.LGCGame;
-import kifio.leningrib.model.actors.game.Mushroom;
 
 public class ResourcesManager {
 
@@ -34,6 +32,8 @@ public class ResourcesManager {
     public static final String PAUSE_PRESSED = "pause_pressed.png";
     public static final String SETTINGS = "settings_unpressed.png";
     public static final String SETTINGS_PRESSED = "settings_pressed.png";
+    public static final String STORE = "store_hud.png";
+    public static final String STORE_PRESSED = "store_hud_pressed.png";
     public static final String HUD_BACKGROUND = "background_hud.png";
     public static final String LENIN_GRIB = "lenin_grib.png";
     public static final String LAUNCH_TREES = "launch_trees.png";
@@ -57,6 +57,7 @@ public class ResourcesManager {
     public static final String TRACK_2 = "sounds/track_2.ogg";
     public static final String CLICK = "sounds/click.ogg";
     public static final String GAMEOVER = "sounds/gameover.wav";
+    public static final String STORE_TOP = "store_top.png";
 
 
     public static I18NBundle commonMushroomsSpeechBundle;
@@ -158,6 +159,9 @@ public class ResourcesManager {
         am.load(RESTART_BUTTON_PRESSED, Texture.class, param);
         am.load(GAME_OVER, Texture.class, param);
         am.load(RESULT_MUSHROOM, Texture.class, param);
+        am.load(STORE_TOP, Texture.class, param);
+        am.load(STORE, Texture.class, param);
+        am.load(STORE_PRESSED, Texture.class, param);
         am.load(TRACK_1, Music.class);
         am.load(TRACK_2, Music.class);
         am.load("sounds/pop_1.wav", Sound.class);
@@ -212,6 +216,8 @@ public class ResourcesManager {
         putTexture(PAUSE_PRESSED);
         putTexture(SETTINGS);
         putTexture(SETTINGS_PRESSED);
+        putTexture(STORE);
+        putTexture(STORE_PRESSED);
         putTexture(PAUSE_PRESSED);
         putTexture(HUD_BACKGROUND);
         putTexture(SETTING);
