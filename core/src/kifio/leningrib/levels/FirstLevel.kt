@@ -153,7 +153,9 @@ class FirstLevel() : Level() {
                 "Для начала осмотримся."
         )
 
-        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        val next = arrayOf("Понятно", "Ок", "Давай")
+
+        return Dialog(camera, lutController, speeches, next, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[0].stableSpeech = "Нажми на меня"
                 disposeHandler.invoke()
@@ -168,10 +170,10 @@ class FirstLevel() : Level() {
         val speeches = arrayOf(
                 "Отлично!\nГрибы здесь сами говорят куда идти.",
                 "Отправь меня в любую точку экрана, указав на нее.",
-                "Что там на соседней поляне?"
+                "Посмотрим, что там на соседней поляне"
         )
 
-        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, arrayOf("Понятно", "Хорошо", "Ок"), Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[2].stableSpeech = PROVOCATION_0
                 disposeHandler.invoke()
@@ -189,7 +191,7 @@ class FirstLevel() : Level() {
                 "Здесь мне просто так не пройти!",
                 "Хорошо, что этот гриб убеждает меня в обратном..")
 
-        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, arrayOf("Это да", "Ок"), Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 mushrooms[3].stableSpeech = "Со мной ты тут пролезешь!"
                 disposeHandler.invoke()
@@ -207,7 +209,8 @@ class FirstLevel() : Level() {
                 "Нажми на кнопку с бутылкой, чтобы отвлечь ей лесника."
         )
 
-        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+
+        return Dialog(camera, lutController, speeches, arrayOf("Ок", "Да", "Окей"), Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 disposeHandler.invoke()
             }
@@ -219,12 +222,11 @@ class FirstLevel() : Level() {
                               disposeHandler: () -> Unit): Dialog {
         val speeches = arrayOf(
                 "Получилось! " +
-                "По этой тропинке я смогу пройти дальше!",
-                "Дальше начинается настоящий лес.",
+                        "Дальше начинается настоящий лес.",
                 "А эти грибы помогут мне найти дорогу к следующей опушкеz."
         )
 
-        return Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
+        return Dialog(camera, lutController, speeches, arrayOf("Да!", "Окей", "Погнали"), Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {
             this.disposeHandler = {
                 disposeHandler.invoke()
             }

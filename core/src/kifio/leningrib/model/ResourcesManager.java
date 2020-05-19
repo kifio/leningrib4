@@ -23,6 +23,7 @@ public class ResourcesManager {
 
     public static final String GRASS_2 = "grass_2.png";
     public static final String GRASS_0 = "grass_0.png";
+    public static final String GREEN_BG = "green_bg.png";
     public static final String OVERLAY = "overlay.png";
     public static final String BOTTLE = "bottle.png";
     public static final String BOTTLE_SMOL = "bottle_smol.png";
@@ -137,6 +138,7 @@ public class ResourcesManager {
 
         am.load(GRASS_0, Texture.class);
         am.load(GRASS_2, Texture.class);
+        am.load(GREEN_BG, Texture.class, param);
         am.load(OVERLAY, Texture.class, param);
         am.load(BOTTLE, Texture.class, param);
         am.load(BOTTLE_SMOL, Texture.class, param);

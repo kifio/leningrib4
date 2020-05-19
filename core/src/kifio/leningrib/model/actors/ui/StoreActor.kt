@@ -1,9 +1,12 @@
 package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Touchable
@@ -32,20 +35,28 @@ class StoreActor(camera: OrthographicCamera,
     private val topTexture = getTexture(STORE_TOP)
     private val topTextureWidth: Float
     private val topTextureHeight: Float
-    private var items: List<StoreItem>? = null
-    private var storeLabel = "МАГАЗИН"
-    private var storeLabelHeight = LabelManager.getInstance().getTextHeight("МАГАЗИН", LabelManager.getInstance().mediumFont)
-    private var storeLabelWidth = LabelManager.getInstance().getTextWidth("МАГАЗИН", LabelManager.getInstance().mediumFont)
-    private var xStoreLabel = (Gdx.graphics.width - storeLabelWidth) / 2
+
+    private var items = mutableListOf<StoreItem>()
+    private var descriptionsHeights = mutableListOf<Float>()
+
+    private var buyLabel = "КУПИТЬ"
+    private var buyLabelColor = Color(39f / 255f, 113f / 255f, 41f / 255f, 1f)
+    private var buyLabelTexture: Texture = ResourcesManager.getTexture(GREEN_BG)
+    private var buyLabelHeight = LabelManager.getInstance().getTextHeight(buyLabel, LabelManager.getInstance().mediumFont)
+    private var buyLabelWidth = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 1.4f
+    private var buyLabelOffset = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 0.2f
 
     init {
         val scale = Gdx.graphics.width.toFloat() / topTexture.width.toFloat()
         topTextureWidth = topTexture.width * scale
         topTextureHeight = topTexture.height * scale
 
-        if (items == null) {
-            store.loadPurchases {
-                this.items = it
+
+        if (items.isEmpty()) {
+            store.loadPurchases { it ->
+                val lm = LabelManager.getInstance()
+                this.items.addAll(it)
+                this.descriptionsHeights.addAll( it.map { item -> lm.getTextHeight(item.description, lm.smallFont) })
             }
         }
 
@@ -73,12 +84,14 @@ class StoreActor(camera: OrthographicCamera,
         batch.shader = null
         if (region != null) batch.draw(region, x, y, width, height)
 
+//        for (index in items.indices) {
+//            drawBuyBackground(index, top)
+//        }
+
         batch.draw(topTexture, offset, top, topTextureWidth,  topTextureHeight)
 
-        items?.let {
-            for (index in it.indices) {
-                drawItem(batch, index, it[index], top)
-            }
+        for (index in items.indices) {
+            drawItem(batch, index, items[index], top)
         }
 
         if (lutController?.lutTexture != null) {
@@ -90,22 +103,35 @@ class StoreActor(camera: OrthographicCamera,
         val texture = getTexture(item.id)
         val xImage = offset + innerOffset
 
+        val imageY = top - (imageSize + 2f * innerOffset) * (index + 1)
+        val descriptionOffset = (imageSize - descriptionsHeights[index])
+
         batch.draw(texture,
                 xImage,
-                top - (imageSize + 2 * innerOffset) * (index + 1),
+                imageY,
                 imageSize,
                 imageSize)
 
         LabelManager.getInstance().smallFont.draw(batch,
-                item.price,
-                xImage,
-                top - (imageSize + 3 * innerOffset) * (index + 1) + (innerOffset * index),
-                imageSize, Align.center, true)
-
-        LabelManager.getInstance().smallFont.draw(batch,
                 item.description,
                 textOffset,
-                top - (imageSize + 2 * innerOffset) * (index + 1) + (imageSize / 1.8f),
+                imageY + descriptionOffset,
+                textWidth, Align.left, true)
+
+        val buyY = imageY + (descriptionOffset - buyLabelHeight) / 2f
+
+        batch.draw(buyLabelTexture, textOffset + imageSize , buyY - (0.8f * GameScreen.tileSize), buyLabelWidth, GameScreen.tileSize.toFloat())
+
+        LabelManager.getInstance().mediumFont.draw(batch,
+                item.price,
+                textOffset,
+                buyY - (0.25f * GameScreen.tileSize),
+                imageSize, Align.center, true)
+
+        LabelManager.getInstance().mediumFont.draw(batch,
+                buyLabel,
+                textOffset + buyLabelOffset + imageSize,
+                buyY - (0.25f * GameScreen.tileSize),
                 textWidth, Align.left, true)
     }
 

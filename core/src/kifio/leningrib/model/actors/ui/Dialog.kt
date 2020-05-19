@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors.ui
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -11,15 +12,15 @@ import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.PLAYER_DIALOG_FACE
 import kifio.leningrib.model.speech.LabelManager
+import kifio.leningrib.screens.GameScreen
+import java.util.concurrent.ThreadLocalRandom
 
 
 class Dialog(camera: OrthographicCamera,
              lutController: LUTController,
              private val speeches: Array<String>,
+             private val next: Array<String>,
              private val characters: Array<String>) : StaticActor(null, camera, lutController) {
-
-    private val next = "Далее"
-    private val ok = "Ок"
 
     var disposeHandler: (() -> Unit)? = null
 
@@ -69,8 +70,8 @@ class Dialog(camera: OrthographicCamera,
 
         val lm = LabelManager.getInstance()
 
-        buttonWidth = lm.getTextWidth(next, lm.mediumFont)
-        buttonHeight = lm.getTextHeight(next, lm.mediumFont)
+        buttonWidth = GameScreen.tileSize * 2f
+        buttonHeight = GameScreen.tileSize / 2f
 
         if (characters.isEmpty()) {
             faceWidth = 0f
@@ -124,7 +125,7 @@ class Dialog(camera: OrthographicCamera,
                 labelWidth, Align.left, true)
 
         font.draw(batch,
-                if (index == speeches.size - 1) ok else next,
+                next[index],
                 buttonX,
                 (this.y + 2f * buttonHeight),
                 buttonWidth,
