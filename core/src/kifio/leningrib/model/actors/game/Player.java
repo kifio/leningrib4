@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Array;
 
 import org.jetbrains.annotations.Nullable;
 
+import kifio.leningrib.LGCGame;
 import kifio.leningrib.Utils;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;
@@ -36,12 +37,13 @@ public class Player extends MovableActor {
 
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
-    public int bottlesCount = 0;
+    private int bottlesCount = 0;
 
     public Label label;
 
     public Player(float x, float y) {
         super(x, y);
+        bottlesCount = LGCGame.Companion.getBottlesCount();
         clothesHSV = tmpColor.toHsv(clothesHSV);
         label = LabelManager.getInstance().getLabel(null, x,
                 y + 1.3f * GameScreen.tileSize);
@@ -100,6 +102,20 @@ public class Player extends MovableActor {
         if (mushroomsCount == 1) {
             label.setText(LabelManager.getInstance().getWonderingSpeech());
         }
+    }
+
+    public void increaseBottlesCount() {
+        this.bottlesCount++;
+        LGCGame.Companion.setBottlesCount(this.bottlesCount);
+    }
+
+    public void decreaseBottlesCount() {
+        this.bottlesCount--;
+        LGCGame.Companion.setBottlesCount(this.bottlesCount);
+    }
+
+    public int getBottlesCount() {
+        return bottlesCount;
     }
 
     public void onEffectiveMushroomTake(Mushroom mushroom) {

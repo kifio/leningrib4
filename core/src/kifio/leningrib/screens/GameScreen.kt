@@ -21,6 +21,7 @@ import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
+import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.game.MovableActor
 import kifio.leningrib.model.actors.ui.Overlay
@@ -162,26 +163,17 @@ class GameScreen(game: LGCGame,
 
     private fun update(delta: Float) {
         if (player.bottlesCount > 0) {
-            val lvl = level
-            if (lvl is FirstLevel) {
-                if (!bottleWasUpdated) {
-                    bottleWasUpdated = true
-                    vodkaButton?.isVisible = true
-                    val sequenceAction = SequenceAction()
-                    sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-                    sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-                    sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-                    sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-//                    sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-//                    sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-//                    sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-//                    sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-//                    sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-//                    sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-                    vodkaButton?.addAction(sequenceAction)
-                }
-            } else {
+            if (!bottleWasUpdated) {
+                bottleWasUpdated = true
                 vodkaButton?.isVisible = true
+                val sequenceAction = SequenceAction()
+                sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
+                sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
+                sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
+                sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
+                sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
+                sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
+                vodkaButton?.addAction(sequenceAction)
             }
         }
 
@@ -254,8 +246,18 @@ class GameScreen(game: LGCGame,
                         x = -Gdx.graphics.width.toFloat()
                         val storeActor = StoreActor(camera, lutController, game.store)
                         storeActor.onTouchHandler = {
-                            player.bottlesCount++
-                            removeSettings()
+                            player.increaseBottlesCount()
+                            stage.addAction(Actions.delay(0.1f,
+                                    Actions.run {
+                                        stage.addActor(Dialog(camera, lutController,
+                                                arrayOf("Ты купил цифровую водку, милок!"),
+                                                arrayOf("Ок"), Array(1) { i -> GRANDMA_DIALOG_FACE }).apply {
+                                            this.disposeHandler = {
+                                                remove()
+                                            }
+                                        })
+                                    }))
+
                         }
                         addActor(storeActor)
                         addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
@@ -491,20 +493,22 @@ class GameScreen(game: LGCGame,
                     SquareButton.VODKA,
                     SquareButton.RIGHT)
 
-            vodkaButton?.isVisible = false
+            vodkaButton?.isVisible = player.bottlesCount > 0
             vodkaButton?.onTouchHandler = {
 
                 if (vodkaButton?.isVisible == true) {
                     setupVodka()
                 }
 
-                player.bottlesCount -= 1
+                player.decreaseBottlesCount();
 
                 if (player.bottlesCount == 0) {
                     vodkaButton?.remove()
                     vodkaButton = null
                 }
             }
+        } else {
+            vodkaButton?.isVisible = player.bottlesCount > 0
         }
         stage.addActor(pauseButton)
         stage.addActor(vodkaButton)
@@ -517,6 +521,11 @@ class GameScreen(game: LGCGame,
             (level as? FirstLevel)?.let {
                 stage.addAction(it.showDialog(0, camera, stage, player, true))
             }
+        }
+
+        (level as? CommonLevel)?.showDailyDialogIfNeeded(camera, lutController, stage) {
+            player.increaseBottlesCount();
+            bottleWasUpdated = false
         }
     }
 

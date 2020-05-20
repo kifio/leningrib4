@@ -281,7 +281,7 @@ class FirstLevel() : Level() {
                                 if (actor is Dialog) {
                                     actor.remove()
                                 } else if (actor is Player) {
-                                    actor.bottlesCount += 1
+                                    actor.increaseBottlesCount()
                                 }
                             }
                         }

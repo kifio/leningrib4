@@ -22,6 +22,8 @@ import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
 import model.LevelMap
 import model.WorldMap
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
@@ -36,13 +38,16 @@ class LGCGame(val store: StoreInterface) : Game() {
         const val PREFERENCES_NAME = "kifio.leningrib"
 
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
+        const val PLAYER_BOTTLES_COUNT = "PLAYER_BOTTLES_COUNT"
         const val MUSIC = "music"
         const val SOUNDS = "sounds"
         private const val WAS_LAUNCHED = "is_first_launch"
 
         private var firstLevelPassed = false
+        private var shouldShowBottleDialog = false
 
         private var prefs: Preferences? = null
+        private val currentDate = SimpleDateFormat("yyyy-MM-dd ", Locale.ENGLISH).format(Date())
 
         fun isFirstLevelPassed() = firstLevelPassed
 
@@ -79,6 +84,23 @@ class LGCGame(val store: StoreInterface) : Game() {
             }
             return Pair(player, level)
         }
+
+        fun shouldShowBottleDialog(): Boolean {
+            return shouldShowBottleDialog
+        }
+
+        fun keepCurrentDate() {
+            shouldShowBottleDialog = false
+            prefs?.putBoolean(currentDate, true)
+            prefs?.flush()
+        }
+
+        fun getBottlesCount() = prefs?.getInteger(PLAYER_BOTTLES_COUNT) ?: 0
+
+        fun setBottlesCount(bottlesCount: Int) {
+            prefs?.putInteger(PLAYER_BOTTLES_COUNT, bottlesCount)
+            prefs?.flush()
+        }
     }
 
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -92,6 +114,8 @@ class LGCGame(val store: StoreInterface) : Game() {
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
         firstLevelPassed = prefs?.getBoolean(FIRST_LEVEL_PASSED) ?: false
+
+        shouldShowBottleDialog = prefs?.contains(currentDate) != true
 
         if (prefs?.getBoolean(WAS_LAUNCHED) != true) {
             prefs?.putBoolean(MUSIC, true)

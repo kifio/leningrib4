@@ -37,7 +37,6 @@ class StoreActor(camera: OrthographicCamera,
     private var descriptionsHeights: List<Float>? = null
 
     private var buyLabel = "КУПИТЬ"
-    private var buyLabelColor = Color(39f / 255f, 113f / 255f, 41f / 255f, 1f)
     private var buyLabelTexture: Texture = ResourcesManager.getTexture(GREEN_BG)
     private var buyLabelHeight = LabelManager.getInstance().getTextHeight(buyLabel, LabelManager.getInstance().mediumFont)
     private var buyLabelWidth = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 1.4f
@@ -63,7 +62,8 @@ class StoreActor(camera: OrthographicCamera,
                 }
 
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
-                    val item = getTouchedItem(x, Gdx.graphics.height - y)
+                    val top = camera.position.y + (Gdx.graphics.height / 2f) - topTextureHeight
+                    val item = getTouchedItem(top - y)
                     if (item != null) {
                         onTouchHandler?.invoke()
                         touched = false
@@ -140,8 +140,8 @@ class StoreActor(camera: OrthographicCamera,
         return getTexture(HUD_BOTTLE)
     }
 
-    private fun getTouchedItem(x: Float, y: Float): StoreItem? {
-        val index = (y / (innerOffset + imageSize)).toInt()
+    private fun getTouchedItem(y: Float): StoreItem? {
+        val index = (y / (3 * innerOffset + imageSize)).toInt()
         return items?.let {
             if (index < it.size) return it[index]
             else return null

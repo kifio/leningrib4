@@ -19,6 +19,8 @@ import kifio.leningrib.model.actors.ui.Dialog
 import kifio.leningrib.model.pathfinding.ForestGraph
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 class CommonLevel() : Level() {
@@ -52,8 +54,9 @@ class CommonLevel() : Level() {
 
             var x: Int
             var y: Int
+            val max = ((top - bottom) * (levelWidth - 2))
 
-            val mushroomsLimit = (MIN + (mushroomsCount / 10) + ThreadLocalRandom.current().nextInt(2)).coerceAtMost(Int.MAX_VALUE)
+            val mushroomsLimit = (MIN + (mushroomsCount / 10) + ThreadLocalRandom.current().nextInt(2)).coerceAtMost(max)
 
             while (count < mushroomsLimit) {
 
@@ -122,7 +125,7 @@ class CommonLevel() : Level() {
         return gameObjects
     }
 
-//    override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
+    //    override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
 //        val grandma = this.grandma
 //        if (grandma == null) {
 //            super.movePlayerTo(x, y, player, null)
@@ -154,34 +157,33 @@ class CommonLevel() : Level() {
 //        }
 //    }
 //
-//    fun showGrandmaDialogIfNeeded(camera: OrthographicCamera,
-//                          lutController: LUTController,
-//                          stage: Stage) {
-//
-//        if (LGCGame.getPreferences()?.getBoolean(LGCGame.WAS_GRANDMA_DIALOG_SHOWN) == true) {
-//            return
-//        }
-//
-//        LGCGame.getPreferences()?.putBoolean(LGCGame.WAS_GRANDMA_DIALOG_SHOWN, true)
-//
-//        val speeches = arrayOf(
-//                "Подходи, милок, не бойся.",
-//                "У меня есть все что тебе нужно."
-//        )
-//
-//        stage.addAction(Actions.delay(0.5f,
-//        Actions.run {
-//            stage.addActor(Dialog(camera, lutController, speeches, Array(speeches.size) { i -> ResourcesManager.GRANDMA_DIALOG_FACE }).apply {
-//                this.disposeHandler = {
-//                    remove()
-//                }
-//            })
-//        }))
-//    }
+    fun showDailyDialogIfNeeded(camera: OrthographicCamera,
+                                lutController: LUTController,
+                                stage: Stage,
+                                callback: () -> Unit) {
+
+        if (!LGCGame.shouldShowBottleDialog()) {
+            return
+        }
+
+        LGCGame.keepCurrentDate()
+
+        val speeches = arrayOf("Ежедневная бутылка водки!\nБрось ее рядом с лесником, чтобы отвлечь его.")
+
+        stage.addAction(Actions.delay(0.5f,
+                Actions.run {
+                    stage.addActor(Dialog(camera, lutController, speeches, arrayOf("Ок"), Array(speeches.size) { i -> ResourcesManager.GRANDMA_DIALOG_FACE }).apply {
+                        this.disposeHandler = {
+                            remove()
+                            callback.invoke()
+                        }
+                    })
+                }))
+    }
 
     companion object {
         private const val MIN = 1
-        private const val MAX = 6
+        private const val MAX = 12
         const val LEVEL_HEIGHT = 48
     }
 }
