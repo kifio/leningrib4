@@ -251,7 +251,7 @@ class GameScreen(game: LGCGame,
                 storeOpened = true
                 if (settings == null) {
                     settings = Group().apply {
-                        x = Gdx.graphics.width.toFloat()
+                        x = -Gdx.graphics.width.toFloat()
                         val storeActor = StoreActor(camera, lutController, game.store)
                         storeActor.onTouchHandler = {
                             player.bottlesCount++
@@ -558,19 +558,30 @@ class GameScreen(game: LGCGame,
         var tileSize = 0
     }
 
-    internal fun handleFling() {
-        removeSettings()
+    internal fun handleFlingRight() {
+        if (!storeOpened) {
+            removeSettings()
+        }
+    }
+
+    fun handleFlingLeft() {
+        if (storeOpened) {
+            removeSettings()
+        }
     }
 
     internal fun handleKeyDown(keycode: Int): Boolean {
         val handled = keycode == Input.Keys.BACK
-        if (handled) removeSettings()
+        if (handled) {
+            removeSettings()
+        }
         return handled
     }
 
     private fun removeSettings() {
         val sequenceAction = SequenceAction()
-        sequenceAction.addAction(Actions.moveTo(Gdx.graphics.width.toFloat(), 0f, ANIMATION_DURATION))
+        val x = if (storeOpened) -Gdx.graphics.width.toFloat() else Gdx.graphics.width.toFloat()
+        sequenceAction.addAction(Actions.moveTo(x, 0f, ANIMATION_DURATION))
         sequenceAction.addAction(Actions.run {
             settings?.remove()
             settings = null

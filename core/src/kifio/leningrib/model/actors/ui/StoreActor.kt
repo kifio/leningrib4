@@ -3,13 +3,10 @@ package kifio.leningrib.model.actors.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
-import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.utils.Align
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
@@ -36,8 +33,8 @@ class StoreActor(camera: OrthographicCamera,
     private val topTextureWidth: Float
     private val topTextureHeight: Float
 
-    private var items = mutableListOf<StoreItem>()
-    private var descriptionsHeights = mutableListOf<Float>()
+    private var items: List<StoreItem>? = null
+    private var descriptionsHeights: List<Float>? = null
 
     private var buyLabel = "КУПИТЬ"
     private var buyLabelColor = Color(39f / 255f, 113f / 255f, 41f / 255f, 1f)
@@ -50,30 +47,30 @@ class StoreActor(camera: OrthographicCamera,
         val scale = Gdx.graphics.width.toFloat() / topTexture.width.toFloat()
         topTextureWidth = topTexture.width * scale
         topTextureHeight = topTexture.height * scale
-
-
-        if (items.isEmpty()) {
-            store.loadPurchases { it ->
+        if (items == null) {
+            store.loadPurchases { items ->
                 val lm = LabelManager.getInstance()
-                this.items.addAll(it)
-                this.descriptionsHeights.addAll( it.map { item -> lm.getTextHeight(item.description, lm.smallFont) })
-            }
-        }
-
-        addListener(object : InputListener() {
-            override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                touched = true
-                return true
-            }
-
-            override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
-                val item = getTouchedItem(x, Gdx.graphics.height - y)
-                if (item != null) {
-                    onTouchHandler?.invoke()
-                    touched = false
+                this.items = items
+                this.descriptionsHeights = items.map { item ->
+                    lm.getTextHeight(item.description, lm.smallFont)
                 }
             }
-        })
+
+            addListener(object : InputListener() {
+                override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                    touched = true
+                    return true
+                }
+
+                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                    val item = getTouchedItem(x, Gdx.graphics.height - y)
+                    if (item != null) {
+                        onTouchHandler?.invoke()
+                        touched = false
+                    }
+                }
+            })
+        }
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
@@ -84,14 +81,14 @@ class StoreActor(camera: OrthographicCamera,
         batch.shader = null
         if (region != null) batch.draw(region, x, y, width, height)
 
-//        for (index in items.indices) {
-//            drawBuyBackground(index, top)
-//        }
+        batch.draw(topTexture, offset, top, topTextureWidth, topTextureHeight)
 
-        batch.draw(topTexture, offset, top, topTextureWidth,  topTextureHeight)
-
-        for (index in items.indices) {
-            drawItem(batch, index, items[index], top)
+        items?.let { items ->
+            descriptionsHeights?.let { heights ->
+                for (index in items.indices) {
+                    drawItem(batch, index, items[index], heights[index], top)
+                }
+            }
         }
 
         if (lutController?.lutTexture != null) {
@@ -99,12 +96,16 @@ class StoreActor(camera: OrthographicCamera,
         }
     }
 
-    private fun drawItem(batch: Batch, index: Int, item: StoreItem, top: Float) {
+    private fun drawItem(batch: Batch,
+                         index: Int,
+                         item: StoreItem,
+                         height: Float,
+                         top: Float) {
         val texture = getTexture(item.id)
         val xImage = offset + innerOffset
 
-        val imageY = top - (imageSize + 2f * innerOffset) * (index + 1)
-        val descriptionOffset = (imageSize - descriptionsHeights[index])
+        val imageY = top - (imageSize + 3f * innerOffset) * (index + 1)
+        val descriptionOffset = (imageSize - height)
 
         batch.draw(texture,
                 xImage,
@@ -120,13 +121,13 @@ class StoreActor(camera: OrthographicCamera,
 
         val buyY = imageY + (descriptionOffset - buyLabelHeight) / 2f
 
-        batch.draw(buyLabelTexture, textOffset + imageSize , buyY - (0.8f * GameScreen.tileSize), buyLabelWidth, GameScreen.tileSize.toFloat())
+        batch.draw(buyLabelTexture, textOffset + imageSize, buyY - (0.8f * GameScreen.tileSize), buyLabelWidth, GameScreen.tileSize.toFloat())
 
         LabelManager.getInstance().mediumFont.draw(batch,
                 item.price,
                 textOffset,
                 buyY - (0.25f * GameScreen.tileSize),
-                imageSize, Align.center, true)
+                imageSize, Align.left, true)
 
         LabelManager.getInstance().mediumFont.draw(batch,
                 buyLabel,

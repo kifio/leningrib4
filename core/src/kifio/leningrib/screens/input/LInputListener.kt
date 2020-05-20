@@ -8,8 +8,12 @@ import kotlin.math.abs
 class LInputListener(private var gameScreen: GameScreen?) : GestureDetector.GestureListener {
 
     override fun fling(velocityX: Float, velocityY: Float, button: Int): Boolean {
-        if (abs(velocityX) > abs(velocityY) && velocityX > 0) {
-            gameScreen?.handleFling()
+        if (abs(velocityX) > abs(velocityY)) {
+            if (velocityX > 0) {
+                gameScreen?.handleFlingRight()
+            } else {
+                gameScreen?.handleFlingLeft()
+            }
         }
         return true
     }

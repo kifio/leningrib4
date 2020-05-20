@@ -54,7 +54,7 @@ public class LabelManager {
 		parameter.color = Color.WHITE;
 		parameter.minFilter = Nearest;
 		parameter.magFilter = Linear;
-		parameter.spaceY = (int) (2 * Gdx.graphics.getDensity());
+		parameter.spaceY = (int) (4 * Gdx.graphics.getDensity());
 		parameter.shadowOffsetY = shadowOffsetY;
 		parameter.size *= (scale * Gdx.graphics.getDensity());
 		return parameter;
