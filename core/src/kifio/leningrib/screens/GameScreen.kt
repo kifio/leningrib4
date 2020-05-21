@@ -50,6 +50,7 @@ class GameScreen(game: LGCGame,
     private var lastKnownCameraPosition = 0f
     private var settings: Group? = null
     private var vodkaButton: SquareButton? = null
+    private var gumButton: SquareButton? = null
     private val levelSize = CommonLevel.LEVEL_HEIGHT * tileSize
     private var accumulatedTime = 0f
 
@@ -151,15 +152,12 @@ class GameScreen(game: LGCGame,
             if (!bottleWasUpdated) {
                 bottleWasUpdated = true
                 vodkaButton?.isVisible = true
-                val sequenceAction = SequenceAction()
-                sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-                sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-                sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-                sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-                sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
-                sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
-                vodkaButton?.addAction(sequenceAction)
+                vodkaButton?.addAction(getScaleAnimSequence())
             }
+        }
+
+        if (player.gumsCount > 0) {
+            gumButton?.isVisible = true
         }
 
         if (isFirstLevelPassed() && player.mushroomsCount > 0) {
@@ -169,6 +167,17 @@ class GameScreen(game: LGCGame,
         level.mushroomsSpeeches?.let { addSpeechesToStage(it) }
         level.forestersSpeeches?.let { addSpeechesToStage(it) }
         updateWorld(delta)
+    }
+
+    private fun getScaleAnimSequence(): SequenceAction {
+        val sequenceAction = SequenceAction()
+        sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
+        sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
+        sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
+        sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
+        sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
+        sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
+        return sequenceAction
     }
 
     private fun updateWorld(delta: Float) {
@@ -235,7 +244,8 @@ class GameScreen(game: LGCGame,
                                 player.increaseBottlesCount()
                                 arrayOf("Ты купил цифровую водку, милок!")
                             } else {
-                                arrayOf("Нет в наличии, милок!")
+                                player.increaseGumsCount()
+                                arrayOf("Ты купил цифровую жвачку, милок!")
                             }
                             stage.addAction(Actions.delay(0.1f,
                                     Actions.run {
@@ -367,7 +377,7 @@ class GameScreen(game: LGCGame,
         transitionActor?.addActor(getSettingsButton())
         transitionActor?.addActor(getStoreButton())
         transitionActor?.addActor(gameOverLogo)
-        transitionActor?.addActor(MushroomsCountView(camera, player.mushroomsCount, lutController))
+        transitionActor?.addActor(MushroomsCountView(camera, player.score, lutController))
         transitionActor?.addActor(restartGameButton)
 
         stage.addActor(transitionActor)
@@ -498,8 +508,36 @@ class GameScreen(game: LGCGame,
         } else {
             vodkaButton?.isVisible = player.bottlesCount > 0
         }
+
+        if (gumButton == null) {
+            gumButton = SquareButton(
+                    getRegion(GUM_1_PRESSED),
+                    getRegion(GUM_1),
+                    camera, lutController,
+                    SquareButton.GUM,
+                    SquareButton.RIGHT)
+
+            gumButton?.isVisible = player.bottlesCount > 0
+            gumButton?.onTouchHandler = {
+
+                if (gumButton?.isVisible == true) {
+                    setupVodka()
+                }
+
+                player.decreaseGumsCount();
+
+                if (player.gumsCount == 0) {
+                    gumButton?.remove()
+                    gumButton = null
+                }
+            }
+        } else {
+            gumButton?.isVisible = player.gumsCount > 0
+        }
+
         stage.addActor(pauseButton)
         stage.addActor(vodkaButton)
+        stage.addActor(gumButton)
 
         pauseButton.zIndex = stage.actors.count() - 1
         vodkaButton?.zIndex = stage.actors.count() - 1

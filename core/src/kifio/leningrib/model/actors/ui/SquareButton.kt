@@ -25,6 +25,7 @@ class SquareButton(
 
         const val BUTTON = 1
         const val VODKA = 2
+        const val GUM = 3
     }
 
     var onTouchHandler: (() -> Unit)? = null

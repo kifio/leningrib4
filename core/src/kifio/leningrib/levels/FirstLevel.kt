@@ -223,7 +223,7 @@ class FirstLevel() : Level() {
         val speeches = arrayOf(
                 "Получилось! " +
                         "Дальше начинается настоящий лес.",
-                "А эти грибы помогут мне найти дорогу к следующей опушкеz."
+                "А эти грибы помогут мне найти дорогу к следующей опушке."
         )
 
         return Dialog(camera, lutController, speeches, arrayOf("Да!", "Окей", "Погнали"), Array(speeches.size) { i -> ResourcesManager.PLAYER_DIALOG_FACE }).apply {

@@ -37,7 +37,10 @@ class LGCGame(val store: StoreInterface) : Game() {
         const val PREFERENCES_NAME = "kifio.leningrib"
 
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
-        const val PLAYER_BOTTLES_COUNT = "PLAYER_BOTTLES_COUNT"
+
+        private const val PLAYER_BOTTLES_COUNT = "PLAYER_BOTTLES_COUNT"
+        private const val PLAYER_GUMS_COUNT = "PLAYER_GUMS_COUNT"
+
         const val MUSIC = "music"
         const val SOUNDS = "sounds"
         private const val WAS_LAUNCHED = "is_first_launch"
@@ -90,12 +93,18 @@ class LGCGame(val store: StoreInterface) : Game() {
             prefs?.flush()
         }
 
-        fun getBottlesCount() = prefs?.getInteger(PLAYER_BOTTLES_COUNT) ?: 0
+        // TODO: Migrate to in app purchases
+        fun getBottlesCount() = getCount(PLAYER_BOTTLES_COUNT)
+        fun getGumsCount() = getCount(PLAYER_GUMS_COUNT)
+        fun setBottlesCount(count: Int) = setCount(PLAYER_BOTTLES_COUNT, count)
+        fun setGumsCount(count: Int) = setCount(PLAYER_GUMS_COUNT, count)
 
-        fun setBottlesCount(bottlesCount: Int) {
-            prefs?.putInteger(PLAYER_BOTTLES_COUNT, bottlesCount)
+        private fun setCount(item: String, count: Int) {
+            prefs?.putInteger(item, count)
             prefs?.flush()
         }
+
+        private fun getCount(item: String) = prefs?.getInteger(item) ?: 0
     }
 
     val executor: ExecutorService = Executors.newSingleThreadExecutor()

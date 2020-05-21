@@ -63,6 +63,7 @@ public class ResourcesManager {
     public static final String VODKA_5 = "vodka_5.png";
     public static final String GUM_1 = "gum_1.png";
     public static final String GUM_2 = "gum_2.png";
+    public static final String GUM_1_PRESSED = "gum_1_pressed.png";
 
 
     public static I18NBundle commonMushroomsSpeechBundle;
@@ -79,7 +80,7 @@ public class ResourcesManager {
     public static I18NBundle forestersSpeechesDrunk;
     public static I18NBundle forestersSpeechesRunToBottle;
     public static I18NBundle playerWonderingSpeeches;
-    public static I18NBundle grandmaSpeechesBundle;
+    public static I18NBundle playerClearSpeeches;
 
     private static final int TILE_SIZE = 16; // Размер тайла который мы вырезаем из png в пикселя
     private static AssetManager am = new AssetManager();
@@ -185,6 +186,7 @@ public class ResourcesManager {
         am.load(VODKA_5, Texture.class, param);
         am.load(GUM_1, Texture.class, param);
         am.load(GUM_2, Texture.class, param);
+        am.load(GUM_1_PRESSED, Texture.class, param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -199,7 +201,7 @@ public class ResourcesManager {
         am.load("i18n/foresters_speeches_drinking", I18NBundle.class);
         am.load("i18n/foresters_speeches_drunk", I18NBundle.class);
         am.load("i18n/foresters_speeches_run_to_bottle", I18NBundle.class);
-        am.load("i18n/grandma_speeches", I18NBundle.class);
+        am.load("i18n/player_clear_speeches", I18NBundle.class);
         am.load("i18n/player_wondering_speeches", I18NBundle.class);
     }
 
@@ -224,6 +226,10 @@ public class ResourcesManager {
         putTexture(PAUSE_PRESSED);
         putTexture(SETTINGS);
         putTexture(SETTINGS_PRESSED);
+        putTexture(STORE);
+        putTexture(GUM_1);
+        putTexture(GUM_1_PRESSED);
+        putTexture(GUM_2);
         putTexture(STORE);
         putTexture(STORE_PRESSED);
         putTexture(PAUSE_PRESSED);
@@ -256,7 +262,7 @@ public class ResourcesManager {
         forestersSpeechesFearBundle = am.get("i18n/foresters_speeches_fear", I18NBundle.class);
         forestersSpeechesPatrolBundle = am.get("i18n/foresters_speeches_patrol", I18NBundle.class);
         forestersSpeechesStopBundle = am.get("i18n/foresters_speeches_stop", I18NBundle.class);
-        grandmaSpeechesBundle = am.get("i18n/grandma_speeches", I18NBundle.class);
+        playerClearSpeeches = am.get("i18n/player_clear_speeches", I18NBundle.class);
         forestersSpeechesInvisiblePlayerBundle = am.get("i18n/foresters_speeches_invisible_player", I18NBundle.class);
         forestersSpeechesDrinking = am.get("i18n/foresters_speeches_drinking", I18NBundle.class);
         forestersSpeechesDrunk = am.get("i18n/foresters_speeches_drunk", I18NBundle.class);

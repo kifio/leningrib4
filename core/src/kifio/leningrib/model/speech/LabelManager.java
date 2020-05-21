@@ -128,8 +128,8 @@ public class LabelManager {
 		return ResourcesManager.playerWonderingSpeeches.get(String.valueOf(random(1, 6)));
 	}
 
-	public String getGrandmaSpeech(int i) {
-		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
+	public String getClearSpeech(int i) {
+		return ResourcesManager.playerClearSpeeches.get(String.valueOf(random(1, 5)));
 	}
 
 	public Label getLabel(String text, float x, float y, Color color) {

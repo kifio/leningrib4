@@ -38,12 +38,15 @@ public class Player extends MovableActor {
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
     private int bottlesCount = 0;
+    private int score = 0;
+    private int gumsCount = 0;
 
     public Label label;
 
     public Player(float x, float y) {
         super(x, y);
         bottlesCount = LGCGame.Companion.getBottlesCount();
+        bottlesCount = LGCGame.Companion.getGumsCount();
         clothesHSV = tmpColor.toHsv(clothesHSV);
         label = LabelManager.getInstance().getLabel(null, x,
                 y + 1.3f * GameScreen.tileSize, Color.WHITE);
@@ -99,9 +102,15 @@ public class Player extends MovableActor {
 
     public void increaseMushroomCount() {
         this.mushroomsCount++;
+        this.score++;
         if (mushroomsCount == 1) {
             label.setText(LabelManager.getInstance().getWonderingSpeech());
         }
+    }
+
+    public void resetMushroomCount() {
+        this.mushroomsCount = 0;
+        label.setText(LabelManager.getInstance().getWonderingSpeech());
     }
 
     public void increaseBottlesCount() {
@@ -116,6 +125,24 @@ public class Player extends MovableActor {
 
     public int getBottlesCount() {
         return bottlesCount;
+    }
+
+    public void increaseGumsCount() {
+        this.gumsCount++;
+        LGCGame.Companion.setGumsCount(this.gumsCount);
+    }
+
+    public void decreaseGumsCount() {
+        this.gumsCount--;
+        LGCGame.Companion.setGumsCount(this.gumsCount);
+    }
+
+    public int getGumsCount() {
+        return gumsCount;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void onEffectiveMushroomTake(Mushroom mushroom) {
