@@ -20,7 +20,7 @@ class StoreActor(camera: OrthographicCamera,
                  store: StoreInterface
 ) : Overlay(camera, 0f, lutController, getRegion(SETTINGS_BACKGROUND)) {
 
-    var onTouchHandler: (() -> Unit)? = null
+    var onTouchHandler: ((item: StoreItem?) -> Unit)? = null
 
     private val innerOffset = 16 * Gdx.graphics.density
     private val imageSize = GameScreen.tileSize * 2f
@@ -62,9 +62,9 @@ class StoreActor(camera: OrthographicCamera,
 
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                     val top = Gdx.graphics.height - topTextureHeight
-                    val item = getTouchedItem(top - y)
+                    val item = getTouchedItem(x, top - y)
                     if (item != null) {
-                        onTouchHandler?.invoke()
+                        onTouchHandler?.invoke(item)
                         touched = false
                     }
                 }
@@ -146,7 +146,13 @@ class StoreActor(camera: OrthographicCamera,
         }
     }
 
-    private fun getTouchedItem(y: Float): StoreItem? {
+    private fun getTouchedItem(x: Float, y: Float): StoreItem? {
+        val min = offset + innerOffset
+        val max = Gdx.graphics.width - (offset + innerOffset)
+        if (x <= min || x >= max) {
+            return null
+        }
+
         val index = (y / (3 * innerOffset + imageSize)).toInt()
         return items?.let {
             if (index < it.size) return it[index]

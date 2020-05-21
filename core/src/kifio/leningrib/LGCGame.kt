@@ -69,9 +69,6 @@ class LGCGame(val store: StoreInterface) : Game() {
                 val x = 3f
                 val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 3).toFloat()
                 player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize)
-                val xPlayer = Utils.mapCoordinate(player.x)
-                val yPlayer = Utils.mapCoordinate(player.y)
-                val xGrandma = xPlayer + (GameScreen.tileSize * 3)
                 level = CommonLevel(player, levelMap)
             } else {
                 val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2

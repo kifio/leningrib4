@@ -231,18 +231,21 @@ class GameScreen(game: LGCGame,
                         x = -Gdx.graphics.width.toFloat()
                         val storeActor = StoreActor(camera, lutController, game.store)
                         storeActor.onTouchHandler = {
-                            player.increaseBottlesCount()
+                            val msg: Array<String> = if (it != null && it.id < 2) {
+                                player.increaseBottlesCount()
+                                arrayOf("Ты купил цифровую водку, милок!")
+                            } else {
+                                arrayOf("Нет в наличии, милок!")
+                            }
                             stage.addAction(Actions.delay(0.1f,
                                     Actions.run {
-                                        stage.addActor(Dialog(camera, lutController,
-                                                arrayOf("Ты купил цифровую водку, милок!"),
+                                        stage.addActor(Dialog(camera, lutController, msg,
                                                 arrayOf("Ок"), Array(1) { i -> GRANDMA_DIALOG_FACE }).apply {
                                             this.disposeHandler = {
                                                 remove()
                                             }
                                         })
                                     }))
-
                         }
                         addActor(storeActor)
                         addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
