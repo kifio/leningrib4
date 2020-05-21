@@ -48,7 +48,7 @@ public class TutorialForester extends TutorialCharacter {
         this.idle = texture + "_idle";
         this.run = texture + "_run";
         this.isPaused = false;
-        this.label = LabelManager.getInstance().getLabel(labels[0], x - 0.5f * GameScreen.tileSize,
+        this.label = LabelManager.getInstance().getLabel(labels[0], false, x - 0.5f * GameScreen.tileSize,
                 y + 1.3f * GameScreen.tileSize, Forester.DEFAULT_SPEECH_COLOR);
     }
 

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LGCGame
-import kifio.leningrib.LGCGame.Companion.FIRST_LEVEL_PASSED
 import kifio.leningrib.LGCGame.Companion.MUSIC
 import kifio.leningrib.LGCGame.Companion.SOUNDS
 import kifio.leningrib.LUTController

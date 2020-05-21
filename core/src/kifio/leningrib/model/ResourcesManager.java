@@ -59,6 +59,10 @@ public class ResourcesManager {
     public static final String CLICK = "sounds/click.ogg";
     public static final String GAMEOVER = "sounds/gameover.wav";
     public static final String STORE_TOP = "store_top.png";
+    public static final String VODKA_3 = "vodka_3.png";
+    public static final String VODKA_5 = "vodka_5.png";
+    public static final String GUM_1 = "gum_1.png";
+    public static final String GUM_2 = "gum_2.png";
 
 
     public static I18NBundle commonMushroomsSpeechBundle;
@@ -177,8 +181,10 @@ public class ResourcesManager {
         param.magFilter = Texture.TextureFilter.Nearest;
         am.load(PLAYER_DIALOG_FACE, Texture.class, param);
         am.load(GRANDMA_DIALOG_FACE, Texture.class, param);
-//        am.load(TARGET, Texture.class, param);
-//        loadLut(param);
+        am.load(VODKA_3, Texture.class, param);
+        am.load(VODKA_5, Texture.class, param);
+        am.load(GUM_1, Texture.class, param);
+        am.load(GUM_2, Texture.class, param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -236,7 +242,6 @@ public class ResourcesManager {
         putTexture(RESULT_MUSHROOM);
         putTexture(PLAYER_DIALOG_FACE);
         putTexture(GRANDMA_DIALOG_FACE);
-//        putTexture(TARGET);
         putTexture(GRASS_0, TILE_SIZE * 2, TILE_SIZE * 2);
         putTexture(GRASS_2, TILE_SIZE * 2, TILE_SIZE * 2);
     }

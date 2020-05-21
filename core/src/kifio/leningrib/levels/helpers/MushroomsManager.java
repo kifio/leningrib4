@@ -19,11 +19,14 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
 
     private static int SPEECH_SEED = 768;
     private float velocityMultiplier = 1;
+    private boolean isSmall = true;
 
     private Array<Integer> removedMushrooms = new Array<>(4);
 
-    public MushroomsManager() {
+
+    public MushroomsManager(boolean isSmall) {
         gameObjects = new Array<>();
+        this.isSmall = isSmall;
     }
 
     public void addMushrooms(Array<Mushroom> mushrooms) {
@@ -99,7 +102,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
             float x = m.getX() + (0.5f * GameScreen.tileSize) - (1.3f * GameScreen.tileSize);
             float yOffset = 1f * GameScreen.tileSize;
             float y = m.getY() + yOffset;
-            speeches[index] = LabelManager.getInstance().getLabel(speech, x, y, m.getSpeechColor());
+            speeches[index] = LabelManager.getInstance().getLabel(speech, isSmall, x, y, m.getSpeechColor());
             if (!m.hasStableSpeech()) {
                 speeches[index].addAction(
                         getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index)

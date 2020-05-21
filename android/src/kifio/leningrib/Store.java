@@ -16,11 +16,18 @@ public class Store implements StoreInterface {
     @Override
     public void loadPurchases(final OnPurchasesLoadedListener listener) {
         ArrayList<StoreItem> items = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            items.add(new StoreItem(
-                    i, "0.00Р", "Cамогон. Популярен у лесников."
-            ));
-        }
+        items.add(new StoreItem(
+                0, "0.00Р", "3 бутылки водки. Отвлекает лесников."
+        ));
+        items.add(new StoreItem(
+                1, "0.00Р", "5 бутылок водки. Отвлекает лесников."
+        ));
+        items.add(new StoreItem(
+                2, "0.00Р", "Пачка жвачек. Снимает эфекты от грибов."
+        ));
+        items.add(new StoreItem(
+                3, "0.00Р", "2 пачки жвачек. Снимает эфекты от грибов."
+        ));
         listener.onPurchasesLoaded(items);
     }
 }

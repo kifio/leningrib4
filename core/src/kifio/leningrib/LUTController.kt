@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import kifio.leningrib.model.ResourcesManager
-import java.util.Collections.min
 import java.util.concurrent.ThreadLocalRandom
 
 class LUTController {

@@ -25,7 +25,8 @@ public class LabelManager {
 	public BitmapFont largeFont;
 
 	private GlyphLayout glyphLayout = new GlyphLayout();
-	private Label.LabelStyle labelStyle = new Label.LabelStyle();
+	private Label.LabelStyle smallLabelStyle = new Label.LabelStyle();
+	private Label.LabelStyle mediumLabelStyle = new Label.LabelStyle();
 
 	private static final float SCALE = 0.9f;
 	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?'+-*/()[]={}@";
@@ -44,7 +45,8 @@ public class LabelManager {
 		smallFont = generator.generateFont(getFontParameters(0.6f, 0));
 		mediumFont = generator.generateFont(getFontParameters(0.8f, 0));
 		largeFont = generator.generateFont(getFontParameters(1f, 1));
-		labelStyle.font = smallFont;
+		smallLabelStyle.font = smallFont;
+		mediumLabelStyle.font = mediumFont;
 		generator.dispose();
 	}
 
@@ -130,22 +132,18 @@ public class LabelManager {
 		return ResourcesManager.grandmaSpeechesBundle.get(String.valueOf(i));
 	}
 
-	public Label getLabel(String text, float x, float y) {
-		return getLabel(text, x, y, Color.WHITE);
-	}
-
 	public Label getLabel(String text, float x, float y, Color color) {
-		return getLabel(text, x, y, Align.center, color);
+		return getLabel(text, true, x, y, color);
 	}
 
-	public Label getLabel(String text, float x, float y, int align, Color color) {
-		Label label = new Label(text, labelStyle);
+	public Label getLabel(String text, boolean isSmall, float x, float y, Color color) {
+		Label label = new Label(text, isSmall ? smallLabelStyle : mediumLabelStyle);
 		label.setColor(color);
 		label.setWidth(GameScreen.tileSize * 2.7f);
 		label.setFontScale(SCALE, SCALE);
 		label.setPosition(x, y);
 		label.setWrap(true);
-		label.setAlignment(align, align);
+		label.setAlignment(Align.center, Align.center);
 		return label;
 	}
 }

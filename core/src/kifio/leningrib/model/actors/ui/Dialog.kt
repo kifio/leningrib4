@@ -1,6 +1,5 @@
 package kifio.leningrib.model.actors.ui
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -13,7 +12,6 @@ import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.PLAYER_DIALOG_FACE
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
-import java.util.concurrent.ThreadLocalRandom
 
 
 class Dialog(camera: OrthographicCamera,

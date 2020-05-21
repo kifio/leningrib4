@@ -147,19 +147,19 @@ public class Mushroom extends MovableActor {
         else return 1f;
     }
 
-    public boolean isInvisibilityMushroom() {
+    boolean isInvisibilityMushroom() {
         return effect == Effect.INVISIBLE;
     }
 
-    public boolean isStrengthMushroom() {
+    boolean isStrengthMushroom() {
         return effect == Effect.POWER;
     }
 
-    public boolean isDexterityMushroom() {
+    boolean isDexterityMushroom() {
         return effect == Effect.DEXTERITY;
     }
 
-    public float getEffectAlertTime() {
+    float getEffectAlertTime() {
         if (effectTime == Float.POSITIVE_INFINITY) {
             return Float.POSITIVE_INFINITY;
         } else {

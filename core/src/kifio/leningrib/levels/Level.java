@@ -19,15 +19,13 @@ import kifio.leningrib.levels.helpers.MushroomsManager;
 import kifio.leningrib.levels.helpers.TreesManager;
 import kifio.leningrib.model.TreePart;
 import kifio.leningrib.model.actors.fixed.Bottle;
-import kifio.leningrib.model.actors.game.Mushroom;
 import kifio.leningrib.model.actors.game.Forester;
+import kifio.leningrib.model.actors.game.Mushroom;
 import kifio.leningrib.model.actors.game.Player;
-import kifio.leningrib.model.actors.fixed.Grandma;
 import kifio.leningrib.model.pathfinding.ForestGraph;
 import kifio.leningrib.screens.GameScreen;
 import model.LevelMap;
 import model.Room;
-import model.Segment;
 
 public abstract class Level {
 
@@ -54,14 +52,14 @@ public abstract class Level {
         this.nextLevel = level.nextLevel;
     }
 
-    protected void setup(Player player, Grandma grandma, LevelMap levelMap, Config levelConfig) {
+    protected void setup(Player player,  LevelMap levelMap, Config levelConfig) {
         roomsRectangles = new Array<>();
         treesManager = new TreesManager();
         treesManager.updateTrees(levelMap, levelConfig, nextLevel);
 
-        forestGraph = new ForestGraph(grandma, treesManager.getObstacleTrees());
-        dexterityForestGraph = new ForestGraph(grandma, treesManager.getOuterBordersTrees());
-        strengthForestGraph = new ForestGraph(grandma, treesManager.getObstacleTrees());
+        forestGraph = new ForestGraph(treesManager.getObstacleTrees());
+        dexterityForestGraph = new ForestGraph(treesManager.getOuterBordersTrees());
+        strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
 
         Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
         Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles, forestGraph);
@@ -69,7 +67,7 @@ public abstract class Level {
 
         bottleManager = new BottleManager();
         forestersManager = new ForestersManager(foresters);
-        mushroomsManager = new MushroomsManager();
+        mushroomsManager = new MushroomsManager(this instanceof CommonLevel);
 
         mushroomsManager.addMushrooms(initMushrooms(levelConfig,
                 treesManager,
@@ -104,9 +102,9 @@ public abstract class Level {
                                     Config levelConfig) {
 
         treesManager.updateTrees(levelMap, levelConfig, nextLevel);
-        forestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
-        dexterityForestGraph = new ForestGraph(null, treesManager.getOuterBordersTrees());
-        strengthForestGraph = new ForestGraph(null, treesManager.getObstacleTrees());
+        forestGraph = new ForestGraph(treesManager.getObstacleTrees());
+        dexterityForestGraph = new ForestGraph(treesManager.getOuterBordersTrees());
+        strengthForestGraph = new ForestGraph(treesManager.getObstacleTrees());
 
         Rectangle[] rectangles = getRoomsRectangles(levelMap, levelConfig, nextLevel);
         Array<Forester> foresters = initForesters(levelMap, levelConfig, player, rectangles, forestGraph);

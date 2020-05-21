@@ -10,7 +10,6 @@ import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.TreePart
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
-import java.util.*
 
 class TreesManager {
 

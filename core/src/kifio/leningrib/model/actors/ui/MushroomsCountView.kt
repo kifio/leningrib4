@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager.RESULT_MUSHROOM
 import kifio.leningrib.model.ResourcesManager.getRegion
-import kifio.leningrib.model.actors.ui.StaticActor
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
 

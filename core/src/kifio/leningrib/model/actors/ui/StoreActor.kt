@@ -1,7 +1,6 @@
 package kifio.leningrib.model.actors.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -62,7 +61,7 @@ class StoreActor(camera: OrthographicCamera,
                 }
 
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
-                    val top = camera.position.y + (Gdx.graphics.height / 2f) - topTextureHeight
+                    val top = Gdx.graphics.height - topTextureHeight
                     val item = getTouchedItem(top - y)
                     if (item != null) {
                         onTouchHandler?.invoke()
@@ -101,7 +100,8 @@ class StoreActor(camera: OrthographicCamera,
                          item: StoreItem,
                          height: Float,
                          top: Float) {
-        val texture = getTexture(item.id)
+
+        val texture = getTexture(item.id) ?: return
         val xImage = offset + innerOffset
 
         val imageY = top - (imageSize + 3f * innerOffset) * (index + 1)
@@ -136,8 +136,14 @@ class StoreActor(camera: OrthographicCamera,
                 textWidth, Align.left, true)
     }
 
-    private fun getTexture(id: Int): Texture {
-        return getTexture(HUD_BOTTLE)
+    private fun getTexture(id: Int): Texture? {
+        return when (id) {
+            0 -> getTexture(VODKA_3)
+            1 -> getTexture(VODKA_5)
+            2 -> getTexture(GUM_1)
+            3 -> getTexture(GUM_2)
+            else -> null
+        }
     }
 
     private fun getTouchedItem(y: Float): StoreItem? {

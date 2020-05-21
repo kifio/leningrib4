@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
-import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
-import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager.getClickSound
 import kifio.leningrib.screens.GameScreen

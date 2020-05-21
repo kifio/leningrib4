@@ -46,7 +46,7 @@ public class Player extends MovableActor {
         bottlesCount = LGCGame.Companion.getBottlesCount();
         clothesHSV = tmpColor.toHsv(clothesHSV);
         label = LabelManager.getInstance().getLabel(null, x,
-                y + 1.3f * GameScreen.tileSize);
+                y + 1.3f * GameScreen.tileSize, Color.WHITE);
     }
 
     private float stateTime = 0f;

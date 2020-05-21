@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LUTController
-import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.getClickSound
-import kifio.leningrib.model.actors.ui.WideAssetActor
 import kifio.leningrib.model.speech.LabelManager
 
 class StartGameButton(

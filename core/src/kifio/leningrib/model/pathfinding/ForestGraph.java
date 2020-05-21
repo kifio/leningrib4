@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
 import kifio.leningrib.Utils;
-import kifio.leningrib.model.actors.fixed.Grandma;
 import kifio.leningrib.screens.GameScreen;
 
 public class ForestGraph implements IndexedGraph<Vector2> {
@@ -32,7 +31,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
     private Array<Vector2> nodes = new Array<>();
 
     // Инициализирует ноды, которые могут использоваться для поиска маршрута
-    public ForestGraph(Grandma grandma, Array<? extends Actor> trees) {
+    public ForestGraph(Array<? extends Actor> trees) {
 
         int xMin = 0;
         int xMax = Gdx.graphics.getWidth();
@@ -56,7 +55,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
             for (int j = yMin; j <= yMax; j+=GameScreen.tileSize) {
                 x = i;
                 y = j;
-                if (!isActor(x, y, trees, grandma)) {
+                if (!isActor(x, y, trees)) {
                     nodes.add(new Vector2(x, y));
                 }
             }
@@ -66,7 +65,7 @@ public class ForestGraph implements IndexedGraph<Vector2> {
 
         for (int i = 0; i < nodes.size; i++) {
             this.connections.add(new Array<Connection<Vector2>>());
-            addNeighbours(nodes.get(i), trees, grandma);
+            addNeighbours(nodes.get(i), trees);
         }
     }
 
@@ -90,29 +89,29 @@ public class ForestGraph implements IndexedGraph<Vector2> {
         return this.connections.get(index);
     }
 
-    private void addNeighbours(Vector2 origin, Array<? extends Actor> actors, Grandma grandma) {
+    private void addNeighbours(Vector2 origin, Array<? extends Actor> actors) {
 
         if (origin.x > 0) {
-            addConnection(origin, origin.x - GameScreen.tileSize, origin.y, actors, grandma);
+            addConnection(origin, origin.x - GameScreen.tileSize, origin.y, actors);
         }
 
         if (origin.x < Gdx.graphics.getWidth() - GameScreen.tileSize) {
-            addConnection(origin, origin.x + GameScreen.tileSize, origin.y, actors, grandma);
+            addConnection(origin, origin.x + GameScreen.tileSize, origin.y, actors);
         }
 
-        addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors, grandma);
+        addConnection(origin, origin.x, origin.y + GameScreen.tileSize, actors);
 
         if (origin.y > 0) {
-            addConnection(origin, origin.x, origin.y - GameScreen.tileSize, actors, grandma);
+            addConnection(origin, origin.x, origin.y - GameScreen.tileSize, actors);
         }
     }
 
     // Добавление пути между двумя нодами
-    private void addConnection(Vector2 from, float toX, float toY, Array<? extends Actor> actors, Grandma grandma) {
+    private void addConnection(Vector2 from, float toX, float toY, Array<? extends Actor> actors) {
 
         Vector2 to = getVector2(toX, toY);
 
-        if (to == null || isActor((int) toX, (int) toY, actors, grandma)) {
+        if (to == null || isActor((int) toX, (int) toY, actors)) {
             return;
         }
 
@@ -154,18 +153,14 @@ public class ForestGraph implements IndexedGraph<Vector2> {
     }
 
     // Нодой может быть только клетка, на которой нет актера
-    private boolean isActor(int x, int y, Array<? extends Actor> actor, Grandma grandma) {
+    private boolean isActor(int x, int y, Array<? extends Actor> actor) {
         for (int i = 0; i < actor.size; i++) {
             Actor segment = actor.get(i);
             if (segment != null && Utils.mapCoordinate(segment.getX()) == x && Utils.mapCoordinate(segment.getY()) == y) {
                 return true;
             }
         }
-
-        int xGrandma = grandma == null ? 0 : (int) Utils.mapCoordinate(grandma.getX());
-        int yGrandma = grandma == null ? 0 : (int) Utils.mapCoordinate(grandma.getY());
-
-        return grandma != null && isGrandma(xGrandma, yGrandma, x, y);
+        return false;
     }
 
     private boolean isGrandma(int xGrandma, int yGrandma, int x, int y) {

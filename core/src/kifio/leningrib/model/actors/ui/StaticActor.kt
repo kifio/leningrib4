@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Actor
-import kifio.leningrib.LGCGame
 import kifio.leningrib.LUTController
 
 abstract class StaticActor(protected var region: TextureRegion?,

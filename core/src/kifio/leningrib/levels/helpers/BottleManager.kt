@@ -5,14 +5,19 @@ import kifio.leningrib.model.actors.fixed.Bottle
 class BottleManager {
 
     val bottles = ArrayList<Bottle>()
+    val removableBottles = ArrayList<Bottle>()
 
     fun updateBottles() {
+        removableBottles.clear()
+
         for (b in bottles) {
             if (b.isRemovable()) {
                 b.remove()
-                bottles.remove(b)
+                removableBottles.add(b)
             }
         }
+
+        bottles.removeAll(removableBottles)
     }
 
     fun addBottle(bottle: Bottle) {

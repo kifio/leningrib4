@@ -11,7 +11,6 @@ import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.helpers.TreesManager
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.fixed.Grandma
 import kifio.leningrib.model.actors.game.Forester
 import kifio.leningrib.model.actors.game.Mushroom
 import kifio.leningrib.model.actors.game.Player
@@ -19,14 +18,12 @@ import kifio.leningrib.model.actors.ui.Dialog
 import kifio.leningrib.model.pathfinding.ForestGraph
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 class CommonLevel() : Level() {
 
-    constructor(player: Player, grandma: Grandma?, levelMap: LevelMap) : this() {
-        super.setup(player, grandma, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
+    constructor(player: Player,levelMap: LevelMap) : this() {
+        super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, LEVEL_HEIGHT))
     }
 
     constructor(level: Level) : this() {

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
@@ -21,21 +20,11 @@ import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
-import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
-import kifio.leningrib.model.actors.game.MovableActor
-import kifio.leningrib.model.actors.ui.Overlay
-import kifio.leningrib.model.actors.ui.StaticActor
-import kifio.leningrib.model.actors.ui.StoreActor
-import kifio.leningrib.model.actors.game.*
-import kifio.leningrib.model.actors.fixed.Grandma
 import kifio.leningrib.model.actors.fixed.Bottle
-import kifio.leningrib.model.actors.ui.Dialog
-import kifio.leningrib.model.actors.ui.GameOverLogo
-import kifio.leningrib.model.actors.ui.MushroomsCountView
-import kifio.leningrib.model.actors.ui.SettingButton
-import kifio.leningrib.model.actors.ui.SquareButton
-import kifio.leningrib.model.actors.ui.StartGameButton
+import kifio.leningrib.model.actors.game.MovableActor
+import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.actors.ui.*
 import kifio.leningrib.screens.input.LGestureDetector
 import kifio.leningrib.screens.input.LInputListener
 import model.WorldMap
@@ -133,7 +122,7 @@ class GameScreen(game: LGCGame,
         } else if (isTutorialPassed && blackScreenTime >= ANIMATION_DURATION) {
             renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
             player.resetPosition()
-            level = getNextLevel(0, 0)
+            level = getNextLevel()
             resetStage()
             resumeGame()
             lastKnownCameraPosition = Gdx.graphics.height / 2f
@@ -149,14 +138,10 @@ class GameScreen(game: LGCGame,
         }
     }
 
-    private fun getNextLevel(x: Int, y: Int): Level {
+    private fun getNextLevel(): Level {
         LGCGame.setFirstLevelPassed(true)
-        val xPlayer = Utils.mapCoordinate(player.x)
-        val yPlayer = Utils.mapCoordinate(player.y)
-        val xGrandma = xPlayer + (tileSize * 3)
         return CommonLevel(player,
-                Grandma(xGrandma, yPlayer + tileSize),
-                worldMap.addLevel(x, y, (player.x / tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
+                worldMap.addLevel(0, 0, (player.x / tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
 
     private var bottleWasUpdated = false

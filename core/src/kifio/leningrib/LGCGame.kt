@@ -14,7 +14,6 @@ import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.fixed.Grandma
 import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.platform.StoreInterface
 import kifio.leningrib.screens.BaseScreen
@@ -73,8 +72,7 @@ class LGCGame(val store: StoreInterface) : Game() {
                 val xPlayer = Utils.mapCoordinate(player.x)
                 val yPlayer = Utils.mapCoordinate(player.y)
                 val xGrandma = xPlayer + (GameScreen.tileSize * 3)
-                val grandma = Grandma(xGrandma, yPlayer)
-                level = CommonLevel(player, grandma, levelMap)
+                level = CommonLevel(player, levelMap)
             } else {
                 val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
                 val config = Config(LEVEL_WIDTH, firstRoomHeight + 20)

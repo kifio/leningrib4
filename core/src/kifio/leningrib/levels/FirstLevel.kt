@@ -14,12 +14,12 @@ import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.helpers.TreesManager
 import kifio.leningrib.model.ResourcesManager
-import kifio.leningrib.model.actors.game.Mushroom
 import kifio.leningrib.model.actors.ShaderStage
-import kifio.leningrib.model.actors.ui.Dialog
-import kifio.leningrib.model.actors.game.Forester
-import kifio.leningrib.model.actors.game.Player
 import kifio.leningrib.model.actors.fixed.TutorialForester
+import kifio.leningrib.model.actors.game.Forester
+import kifio.leningrib.model.actors.game.Mushroom
+import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.model.actors.ui.Dialog
 import kifio.leningrib.model.pathfinding.ForestGraph
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
@@ -30,12 +30,12 @@ class FirstLevel() : Level() {
     var passed = false
 
     constructor(player: Player, levelMap: LevelMap) : this() {
-        super.setup(player, null, levelMap, Config(LGCGame.LEVEL_WIDTH, levelHeight))
+        super.setup(player, levelMap, Config(LGCGame.LEVEL_WIDTH, levelHeight))
         if (guards == null) {
             guards = Array<TutorialForester>()
             guards?.add(TutorialForester(
                     GameScreen.tileSize * 1f,
-                    GameScreen.tileSize * 28f,
+                    GameScreen.tileSize * (firstRoomHeight + 13f),
                     "enemy_3")
             )
         }
@@ -55,9 +55,9 @@ class FirstLevel() : Level() {
         val mushrooms = Array<Mushroom>()
         mushrooms.add(Mushroom(GameScreen.tileSize * 4, GameScreen.tileSize * 7))
         mushrooms.add(Mushroom(GameScreen.tileSize * 5, GameScreen.tileSize * 12))
-        mushrooms.add(Mushroom(GameScreen.tileSize * 5, GameScreen.tileSize * 23))
+        mushrooms.add(Mushroom(GameScreen.tileSize * 5, GameScreen.tileSize * (firstRoomHeight + 8)))
         mushrooms.add(Mushroom(GameScreen.tileSize * 5,
-                GameScreen.tileSize * 18,
+                GameScreen.tileSize * (firstRoomHeight + 4),
                 Mushroom.Effect.DEXTERITY,
                 Float.POSITIVE_INFINITY))
         mushrooms.add(Mushroom(GameScreen.tileSize * 3, GameScreen.tileSize * (levelHeight - 1)))
@@ -333,10 +333,11 @@ class FirstLevel() : Level() {
         private val PLAYER_INITIAL_Y = GameScreen.tileSize * 3
         private val PLAYER_INITIAL_X = GameScreen.tileSize * 5
 
+        private val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
+
         fun getPlayer() = Player(PLAYER_INITIAL_X.toFloat(), PLAYER_INITIAL_Y.toFloat())
 
         fun getLevelHeight(): Int {
-            val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
             return firstRoomHeight + 20
         }
     }
