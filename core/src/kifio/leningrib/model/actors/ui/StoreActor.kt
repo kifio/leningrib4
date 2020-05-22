@@ -32,14 +32,17 @@ class StoreActor(camera: OrthographicCamera,
     private val topTextureWidth: Float
     private val topTextureHeight: Float
 
+    private var selectedItemIndex: Int? = null
     private var items: List<StoreItem>? = null
     private var descriptionsHeights: List<Float>? = null
 
     private var buyLabel = "КУПИТЬ"
-    private var buyLabelTexture: Texture = ResourcesManager.getTexture(GREEN_BG)
+    private var buyLabelTexture: Texture = getTexture(GREEN_BG)
     private var buyLabelHeight = LabelManager.getInstance().getTextHeight(buyLabel, LabelManager.getInstance().mediumFont)
     private var buyLabelWidth = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 1.4f
     private var buyLabelOffset = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 0.2f
+
+    private val overlay = getTexture(STORE_ITEM_BG)
 
     init {
         val scale = Gdx.graphics.width.toFloat() / topTexture.width.toFloat()
@@ -57,16 +60,19 @@ class StoreActor(camera: OrthographicCamera,
             addListener(object : InputListener() {
                 override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                     touched = true
+                    val top = Gdx.graphics.height - topTextureHeight
+                    selectedItemIndex = getTouchedItemIndex(x, top - y)
                     return true
                 }
 
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
-                    val top = Gdx.graphics.height - topTextureHeight
-                    val item = getTouchedItem(x, top - y)
-                    if (item != null) {
-                        onTouchHandler?.invoke(item)
-                        touched = false
+                    val index = selectedItemIndex
+                    val items = items
+                    if (index != null && items != null) {
+                        onTouchHandler?.invoke(items[index])
+                        selectedItemIndex = null
                     }
+                    touched = false
                 }
             })
         }
@@ -104,22 +110,30 @@ class StoreActor(camera: OrthographicCamera,
         val texture = getTexture(item.id) ?: return
         val xImage = offset + innerOffset
 
-        val imageY = top - (imageSize + 3f * innerOffset) * (index + 1)
+        val yImage = top - (imageSize + 3f * innerOffset) * (index + 1)
         val descriptionOffset = (imageSize - height)
+
+        if (index == selectedItemIndex) {
+            batch.draw(overlay,
+                    0f,
+                    yImage - innerOffset,
+                    Gdx.graphics.width.toFloat(),
+                    imageSize + 2 * innerOffset)
+        }
 
         batch.draw(texture,
                 xImage,
-                imageY,
+                yImage,
                 imageSize,
                 imageSize)
 
         LabelManager.getInstance().smallFont.draw(batch,
                 item.description,
                 textOffset,
-                imageY + descriptionOffset,
+                yImage + descriptionOffset,
                 textWidth, Align.left, true)
 
-        val buyY = imageY + (descriptionOffset - buyLabelHeight) / 2f
+        val buyY = yImage + (descriptionOffset - buyLabelHeight) / 2f
 
         batch.draw(buyLabelTexture, textOffset + imageSize, buyY - (0.8f * GameScreen.tileSize), buyLabelWidth, GameScreen.tileSize.toFloat())
 
@@ -146,7 +160,7 @@ class StoreActor(camera: OrthographicCamera,
         }
     }
 
-    private fun getTouchedItem(x: Float, y: Float): StoreItem? {
+    private fun getTouchedItemIndex(x: Float, y: Float): Int? {
         val min = offset + innerOffset
         val max = Gdx.graphics.width - (offset + innerOffset)
         if (x <= min || x >= max) {
@@ -155,8 +169,7 @@ class StoreActor(camera: OrthographicCamera,
 
         val index = (y / (3 * innerOffset + imageSize)).toInt()
         return items?.let {
-            if (index < it.size) return it[index]
-            else return null
+            return if (index < it.size) index else null
         }
     }
 }

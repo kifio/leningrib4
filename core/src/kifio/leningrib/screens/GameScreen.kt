@@ -460,7 +460,6 @@ class GameScreen(game: LGCGame,
                         getRegion(SETTINGS_BACKGROUND)))
                 addActor(SettingButton(camera, lutController, game, 0))
                 addActor(SettingButton(camera, lutController, game, 1))
-//                addActor(SettingButton(camera, lutController, game, 2))
                 addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
             }
 
@@ -521,10 +520,11 @@ class GameScreen(game: LGCGame,
             gumButton?.onTouchHandler = {
 
                 if (gumButton?.isVisible == true) {
-                    setupVodka()
+                    player.resetMushroomCount();
                 }
 
-                player.decreaseGumsCount();
+                player.decreaseGumsCount()
+                lutController.stop()
 
                 if (player.gumsCount == 0) {
                     gumButton?.remove()

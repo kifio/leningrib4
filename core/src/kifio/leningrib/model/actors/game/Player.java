@@ -46,7 +46,7 @@ public class Player extends MovableActor {
     public Player(float x, float y) {
         super(x, y);
         bottlesCount = LGCGame.Companion.getBottlesCount();
-        bottlesCount = LGCGame.Companion.getGumsCount();
+        gumsCount = LGCGame.Companion.getGumsCount();
         clothesHSV = tmpColor.toHsv(clothesHSV);
         label = LabelManager.getInstance().getLabel(null, x,
                 y + 1.3f * GameScreen.tileSize, Color.WHITE);
@@ -119,8 +119,10 @@ public class Player extends MovableActor {
     }
 
     public void decreaseBottlesCount() {
-        this.bottlesCount--;
-        LGCGame.Companion.setBottlesCount(this.bottlesCount);
+        if (bottlesCount > 0) {
+            this.bottlesCount--;
+            LGCGame.Companion.setBottlesCount(this.bottlesCount);
+        }
     }
 
     public int getBottlesCount() {
@@ -133,8 +135,10 @@ public class Player extends MovableActor {
     }
 
     public void decreaseGumsCount() {
-        this.gumsCount--;
-        LGCGame.Companion.setGumsCount(this.gumsCount);
+        if (bottlesCount > 0) {
+            this.gumsCount--;
+            LGCGame.Companion.setGumsCount(this.gumsCount);
+        }
     }
 
     public int getGumsCount() {

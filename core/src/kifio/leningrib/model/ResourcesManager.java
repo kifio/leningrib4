@@ -64,6 +64,7 @@ public class ResourcesManager {
     public static final String GUM_1 = "gum_1.png";
     public static final String GUM_2 = "gum_2.png";
     public static final String GUM_1_PRESSED = "gum_1_pressed.png";
+    public static final String STORE_ITEM_BG = "store_item_bg.png";
 
 
     public static I18NBundle commonMushroomsSpeechBundle;
@@ -169,6 +170,7 @@ public class ResourcesManager {
         am.load(STORE_TOP, Texture.class, param);
         am.load(STORE, Texture.class, param);
         am.load(STORE_PRESSED, Texture.class, param);
+        am.load(STORE_ITEM_BG, Texture.class, param);
         am.load(TRACK_1, Music.class);
         am.load(TRACK_2, Music.class);
         am.load("sounds/pop_1.wav", Sound.class);
@@ -187,6 +189,7 @@ public class ResourcesManager {
         am.load(GUM_1, Texture.class, param);
         am.load(GUM_2, Texture.class, param);
         am.load(GUM_1_PRESSED, Texture.class, param);
+        am.load(STORE_ITEM_BG, Texture.class, param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);

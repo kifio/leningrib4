@@ -83,5 +83,6 @@ class LUTController {
 
     fun stop() {
         lutTexture = null
+        index = -1
     }
 }
