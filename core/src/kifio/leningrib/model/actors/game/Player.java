@@ -135,7 +135,7 @@ public class Player extends MovableActor {
     }
 
     public void decreaseGumsCount() {
-        if (bottlesCount > 0) {
+        if (gumsCount > 0) {
             this.gumsCount--;
             LGCGame.Companion.setGumsCount(this.gumsCount);
         }

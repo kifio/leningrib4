@@ -1,0 +1,5 @@
+/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86/CMakeFiles/rebuild_cache.dir
+/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86/CMakeFiles/edit_cache.dir
+/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86/cipher.out/CMakeFiles/rebuild_cache.dir
+/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86/cipher.out/CMakeFiles/edit_cache.dir
+/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86/cipher.out/CMakeFiles/cipher-lib.dir

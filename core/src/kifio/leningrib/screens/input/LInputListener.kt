@@ -11,8 +11,6 @@ class LInputListener(private var gameScreen: GameScreen?) : GestureDetector.Gest
         if (abs(velocityX) > abs(velocityY)) {
             if (velocityX > 0) {
                 gameScreen?.handleFlingRight()
-            } else {
-                gameScreen?.handleFlingLeft()
             }
         }
         return true

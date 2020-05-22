@@ -250,6 +250,11 @@ class GameScreen(game: LGCGame,
                     settings = Group().apply {
                         x = -Gdx.graphics.width.toFloat()
                         val storeActor = StoreActor(camera, lutController, game.store)
+                        storeActor.closeHandler = {
+                            if (storeOpened) {
+                                removeSettings()
+                            }
+                        }
                         storeActor.onTouchHandler = {
                             val msg: Array<String> = if (it != null && it.id < 2) {
                                 player.increaseBottlesCount()
@@ -527,7 +532,7 @@ class GameScreen(game: LGCGame,
                     SquareButton.GUM,
                     SquareButton.RIGHT)
 
-            gumButton?.isVisible = player.bottlesCount > 0
+            gumButton?.isVisible = player.gumsCount > 0
             gumButton?.onTouchHandler = {
 
                 if (gumButton?.isVisible == true) {
@@ -606,12 +611,6 @@ class GameScreen(game: LGCGame,
 
     internal fun handleFlingRight() {
         if (!storeOpened) {
-            removeSettings()
-        }
-    }
-
-    fun handleFlingLeft() {
-        if (storeOpened) {
             removeSettings()
         }
     }

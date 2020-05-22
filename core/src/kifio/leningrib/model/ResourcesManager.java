@@ -65,6 +65,8 @@ public class ResourcesManager {
     public static final String GUM_2 = "gum_2.png";
     public static final String GUM_1_PRESSED = "gum_1_pressed.png";
     public static final String STORE_ITEM_BG = "store_item_bg.png";
+    public static final String CLOSE_STORE = "close_store.png";
+    public static final String CLOSE_STORE_PRESSED = "close_store_pressed.png";
 
 
     public static I18NBundle commonMushroomsSpeechBundle;
@@ -141,7 +143,8 @@ public class ResourcesManager {
         param.magFilter = Texture.TextureFilter.Linear;
 
         am.load("trees_map.png", Texture.class);
-
+        am.load(CLOSE_STORE, Texture.class, param);
+        am.load(CLOSE_STORE_PRESSED, Texture.class, param);
         am.load(GRASS_0, Texture.class);
         am.load(GRASS_2, Texture.class);
         am.load(GREEN_BG, Texture.class, param);

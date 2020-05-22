@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.utils.Align
 import kifio.leningrib.LUTController
-import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.platform.StoreInterface
@@ -21,6 +20,7 @@ class StoreActor(camera: OrthographicCamera,
 ) : Overlay(camera, 0f, lutController, getRegion(SETTINGS_BACKGROUND)) {
 
     var onTouchHandler: ((item: StoreItem?) -> Unit)? = null
+    var closeHandler: (() -> Unit)? = null
 
     private val innerOffset = 16 * Gdx.graphics.density
     private val imageSize = GameScreen.tileSize * 2f
@@ -43,6 +43,10 @@ class StoreActor(camera: OrthographicCamera,
     private var buyLabelOffset = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 0.2f
 
     private val overlay = getTexture(STORE_ITEM_BG)
+    private val closeTexture = getTexture(CLOSE_STORE)
+    private val closePressedTexture = getTexture(CLOSE_STORE_PRESSED)
+    private val buttonOffset = GameScreen.tileSize + innerOffset
+    private var closePressed = false
 
     init {
         val scale = Gdx.graphics.width.toFloat() / topTexture.width.toFloat()
@@ -61,6 +65,7 @@ class StoreActor(camera: OrthographicCamera,
                 override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                     touched = true
                     val top = Gdx.graphics.height - topTextureHeight
+                    closePressed = isClosePressed(x, y)
                     selectedItemIndex = getTouchedItemIndex(x, top - y)
                     return true
                 }
@@ -71,8 +76,12 @@ class StoreActor(camera: OrthographicCamera,
                     if (index != null && items != null) {
                         onTouchHandler?.invoke(items[index])
                         selectedItemIndex = null
+                    } else if (closePressed) {
+                        closeHandler?.invoke()
                     }
+
                     touched = false
+                    closePressed = false
                 }
             })
         }
@@ -99,6 +108,14 @@ class StoreActor(camera: OrthographicCamera,
         if (lutController?.lutTexture != null) {
             batch.shader = lutController.shader
         }
+
+        val xCloseStore = Gdx.graphics.width - buttonOffset
+        val yCloseStore = (camera.position.y - Gdx.graphics.height / 2f) + innerOffset
+
+        batch.draw(if (closePressed) closePressedTexture else closeTexture, xCloseStore, yCloseStore,
+                GameScreen.tileSize.toFloat(),
+                GameScreen.tileSize.toFloat())
+
     }
 
     private fun drawItem(batch: Batch,
@@ -171,5 +188,13 @@ class StoreActor(camera: OrthographicCamera,
         return items?.let {
             return if (index < it.size) index else null
         }
+    }
+
+    private fun isClosePressed(x: Float, y: Float): Boolean {
+        val xCloseStore = Gdx.graphics.width - buttonOffset
+        val yCloseStore = (camera.position.y - Gdx.graphics.height / 2f) + buttonOffset
+        val foo = x > xCloseStore && x < Gdx.graphics.width - innerOffset
+        val bar = y < yCloseStore && x > innerOffset
+        return foo && bar
     }
 }

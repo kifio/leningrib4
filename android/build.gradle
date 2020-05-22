@@ -1,6 +1,18 @@
+cipher.so {
+    keys {
+        appId {
+            value = '281375052718'
+        }
+        licenceKey {
+            value = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2FFKMV8jr7GjsAvjNRL/R96A7HUy6GHuSiDaW3D4XPO8jVI8xABYYRAIHz2PvOQvNpNJCrwNtIgVP9V+09yqGJe0Ij/EtaORHghTuiHh39rcX5sWgMBOlF7+DrUo9WYBlq8HVghFVnCeoDF0VGOgrybC20+I7EUTwzPms3xNywHf4LhQBclJTmT2yD1dpG4Qbp9JHjM1rmzn74qYbfM1yfpk7DFGF2gsWXXvcpNyqwk1QZvVjmEmPT0v28pd4fRMrZ9vrtejn/9W4MU5bJApo/Uus7NqKXJfqPQhQVRoAHOe6m/r3xs0PvFNXsIwn5oWEgs9FezCRAuci4c8n4YQ5wIDAQAB'
+        }
+    }
+    encryptSeed = 'makegrunewaldgreatagain'
+}
+
 android {
-    buildToolsVersion "28.0.3"
-    compileSdkVersion 28
+    buildToolsVersion "29.0.3"
+    compileSdkVersion 29
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

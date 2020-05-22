@@ -1,0 +1,19 @@
+[
+{
+  "directory": "/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86",
+  "command": "/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android21 --gcc-toolchain=/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dcipher_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -o cipher.out/CMakeFiles/cipher-lib.dir/src/main/cpp/cipher-lib.cpp.o -c /Users/ivan.murashov/Desktop/leningrib4/android/build/cipher.so/src/main/cpp/cipher-lib.cpp",
+  "file": "/Users/ivan.murashov/Desktop/leningrib4/android/build/cipher.so/src/main/cpp/cipher-lib.cpp"
+},
+
+{
+  "directory": "/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86",
+  "command": "/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android21 --gcc-toolchain=/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dcipher_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -o cipher.out/CMakeFiles/cipher-lib.dir/src/main/cpp/Environments.cpp.o -c /Users/ivan.murashov/Desktop/leningrib4/android/build/cipher.so/src/main/cpp/Environments.cpp",
+  "file": "/Users/ivan.murashov/Desktop/leningrib4/android/build/cipher.so/src/main/cpp/Environments.cpp"
+},
+
+{
+  "directory": "/Users/ivan.murashov/Desktop/leningrib4/android/.cxx/cmake/debug/x86",
+  "command": "/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android21 --gcc-toolchain=/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ivan.murashov/Library/Android/sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dcipher_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O0 -fno-limit-debug-info  -fPIC   -o cipher.out/CMakeFiles/cipher-lib.dir/src/main/cpp/Encryptor.cpp.o -c /Users/ivan.murashov/Desktop/leningrib4/android/build/cipher.so/src/main/cpp/Encryptor.cpp",
+  "file": "/Users/ivan.murashov/Desktop/leningrib4/android/build/cipher.so/src/main/cpp/Encryptor.cpp"
+}
+]
