@@ -53,6 +53,7 @@ class GameScreen(game: LGCGame,
     private var gumButton: SquareButton? = null
     private val levelSize = CommonLevel.LEVEL_HEIGHT * tileSize
     private var accumulatedTime = 0f
+    private var dialogs = mutableListOf<Dialog>()
 
     val lutController = LUTController()
     var gameOver = false
@@ -178,6 +179,16 @@ class GameScreen(game: LGCGame,
         sequenceAction.addAction(Actions.scaleTo(2f, 2f, ANIMATION_DURATION, Interpolation.exp5))
         sequenceAction.addAction(Actions.scaleTo(1.0f, 1.0f, ANIMATION_DURATION, Interpolation.exp5))
         return sequenceAction
+    }
+
+    fun getDialogs(): List<Dialog> {
+        dialogs.clear()
+        for (actor in stage.actors) {
+            if (actor is Dialog) {
+                dialogs.add(actor)
+            }
+        }
+        return dialogs
     }
 
     private fun updateWorld(delta: Float) {

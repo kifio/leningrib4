@@ -164,7 +164,7 @@ public abstract class Level {
         }
 
         if (mushroomsManager != null) {
-            mushroomsManager.updateMushrooms(gameScreen.player, cameraY, isPaused);
+            mushroomsManager.updateMushrooms(gameScreen.player, gameScreen.getDialogs(), cameraY, isPaused);
         }
 
         for (TreePart treePart : treesManager.getInnerBordersTrees()) {

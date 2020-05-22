@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.utils.Align
@@ -22,6 +23,7 @@ class Dialog(camera: OrthographicCamera,
 
     var disposeHandler: (() -> Unit)? = null
 
+    private var bounds: Rectangle = Rectangle()
     private val labelColor = Color(249 / 255f, 218 / 255f, 74f / 255f, 1f)
     private val bgColor = Color.valueOf("#3C3C3C")
     private val renderer = ShapeRenderer()
@@ -90,6 +92,9 @@ class Dialog(camera: OrthographicCamera,
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         this.y = camera.position.y - (height / 2)
+
+        bounds.set(x, y, width, height)
+
         renderer.projectionMatrix = camera.combined
         renderer.begin(ShapeRenderer.ShapeType.Filled)
         renderer.color = bgColor
@@ -134,5 +139,9 @@ class Dialog(camera: OrthographicCamera,
     override fun act(delta: Float) {
         super.act(delta)
         accumulatedTime += delta
+    }
+
+    fun getBounds(): Rectangle {
+        return bounds
     }
 }

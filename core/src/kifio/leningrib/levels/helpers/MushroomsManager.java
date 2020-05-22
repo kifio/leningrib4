@@ -2,16 +2,19 @@ package kifio.leningrib.levels.helpers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import kifio.leningrib.model.ResourcesManager;
 import kifio.leningrib.model.actors.game.Mushroom;
 import kifio.leningrib.model.actors.game.Player;
+import kifio.leningrib.model.actors.ui.Dialog;
 import kifio.leningrib.model.speech.LabelManager;
 import kifio.leningrib.screens.GameScreen;
 
@@ -20,6 +23,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
     private static int SPEECH_SEED = 768;
     private float velocityMultiplier = 1;
     private boolean isSmall = true;
+    private Rectangle speechBounds = new Rectangle();
 
     private Array<Integer> removedMushrooms = new Array<>(4);
 
@@ -42,7 +46,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         }
     }
 
-    public void updateMushrooms(Player p, float cameraPositionY, boolean isPaused) {
+    public void updateMushrooms(Player p, List<Dialog> dialogs, float cameraPositionY, boolean isPaused) {
         if (isPaused) return;
         int halfScreenHeight = Gdx.graphics.getHeight() / 2;
 
@@ -82,7 +86,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
 
                         p.increaseMushroomCount();
                     } else {
-                        addMushroomSpeech(p, m, index);
+                        addMushroomSpeech(p, dialogs, m, index);
                     }
                 }
             }
@@ -95,20 +99,33 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
         removedMushrooms.clear();
     }
 
-    private void addMushroomSpeech(Player player, Mushroom m, int index) {
+    private void addMushroomSpeech(Player player, List<Dialog> dialogs, Mushroom m, int index) {
         // С некоторой вероятностью добавляем новую речь
         if ((shouldAddSpeech(player) || m.hasStableSpeech()) && speeches[index] == null) {
             String speech = m.getSpeech();
             float x = m.getX() + (0.5f * GameScreen.tileSize) - (1.3f * GameScreen.tileSize);
             float yOffset = 1f * GameScreen.tileSize;
             float y = m.getY() + yOffset;
-            speeches[index] = LabelManager.getInstance().getLabel(speech, isSmall, x, y, m.getSpeechColor());
-            if (!m.hasStableSpeech()) {
+            Label label = LabelManager.getInstance().getLabel(speech, isSmall, x, y, m.getSpeechColor());
+            if (m.hasStableSpeech()) {
+                speeches[index] = label;
+            } else if (!speechOverlapsWithDialog(dialogs, label)) {
+                speeches[index] = label;
                 speeches[index].addAction(
                         getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index)
                 );
             }
         }
+    }
+
+    private boolean speechOverlapsWithDialog(List<Dialog> dialogs, Label label) {
+        speechBounds.set(label.getX(), label.getY(), label.getWidth(), label.getHeight());
+        for (Dialog dialog : dialogs) {
+            if (dialog.getBounds().overlaps(speechBounds)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean shouldAddSpeech(Player player) {
