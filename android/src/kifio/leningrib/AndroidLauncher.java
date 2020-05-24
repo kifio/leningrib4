@@ -19,16 +19,14 @@ import com.google.android.gms.tasks.Task;
 
 public class AndroidLauncher extends AndroidApplication {
 
-	private GoogleSignInClient googleSignInClient;
-	private AchievementsClient achievementClient;
-	private LeaderboardsClient leaderboardsClient;
-
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		initGoogleClientAndSignIn();
+		PlayGamesClient playGamesClient = new PlayGamesClient(this);
+		playGamesClient.initGoogleClientAndSignIn();
+		Store store = new Store(this);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new LGCGame(new Store()), config);
+		initialize(new LGCGame(store), config);
 	}
 
 	@Override
@@ -41,24 +39,5 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onTrimMemory(level);
 	}
 
-	private void initGoogleClientAndSignIn() {
-		googleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(
-				GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());
 
-		googleSignInClient.silentSignIn().addOnCompleteListener(new OnCompleteListener<GoogleSignInAccount>() {
-
-			@Override
-			public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
-				if (task.isSuccessful()) {
-					GoogleSignInAccount account = task.getResult();
-					if (account != null) {
-						achievementClient = Games.getAchievementsClient(AndroidLauncher.this, account);
-						leaderboardsClient = Games.getLeaderboardsClient(AndroidLauncher.this, account);
-					}
-				} else {
-					Log.e("Error", "signInError", task.getException());
-				}
-			}
-		});
-	}
 }

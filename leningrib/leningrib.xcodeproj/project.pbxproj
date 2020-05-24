@@ -56,8 +56,8 @@
 		405D0E4A24703DD7009FF2D1 /* leningrib */ = {
 			isa = PBXGroup;
 			children = (
-				405D0E4B24703DD7009FF2D1 /* AppDelegate.swift */,
 				405D0E4D24703DD7009FF2D1 /* SceneDelegate.swift */,
+				405D0E4B24703DD7009FF2D1 /* AppDelegate.swift */,
 				405D0E4F24703DD7009FF2D1 /* ViewController.swift */,
 				405D0E5124703DD7009FF2D1 /* Main.storyboard */,
 				405D0E5424703DD9009FF2D1 /* Assets.xcassets */,
@@ -291,7 +291,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = kifio.leningrib.leningrib;
+				PRODUCT_BUNDLE_IDENTIFIER = kifio.leningrib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -309,7 +309,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = kifio.leningrib.leningrib;
+				PRODUCT_BUNDLE_IDENTIFIER = kifio.leningrib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

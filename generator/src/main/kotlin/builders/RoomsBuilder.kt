@@ -1,6 +1,5 @@
 package builders
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import generator.Config
 import model.Exit
 import model.Room

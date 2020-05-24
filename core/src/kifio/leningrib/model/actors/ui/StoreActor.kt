@@ -52,12 +52,16 @@ class StoreActor(camera: OrthographicCamera,
         val scale = Gdx.graphics.width.toFloat() / topTexture.width.toFloat()
         topTextureWidth = topTexture.width * scale
         topTextureHeight = topTexture.height * scale
+
         if (items == null) {
-            store.loadPurchases { items ->
-                val lm = LabelManager.getInstance()
-                this.items = items
-                this.descriptionsHeights = items.map { item ->
-                    lm.getTextHeight(item.description, lm.smallFont)
+
+            store.setup {
+                store.loadPurchases { items ->
+                    val lm = LabelManager.getInstance()
+                    this.items = items
+                    this.descriptionsHeights = items.map { item ->
+                        lm.getTextHeight(item.description, lm.smallFont)
+                    }
                 }
             }
 
@@ -196,5 +200,9 @@ class StoreActor(camera: OrthographicCamera,
         val foo = x > xCloseStore && x < Gdx.graphics.width - innerOffset
         val bar = y < yCloseStore && x > innerOffset
         return foo && bar
+    }
+
+    fun dispose(store: StoreInterface) {
+        store.dispose()
     }
 }

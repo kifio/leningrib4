@@ -626,6 +626,13 @@ class GameScreen(game: LGCGame,
     private fun removeSettings() {
         val sequenceAction = SequenceAction()
         val x = if (storeOpened) -Gdx.graphics.width.toFloat() else Gdx.graphics.width.toFloat()
+        settings?.let {
+            for (actor in it.children) {
+                if (actor is StoreActor) {
+                    actor.dispose(game.store)
+                }
+            }
+        }
         sequenceAction.addAction(Actions.moveTo(x, 0f, ANIMATION_DURATION))
         sequenceAction.addAction(Actions.run {
             settings?.remove()
