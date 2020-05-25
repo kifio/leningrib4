@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.utils.Align
+import kifio.leningrib.LGCGame
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.speech.LabelManager
@@ -55,15 +56,17 @@ class StoreActor(camera: OrthographicCamera,
 
         if (items == null) {
 
-            store.setup {
-                store.loadPurchases { items ->
+            store.setup({
+                store.loadSku { items ->
                     val lm = LabelManager.getInstance()
                     this.items = items
                     this.descriptionsHeights = items.map { item ->
                         lm.getTextHeight(item.description, lm.smallFont)
                     }
                 }
-            }
+            }, { sku ->
+                LGCGame.savePurchasedSku(listOf(sku))
+            })
 
             addListener(object : InputListener() {
                 override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {

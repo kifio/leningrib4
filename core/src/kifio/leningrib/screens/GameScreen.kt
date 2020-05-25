@@ -256,22 +256,25 @@ class GameScreen(game: LGCGame,
                             }
                         }
                         storeActor.onTouchHandler = {
-                            val msg: Array<String> = if (it != null && it.id < 2) {
-                                player.increaseBottlesCount()
-                                arrayOf("Ты купил цифровую водку, милок!")
-                            } else {
-                                player.increaseGumsCount()
-                                arrayOf("Ты купил цифровую жвачку, милок!")
+                            it?.let {
+                                game.store.launchBillingFlow(it.id)
                             }
-                            stage.addAction(Actions.delay(0.1f,
-                                    Actions.run {
-                                        stage.addActor(Dialog(camera, lutController, msg,
-                                                arrayOf("Ок"), Array(1) { i -> GRANDMA_DIALOG_FACE }).apply {
-                                            this.disposeHandler = {
-                                                remove()
-                                            }
-                                        })
-                                    }))
+//                            val msg: Array<String> = if (it != null && it.id < 2) {
+//                                player.increaseBottlesCount()
+//                                arrayOf("Ты купил цифровую водку, милок!")
+//                            } else {
+//                                player.increaseGumsCount()
+//                                arrayOf("Ты купил цифровую жвачку, милок!")
+//                            }
+//                            stage.addAction(Actions.delay(0.1f,
+//                                    Actions.run {
+//                                        stage.addActor(Dialog(camera, lutController, msg,
+//                                                arrayOf("Ок"), Array(1) { i -> GRANDMA_DIALOG_FACE }).apply {
+//                                            this.disposeHandler = {
+//                                                remove()
+//                                            }
+//                                        })
+//                                    }))
                         }
                         addActor(storeActor)
                         addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))

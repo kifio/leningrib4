@@ -4,6 +4,6 @@ import java.util.List;
 
 import kifio.leningrib.platform.items.StoreItem;
 
-public interface OnPurchasesLoadedListener {
-    void onPurchasesLoaded(List<String> purchasedSkuList);
+public interface OnStoreItemsLoadedListener {
+    void onPurchasesLoaded(List<StoreItem> items);
 }

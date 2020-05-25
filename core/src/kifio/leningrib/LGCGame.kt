@@ -15,7 +15,6 @@ import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.game.Player
-import kifio.leningrib.platform.OnBillingInitializedListener
 import kifio.leningrib.platform.StoreInterface
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
@@ -106,6 +105,22 @@ class LGCGame(val store: StoreInterface) : Game() {
         }
 
         private fun getCount(item: String) = prefs?.getInteger(item) ?: 0
+
+        fun savePurchasedSku(skuList: List<String>) {
+            for (sku in skuList) {
+                prefs?.putBoolean(sku, true)
+            }
+            prefs?.flush()
+        }
+
+        fun getConsumedSkuList(): List<String> {
+            val skuList = mutableListOf<String>()
+            for (sku in StoreInterface.SKU_LIST) {
+                prefs?.contains(sku)
+                skuList.add(sku)
+            }
+            return skuList
+        }
     }
 
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -128,6 +143,12 @@ class LGCGame(val store: StoreInterface) : Game() {
             prefs?.putBoolean(WAS_LAUNCHED, true)
             prefs?.flush()
         }
+
+        store.setup({
+            store.loadPurchases {
+                items -> savePurchasedSku(items)
+            }
+        }, { sku -> savePurchasedSku(listOf(sku)) })
 
         ResourcesManager.loadSplash()
         GameScreen.tileSize = Gdx.graphics.width / LEVEL_WIDTH

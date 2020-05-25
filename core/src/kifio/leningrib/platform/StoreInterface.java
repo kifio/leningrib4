@@ -1,16 +1,23 @@
 package kifio.leningrib.platform;
 
-import org.jetbrains.annotations.Nullable;
-
 public interface StoreInterface {
 
-    public void setup(OnBillingInitializedListener listener);
-    public void dispose();
+    String[] SKU_LIST = {
+            "3_vodka_bottles",
+            "5_vodka_bottles",
+            "gum_1",
+            "gum_2"
+    };
+
+    void loadPurchases(OnPurchasesLoadedListener listener);
+
+    void setup(OnBillingInitializedListener listener, OnUpdatePurchasesListener consumeListener);
+    void dispose();
 
     // Load and cache purchases.
     // If loading failed, try to use cached values.
     // If listener is null, cache, but do not update UI.
-    public void loadPurchases(@Nullable OnPurchasesLoadedListener listener);
+    void loadSku(OnStoreItemsLoadedListener listener);
 
-    public void launchBillingFlow(int index);
+    void launchBillingFlow(int index);
 }
