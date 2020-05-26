@@ -392,12 +392,17 @@ class GameScreen(game: LGCGame,
             }
         }
 
+        val settingsButton = getSettingsButton()
+        val storeButton = getStoreButton()
+        val leaderboardsButton = LeaderboardButton(camera, lutController, -tileSize.toFloat(), storeButton.getHeightWithOffsets())
+
         transitionActor?.addActor(overlay)
-        transitionActor?.addActor(getSettingsButton())
-        transitionActor?.addActor(getStoreButton())
+        transitionActor?.addActor(settingsButton)
+        transitionActor?.addActor(storeButton)
         transitionActor?.addActor(gameOverLogo)
         transitionActor?.addActor(MushroomsCountView(camera, player.score, lutController))
         transitionActor?.addActor(restartGameButton)
+        transitionActor?.addActor(leaderboardsButton)
 
         stage.addActor(transitionActor)
     }
@@ -414,7 +419,6 @@ class GameScreen(game: LGCGame,
             resumeOffsetsCount = 1
             restartOffsetsCount = -1
         }
-
         val resumeGameButton = StartGameButton(
                 resumeOffsetsCount,
                 if (withRestartOption) "ПРОДОЛЖИТЬ ИГРУ" else "НАЧАТЬ ИГРУ",
@@ -445,6 +449,7 @@ class GameScreen(game: LGCGame,
 
         val settingsButton = getSettingsButton()
         val storeButton = getStoreButton()
+        val leaderboardsButton = LeaderboardButton(camera, lutController, Gdx.graphics.height / 2f, storeButton.getHeightWithOffsets())
 
         resumeGameButton.onTouchHandler = {
             if (!isFirstLevelPassed() && shouldShowTutorial) {
@@ -457,14 +462,17 @@ class GameScreen(game: LGCGame,
                 overlay.remove()
                 resumeGameButton.remove()
                 restartGameButton?.remove()
+                leaderboardsButton.remove()
                 resumeGame()
             }
         }
+
 
         stage.addActor(overlay)
         stage.addActor(settingsButton)
         stage.addActor(storeButton)
         stage.addActor(resumeGameButton)
+        stage.addActor(leaderboardsButton)
 
         if (restartGameButton != null) {
             stage.addActor(restartGameButton)

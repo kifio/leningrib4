@@ -85,4 +85,14 @@ class SquareButton(
             batch.shader = lutController.shader
         }
     }
+
+    fun getHeightWithOffsets(): Float {
+        val w = width * scaleX
+        val h = height * scaleY
+
+        val wOffset = ((width - w) / 2)
+        val hOffset = ((height - h) / 2)
+
+        return h + (hOffset * 2)
+    }
 }

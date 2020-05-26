@@ -67,6 +67,9 @@ public class ResourcesManager {
     public static final String STORE_ITEM_BG = "store_item_bg.png";
     public static final String CLOSE_STORE = "close_store.png";
     public static final String CLOSE_STORE_PRESSED = "close_store_pressed.png";
+    public static final String LEADERBOARD = "leaderboard_bg.png";
+    public static final String LEADERBOARD_PRESSED = "leaderboard_bg_pressed.png";
+    public static final String GAME_OVER_RESULTS_OVERLAY = "game_over_results_overlay.png";
 
 
     public static I18NBundle commonMushroomsSpeechBundle;
@@ -174,6 +177,7 @@ public class ResourcesManager {
         am.load(STORE, Texture.class, param);
         am.load(STORE_PRESSED, Texture.class, param);
         am.load(STORE_ITEM_BG, Texture.class, param);
+        am.load(GAME_OVER_RESULTS_OVERLAY, Texture.class, param);
         am.load(TRACK_1, Music.class);
         am.load(TRACK_2, Music.class);
         am.load("sounds/pop_1.wav", Sound.class);
@@ -193,6 +197,8 @@ public class ResourcesManager {
         am.load(GUM_2, Texture.class, param);
         am.load(GUM_1_PRESSED, Texture.class, param);
         am.load(STORE_ITEM_BG, Texture.class, param);
+        am.load(LEADERBOARD, Texture.class, param);
+        am.load(LEADERBOARD_PRESSED, Texture.class, param);
 
         am.load("i18n/mushroom_speech", I18NBundle.class);
         am.load("i18n/mushroom_power_speech", I18NBundle.class);
@@ -232,6 +238,9 @@ public class ResourcesManager {
         putTexture(PAUSE_PRESSED);
         putTexture(SETTINGS);
         putTexture(SETTINGS_PRESSED);
+        putTexture(LEADERBOARD);
+        putTexture(LEADERBOARD_PRESSED);
+        putTexture(GAME_OVER_RESULTS_OVERLAY);
         putTexture(STORE);
         putTexture(GUM_1);
         putTexture(GUM_1_PRESSED);
