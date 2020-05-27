@@ -122,38 +122,6 @@ class CommonLevel() : Level() {
         return gameObjects
     }
 
-    //    override fun movePlayerTo(x: Float, y: Float, player: Player, callback: Runnable?) {
-//        val grandma = this.grandma
-//        if (grandma == null) {
-//            super.movePlayerTo(x, y, player, null)
-//            return
-//        }
-//
-//        val px = player.onLevelMapX
-//        val py = player.onLevelMapY
-//
-//        var tx = Utils.mapCoordinate(x).toInt()
-//        var ty = Utils.mapCoordinate(y).toInt()
-//
-//        val gx = Utils.mapCoordinate(grandma.x).toInt()
-//        val gy = Utils.mapCoordinate(grandma.y).toInt()
-//
-//        forestGraph?.let {
-//            if (gx == tx && gy == ty) {
-//                val nearest = it.findNearest(tx, ty, px, py)
-//                tx = nearest.x.toInt()
-//                ty = nearest.y.toInt()
-//                if (tx == px && ty == py) {
-//                    player.addAction(Actions.run(callback))
-//                } else {
-//                    super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, callback)
-//                }
-//            } else {
-//                super.movePlayerTo(tx.toFloat(), ty.toFloat(), player, null)
-//            }
-//        }
-//    }
-//
     fun showDailyDialogIfNeeded(camera: OrthographicCamera,
                                 lutController: LUTController,
                                 stage: Stage,
@@ -165,7 +133,7 @@ class CommonLevel() : Level() {
 
         LGCGame.keepCurrentDate()
 
-        val speeches = arrayOf("Ежедневная бутылка водки!\nБрось ее рядом с лесником, чтобы отвлечь его.")
+        val speeches = arrayOf("Ежедневная бутылка водки!")
 
         stage.addAction(Actions.delay(0.5f,
                 Actions.run {
@@ -180,7 +148,6 @@ class CommonLevel() : Level() {
 
     companion object {
         private const val MIN = 1
-        private const val MAX = 12
         const val LEVEL_HEIGHT = 48
     }
 }

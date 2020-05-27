@@ -25,10 +25,6 @@ public class Player extends MovableActor {
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
 
-    private int newColor;
-    private Color tmpColor = Color.valueOf("#FDA010");
-    private float[] clothesHSV = new float[3];
-
     private float velocity = GameScreen.tileSize * 6 + (getMushroomsCount() / VELOCITY_DELIMETER);
     private int mushroomsCount = 0;
     private float effectTime = 0L;
@@ -44,15 +40,16 @@ public class Player extends MovableActor {
     public Label label;
 
     public Player(float x, float y) {
+        this(x, y, 0 ,0);
+    }
+
+    public Player(float x, float y, int bottlesCount, int gumsCount) {
         super(x, y);
-        bottlesCount = LGCGame.Companion.getBottlesCount();
-        gumsCount = LGCGame.Companion.getGumsCount();
-        clothesHSV = tmpColor.toHsv(clothesHSV);
+        this.bottlesCount = bottlesCount;
+        this.gumsCount = gumsCount;
         label = LabelManager.getInstance().getLabel(null, x,
                 y + 1.3f * GameScreen.tileSize, Color.WHITE);
     }
-
-    private float stateTime = 0f;
 
     @Override
     public void act(float delta) {
@@ -96,13 +93,11 @@ public class Player extends MovableActor {
 
     public void increaseBottlesCount() {
         this.bottlesCount++;
-        LGCGame.Companion.setBottlesCount(this.bottlesCount);
     }
 
     public void decreaseBottlesCount() {
         if (bottlesCount > 0) {
             this.bottlesCount--;
-            LGCGame.Companion.setBottlesCount(this.bottlesCount);
         }
     }
 
@@ -110,15 +105,9 @@ public class Player extends MovableActor {
         return bottlesCount;
     }
 
-    public void increaseGumsCount() {
-        this.gumsCount++;
-        LGCGame.Companion.setGumsCount(this.gumsCount);
-    }
-
     public void decreaseGumsCount() {
         if (gumsCount > 0) {
             this.gumsCount--;
-            LGCGame.Companion.setGumsCount(this.gumsCount);
         }
     }
 

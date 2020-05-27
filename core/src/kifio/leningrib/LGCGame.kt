@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
+import com.sun.org.apache.xpath.internal.operations.Bool
 import generator.Config
 import kifio.leningrib.levels.CommonLevel
 import kifio.leningrib.levels.FirstLevel
@@ -39,10 +40,6 @@ class LGCGame(val store: StoreInterface,
         const val PREFERENCES_NAME = "kifio.leningrib"
 
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
-
-        private const val PLAYER_BOTTLES_COUNT = "PLAYER_BOTTLES_COUNT"
-        private const val PLAYER_GUMS_COUNT = "PLAYER_GUMS_COUNT"
-
         const val MUSIC = "music"
         const val SOUNDS = "sounds"
         private const val WAS_LAUNCHED = "is_first_launch"
@@ -68,13 +65,26 @@ class LGCGame(val store: StoreInterface,
             val levelMap: LevelMap
             val level: Level
             val player: Player
+            var bottlesCount = 0
+            var gumsCount = 0
+
+            if (isPurchased(StoreInterface.SKU_LIST[0])) {
+                bottlesCount += 1
+            } else if (isPurchased(StoreInterface.SKU_LIST[1])) {
+                bottlesCount += 2
+            } else if (isPurchased(StoreInterface.SKU_LIST[2])) {
+                gumsCount += 1
+            } else if (isPurchased(StoreInterface.SKU_LIST[3])) {
+                gumsCount += 2
+            }
+
             if (isFirstLevelPassed()) {
                 val config = Config(LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
                 levelMap = worldMap.addLevel(0, 0, null, config)
                 val room = levelMap.rooms[0]
                 val x = 3f
                 val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 3).toFloat()
-                player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize)
+                player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize, bottlesCount, gumsCount)
                 level = CommonLevel(player, levelMap)
             } else {
                 val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
@@ -83,6 +93,8 @@ class LGCGame(val store: StoreInterface,
                 player = FirstLevel.getPlayer()
                 level = FirstLevel(player, levelMap)
             }
+
+
             return Pair(player, level)
         }
 
@@ -95,12 +107,6 @@ class LGCGame(val store: StoreInterface,
             prefs?.putBoolean(currentDate, true)
             prefs?.flush()
         }
-
-        // TODO: Migrate to in app purchases
-        fun getBottlesCount() = getCount(PLAYER_BOTTLES_COUNT)
-        fun getGumsCount() = getCount(PLAYER_GUMS_COUNT)
-        fun setBottlesCount(count: Int) = setCount(PLAYER_BOTTLES_COUNT, count)
-        fun setGumsCount(count: Int) = setCount(PLAYER_GUMS_COUNT, count)
 
         private fun setCount(item: String, count: Int) {
             prefs?.putInteger(item, count)
@@ -115,6 +121,8 @@ class LGCGame(val store: StoreInterface,
             }
             prefs?.flush()
         }
+
+        fun isPurchased(sku: String): Boolean = prefs?.getBoolean(sku) == true
 
         fun saveMaxScore(score: Long) {
             prefs?.putLong(MAX_SCORE, score)

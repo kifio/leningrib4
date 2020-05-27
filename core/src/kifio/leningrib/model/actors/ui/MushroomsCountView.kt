@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.utils.Align
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.ResourcesManager.*
@@ -29,10 +30,9 @@ class MushroomsCountView(camera: OrthographicCamera,
 
     init {
         this.height = tileSize * 3f
-        this.width = tileSize + lm.getTextWidth(label, lm.common.large)
-
-        this.x = (Gdx.graphics.width - this.width) / 2f
-        labelX = this.x + tileSize * 1.5f
+        this.width = tileSize + (lm.getTextWidth(label, lm.common.large))
+        this.x = Gdx.graphics.width / 2f - width / 2f
+        labelX = this.x + (tileSize * 1.5f)
 
         val labelHeight = lm.getTextHeight(label, lm.common.large)
         labelYOffset = 1.5f * labelHeight
@@ -47,8 +47,7 @@ class MushroomsCountView(camera: OrthographicCamera,
         val lm = lm
 
         lm.common.large.color = labelColor
-        lm.common.large.draw(batch, label, labelX, (this.y + 2f * tileSize) + labelYOffset)
-
+        lm.common.large.draw(batch, label, labelX, (this.y + 2f * tileSize) + labelYOffset, tileSize, Align.center, false)
         lm.common.medium.draw(batch, maxCountLabel, (Gdx.graphics.width - maxWidth) / 2f, (this.y + 0.8f * tileSize) + labelYOffset)
 
         if (lutController?.lutTexture != null) {

@@ -11,8 +11,6 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ConsumeParams;
-import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
@@ -26,9 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import kifio.leningrib.platform.OnBillingInitializedListener;
-import kifio.leningrib.platform.OnUpdatePurchasesListener;
 import kifio.leningrib.platform.OnPurchasesLoadedListener;
 import kifio.leningrib.platform.OnStoreItemsLoadedListener;
+import kifio.leningrib.platform.OnUpdatePurchasesListener;
 import kifio.leningrib.platform.StoreInterface;
 import kifio.leningrib.platform.items.StoreItem;
 
@@ -107,8 +105,10 @@ public class Store implements StoreInterface {
 
     @Override
     public void dispose() {
-        billingClient.endConnection();
-        billingClient = null;
+        if (billingClient != null) {
+            billingClient.endConnection();
+            billingClient = null;
+        }
         hasBillingConnection = false;
     }
 
