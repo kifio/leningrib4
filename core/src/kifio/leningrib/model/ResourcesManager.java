@@ -59,8 +59,8 @@ public class ResourcesManager {
     public static final String CLICK = "sounds/click.ogg";
     public static final String GAMEOVER = "sounds/gameover.wav";
     public static final String STORE_TOP = "store_top.png";
-    public static final String VODKA_3 = "vodka_3.png";
-    public static final String VODKA_5 = "vodka_5.png";
+    public static final String VODKA_1 = "vodka_1.png";
+    public static final String VODKA_2 = "vodka_2.png";
     public static final String GUM_1 = "gum_1.png";
     public static final String GUM_2 = "gum_2.png";
     public static final String GUM_1_PRESSED = "gum_1_pressed.png";
@@ -191,8 +191,8 @@ public class ResourcesManager {
         param.magFilter = Texture.TextureFilter.Nearest;
         am.load(PLAYER_DIALOG_FACE, Texture.class, param);
         am.load(GRANDMA_DIALOG_FACE, Texture.class, param);
-        am.load(VODKA_3, Texture.class, param);
-        am.load(VODKA_5, Texture.class, param);
+        am.load(VODKA_1, Texture.class, param);
+        am.load(VODKA_2, Texture.class, param);
         am.load(GUM_1, Texture.class, param);
         am.load(GUM_2, Texture.class, param);
         am.load(GUM_1_PRESSED, Texture.class, param);

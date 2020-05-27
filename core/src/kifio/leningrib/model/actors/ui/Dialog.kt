@@ -42,7 +42,7 @@ class Dialog(camera: OrthographicCamera,
     private var index = 0
     private var accumulatedTime = 0f
     private val halfHeight = (camera.viewportHeight * camera.zoom) / 2
-    private val font = LabelManager.getInstance().mediumFont
+    private val font = LabelManager.getInstance().roboto.medium
 
     init {
         measure()

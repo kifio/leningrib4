@@ -120,8 +120,8 @@ class SettingButton(
         batch.shader = null
         if (region != null) batch.draw(region, x, y, width, height)
         batch.draw(switchIcon, iconX, iconY, iconWidth, iconHeight)
-        LabelManager.getInstance().largeFont.color = labelColor
-        LabelManager.getInstance().largeFont.draw(batch, label, labelX, this.y + (0.6f * this.height))
+        LabelManager.getInstance().common.large.color = labelColor
+        LabelManager.getInstance().common.large.draw(batch, label, labelX, this.y + (0.6f * this.height))
         if (lutController?.lutTexture != null) {
             batch.shader = lutController.shader
         }

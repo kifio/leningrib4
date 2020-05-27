@@ -20,130 +20,149 @@ import static com.badlogic.gdx.math.MathUtils.random;
  */
 public class LabelManager {
 
-	public BitmapFont smallFont;
-	public BitmapFont mediumFont;
-	public BitmapFont largeFont;
+    public static class Font {
+        public BitmapFont small;
+        public BitmapFont medium;
+        public BitmapFont large;
 
-	private GlyphLayout glyphLayout = new GlyphLayout();
-	private Label.LabelStyle smallLabelStyle = new Label.LabelStyle();
-	private Label.LabelStyle mediumLabelStyle = new Label.LabelStyle();
+        public Font(BitmapFont small, BitmapFont medium, BitmapFont large) {
+            this.small = small;
+            this.medium = medium;
+            this.large = large;
+        }
+    }
 
-	private static final float SCALE = 0.9f;
-	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?'+-*/()[]={}@";
 
-	private static LabelManager speechManager;
+    public Font roboto;
+    public Font common;
 
-	public static LabelManager getInstance() {
-		if (speechManager == null) {
-			speechManager = new LabelManager();
-		}
-		return speechManager;
-	}
+    private GlyphLayout glyphLayout = new GlyphLayout();
+    private Label.LabelStyle smallLabelStyle = new Label.LabelStyle();
+    private Label.LabelStyle mediumLabelStyle = new Label.LabelStyle();
 
-	private LabelManager() {
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/3572.ttf"));
-		smallFont = generator.generateFont(getFontParameters(0.6f, 0));
-		mediumFont = generator.generateFont(getFontParameters(0.8f, 0));
-		largeFont = generator.generateFont(getFontParameters(1f, 1));
-		smallLabelStyle.font = smallFont;
-		mediumLabelStyle.font = mediumFont;
-		generator.dispose();
-	}
+    private static final float SCALE = 0.9f;
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890.,:;_¡!¿?'+-*/()[]={}@";
 
-	private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameters(float scale, int shadowOffsetY) {
-		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		parameter.characters = CHARACTERS;
-		parameter.color = Color.WHITE;
-		parameter.minFilter = Nearest;
-		parameter.magFilter = Linear;
-		parameter.spaceY = (int) (4 * Gdx.graphics.getDensity());
-		parameter.shadowOffsetY = shadowOffsetY;
-		parameter.size *= (scale * Gdx.graphics.getDensity());
-		return parameter;
-	}
+    private static LabelManager speechManager;
 
-	public float getTextWidth(String text, BitmapFont font) {
-		glyphLayout.setText(font, text);
-		return glyphLayout.width;
-	}
+    public static LabelManager getInstance() {
+        if (speechManager == null) {
+            speechManager = new LabelManager();
+        }
+        return speechManager;
+    }
 
-	public float getTextHeight(String text, BitmapFont font) {
-		glyphLayout.setText(font, text);
-		return glyphLayout.height;
-	}
+    private LabelManager() {
+        common = getFont("fonts/pixel.ttf");
+        roboto = getFont("fonts/roboto.ttf");
+        smallLabelStyle.font = common.small;
+        mediumLabelStyle.font = common.medium;
+    }
 
-	public String getRandomMushroomSpeech() {
-		return ResourcesManager.commonMushroomsSpeechBundle.get(String.valueOf(random(1, 111)));
-	}
+    private Font getFont(String path) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
+        Font font = new Font(
+                generator.generateFont(getFontParameters(0.6f, 0)),
+                generator.generateFont(getFontParameters(0.8f, 0)),
+                generator.generateFont(getFontParameters(1f, 1)));
+        generator.dispose();
+        return font;
+    }
 
-	public String getPowerMushroomSpeech() {
-		return ResourcesManager.powerMushroomsSpeechBundle.get(String.valueOf(random(1, 21)));
-	}
+    private FreeTypeFontGenerator.FreeTypeFontParameter getFontParameters(float scale, int shadowOffsetY) {
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.characters = CHARACTERS;
+        parameter.color = Color.WHITE;
+        parameter.minFilter = Nearest;
+        parameter.magFilter = Linear;
+        parameter.spaceY = (int) (4 * Gdx.graphics.getDensity());
+        parameter.shadowOffsetY = shadowOffsetY;
+        parameter.size *= (scale * Gdx.graphics.getDensity());
+        return parameter;
+    }
 
-	public String getSpeedMushroomSpeech() {
-		return ResourcesManager.speedMushroomsSpeechBundle.get(String.valueOf(random(1, 15)));
-	}
+    public float getTextWidth(String text, BitmapFont font) {
+        glyphLayout.setText(font, text);
+        return glyphLayout.width;
+    }
 
-	public String getInvisibilityMushroomSpeech() {
-		return ResourcesManager.invisibilityMushroomsSpeechBundle.get(String.valueOf(random(1, 12)));
-	}
+    public float getTextHeight(String text, BitmapFont font) {
+        glyphLayout.setText(font, text);
+        return glyphLayout.height;
+    }
 
-	public String getDexterityMushroomSpeech() {
-		return ResourcesManager.dexterityMushroomsSpeechBundle.get(String.valueOf(random(1, 15)));
-	}
+    public String getRandomMushroomSpeech() {
+        return ResourcesManager.commonMushroomsSpeechBundle.get(String.valueOf(random(1, 111)));
+    }
 
-	public String getForesterPatrolSpeech() {
-		return ResourcesManager.forestersSpeechesPatrolBundle.get(String.valueOf(random(1, 11)));
-	}
+    public String getPowerMushroomSpeech() {
+        return ResourcesManager.powerMushroomsSpeechBundle.get(String.valueOf(random(1, 21)));
+    }
 
-	public String getForesterInvisiblePlayerSpeech() {
-		return ResourcesManager.forestersSpeechesInvisiblePlayerBundle.get(String.valueOf(random(1, 3)));
-	}
+    public String getSpeedMushroomSpeech() {
+        return ResourcesManager.speedMushroomsSpeechBundle.get(String.valueOf(random(1, 15)));
+    }
 
-	public String getForesterScaredSpeech() {
-		return ResourcesManager.forestersSpeechesFearBundle.get(String.valueOf(random(1, 4)));
-	}
+    public String getInvisibilityMushroomSpeech() {
+        return ResourcesManager.invisibilityMushroomsSpeechBundle.get(String.valueOf(random(1, 12)));
+    }
 
-	public String getForesterPursuitSpeech() {
-		return ResourcesManager.forestersSpeechesPursuitBundle.get(String.valueOf(random(1, 24)));
-	}
+    public String getDexterityMushroomSpeech() {
+        return ResourcesManager.dexterityMushroomsSpeechBundle.get(String.valueOf(random(1, 15)));
+    }
 
-	public String getForesterStopSpeech() {
-		return ResourcesManager.forestersSpeechesStopBundle.get(String.valueOf(random(1, 5)));
-	}
+    public String getForesterPatrolSpeech() {
+        return ResourcesManager.forestersSpeechesPatrolBundle.get(String.valueOf(random(1, 11)));
+    }
 
-	public String getForesterDrinkingSpeech() {
-		return ResourcesManager.forestersSpeechesDrinking.get(String.valueOf(random(1, 10)));
-	}
+    public String getForesterInvisiblePlayerSpeech() {
+        return ResourcesManager.forestersSpeechesInvisiblePlayerBundle.get(String.valueOf(random(1, 3)));
+    }
 
-	public String getForesterDrunkSpeech() {
-		return ResourcesManager.forestersSpeechesDrunk.get(String.valueOf(random(1, 10)));
-	}
+    public String getForesterScaredSpeech() {
+        return ResourcesManager.forestersSpeechesFearBundle.get(String.valueOf(random(1, 4)));
+    }
 
-	public String getForesterRunToBottleSpeech() {
-		return ResourcesManager.forestersSpeechesRunToBottle.get(String.valueOf(random(1, 6)));
-	}
+    public String getForesterPursuitSpeech() {
+        return ResourcesManager.forestersSpeechesPursuitBundle.get(String.valueOf(random(1, 24)));
+    }
 
-	public String getWonderingSpeech() {
-		return ResourcesManager.playerWonderingSpeeches.get(String.valueOf(random(1, 6)));
-	}
+    public String getForesterStopSpeech() {
+        return ResourcesManager.forestersSpeechesStopBundle.get(String.valueOf(random(1, 5)));
+    }
 
-	public String getClearSpeech(int i) {
-		return ResourcesManager.playerClearSpeeches.get(String.valueOf(random(1, 5)));
-	}
+    public String getForesterDrinkingSpeech() {
+        return ResourcesManager.forestersSpeechesDrinking.get(String.valueOf(random(1, 10)));
+    }
 
-	public Label getLabel(String text, float x, float y, Color color) {
-		return getLabel(text, true, x, y, color);
-	}
+    public String getForesterDrunkSpeech() {
+        return ResourcesManager.forestersSpeechesDrunk.get(String.valueOf(random(1, 10)));
+    }
 
-	public Label getLabel(String text, boolean isSmall, float x, float y, Color color) {
-		Label label = new Label(text, isSmall ? smallLabelStyle : mediumLabelStyle);
-		label.setColor(color);
-		label.setWidth(GameScreen.tileSize * 2.7f);
-		label.setFontScale(SCALE, SCALE);
-		label.setPosition(x, y);
-		label.setWrap(true);
-		label.setAlignment(Align.center, Align.center);
-		return label;
-	}
+    public String getForesterRunToBottleSpeech() {
+        return ResourcesManager.forestersSpeechesRunToBottle.get(String.valueOf(random(1, 6)));
+    }
+
+    public String getWonderingSpeech() {
+        return ResourcesManager.playerWonderingSpeeches.get(String.valueOf(random(1, 6)));
+    }
+
+    public String getClearSpeech(int i) {
+        return ResourcesManager.playerClearSpeeches.get(String.valueOf(random(1, 5)));
+    }
+
+    public Label getLabel(String text, float x, float y, Color color) {
+        return getLabel(text, true, x, y, color);
+    }
+
+    public Label getLabel(String text, boolean isSmall, float x, float y, Color color) {
+        Label label = new Label(text, isSmall ? smallLabelStyle : mediumLabelStyle);
+        label.setColor(color);
+        label.setWidth(GameScreen.tileSize * 2.7f);
+        label.setFontScale(SCALE, SCALE);
+        label.setPosition(x, y);
+        label.setWrap(true);
+        label.setAlignment(Align.center, Align.center);
+        return label;
+    }
 }

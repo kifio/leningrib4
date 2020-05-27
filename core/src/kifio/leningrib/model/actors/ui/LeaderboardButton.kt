@@ -18,10 +18,10 @@ class LeaderboardButton(camera: OrthographicCamera,
                         targetHeight: Float) : StaticActor(ResourcesManager.getRegion(ResourcesManager.LEADERBOARD), camera, lutController) {
 
     val textWidth = LabelManager.getInstance().getTextWidth(
-            "ТАБЛИЦА ЛИДЕРОВ", LabelManager.getInstance().mediumFont)
+            "ТАБЛИЦА ЛИДЕРОВ", LabelManager.getInstance().common.medium)
 
     val textHeight = LabelManager.getInstance().getTextHeight(
-            "ТАБЛИЦА ЛИДЕРОВ", LabelManager.getInstance().mediumFont)
+            "ТАБЛИЦА ЛИДЕРОВ", LabelManager.getInstance().common.medium)
 
     var onTouchHandler: (() -> Unit)? = null
 
@@ -61,7 +61,7 @@ class LeaderboardButton(camera: OrthographicCamera,
             ((camera.position.y + offset) - (height - 0.9f * textHeight))
         }
 
-        LabelManager.getInstance().mediumFont.draw(batch,
+        LabelManager.getInstance().common.medium.draw(batch,
                 "Таблица лидеров",
                 (Gdx.graphics.width - textWidth) / 2f,
                 labelY,

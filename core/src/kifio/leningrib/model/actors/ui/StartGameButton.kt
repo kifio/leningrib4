@@ -27,7 +27,7 @@ class StartGameButton(
     private var offset: Float = 0f
 
     init {
-        val labelWidth = LabelManager.getInstance().getTextWidth(title, LabelManager.getInstance().largeFont)
+        val labelWidth = LabelManager.getInstance().getTextWidth(title, LabelManager.getInstance().common.large)
         labelX = x + (width - labelWidth) / 2
 
         addListener(object : InputListener() {
@@ -51,8 +51,8 @@ class StartGameButton(
         y = camera.position.y - (height / 2) - ((0.75f * height) * offsetsCount)
         if (region != null) batch.draw(region, x, y, width, height)
         offset = if (touched) 0.5f else 0.6f
-        LabelManager.getInstance().largeFont.color = labelColor
-        LabelManager.getInstance().largeFont.draw(batch, title, labelX, this.y + (offset * this.height))
+        LabelManager.getInstance().common.large.color = labelColor
+        LabelManager.getInstance().common.large.draw(batch, title, labelX, this.y + (offset * this.height))
 
         if (lutController?.lutTexture != null) {
             batch.shader = lutController.shader

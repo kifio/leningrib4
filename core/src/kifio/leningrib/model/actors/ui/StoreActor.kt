@@ -37,11 +37,12 @@ class StoreActor(camera: OrthographicCamera,
     private var items: List<StoreItem>? = null
     private var descriptionsHeights: List<Float>? = null
 
+    private val lm = LabelManager.getInstance()
     private var buyLabel = "КУПИТЬ"
     private var buyLabelTexture: Texture = getTexture(GREEN_BG)
-    private var buyLabelHeight = LabelManager.getInstance().getTextHeight(buyLabel, LabelManager.getInstance().mediumFont)
-    private var buyLabelWidth = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 1.4f
-    private var buyLabelOffset = LabelManager.getInstance().getTextWidth(buyLabel, LabelManager.getInstance().mediumFont) * 0.2f
+    private var buyLabelHeight = lm.getTextHeight(buyLabel, lm.common.medium)
+    private var buyLabelWidth = lm.getTextWidth(buyLabel, lm.common.medium) * 1.4f
+    private var buyLabelOffset = lm.getTextWidth(buyLabel, lm.common.medium) * 0.2f
 
     private val overlay = getTexture(STORE_ITEM_BG)
     private val closeTexture = getTexture(CLOSE_STORE)
@@ -58,10 +59,10 @@ class StoreActor(camera: OrthographicCamera,
 
             store.setup({
                 store.loadSku { items ->
-                    val lm = LabelManager.getInstance()
+                    val lm = lm
                     this.items = items
                     this.descriptionsHeights = items.map { item ->
-                        lm.getTextHeight(item.description, lm.smallFont)
+                        lm.getTextHeight(item.description, lm.roboto.medium)
                     }
                 }
             }, { sku ->
@@ -151,7 +152,7 @@ class StoreActor(camera: OrthographicCamera,
                 imageSize,
                 imageSize)
 
-        LabelManager.getInstance().smallFont.draw(batch,
+        lm.roboto.small.draw(batch,
                 item.description,
                 textOffset,
                 yImage + descriptionOffset,
@@ -161,13 +162,13 @@ class StoreActor(camera: OrthographicCamera,
 
         batch.draw(buyLabelTexture, textOffset + imageSize, buyY - (0.8f * GameScreen.tileSize), buyLabelWidth, GameScreen.tileSize.toFloat())
 
-        LabelManager.getInstance().mediumFont.draw(batch,
+        lm.common.small.draw(batch,
                 item.price,
                 textOffset,
                 buyY - (0.25f * GameScreen.tileSize),
                 imageSize, Align.left, true)
 
-        LabelManager.getInstance().mediumFont.draw(batch,
+        lm.common.medium.draw(batch,
                 buyLabel,
                 textOffset + buyLabelOffset + imageSize,
                 buyY - (0.25f * GameScreen.tileSize),
@@ -176,8 +177,8 @@ class StoreActor(camera: OrthographicCamera,
 
     private fun getTexture(id: Int): Texture? {
         return when (id) {
-            0 -> getTexture(VODKA_3)
-            1 -> getTexture(VODKA_5)
+            0 -> getTexture(VODKA_1)
+            1 -> getTexture(VODKA_2)
             2 -> getTexture(GUM_1)
             3 -> getTexture(GUM_2)
             else -> null
