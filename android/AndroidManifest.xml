@@ -4,6 +4,7 @@
 
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="false"
@@ -11,6 +12,12 @@
         android:isGame="true"
         android:label="@string/app_name"
         android:theme="@style/GdxTheme" >
+
+        <meta-data android:name="com.google.android.gms.games.APP_ID"
+            android:value="@string/app_id" />
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
         <activity
             android:name="kifio.leningrib.AndroidLauncher"
             android:label="@string/app_name" 

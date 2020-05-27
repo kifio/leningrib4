@@ -10,7 +10,10 @@ import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.speech.LabelManager
 import kifio.leningrib.screens.GameScreen
 
-class MushroomsCountView(camera: OrthographicCamera, count: Int, lutController: LUTController
+class MushroomsCountView(camera: OrthographicCamera,
+                         count: Long,
+                         max: Long,
+                         lutController: LUTController
 ) : StaticActor(getRegion(RESULT_MUSHROOM), camera, lutController) {
 
     private val labelColor = Color.WHITE
@@ -21,7 +24,9 @@ class MushroomsCountView(camera: OrthographicCamera, count: Int, lutController: 
     private val labelYOffset: Float
     private val tileSize = GameScreen.tileSize.toFloat()
     private  val lm = LabelManager.getInstance()
-    
+    private val maxCountLabel = "РЕКОРД: $max"
+    private val maxWidth = lm.getTextWidth(maxCountLabel, lm.common.medium)
+
     init {
         this.height = tileSize * 3f
         this.width = tileSize + lm.getTextWidth(label, lm.common.large)
@@ -44,8 +49,7 @@ class MushroomsCountView(camera: OrthographicCamera, count: Int, lutController: 
         lm.common.large.color = labelColor
         lm.common.large.draw(batch, label, labelX, (this.y + 2f * tileSize) + labelYOffset)
 
-        val maxWidth = lm.getTextWidth("РЕКОРД: 200", lm.common.medium)
-        lm.common.medium.draw(batch, "РЕКОРД: 200", (Gdx.graphics.width - maxWidth) / 2f, (this.y + 0.8f * tileSize) + labelYOffset)
+        lm.common.medium.draw(batch, maxCountLabel, (Gdx.graphics.width - maxWidth) / 2f, (this.y + 0.8f * tileSize) + labelYOffset)
 
         if (lutController?.lutTexture != null) {
             batch.shader = lutController.shader

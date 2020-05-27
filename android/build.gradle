@@ -13,9 +13,7 @@ android {
         }
 
     }
-    packagingOptions {
-        exclude 'META-INF/robovm/ios/robovm.xml'
-    }
+
     defaultConfig {
         applicationId "kifio.leningrib"
         minSdkVersion 21
@@ -26,7 +24,7 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("leningrib.keystore")
+            storeFile file("leningrib.jks")
             storePassword "qwerty"
             keyAlias "leningrib"
             keyPassword "qwerty"

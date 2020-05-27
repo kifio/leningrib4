@@ -38,7 +38,7 @@ public class Player extends MovableActor {
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
     private int bottlesCount = 0;
-    private int score = 0;
+    private long score = 0;
     private int gumsCount = 0;
 
     public Label label;
@@ -69,25 +69,6 @@ public class Player extends MovableActor {
             }
         }
         updateEffectState(delta);
-    }
-
-//    private void updateClothesColor(float delta) {
-//        if (stateTime > 0 && this.passedLevelsCount == 0 && stateTime > 1 - passedLevelsCount * 0.1f) {
-//            updateClothesColor();
-//            replaceColorInTexture(UIState.obtainUIState(getIdlingState(), this), 0xFDA010FF, newColor);
-//            replaceColorInTexture(UIState.obtainUIState(getRunningState(), this), 0xFDA010FF, newColor);
-//            stateTime = 0f;
-//        }
-//        stateTime += delta;
-//    }
-
-    private void updateClothesColor() {
-        if (clothesHSV[0] >= 360) {
-            clothesHSV[0] = 0;
-        } else {
-            clothesHSV[0] += 10;
-        }
-        newColor = Color.argb8888(tmpColor.fromHsv(clothesHSV));
     }
 
     @Override
@@ -145,7 +126,7 @@ public class Player extends MovableActor {
         return gumsCount;
     }
 
-    public int getScore() {
+    public long getScore() {
         return score;
     }
 

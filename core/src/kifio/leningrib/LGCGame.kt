@@ -15,6 +15,7 @@ import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.game.Player
+import kifio.leningrib.platform.PlayGamesClientInterface
 import kifio.leningrib.platform.StoreInterface
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
@@ -27,7 +28,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
 
-class LGCGame(val store: StoreInterface) : Game() {
+class LGCGame(val store: StoreInterface,
+              val playGamesClient: PlayGamesClientInterface) : Game() {
 
     companion object {
 
@@ -44,6 +46,7 @@ class LGCGame(val store: StoreInterface) : Game() {
         const val MUSIC = "music"
         const val SOUNDS = "sounds"
         private const val WAS_LAUNCHED = "is_first_launch"
+        private const val MAX_SCORE = "max_score"
 
         private var firstLevelPassed = false
         private var shouldShowBottleDialog = false
@@ -113,14 +116,12 @@ class LGCGame(val store: StoreInterface) : Game() {
             prefs?.flush()
         }
 
-        fun getConsumedSkuList(): List<String> {
-            val skuList = mutableListOf<String>()
-            for (sku in StoreInterface.SKU_LIST) {
-                prefs?.contains(sku)
-                skuList.add(sku)
-            }
-            return skuList
+        fun saveMaxScore(score: Long) {
+            prefs?.putLong(MAX_SCORE, score)
+            prefs?.flush()
         }
+
+        fun getMaxScore() = prefs?.getLong(MAX_SCORE, 0) ?: 0
     }
 
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -144,9 +145,15 @@ class LGCGame(val store: StoreInterface) : Game() {
             prefs?.flush()
         }
 
+        playGamesClient.initGoogleClientAndSignIn {
+            playGamesClient.queryScore {
+                saveMaxScore(it)
+            }
+        }
+
         store.setup({
-            store.loadPurchases {
-                items -> savePurchasedSku(items)
+            store.loadPurchases { items ->
+                savePurchasedSku(items)
             }
         }, { sku -> savePurchasedSku(listOf(sku)) })
 
@@ -189,6 +196,10 @@ class LGCGame(val store: StoreInterface) : Game() {
             music?.stop()
             music?.dispose()
         }
+    }
+
+    fun openLeaderBoards() {
+        playGamesClient.openLeaderBoards()
     }
 
     private fun showScreen(screen: Screen) {

@@ -1,58 +1,103 @@
 package kifio.leningrib;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.badlogic.gdx.Gdx;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.AchievementsClient;
+import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.LeaderboardsClient;
+import com.google.android.gms.games.leaderboard.LeaderboardScore;
+import com.google.android.gms.games.leaderboard.LeaderboardVariant;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-public class PlayGamesClient {
+import kifio.leningrib.platform.OnGetScoreListener;
+import kifio.leningrib.platform.OnInitListener;
+import kifio.leningrib.platform.PlayGamesClientInterface;
 
-    static final int LEADERBOARDS_REQUEST_CODE = 100;
-    static final int ACHIEVEMENTS_REQUEST_CODE = 101;
+public class PlayGamesClient implements PlayGamesClientInterface {
+
+    private static final int SIGN_IN_REQUEST_CODE = 99;
+    private static final int LEADERBOARDS_REQUEST_CODE = 100;
+    private static final int ACHIEVEMENTS_REQUEST_CODE = 101;
+
+    private static final String LEADERBOAD_ID = "CgkIrqeKmpgIEAIQAQ";
 
     private GoogleSignInClient googleSignInClient;
     private AchievementsClient achievementClient;
     private LeaderboardsClient leaderboardsClient;
 
     private Activity ctx;
+    private OnInitListener onInitListener;
 
     PlayGamesClient(Activity ctx) {
         this.ctx = ctx;
     }
 
-    void initGoogleClientAndSignIn() {
-        googleSignInClient = GoogleSignIn.getClient(ctx, new GoogleSignInOptions.Builder(
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());
-
+    @Override
+    public void initGoogleClientAndSignIn(OnInitListener listener) {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(
+                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build();
+        this.onInitListener = listener;
+        googleSignInClient = GoogleSignIn.getClient(ctx, gso);
         googleSignInClient.silentSignIn().addOnCompleteListener(new OnCompleteListener<GoogleSignInAccount>() {
 
             @Override
             public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
                 if (task.isSuccessful()) {
-                    GoogleSignInAccount account = task.getResult();
-                    if (account != null && !ctx.isDestroyed()) {
-                        achievementClient = Games.getAchievementsClient(ctx, account);
-                        leaderboardsClient = Games.getLeaderboardsClient(ctx, account);
-                    }
+                    initClients(task.getResult());
                 } else {
-                    Log.e("Error", "signInError", task.getException());
+                    signInWithUI();
                 }
             }
         });
     }
 
+    void handleSignInResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PlayGamesClient.SIGN_IN_REQUEST_CODE) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result != null && result.isSuccess()) {
+                // The signed in account is stored in the result.
+                initClients(result.getSignInAccount());
+            } else {
+                String message = result.getStatus().getStatusMessage();
+                new AlertDialog.Builder(ctx).setMessage(message)
+                        .setNeutralButton(android.R.string.ok, null).show();
+            }
+        }
+    }
+
+    private void initClients(GoogleSignInAccount account) {
+        if (account != null && !ctx.isDestroyed()) {
+            achievementClient = Games.getAchievementsClient(ctx, account);
+            leaderboardsClient = Games.getLeaderboardsClient(ctx, account);
+        }
+
+        if (onInitListener != null) {
+            onInitListener.onInit();
+            onInitListener = null;
+        }
+    }
+
+    private void signInWithUI() {
+        Intent intent = googleSignInClient.getSignInIntent();
+        ctx.startActivityForResult(intent, SIGN_IN_REQUEST_CODE);
+    }
+
+    @Override
     public void openAchievements() {
         if (achievementClient != null && !ctx.isDestroyed()) {
             achievementClient.getAchievementsIntent().addOnSuccessListener(new OnSuccessListener<Intent>() {
@@ -64,12 +109,42 @@ public class PlayGamesClient {
         }
     }
 
+    @Override
     public void openLeaderBoards() {
         if (leaderboardsClient != null && !ctx.isDestroyed()) {
             leaderboardsClient.getAllLeaderboardsIntent().addOnSuccessListener(new OnSuccessListener<Intent>() {
                 @Override
                 public void onSuccess(Intent intent) {
                     ctx.startActivityForResult(intent, LEADERBOARDS_REQUEST_CODE);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void submitScore(final long score) {
+        if (leaderboardsClient != null && !ctx.isDestroyed()) {
+            leaderboardsClient.submitScoreImmediate(LEADERBOAD_ID, score).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Gdx.app.log("kPlayGamesClient", "Cannot submit score: " + score);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void queryScore(final OnGetScoreListener listener) {
+        if (leaderboardsClient != null && !ctx.isDestroyed()) {
+            leaderboardsClient.loadCurrentPlayerLeaderboardScore(LEADERBOAD_ID,
+                    LeaderboardVariant.TIME_SPAN_ALL_TIME,
+                    LeaderboardVariant.COLLECTION_PUBLIC).addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardScore>>() {
+                @Override
+                public void onSuccess(AnnotatedData<LeaderboardScore> leaderboardScoreAnnotatedData) {
+                    LeaderboardScore score = leaderboardScoreAnnotatedData.get();
+                    if (score != null) {
+                        listener.onGetScore(score.getRawScore());
+                    }
                 }
             });
         }

@@ -222,6 +222,14 @@ class GameScreen(game: LGCGame,
         }
     }
 
+    private fun getLeaderBoardsButton(offset: Float, targetHeight: Float): LeaderboardButton {
+        val lb = LeaderboardButton(camera, lutController, offset, targetHeight)
+        lb.onTouchHandler = {
+            game.openLeaderBoards()
+        }
+        return lb
+    }
+
     private fun getSettingsButton(): SquareButton {
         return SquareButton(
                 getRegion(SETTINGS_PRESSED),
@@ -363,6 +371,13 @@ class GameScreen(game: LGCGame,
         if (gameOver) return
         gameOver = true
 
+        game.playGamesClient.submitScore(player.score)
+        var maxScore = LGCGame.getMaxScore()
+        if (player.score > maxScore) {
+            LGCGame.saveMaxScore(player.score)
+            maxScore = player.score
+        }
+
         stage.actors
                 .filterIsInstance<SquareButton>()
                 .forEach {
@@ -394,13 +409,13 @@ class GameScreen(game: LGCGame,
 
         val settingsButton = getSettingsButton()
         val storeButton = getStoreButton()
-        val leaderboardsButton = LeaderboardButton(camera, lutController, -tileSize.toFloat(), storeButton.getHeightWithOffsets())
+        val leaderboardsButton = getLeaderBoardsButton(-tileSize.toFloat(), storeButton.getHeightWithOffsets())
 
         transitionActor?.addActor(overlay)
         transitionActor?.addActor(settingsButton)
         transitionActor?.addActor(storeButton)
         transitionActor?.addActor(gameOverLogo)
-        transitionActor?.addActor(MushroomsCountView(camera, player.score, lutController))
+        transitionActor?.addActor(MushroomsCountView(camera, player.score, maxScore, lutController))
         transitionActor?.addActor(restartGameButton)
         transitionActor?.addActor(leaderboardsButton)
 
@@ -449,7 +464,7 @@ class GameScreen(game: LGCGame,
 
         val settingsButton = getSettingsButton()
         val storeButton = getStoreButton()
-        val leaderboardsButton = LeaderboardButton(camera, lutController, Gdx.graphics.height / 2f, storeButton.getHeightWithOffsets())
+        val leaderboardsButton = getLeaderBoardsButton(Gdx.graphics.height / 2f, storeButton.getHeightWithOffsets())
 
         resumeGameButton.onTouchHandler = {
             if (!isFirstLevelPassed() && shouldShowTutorial) {

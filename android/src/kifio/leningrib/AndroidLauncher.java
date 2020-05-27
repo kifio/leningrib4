@@ -1,32 +1,21 @@
 package kifio.leningrib;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.games.AchievementsClient;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.LeaderboardsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 public class AndroidLauncher extends AndroidApplication {
+
+	private PlayGamesClient playGamesClient = new PlayGamesClient(this);
 
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		PlayGamesClient playGamesClient = new PlayGamesClient(this);
-		playGamesClient.initGoogleClientAndSignIn();
 		Store store = new Store(this);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new LGCGame(store), config);
+		initialize(new LGCGame(store, playGamesClient), config);
 	}
 
 	@Override
@@ -39,5 +28,10 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onTrimMemory(level);
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		playGamesClient.handleSignInResult(requestCode, resultCode, data);
+	}
 
 }
