@@ -17,24 +17,25 @@ class LeaderboardButton(camera: OrthographicCamera,
                         private val offset: Float,
                         targetHeight: Float) : StaticActor(ResourcesManager.getRegion(ResourcesManager.LEADERBOARD), camera, lutController) {
 
+    private val label = "Таблица лидеров"
+
     val textWidth = LabelManager.getInstance().getTextWidth(
-            "ТАБЛИЦА ЛИДЕРОВ", LabelManager.getInstance().common.medium)
+            label, LabelManager.getInstance().common.medium)
 
     val textHeight = LabelManager.getInstance().getTextHeight(
-            "ТАБЛИЦА ЛИДЕРОВ", LabelManager.getInstance().common.medium)
+            label, LabelManager.getInstance().common.medium)
 
     var onTouchHandler: (() -> Unit)? = null
 
     init {
 
         val logoOffset = GameScreen.tileSize * 2f
-        val h = region!!.regionHeight * Gdx.graphics.density
         val w = (Gdx.graphics.width - (4 * GameScreen.tileSize))
         this.width = w.toFloat()
-        this.height = h
+        this.height = targetHeight * 0.8f
 
         this.x = logoOffset
-        this.y = (camera.position.y + offset) - (1.5f * GameScreen.tileSize)
+        this.y = (camera.position.y + offset) - ((0.9f * targetHeight) + 16 * Gdx.graphics.density)
 
         addListener(object : InputListener() {
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
@@ -54,15 +55,9 @@ class LeaderboardButton(camera: OrthographicCamera,
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
-
-        val labelY = if (touched) {
-            ((camera.position.y + offset) - (height - 0.6f * textHeight))
-        } else {
-            ((camera.position.y + offset) - (height - 0.9f * textHeight))
-        }
-
+        val labelY = this.y + this.height - 0.5f * (this.height - textHeight)
         LabelManager.getInstance().common.medium.draw(batch,
-                "Таблица лидеров",
+                label,
                 (Gdx.graphics.width - textWidth) / 2f,
                 labelY,
                 width,

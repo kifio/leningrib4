@@ -5,6 +5,8 @@ buildscript {
         playAuthVersion = '18.0.0'
         gamesAuthVersion = '19.0.0'
         billingVersion = '2.2.1'
+        firebaseAnalyticsVersion = '17.4.2'
+        crashlyticsVersion = '17.0.0'
     }
 
     repositories {
@@ -19,6 +21,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.3'
         classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
@@ -49,17 +52,18 @@ allprojects {
 project(":android") {
     apply plugin: "android"
     apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'com.google.firebase.crashlytics'
 
     configurations { natives }
 
     dependencies {
         implementation project(":core")
-        implementation 'com.google.firebase:firebase-analytics:17.4.2'
+        implementation "com.google.firebase:firebase-analytics:$firebaseAnalyticsVersion"
+        implementation "com.google.firebase:firebase-crashlytics:$crashlyticsVersion"
         implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         implementation "com.google.android.gms:play-services-games:$gamesAuthVersion"
         implementation "com.google.android.gms:play-services-auth:$playAuthVersion"
         implementation "com.android.billingclient:billing:$billingVersion"
-
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"

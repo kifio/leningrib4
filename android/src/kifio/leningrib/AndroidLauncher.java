@@ -5,15 +5,19 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class AndroidLauncher extends AndroidApplication {
 
-	private PlayGamesClient playGamesClient = new PlayGamesClient(this);
+	private PlayGamesClient playGamesClient;
+	private FirebaseAnalytics firebaseAnalytics;
 
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Store store = new Store(this);
+		firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+		playGamesClient = new PlayGamesClient(this, firebaseAnalytics);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new LGCGame(store, playGamesClient), config);
 	}

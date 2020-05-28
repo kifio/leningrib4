@@ -40,6 +40,10 @@ class LGCGame(val store: StoreInterface,
         const val PREFERENCES_NAME = "kifio.leningrib"
 
         const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
+
+        private const val PLAYER_BOTTLES_COUNT = "PLAYER_BOTTLES_COUNT"
+        private const val PLAYER_GUMS_COUNT = "PLAYER_GUMS_COUNT"
+
         const val MUSIC = "music"
         const val SOUNDS = "sounds"
         private const val WAS_LAUNCHED = "is_first_launch"
@@ -78,6 +82,8 @@ class LGCGame(val store: StoreInterface,
                 gumsCount += 2
             }
 
+            bottlesCount += getBottlesCount()
+
             if (isFirstLevelPassed()) {
                 val config = Config(LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
                 levelMap = worldMap.addLevel(0, 0, null, config)
@@ -106,6 +112,21 @@ class LGCGame(val store: StoreInterface,
             shouldShowBottleDialog = false
             prefs?.putBoolean(currentDate, true)
             prefs?.flush()
+        }
+
+        // TODO: Migrate to in app purchases
+        fun getBottlesCount() = getCount(PLAYER_BOTTLES_COUNT)
+
+        fun decreaseBottlesCount() {
+            val count = getCount(PLAYER_BOTTLES_COUNT)
+            if (count > 0) {
+                setCount(PLAYER_BOTTLES_COUNT, count - 1)
+            }
+        }
+
+        fun increaseBottlesCount() {
+            val count = getCount(PLAYER_BOTTLES_COUNT) + 1
+            setCount(PLAYER_BOTTLES_COUNT, count)
         }
 
         private fun setCount(item: String, count: Int) {

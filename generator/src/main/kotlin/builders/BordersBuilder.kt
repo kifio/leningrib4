@@ -111,7 +111,14 @@ class BordersBuilder(
                 exit[1] = exit[0] + 1
             }
 
-            horizontalSide.removeIf { exit.contains(it.x) }
+            val iterator = horizontalSide.iterator()
+            while (iterator.hasNext()) {
+                val it = iterator.next()
+                if (exit.contains(it.x)) {
+                    iterator.remove()
+                }
+            }
+
             exitsBorderLeft = exit.min()?.minus(1)
             exitsBorderRight = exit.max()?.plus(1)
         }

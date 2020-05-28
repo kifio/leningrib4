@@ -93,11 +93,13 @@ public class Player extends MovableActor {
 
     public void increaseBottlesCount() {
         this.bottlesCount++;
+        LGCGame.Companion.increaseBottlesCount();
     }
 
     public void decreaseBottlesCount() {
         if (bottlesCount > 0) {
             this.bottlesCount--;
+            LGCGame.Companion.decreaseBottlesCount();
         }
     }
 

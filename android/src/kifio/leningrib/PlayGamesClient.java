@@ -3,6 +3,7 @@ package kifio.leningrib;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
@@ -23,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import kifio.leningrib.platform.OnGetScoreListener;
 import kifio.leningrib.platform.OnInitListener;
@@ -34,6 +36,10 @@ public class PlayGamesClient implements PlayGamesClientInterface {
     private static final int LEADERBOARDS_REQUEST_CODE = 100;
     private static final int ACHIEVEMENTS_REQUEST_CODE = 101;
 
+    private static final String AUTH_ERR = "auth_err";
+    private static final String STATUS = "status";
+    private static final String STATUS_CODE = "status_code";
+
     private static final String LEADERBOAD_ID = "CgkIrqeKmpgIEAIQAQ";
 
     private GoogleSignInClient googleSignInClient;
@@ -42,9 +48,11 @@ public class PlayGamesClient implements PlayGamesClientInterface {
 
     private Activity ctx;
     private OnInitListener onInitListener;
+    private FirebaseAnalytics firebaseAnalytics;
 
-    PlayGamesClient(Activity ctx) {
+    PlayGamesClient(Activity ctx, FirebaseAnalytics firebaseAnalytics) {
         this.ctx = ctx;
+        this.firebaseAnalytics = firebaseAnalytics;
     }
 
     @Override
@@ -73,9 +81,16 @@ public class PlayGamesClient implements PlayGamesClientInterface {
                 // The signed in account is stored in the result.
                 initClients(result.getSignInAccount());
             } else {
-                String message = result.getStatus().getStatusMessage();
+                if (result != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(STATUS, result.getStatus().getStatusMessage());
+                    bundle.putInt(STATUS_CODE, result.getStatus().getStatusCode());
+                    firebaseAnalytics.logEvent(AUTH_ERR, bundle);
+                }
+                String message = "Произошла ошибка при авторизации через Play Games";
                 new AlertDialog.Builder(ctx).setMessage(message)
                         .setNeutralButton(android.R.string.ok, null).show();
+                onInitListener.onInit();
             }
         }
     }
@@ -111,13 +126,17 @@ public class PlayGamesClient implements PlayGamesClientInterface {
 
     @Override
     public void openLeaderBoards() {
-        if (leaderboardsClient != null && !ctx.isDestroyed()) {
-            leaderboardsClient.getAllLeaderboardsIntent().addOnSuccessListener(new OnSuccessListener<Intent>() {
-                @Override
-                public void onSuccess(Intent intent) {
-                    ctx.startActivityForResult(intent, LEADERBOARDS_REQUEST_CODE);
-                }
-            });
+        if (leaderboardsClient != null) {
+            if (!ctx.isDestroyed()) {
+                leaderboardsClient.getAllLeaderboardsIntent().addOnSuccessListener(new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        ctx.startActivityForResult(intent, LEADERBOARDS_REQUEST_CODE);
+                    }
+                });
+            }
+        } else {
+            signInWithUI();
         }
     }
 
