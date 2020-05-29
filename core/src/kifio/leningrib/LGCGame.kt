@@ -74,11 +74,17 @@ class LGCGame(val store: StoreInterface,
 
             if (isPurchased(StoreInterface.SKU_LIST[0])) {
                 bottlesCount += 1
-            } else if (isPurchased(StoreInterface.SKU_LIST[1])) {
+            }
+
+            if (isPurchased(StoreInterface.SKU_LIST[1])) {
                 bottlesCount += 2
-            } else if (isPurchased(StoreInterface.SKU_LIST[2])) {
+            }
+
+            if (isPurchased(StoreInterface.SKU_LIST[2])) {
                 gumsCount += 1
-            } else if (isPurchased(StoreInterface.SKU_LIST[3])) {
+            }
+
+            if (isPurchased(StoreInterface.SKU_LIST[3])) {
                 gumsCount += 2
             }
 

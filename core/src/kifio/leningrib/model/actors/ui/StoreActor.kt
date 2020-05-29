@@ -59,8 +59,15 @@ class StoreActor(camera: OrthographicCamera,
 
             store.setup({
                 store.loadSku { items ->
-                    val lm = lm
-                    this.items = items
+                    val notPurchasedItems = mutableListOf<StoreItem>()
+
+                    for (i in StoreInterface.SKU_LIST.indices) {
+                        if (!LGCGame.isPurchased(StoreInterface.SKU_LIST[i])) {
+                            notPurchasedItems.add(items[i])
+                        }
+                    }
+
+                    this.items = notPurchasedItems
                     this.descriptionsHeights = items.map { item ->
                         lm.getTextHeight(item.description, lm.roboto.medium)
                     }
