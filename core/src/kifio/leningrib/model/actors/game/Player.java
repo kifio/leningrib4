@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -24,6 +25,7 @@ public class Player extends MovableActor {
 
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
+    private static final int INITIAL_BOTTLES_COUNT = 1;
 
     private float velocity = GameScreen.tileSize * 6 + (getMushroomsCount() / VELOCITY_DELIMETER);
     private int mushroomsCount = 0;
@@ -33,20 +35,13 @@ public class Player extends MovableActor {
 
     private boolean shouldCheckStuckUnderTrees = false;
     public boolean isUnderTrees = false;
-    private int bottlesCount = 0;
+    private int bottlesCount = INITIAL_BOTTLES_COUNT;
     private long score = 0;
-    private int gumsCount = 0;
 
     public Label label;
 
     public Player(float x, float y) {
-        this(x, y, 0 ,0);
-    }
-
-    public Player(float x, float y, int bottlesCount, int gumsCount) {
         super(x, y);
-        this.bottlesCount = bottlesCount;
-        this.gumsCount = gumsCount;
         label = LabelManager.getInstance().getLabel(null, x,
                 y + 1.3f * GameScreen.tileSize, Color.WHITE);
     }
@@ -93,28 +88,16 @@ public class Player extends MovableActor {
 
     public void increaseBottlesCount() {
         this.bottlesCount++;
-        LGCGame.Companion.increaseBottlesCount();
     }
 
     public void decreaseBottlesCount() {
         if (bottlesCount > 0) {
             this.bottlesCount--;
-            LGCGame.Companion.decreaseBottlesCount();
         }
     }
 
     public int getBottlesCount() {
         return bottlesCount;
-    }
-
-    public void decreaseGumsCount() {
-        if (gumsCount > 0) {
-            this.gumsCount--;
-        }
-    }
-
-    public int getGumsCount() {
-        return gumsCount;
     }
 
     public long getScore() {
@@ -219,10 +202,10 @@ public class Player extends MovableActor {
     }
 
     public void resetPlayerPath(float x, float y, ForestGraph forestGraph, @Nullable Runnable callback) {
-        float fromX = Utils.mapCoordinate(getX());
-        float fromY = Utils.mapCoordinate(getY());
-        float toX = Utils.mapCoordinate(x);
-        float toY = Utils.mapCoordinate(y);
+        float fromX = getX();
+        float fromY = getY();
+        float toX = x;
+        float toY = y;
 
         if (!forestGraph.isNodeExists(toX, toY)) {
             return;
@@ -232,13 +215,31 @@ public class Player extends MovableActor {
         }
 
         stop();
-        forestGraph.updatePath(fromX, fromY, toX, toY, path);
 
-        if (path.getCount() > 0 && current != null) {
-            SequenceAction action = getMoveActionsSequence();
-            if (callback != null) action.addAction(Actions.run(callback));
-            addAction(action);
+        SequenceAction action = new SequenceAction();
+        if (!current.getPackFile().equals(getRunningState())) {
+            action.addAction(Actions.run(new Runnable() {
+                @Override
+                public void run() {
+                    current = UIState.obtainUIState(getRunningState(), Player.this);
+                }
+            }));
         }
+        action.addAction(getMoveAction(fromX, fromY, toX, toY));
+        action.addAction(Actions.run(new Runnable() {
+            @Override
+            public void run() {
+                current = UIState.obtainUIState(getIdlingState(), Player.this);
+            }
+        }));
+        if (callback != null) action.addAction(Actions.run(callback));
+        addAction(action);
+
+//        if (path.getCount() > 0 && current != null) {
+//            SequenceAction action = getMoveActionsSequence();
+//            if (callback != null) action.addAction(Actions.run(callback));
+//            addAction(action);
+//        }
     }
 
     @Override public SequenceAction getMoveActionsSequence() {

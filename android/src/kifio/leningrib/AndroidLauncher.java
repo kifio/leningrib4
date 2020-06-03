@@ -19,7 +19,7 @@ public class AndroidLauncher extends AndroidApplication {
 		firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 		playGamesClient = new PlayGamesClient(this, firebaseAnalytics);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new LGCGame(store, playGamesClient), config);
+		initialize(new LGCGame(), config);
 	}
 
 	@Override

@@ -1,1 +1,1 @@
-include 'android', 'core', 'generator', 'generator_demo'
+include 'android', 'desktop', 'core', 'generator', 'generator_demo'

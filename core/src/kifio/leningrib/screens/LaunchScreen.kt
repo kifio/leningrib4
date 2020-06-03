@@ -81,7 +81,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
             Gdx.app.log("kifio_time", "Loading assets took: ${(finishTime - startTime) / 1000000}")
             LabelManager.getInstance()
 
-            game.executor.submit {
+            executor.submit {
                 startTime = System.nanoTime()
                 ResourcesManager.buildRegions()
                 ResourcesManager.initializeSpeeches()

@@ -11,6 +11,11 @@ class LGestureDetector(listener: GestureListener?,
         return super.keyDown(keycode)
     }
 
+    override fun keyUp(keycode: Int): Boolean {
+        gameScreen?.handleKeyUp(keycode)
+        return super.keyUp(keycode)
+    }
+
     override fun touchUp(x: Int, y: Int, pointer: Int, button: Int): Boolean {
         gameScreen?.handleTouchUp(x, y, pointer, button)
         return super.touchUp(x, y, pointer, button)

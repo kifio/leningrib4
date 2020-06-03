@@ -1,5 +1,6 @@
 package kifio.leningrib.levels
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
@@ -122,25 +123,26 @@ class CommonLevel() : Level() {
         return gameObjects
     }
 
-    fun showDailyDialogIfNeeded(camera: OrthographicCamera,
-                                lutController: LUTController,
-                                stage: Stage,
-                                callback: () -> Unit) {
+    fun showTutorialIfNeeded(camera: OrthographicCamera,
+                             lutController: LUTController,
+                             stage: Stage,
+                             game: LGCGame,
+                             callback: () -> Unit) {
 
-        if (!LGCGame.shouldShowBottleDialog()) {
-            return
-        }
+        if (game.wasTutorialShown()) return
 
-        LGCGame.keepCurrentDate()
-
-        val speeches = arrayOf("Ежедневная бутылка водки!")
+        val speeches = arrayOf(
+                "СОБЕРИ КАК МОЖНО БОЛЬШЕ ГРИБОВ И НЕ ДАЙ ЛЕСНИКАМ СЕБЯ ПОЙМАТЬ!",
+                "Используй стрелки на клавиатуре, чтобы перемещать персонажа.",
+                "В трудной ситуации жми SPACE, чтобы отвлечь лесников водкой, но помни что у тебя лишь две бутылки.")
 
         stage.addAction(Actions.delay(0.5f,
                 Actions.run {
-                    stage.addActor(Dialog(camera, lutController, speeches, arrayOf("Ок"), Array(speeches.size) { i -> ResourcesManager.GRANDMA_DIALOG_FACE }).apply {
+                    stage.addActor(Dialog(camera, lutController, speeches, arrayOf("Да я понял все", "Ок", "Да"), Array(speeches.size) { i -> ResourcesManager.GRANDMA_DIALOG_FACE }).apply {
                         this.disposeHandler = {
                             remove()
                             callback.invoke()
+                            game.setTutorialWasShown()
                         }
                     })
                 }))

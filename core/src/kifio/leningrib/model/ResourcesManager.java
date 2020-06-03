@@ -355,11 +355,10 @@ public class ResourcesManager {
     }
 
     private static @Nullable Sound getSound(String name) {
-        Preferences preferences = LGCGame.Companion.getPreferences();
-        if (preferences != null && preferences.getBoolean(LGCGame.SOUNDS)) {
+//        if (preferences != null && preferences.getBoolean(LGCGame.SOUNDS)) {
             return am.get(name, Sound.class);
-        } else {
-            return null;
-        }
+//        } else {
+//            return null;
+//        }
     }
 }

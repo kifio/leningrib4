@@ -14,7 +14,6 @@ import generator.Config
 import kifio.leningrib.LGCGame
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION
 import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION_LONG
-import kifio.leningrib.LGCGame.Companion.isFirstLevelPassed
 import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
@@ -35,6 +34,7 @@ class GameScreen(game: LGCGame,
                  private var worldMap: WorldMap    // Уровень конструируется с координатами 0,0. Карта уровня долго генерируется первый раз, передаем ее снаружи.
 ) : BaseScreen(game) {
 
+    private var movementDirections = mutableListOf<Int>()
     private val gestureListener: LInputListener? = LInputListener(this)
     private val gestureDetector: LGestureDetector? = LGestureDetector(gestureListener, this)
     private val topCameraThreshold = FirstLevel.getLevelHeight() * tileSize - Gdx.graphics.height / 2f
@@ -43,17 +43,16 @@ class GameScreen(game: LGCGame,
     private var screenEnterTime = 0f
     private var screenOut = false
     private var startGame = false
-    private var shouldShowTutorial = true
     private var paused = true
     private var storeOpened = false
     private var active = false
     private var lastKnownCameraPosition = 0f
     private var settings: Group? = null
     private var vodkaButton: SquareButton? = null
-    private var gumButton: SquareButton? = null
     private val levelSize = CommonLevel.LEVEL_HEIGHT * tileSize
     private var accumulatedTime = 0f
     private var dialogs = mutableListOf<Dialog>()
+    private var pauseButton: SquareButton? = null
 
     val lutController = LUTController()
     var gameOver = false
@@ -78,21 +77,11 @@ class GameScreen(game: LGCGame,
     fun getCameraPostion() = camera.position
 
     private fun updateCamera() {
-        if (!isFirstLevelPassed()) {
-            camera.position.y = if (player.y < bottomCameraThreshold) {
-                bottomCameraThreshold
-            } else {
-                player.y.coerceAtMost(topCameraThreshold)
-            }
-            camera.update()
-        } else {
-            if (camera.position.y > lastKnownCameraPosition) {
-                lastKnownCameraPosition = camera.position.y
-            }
-            camera.position.y = player.y.coerceAtLeast(lastKnownCameraPosition)
-            camera.update()
+        if (camera.position.y > lastKnownCameraPosition) {
+            lastKnownCameraPosition = camera.position.y
         }
-
+        camera.position.y = player.y.coerceAtLeast(lastKnownCameraPosition)
+        camera.update()
     }
 
     /*
@@ -141,7 +130,6 @@ class GameScreen(game: LGCGame,
     }
 
     private fun getNextLevel(): Level {
-        LGCGame.setFirstLevelPassed(true)
         return CommonLevel(player,
                 worldMap.addLevel(0, 0, (player.x / tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
@@ -157,11 +145,7 @@ class GameScreen(game: LGCGame,
             }
         }
 
-        if (player.gumsCount > 0) {
-            gumButton?.isVisible = true
-        }
-
-        if (isFirstLevelPassed() && player.mushroomsCount > 0) {
+        if (player.mushroomsCount > 0) {
             player.updateLabel(lutController.updateLut(delta, player.mushroomsCount))
         }
 
@@ -205,7 +189,7 @@ class GameScreen(game: LGCGame,
                     val config = Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
                     level.clearPassedLevels(currentLevel)
 
-                    game.executor.submit {
+                    executor.submit {
                         val newLevel = CommonLevel(level)
                         val levelMap = worldMap.addLevel(0, level.nextLevel + 1, null, config)
                         newLevel.addLevelMapIfNeeded(levelMap, player, config)
@@ -222,14 +206,6 @@ class GameScreen(game: LGCGame,
         }
     }
 
-    private fun getLeaderBoardsButton(offset: Float, targetHeight: Float): LeaderboardButton {
-        val lb = LeaderboardButton(camera, lutController, offset, targetHeight)
-        lb.onTouchHandler = {
-            game.openLeaderBoards()
-        }
-        return lb
-    }
-
     private fun getSettingsButton(): SquareButton {
         return SquareButton(
                 getRegion(SETTINGS_PRESSED),
@@ -239,56 +215,6 @@ class GameScreen(game: LGCGame,
         ).apply {
             onTouchHandler = {
                 openSettings()
-            }
-        }
-    }
-
-    private fun getStoreButton(): SquareButton {
-        return SquareButton(
-                getRegion(STORE_PRESSED),
-                getRegion(STORE),
-                camera,
-                lutController,
-                SquareButton.BUTTON,
-                SquareButton.LEFT
-        ).apply {
-            onTouchHandler = {
-                storeOpened = true
-                if (settings == null) {
-                    settings = Group().apply {
-                        x = -Gdx.graphics.width.toFloat()
-                        val storeActor = StoreActor(camera, lutController, game.store)
-                        storeActor.closeHandler = {
-                            if (storeOpened) {
-                                removeSettings()
-                            }
-                        }
-                        storeActor.onTouchHandler = {
-                            it?.let {
-                                game.store.launchBillingFlow(it.id)
-                            }
-//                            val msg: Array<String> = if (it != null && it.id < 2) {
-//                                player.increaseBottlesCount()
-//                                arrayOf("Ты купил цифровую водку, милок!")
-//                            } else {
-//                                player.increaseGumsCount()
-//                                arrayOf("Ты купил цифровую жвачку, милок!")
-//                            }
-//                            stage.addAction(Actions.delay(0.1f,
-//                                    Actions.run {
-//                                        stage.addActor(Dialog(camera, lutController, msg,
-//                                                arrayOf("Ок"), Array(1) { i -> GRANDMA_DIALOG_FACE }).apply {
-//                                            this.disposeHandler = {
-//                                                remove()
-//                                            }
-//                                        })
-//                                    }))
-                        }
-                        addActor(storeActor)
-                        addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
-                    }
-                    stage.addActor(settings)
-                }
             }
         }
     }
@@ -371,10 +297,9 @@ class GameScreen(game: LGCGame,
         if (gameOver) return
         gameOver = true
 
-        game.playGamesClient.submitScore(player.score)
-        var maxScore = LGCGame.getMaxScore()
+        var maxScore = game.getMaxScore()
         if (player.score > maxScore) {
-            LGCGame.saveMaxScore(player.score)
+            game.saveMaxScore(player.score)
             maxScore = player.score
         }
 
@@ -408,16 +333,12 @@ class GameScreen(game: LGCGame,
         }
 
         val settingsButton = getSettingsButton()
-        val storeButton = getStoreButton()
-        val leaderboardsButton = getLeaderBoardsButton(-tileSize.toFloat(), storeButton.getHeightWithOffsets())
 
         transitionActor?.addActor(overlay)
         transitionActor?.addActor(settingsButton)
-        transitionActor?.addActor(storeButton)
         transitionActor?.addActor(gameOverLogo)
         transitionActor?.addActor(MushroomsCountView(camera, player.score, maxScore, lutController))
         transitionActor?.addActor(restartGameButton)
-        transitionActor?.addActor(leaderboardsButton)
 
         stage.addActor(transitionActor)
     }
@@ -463,31 +384,19 @@ class GameScreen(game: LGCGame,
         }
 
         val settingsButton = getSettingsButton()
-        val storeButton = getStoreButton()
-        val leaderboardsButton = getLeaderBoardsButton(Gdx.graphics.height / 2f, storeButton.getHeightWithOffsets())
-
         resumeGameButton.onTouchHandler = {
-            if (!isFirstLevelPassed() && shouldShowTutorial) {
-                startGame = true  // Чтобы рисовать черный экран
-            }
-
             if (settings == null) {
                 settingsButton.remove()
-                storeButton.remove()
                 overlay.remove()
                 resumeGameButton.remove()
                 restartGameButton?.remove()
-                leaderboardsButton.remove()
                 resumeGame()
             }
         }
 
-
         stage.addActor(overlay)
         stage.addActor(settingsButton)
-        stage.addActor(storeButton)
         stage.addActor(resumeGameButton)
-        stage.addActor(leaderboardsButton)
 
         if (restartGameButton != null) {
             stage.addActor(restartGameButton)
@@ -512,7 +421,7 @@ class GameScreen(game: LGCGame,
     private fun resumeGame() {
         paused = false
 
-        val pauseButton = SquareButton(
+        pauseButton = SquareButton(
                 getRegion(PAUSE_PRESSED),
                 getRegion(PAUSE),
                 camera,
@@ -534,66 +443,34 @@ class GameScreen(game: LGCGame,
 
             vodkaButton?.isVisible = player.bottlesCount > 0
             vodkaButton?.onTouchHandler = {
-
-                if (vodkaButton?.isVisible == true) {
-                    setupVodka()
-                }
-
-                player.decreaseBottlesCount();
-
-                if (player.bottlesCount == 0) {
-                    vodkaButton?.remove()
-                    vodkaButton = null
-                }
+                throwBottle()
             }
         } else {
             vodkaButton?.isVisible = player.bottlesCount > 0
         }
 
-        if (gumButton == null) {
-            gumButton = SquareButton(
-                    getRegion(GUM_1_PRESSED),
-                    getRegion(GUM_1),
-                    camera, lutController,
-                    SquareButton.GUM,
-                    SquareButton.RIGHT)
-
-            gumButton?.isVisible = player.gumsCount > 0
-            gumButton?.onTouchHandler = {
-
-                if (gumButton?.isVisible == true) {
-                    player.resetMushroomCount();
-                }
-
-                player.decreaseGumsCount()
-                lutController.stop()
-
-                if (player.gumsCount == 0) {
-                    gumButton?.remove()
-                    gumButton = null
-                }
-            }
-        } else {
-            gumButton?.isVisible = player.gumsCount > 0
-        }
-
         stage.addActor(pauseButton)
         stage.addActor(vodkaButton)
-        stage.addActor(gumButton)
 
-        pauseButton.zIndex = stage.actors.count() - 1
+        pauseButton?.zIndex = stage.actors.count() - 1
         vodkaButton?.zIndex = stage.actors.count() - 1
 
-        if (shouldShowTutorial && !isFirstLevelPassed()) {
-            shouldShowTutorial = false
-            (level as? FirstLevel)?.let {
-                stage.addAction(it.showDialog(0, camera, stage, player, true))
-            }
-        }
-
-        (level as? CommonLevel)?.showDailyDialogIfNeeded(camera, lutController, stage) {
+        (level as? CommonLevel)?.showTutorialIfNeeded(camera, lutController, stage, game) {
             player.increaseBottlesCount();
             bottleWasUpdated = false
+        }
+    }
+
+    private fun throwBottle() {
+        if (vodkaButton?.isVisible == true) {
+            setupVodka()
+        }
+
+        player.decreaseBottlesCount();
+
+        if (player.bottlesCount == 0) {
+            vodkaButton?.remove()
+            vodkaButton = null
         }
     }
 
@@ -601,7 +478,6 @@ class GameScreen(game: LGCGame,
     override fun getTransitionActor(): Group = if (transitionActor == null) stage.root else transitionActor!!
 
     private fun restartGame() {
-        LGCGame.setFirstLevelPassed(true)
         blackScreenTime = 0f
         lutController.stop()
         screenOut = true  // Чтобы рисовать черный экран
@@ -641,24 +517,93 @@ class GameScreen(game: LGCGame,
         }
     }
 
-    internal fun handleKeyDown(keycode: Int): Boolean {
-        val handled = keycode == Input.Keys.BACK
-        if (handled) {
-            removeSettings()
+    internal fun handleKeyUp(keycode: Int) {
+        when (keycode) {
+            Input.Keys.LEFT,
+            Input.Keys.RIGHT,
+            Input.Keys.DOWN,
+            Input.Keys.UP -> {
+                if (movementDirections.contains(keycode)) {
+                    movementDirections.remove(keycode)
+                }
+            }
         }
+    }
+
+    internal fun handleKeyDown(keycode: Int): Boolean {
+        var handled = true
+        val x = player.x
+        val y = player.y
+
+        when (keycode) {
+            Input.Keys.LEFT -> {
+                startMovingTo(x - tileSize, y, keycode)
+                Gdx.app.log("kifio", "direction left; move to: ${x - tileSize}; $y)")
+            }
+            Input.Keys.RIGHT -> {
+                startMovingTo(x + tileSize, y, keycode)
+                Gdx.app.log("kifio", "direction right; move to: ${x + tileSize}; $y)")
+            }
+            Input.Keys.UP -> {
+                startMovingTo(x, y + tileSize, keycode)
+                Gdx.app.log("kifio", "direction up; move to: $x; ${y + tileSize}")
+            }
+            Input.Keys.DOWN -> {
+                startMovingTo(x, y - tileSize, keycode)
+                Gdx.app.log("kifio", "direction down; move to: $x; ${y + tileSize}")
+            }
+            Input.Keys.BACK -> {
+                removeSettings()
+            }
+            Input.Keys.SPACE -> {
+                throwBottle()
+            }
+            Input.Keys.ESCAPE -> {
+                if (!paused) {
+                    pauseButton?.remove()
+                    pauseGame(true)
+                } else if (settings != null) {
+                    removeSettings()
+                }
+            }
+            Input.Keys.ENTER -> {
+                if (gameOver) {
+                    restartGame()
+                } else {
+                    (stage.actors.find { it is Dialog } as? Dialog)?.handleTouch()
+                }
+            }
+            else -> {
+                handled = false
+            }
+        }
+
         return handled
+    }
+
+    private fun startMovingTo(x: Float, y: Float, movementDirection: Int) {
+        if (gameOver) {
+            this.movementDirections.clear()
+            return
+        }
+
+        level.movePlayerTo(x, y,
+                player) {
+            if (this.movementDirections.isNotEmpty()) {
+                handleKeyDown(movementDirections.last())
+            }
+        }
+
+        if (!movementDirections.contains(movementDirection)) {
+            this.movementDirections.add(movementDirection)
+        }
+
     }
 
     private fun removeSettings() {
         val sequenceAction = SequenceAction()
         val x = if (storeOpened) -Gdx.graphics.width.toFloat() else Gdx.graphics.width.toFloat()
-        settings?.let {
-            for (actor in it.children) {
-                if (actor is StoreActor) {
-                    actor.dispose(game.store)
-                }
-            }
-        }
+
         sequenceAction.addAction(Actions.moveTo(x, 0f, ANIMATION_DURATION))
         sequenceAction.addAction(Actions.run {
             settings?.remove()
@@ -693,11 +638,6 @@ class GameScreen(game: LGCGame,
             return true
         }
 
-        if (!gameOver) {
-            val targetY = y.mapYToLevel()
-            level.movePlayerTo(x.toFloat(), targetY, player, null)
-        }
-
         return true
     }
 
@@ -712,9 +652,9 @@ class GameScreen(game: LGCGame,
 
     private val renderer: ShapeRenderer = ShapeRenderer()
 
-    fun renderBlackScreen(currentTime: Float,
-                          maximumTime: Float,
-                          inverted: Boolean) {
+    private fun renderBlackScreen(currentTime: Float,
+                                  maximumTime: Float,
+                                  inverted: Boolean) {
         var alpha = (currentTime / maximumTime).coerceAtMost(1f)
         if (inverted) alpha = 1f - alpha
         Gdx.gl.glEnable(GL20.GL_BLEND)

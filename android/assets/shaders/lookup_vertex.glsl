@@ -1,9 +1,8 @@
-attribute lowp vec4 a_position;
+attribute vec4 a_position;
+attribute vec4 a_texCoord0;
 
-attribute lowp vec4 a_texCoord0;
-varying lowp vec2 v_texCoords;
-uniform highp mat4 u_projTrans;
-
+varying vec2 v_texCoords;
+uniform mat4 u_projTrans;
 
 void main() {
     v_texCoords = a_texCoord0.xy;

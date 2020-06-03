@@ -62,9 +62,9 @@ public class LabelManager {
     private Font getFont(String path) {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
         Font font = new Font(
-                generator.generateFont(getFontParameters(0.6f, 0)),
-                generator.generateFont(getFontParameters(0.8f, 0)),
-                generator.generateFont(getFontParameters(1f, 1)));
+                generator.generateFont(getFontParameters(1f, 0)),
+                generator.generateFont(getFontParameters(1.4f, 0)),
+                generator.generateFont(getFontParameters(2f, 1)));
         generator.dispose();
         return font;
     }

@@ -8,11 +8,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import kifio.leningrib.LGCGame
 import kifio.leningrib.model.actors.ShaderStage
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 abstract class BaseScreen(var game: LGCGame) : Screen {
 
+    private val spriteBatch = SpriteBatch()
+    protected val executor: ExecutorService = Executors.newSingleThreadExecutor()
+
     val camera: OrthographicCamera = OrthographicCamera()
-    val spriteBatch = SpriteBatch()
 
     lateinit var stage: Stage
 

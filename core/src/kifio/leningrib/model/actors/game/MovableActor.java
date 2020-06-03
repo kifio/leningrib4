@@ -53,7 +53,7 @@ public abstract class MovableActor extends Actor {
 		if (isPaused) return;
 		elapsedTime += delta;
 		float x = getX();
-		if (!path.nodes.isEmpty() && !MathUtils.isEqual(previousX, x) && elapsedTime - lastChangeDirectionTime > 0.2F) {
+		if (!MathUtils.isEqual(previousX, x) && elapsedTime - lastChangeDirectionTime > 0.2F) {
 			goLeft = previousX > x;
 			lastChangeDirectionTime = elapsedTime;
 		}

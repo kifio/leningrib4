@@ -29,168 +29,56 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
 
-class LGCGame(val store: StoreInterface,
-              val playGamesClient: PlayGamesClientInterface) : Game() {
+class LGCGame() : Game() {
 
     companion object {
 
         const val LEVEL_WIDTH = 10
         const val ANIMATION_DURATION = 0.3f
         const val ANIMATION_DURATION_LONG = 0.6f
+
         const val PREFERENCES_NAME = "kifio.leningrib"
+        const val MAX_SCORE = "MAX_SCORE"
+        const val TUTORIAL_WAS_SHOWN = "TUTORIAL_WAS_SHOWN"
 
-        const val FIRST_LEVEL_PASSED = "FIRST_LEVEL_PASSED"
-
-        private const val PLAYER_BOTTLES_COUNT = "PLAYER_BOTTLES_COUNT"
-        private const val PLAYER_GUMS_COUNT = "PLAYER_GUMS_COUNT"
-
-        const val MUSIC = "music"
-        const val SOUNDS = "sounds"
-        private const val WAS_LAUNCHED = "is_first_launch"
-        private const val MAX_SCORE = "max_score"
-
-        private var firstLevelPassed = false
-        private var shouldShowBottleDialog = false
-
-        private var prefs: Preferences? = null
-        private val currentDate = SimpleDateFormat("yyyy-MM-dd ", Locale.ENGLISH).format(Date())
-
-        fun isFirstLevelPassed() = firstLevelPassed
-
-        fun setFirstLevelPassed(passed: Boolean) {
-            firstLevelPassed = passed
-            prefs?.putBoolean(FIRST_LEVEL_PASSED, passed)
-            prefs?.flush()
+        private enum class Settings {
+            MUSIC, SOUNDS
         }
-
-        fun getPreferences() = prefs
 
         fun getLevelAndPlayer(worldMap: WorldMap): Pair<Player, Level> {
             val levelMap: LevelMap
             val level: Level
             val player: Player
-            var bottlesCount = 0
-            var gumsCount = 0
 
-            if (isPurchased(StoreInterface.SKU_LIST[0])) {
-                bottlesCount += 1
-            }
-
-            if (isPurchased(StoreInterface.SKU_LIST[1])) {
-                bottlesCount += 2
-            }
-
-            if (isPurchased(StoreInterface.SKU_LIST[2])) {
-                gumsCount += 1
-            }
-
-            if (isPurchased(StoreInterface.SKU_LIST[3])) {
-                gumsCount += 2
-            }
-
-            bottlesCount += getBottlesCount()
-
-            if (isFirstLevelPassed()) {
-                val config = Config(LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
-                levelMap = worldMap.addLevel(0, 0, null, config)
-                val room = levelMap.rooms[0]
-                val x = 3f
-                val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 3).toFloat()
-                player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize, bottlesCount, gumsCount)
-                level = CommonLevel(player, levelMap)
-            } else {
-                val firstRoomHeight = (Gdx.graphics.height / GameScreen.tileSize) - 2
-                val config = Config(LEVEL_WIDTH, firstRoomHeight + 20)
-                levelMap = worldMap.addFirstLevel(config, firstRoomHeight)
-                player = FirstLevel.getPlayer()
-                level = FirstLevel(player, levelMap)
-            }
-
+            val config = Config(LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
+            levelMap = worldMap.addLevel(0, 0, null, config)
+            val room = levelMap.rooms[0]
+            val x = 3f
+            val y = ThreadLocalRandom.current().nextInt(room.y + 1, room.y + room.height - 3).toFloat()
+            player = Player(x * GameScreen.tileSize, y * GameScreen.tileSize)
+            level = CommonLevel(player, levelMap)
 
             return Pair(player, level)
         }
-
-        fun shouldShowBottleDialog(): Boolean {
-            return shouldShowBottleDialog
-        }
-
-        fun keepCurrentDate() {
-            shouldShowBottleDialog = false
-            prefs?.putBoolean(currentDate, true)
-            prefs?.flush()
-        }
-
-        // TODO: Migrate to in app purchases
-        fun getBottlesCount() = getCount(PLAYER_BOTTLES_COUNT)
-
-        fun decreaseBottlesCount() {
-            val count = getCount(PLAYER_BOTTLES_COUNT)
-            if (count > 0) {
-                setCount(PLAYER_BOTTLES_COUNT, count - 1)
-            }
-        }
-
-        fun increaseBottlesCount() {
-            val count = getCount(PLAYER_BOTTLES_COUNT) + 1
-            setCount(PLAYER_BOTTLES_COUNT, count)
-        }
-
-        private fun setCount(item: String, count: Int) {
-            prefs?.putInteger(item, count)
-            prefs?.flush()
-        }
-
-        private fun getCount(item: String) = prefs?.getInteger(item) ?: 0
-
-        fun savePurchasedSku(skuList: List<String>) {
-            for (sku in skuList) {
-                prefs?.putBoolean(sku, true)
-            }
-            prefs?.flush()
-        }
-
-        fun isPurchased(sku: String): Boolean = prefs?.getBoolean(sku) == true
-
-        fun saveMaxScore(score: Long) {
-            prefs?.putLong(MAX_SCORE, score)
-            prefs?.flush()
-        }
-
-        fun getMaxScore() = prefs?.getLong(MAX_SCORE, 0) ?: 0
     }
 
-    val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private lateinit var prefs: Preferences
     private var music: Music? = null
+
     private val onCompleteListener: Music.OnCompletionListener = Music.OnCompletionListener {
-        if (prefs?.getBoolean(MUSIC) == true) {
-            setMusic()
+        if (prefs.getBoolean(Settings.MUSIC.name)) {
+            startMusic()
         }
     }
 
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
-        firstLevelPassed = prefs?.getBoolean(FIRST_LEVEL_PASSED) ?: false
 
-        shouldShowBottleDialog = prefs?.contains(currentDate) != true
-
-        if (prefs?.getBoolean(WAS_LAUNCHED) != true) {
-            prefs?.putBoolean(MUSIC, true)
-            prefs?.putBoolean(SOUNDS, true)
-            prefs?.putBoolean(WAS_LAUNCHED, true)
-            prefs?.flush()
+        if (!prefs.contains(Settings.MUSIC.name) && !prefs.contains(Settings.SOUNDS.name)) {
+            prefs.putBoolean(Settings.MUSIC.name, true)
+            prefs.putBoolean(Settings.SOUNDS.name, true)
+            prefs.flush()
         }
-
-        playGamesClient.initGoogleClientAndSignIn {
-            playGamesClient.queryScore {
-                saveMaxScore(it)
-            }
-        }
-
-        store.setup({
-            store.loadPurchases { items ->
-                savePurchasedSku(items)
-            }
-        }, { sku -> savePurchasedSku(listOf(sku)) })
 
         ResourcesManager.loadSplash()
         GameScreen.tileSize = Gdx.graphics.width / LEVEL_WIDTH
@@ -207,8 +95,8 @@ class LGCGame(val store: StoreInterface,
     }
 
     fun showGameScreen(gameScreen: GameScreen?) {
-        if (music == null && prefs?.getBoolean(MUSIC) == true) {
-            setMusic()
+        if (music == null && prefs.getBoolean(Settings.MUSIC.name)) {
+            startMusic()
         }
 
         if (gameScreen == null) return
@@ -216,26 +104,54 @@ class LGCGame(val store: StoreInterface,
         showScreen(gameScreen)
     }
 
-    private fun setMusic() {
+
+    fun isSettingEnabled(index: Int): Boolean {
+        return prefs.getBoolean(index.toString())
+    }
+
+    fun handleSetting(index: Int, enabled: Boolean) {
+        prefs.putBoolean(index.toString(), enabled)
+        prefs.flush()
+
+        if (index == Settings.MUSIC.ordinal) {
+            resetMusic(enabled)
+        }
+    }
+
+    private fun resetMusic(enabled: Boolean) {
+        if (enabled) {
+            startMusic()
+        } else {
+            stopMusic()
+        }
+    }
+
+    private fun startMusic() {
         music?.setOnCompletionListener(null)
         music = ResourcesManager.getNextMusic()
         music?.setOnCompletionListener(onCompleteListener)
         music?.play()
     }
 
-    fun resetMusic() {
-        if (prefs?.getBoolean(MUSIC) == true) {
-            setMusic()
-        } else {
-            music?.setOnCompletionListener(null)
-            music?.stop()
-            music?.dispose()
-        }
+    private fun stopMusic() {
+        music?.setOnCompletionListener(null)
+        music?.stop()
+        music?.dispose()
     }
 
-    fun openLeaderBoards() {
-        playGamesClient.openLeaderBoards()
+    fun saveMaxScore(score: Long) {
+        prefs.putLong(MAX_SCORE, score)
+        prefs.flush()
     }
+
+    fun getMaxScore() = prefs.getLong(MAX_SCORE, 0) ?: 0
+
+    fun setTutorialWasShown() {
+        prefs.putBoolean(TUTORIAL_WAS_SHOWN, true)
+        prefs.flush()
+    }
+
+    fun wasTutorialShown() = prefs.getBoolean(TUTORIAL_WAS_SHOWN)
 
     private fun showScreen(screen: Screen) {
         val currentScreen = getScreen()

@@ -8,8 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import kifio.leningrib.LGCGame
-import kifio.leningrib.LGCGame.Companion.MUSIC
-import kifio.leningrib.LGCGame.Companion.SOUNDS
 import kifio.leningrib.LUTController
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.speech.LabelManager
@@ -24,17 +22,11 @@ class SettingButton(
 
     var onTouchHandler: (() -> Unit)? = null
 
-    private val key = when (index) {
-        0 -> MUSIC
-        else -> SOUNDS
-    }
-
     private val enabledIcon = getRegion(SETTING_ENABLED)
     private val enabledIconPressed = getRegion(SETTING_ENABLED_PRESSED)
     private val disabledIcon = getRegion(SETTING_DISABLED)
     private val disabledIconPressed = getRegion(SETTING_DISABLED_PRESSED)
 
-    private var prefs = LGCGame.getPreferences()
     private var enabled: Boolean
     private var switchIcon: TextureRegion
 
@@ -58,7 +50,7 @@ class SettingButton(
             this.x = 2 * offset
         }
 
-        enabled = prefs?.getBoolean(key) == true
+        enabled = game.isSettingEnabled(index)
 
         switchIcon = if (enabled) enabledIcon else disabledIcon
 
@@ -98,12 +90,7 @@ class SettingButton(
                     disabledIcon
                 }
 
-                prefs?.putBoolean(key, enabled)
-                prefs?.flush()
-
-                if (key == MUSIC) {
-                    game.resetMusic()
-                }
+                game.handleSetting(index, enabled)
 
                 onTouchHandler?.invoke()
             }
