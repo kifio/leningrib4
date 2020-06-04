@@ -118,8 +118,8 @@ public abstract class Level {
             f.initPath(forestGraph);
         }
 
-        Gdx.app.log("kifio_level", "trees.count: " + treesManager.getObstacleTrees());
-        Gdx.app.log("kifio_level", "foresters.count: " + forestersManager.getForesters());
+//        Gdx.app.log("kifio_level", "trees.count: " + treesManager.getObstacleTrees());
+//        Gdx.app.log("kifio_level", "foresters.count: " + forestersManager.getForesters());
     }
 
     private void removeActorsFrom(Array<? extends Actor> actors, float threshold) {

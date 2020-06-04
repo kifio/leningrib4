@@ -78,7 +78,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
         if (ResourcesManager.isLoaded() && !bar) {
             bar = true
             finishTime = System.nanoTime()
-            Gdx.app.log("kifio_time", "Loading assets took: ${(finishTime - startTime) / 1000000}")
+//            Gdx.app.log("kifio_time", "Loading assets took: ${(finishTime - startTime) / 1000000}")
             LabelManager.getInstance()
 
             executor.submit {
@@ -92,7 +92,7 @@ class LaunchScreen(game: LGCGame) : BaseScreen(game) {
                 Gdx.app.postRunnable {
                     this.gameScreen = GameScreen(game, level, player, worldMap)
                     finishTime = System.nanoTime()
-                    Gdx.app.log("kifio_time", "Init first level took: ${(finishTime - startTime) / 1000000}")
+//                    Gdx.app.log("kifio_time", "Init first level took: ${(finishTime - startTime) / 1000000}")
                 }
             }
         }

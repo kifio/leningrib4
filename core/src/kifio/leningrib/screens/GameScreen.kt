@@ -189,7 +189,7 @@ class GameScreen(game: LGCGame,
 
                 if (level.nextLevel == currentLevel) {
                     level.nextLevel += 1
-                    Gdx.app.log("kifio_level", "next level should be: ${level.nextLevel}")
+//                    Gdx.app.log("kifio_level", "next level should be: ${level.nextLevel}")
                     val config = Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)
                     level.clearPassedLevels(currentLevel)
 

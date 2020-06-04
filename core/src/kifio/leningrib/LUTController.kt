@@ -30,9 +30,9 @@ class LUTController {
         val fragmentShader = Gdx.files.internal(FRAGMENT_PATH).readString()
         ShaderProgram.pedantic = false
         shader = ShaderProgram(vertexShader, fragmentShader)
-        if (shader?.isCompiled != true) {
-            Gdx.app.log("kifio_shader", shader?.log)
-        }
+//        if (shader?.isCompiled != true) {
+//            Gdx.app.log("kifio_shader", shader?.log)
+//        }
         shader = ShaderProgram(vertexShader, fragmentShader)
     }
 
@@ -68,7 +68,7 @@ class LUTController {
 //            index = 29 + ThreadLocalRandom.current().nextInt(0, 2)
         }
 
-        Gdx.app.log("kifio_lut", "lut: $index")
+//        Gdx.app.log("kifio_lut", "lut: $index")
         lutTexture = ResourcesManager.getLut(ResourcesManager.getLutName(index))
         return index
     }
