@@ -54,7 +54,7 @@ class LUTController {
                 return index
             }
 
-            intensity = accumulatedTime / effectTime
+            intensity = mushroomsCount / 50f
             return index
         } else {
             return index
@@ -62,10 +62,10 @@ class LUTController {
     }
 
     private fun setNextLut(): Int {
-        var index = mushroomsCount
+        var index = 30
 
         if (index >= 29) {
-            index = 29 + ThreadLocalRandom.current().nextInt(0, 2)
+//            index = 29 + ThreadLocalRandom.current().nextInt(0, 2)
         }
 
         Gdx.app.log("kifio_lut", "lut: $index")

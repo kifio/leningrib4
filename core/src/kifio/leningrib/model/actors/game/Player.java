@@ -25,7 +25,7 @@ public class Player extends MovableActor {
 
     private static final String IDLE = "player_idle";
     private static final String RUNING = "player_run";
-    private static final int INITIAL_BOTTLES_COUNT = 1;
+    private static final int INITIAL_BOTTLES_COUNT = 2;
 
     private float velocity = GameScreen.tileSize * 6 + (getMushroomsCount() / VELOCITY_DELIMETER);
     private int mushroomsCount = 0;
@@ -211,6 +211,10 @@ public class Player extends MovableActor {
             return;
         }
         if (MathUtils.isEqual(fromX, toX) && MathUtils.isEqual(fromY, toY)) {
+            return;
+        }
+
+        if (current == null) {
             return;
         }
 

@@ -49,10 +49,14 @@ class GameScreen(game: LGCGame,
     private var lastKnownCameraPosition = 0f
     private var settings: Group? = null
     private var vodkaButton: SquareButton? = null
+    private var settingsButton: SquareButton? = null
     private val levelSize = CommonLevel.LEVEL_HEIGHT * tileSize
     private var accumulatedTime = 0f
     private var dialogs = mutableListOf<Dialog>()
     private var pauseButton: SquareButton? = null
+    private var restartGameButton: StartGameButton? = null
+    private var resumeGameButton: StartGameButton? = null
+    private var overlay: Overlay? = null
 
     val lutController = LUTController()
     var gameOver = false
@@ -312,11 +316,11 @@ class GameScreen(game: LGCGame,
                 }
 
         transitionActor = Group()
-        val overlay = Overlay(camera, 0f, lutController)
+        overlay = Overlay(camera, 0f, lutController)
 
         val gameOverLogo = GameOverLogo(camera, lutController)
 
-        val restartGameButton = StartGameButton(
+        restartGameButton = StartGameButton(
                 3,
                 "НАЧАТЬ СНАЧАЛА",
                 lutController,
@@ -326,7 +330,7 @@ class GameScreen(game: LGCGame,
                 Color(110 / 255f, 56 / 255f, 22 / 255f, 1f)
         )
 
-        restartGameButton.onTouchHandler = {
+        restartGameButton?.onTouchHandler = {
             if (settings == null) {
                 restartGame()
             }
@@ -346,7 +350,7 @@ class GameScreen(game: LGCGame,
     private fun pauseGame(withRestartOption: Boolean) {
         paused = true
         vodkaButton?.isVisible = false
-        val overlay = Overlay(camera, 0f, lutController)
+        overlay = Overlay(camera, 0f, lutController)
 
         var resumeOffsetsCount = 0
         var restartOffsetsCount = 0
@@ -355,7 +359,7 @@ class GameScreen(game: LGCGame,
             resumeOffsetsCount = 1
             restartOffsetsCount = -1
         }
-        val resumeGameButton = StartGameButton(
+        resumeGameButton = StartGameButton(
                 resumeOffsetsCount,
                 if (withRestartOption) "ПРОДОЛЖИТЬ ИГРУ" else "НАЧАТЬ ИГРУ",
                 lutController,
@@ -364,8 +368,6 @@ class GameScreen(game: LGCGame,
                 getRegion(START_GAME),
                 Color(110 / 255f, 56 / 255f, 22 / 255f, 1f)
         )
-
-        var restartGameButton: StartGameButton? = null
 
         if (withRestartOption) {
             restartGameButton = StartGameButton(
@@ -378,20 +380,14 @@ class GameScreen(game: LGCGame,
                     Color(249 / 255f, 218 / 255f, 74f / 255f, 1f)
             )
 
-            restartGameButton.onTouchHandler = {
+            restartGameButton?.onTouchHandler = {
                 restartGame()
             }
         }
 
-        val settingsButton = getSettingsButton()
-        resumeGameButton.onTouchHandler = {
-            if (settings == null) {
-                settingsButton.remove()
-                overlay.remove()
-                resumeGameButton.remove()
-                restartGameButton?.remove()
-                resumeGame()
-            }
+        settingsButton = getSettingsButton()
+        resumeGameButton?.onTouchHandler = {
+            pressResume()
         }
 
         stage.addActor(overlay)
@@ -403,6 +399,18 @@ class GameScreen(game: LGCGame,
         }
     }
 
+    private fun pressResume() {
+        if (settings == null) {
+            settingsButton?.remove()
+            overlay?.remove()
+            resumeGameButton?.remove()
+            restartGameButton?.remove()
+            resumeGame()
+            settingsButton = null
+            overlay = null
+        }
+    }
+
     private fun openSettings() {
         if (settings == null) {
             settings = Group().apply {
@@ -410,7 +418,7 @@ class GameScreen(game: LGCGame,
                 addActor(Overlay(camera, 40 * Gdx.graphics.density, lutController,
                         getRegion(SETTINGS_BACKGROUND)))
                 addActor(SettingButton(camera, lutController, game, 0))
-                addActor(SettingButton(camera, lutController, game, 1))
+//                addActor(SettingButton(camera, lutController, game, 1))
                 addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
             }
 
@@ -420,7 +428,8 @@ class GameScreen(game: LGCGame,
 
     private fun resumeGame() {
         paused = false
-
+        resumeGameButton = null
+        restartGameButton = null
         pauseButton = SquareButton(
                 getRegion(PAUSE_PRESSED),
                 getRegion(PAUSE),
@@ -485,6 +494,8 @@ class GameScreen(game: LGCGame,
         val levelAndPlayer = LGCGame.getLevelAndPlayer(worldMap)
         val level = levelAndPlayer.second
         val player = levelAndPlayer.first
+        restartGameButton = null
+        resumeGameButton = null
         stage.actors
                 .filterIsInstance<Overlay>()
                 .forEach { it.remove() }
@@ -538,19 +549,19 @@ class GameScreen(game: LGCGame,
         when (keycode) {
             Input.Keys.LEFT -> {
                 startMovingTo(x - tileSize, y, keycode)
-                Gdx.app.log("kifio", "direction left; move to: ${x - tileSize}; $y)")
+//                Gdx.app.log("kifio", "direction left; move to: ${x - tileSize}; $y)")
             }
             Input.Keys.RIGHT -> {
                 startMovingTo(x + tileSize, y, keycode)
-                Gdx.app.log("kifio", "direction right; move to: ${x + tileSize}; $y)")
+//                Gdx.app.log("kifio", "direction right; move to: ${x + tileSize}; $y)")
             }
             Input.Keys.UP -> {
                 startMovingTo(x, y + tileSize, keycode)
-                Gdx.app.log("kifio", "direction up; move to: $x; ${y + tileSize}")
+//                Gdx.app.log("kifio", "direction up; move to: $x; ${y + tileSize}")
             }
             Input.Keys.DOWN -> {
                 startMovingTo(x, y - tileSize, keycode)
-                Gdx.app.log("kifio", "direction down; move to: $x; ${y + tileSize}")
+//                Gdx.app.log("kifio", "direction down; move to: $x; ${y + tileSize}")
             }
             Input.Keys.BACK -> {
                 removeSettings()
@@ -559,15 +570,19 @@ class GameScreen(game: LGCGame,
                 throwBottle()
             }
             Input.Keys.ESCAPE -> {
-                if (!paused) {
+                if (settings != null) {
+                    removeSettings()
+                } else if (restartGameButton != null && resumeGameButton != null) {
+                    pressResume()
+                } else if (!paused) {
                     pauseButton?.remove()
                     pauseGame(true)
-                } else if (settings != null) {
-                    removeSettings()
                 }
             }
             Input.Keys.ENTER -> {
-                if (gameOver) {
+                if (resumeGameButton != null && restartGameButton == null) {
+                    pressResume()
+                } else if (gameOver) {
                     restartGame()
                 } else {
                     (stage.actors.find { it is Dialog } as? Dialog)?.handleTouch()

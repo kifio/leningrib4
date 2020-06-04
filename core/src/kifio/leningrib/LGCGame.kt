@@ -41,9 +41,8 @@ class LGCGame() : Game() {
         const val MAX_SCORE = "MAX_SCORE"
         const val TUTORIAL_WAS_SHOWN = "TUTORIAL_WAS_SHOWN"
 
-        private enum class Settings {
-            MUSIC, SOUNDS
-        }
+        const val MUSIC = 0
+        const val SOUNDS = 1
 
         fun getLevelAndPlayer(worldMap: WorldMap): Pair<Player, Level> {
             val levelMap: LevelMap
@@ -66,7 +65,7 @@ class LGCGame() : Game() {
     private var music: Music? = null
 
     private val onCompleteListener: Music.OnCompletionListener = Music.OnCompletionListener {
-        if (prefs.getBoolean(Settings.MUSIC.name)) {
+        if (prefs.getBoolean(MUSIC.toString())) {
             startMusic()
         }
     }
@@ -74,9 +73,9 @@ class LGCGame() : Game() {
     override fun create() {
         prefs = Gdx.app.getPreferences(PREFERENCES_NAME)
 
-        if (!prefs.contains(Settings.MUSIC.name) && !prefs.contains(Settings.SOUNDS.name)) {
-            prefs.putBoolean(Settings.MUSIC.name, true)
-            prefs.putBoolean(Settings.SOUNDS.name, true)
+        if (!prefs.contains(MUSIC.toString()) && !prefs.contains(SOUNDS.toString())) {
+            prefs.putBoolean(MUSIC.toString(), true)
+            prefs.putBoolean(SOUNDS.toString(), true)
             prefs.flush()
         }
 
@@ -95,7 +94,7 @@ class LGCGame() : Game() {
     }
 
     fun showGameScreen(gameScreen: GameScreen?) {
-        if (music == null && prefs.getBoolean(Settings.MUSIC.name)) {
+        if (music == null && prefs.getBoolean(MUSIC.toString())) {
             startMusic()
         }
 
@@ -113,7 +112,7 @@ class LGCGame() : Game() {
         prefs.putBoolean(index.toString(), enabled)
         prefs.flush()
 
-        if (index == Settings.MUSIC.ordinal) {
+        if (index == MUSIC) {
             resetMusic(enabled)
         }
     }

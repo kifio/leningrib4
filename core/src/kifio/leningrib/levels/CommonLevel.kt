@@ -127,7 +127,7 @@ class CommonLevel() : Level() {
                              lutController: LUTController,
                              stage: Stage,
                              game: LGCGame,
-                             callback: () -> Unit) {
+                             callback: () -> Unit)  {
 
         if (game.wasTutorialShown()) return
 
