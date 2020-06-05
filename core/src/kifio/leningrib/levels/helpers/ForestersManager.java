@@ -23,7 +23,7 @@ public class ForestersManager extends ObjectsManager<Forester> {
     private Rectangle result = new Rectangle();
     private Sound gameOverSound = null;
     private static float caughtArea = 0.5f * GameScreen.tileSize * GameScreen.tileSize;
-    private float foresterVelocityMultiplier = 2;
+//    private float foresterVelocityMultiplier = 2;
 
     public ForestersManager(Array<Forester> foresters) {
         addForesters(foresters, false);
@@ -62,12 +62,10 @@ public class ForestersManager extends ObjectsManager<Forester> {
     }
 
     public void updateForesters(GameScreen gameScreen, float delta, ArrayList<Bottle> bottles, ForestGraph forestGraph) {
-        foresterVelocityMultiplier = 2.5f + (gameScreen.player.getMushroomsCount() / MovableActor.VELOCITY_DELIMETER);
-
         for (int i = 0; i < gameObjects.size; i++) {
             Forester forester = gameObjects.get(i);
             result.set(0f, 0f, 0f, 0f);
-            forester.velocityMultiplier = foresterVelocityMultiplier;
+            forester.velocityMultiplier = 2.5f + (gameScreen.player.getMushroomsCount() / MovableActor.VELOCITY_DELIMETER);
             if (isPlayerCaught(forester, gameScreen.player)) {
                 if (gameScreen.player.isStrong()) {
                     forester.disable(speeches[i]);

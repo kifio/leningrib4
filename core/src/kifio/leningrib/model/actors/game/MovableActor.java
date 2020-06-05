@@ -1,5 +1,6 @@
 package kifio.leningrib.model.actors.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -79,7 +80,7 @@ public abstract class MovableActor extends Actor {
 		double dx = (double) (targetX - fromX);
 		double dy = (double) (targetY - fromY);
 		float length = (float) Math.sqrt(dx * dx + dy * dy);
-		float calculatedDuration = length / getVelocity();
+		float calculatedDuration = GameScreen.tileSize / getVelocity();
 		return Actions.moveTo(targetX, targetY, calculatedDuration);
 	}
 

@@ -131,4 +131,5 @@ class SettingButton(
         1 -> "ЗВУКИ"
         else -> "ОБУЧЕНИЕ"
     }
+
 }

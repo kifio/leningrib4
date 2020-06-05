@@ -420,6 +420,18 @@ class GameScreen(game: LGCGame,
                 addActor(SettingButton(camera, lutController, game, 0))
 //                addActor(SettingButton(camera, lutController, game, 1))
                 addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
+
+                val closeStoreButton = SquareButton(
+                        getRegion(CLOSE_STORE_PRESSED),
+                        getRegion(CLOSE_STORE),
+                        camera, lutController, 1
+                )
+
+                closeStoreButton.onTouchHandler = {
+                    removeSettings()
+                }
+
+                addActor(closeStoreButton)
             }
 
             stage.addActor(settings)
@@ -602,8 +614,7 @@ class GameScreen(game: LGCGame,
             return
         }
 
-        level.movePlayerTo(x, y,
-                player) {
+        level.movePlayerTo(x, y, player) {
             if (this.movementDirections.isNotEmpty()) {
                 handleKeyDown(movementDirections.last())
             }

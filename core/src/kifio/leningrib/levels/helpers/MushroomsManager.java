@@ -112,7 +112,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
             } else if (!speechOverlapsWithDialog(dialogs, label)) {
                 speeches[index] = label;
                 speeches[index].addAction(
-                        getSpeechAction(ThreadLocalRandom.current().nextFloat() + 1f, index)
+                        getSpeechAction(ThreadLocalRandom.current().nextFloat() + 3f, index)
                 );
             }
         }
@@ -138,6 +138,7 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
     }
 
     private SequenceAction getSpeechAction(float duration, final int speechIndex) {
+        Gdx.app.log("kifio", "Mushroom speech duration: " + duration);
         SequenceAction seq = new SequenceAction();
         seq.addAction(Actions.delay(duration));
         seq.addAction(Actions.run(new Runnable() {

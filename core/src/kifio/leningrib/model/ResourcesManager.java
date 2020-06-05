@@ -263,6 +263,8 @@ public class ResourcesManager {
         putTexture(RESULT_MUSHROOM);
         putTexture(PLAYER_DIALOG_FACE);
         putTexture(GRANDMA_DIALOG_FACE);
+        putTexture(CLOSE_STORE);
+        putTexture(CLOSE_STORE_PRESSED);
         putTexture(GRASS_0, TILE_SIZE * 2, TILE_SIZE * 2);
         putTexture(GRASS_2, TILE_SIZE * 2, TILE_SIZE * 2);
     }
