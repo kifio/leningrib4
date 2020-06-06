@@ -17,7 +17,6 @@ import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION_LONG
 import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
-import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.fixed.Bottle
@@ -37,7 +36,6 @@ class GameScreen(game: LGCGame,
     private var movementDirections = mutableListOf<Int>()
     private val gestureListener: LInputListener? = LInputListener(this)
     private val gestureDetector: LGestureDetector? = LGestureDetector(gestureListener, this)
-    private val topCameraThreshold = FirstLevel.getLevelHeight() * tileSize - Gdx.graphics.height / 2f
     private var bottomCameraThreshold = Gdx.graphics.height / 2f
     private var blackScreenTime = 0f
     private var screenEnterTime = 0f
@@ -64,11 +62,7 @@ class GameScreen(game: LGCGame,
     override fun show() {
         super.show()
         resetStage()
-        if (level is FirstLevel) {
-            makeActorsVisible(false)
-        } else {
-            makeActorsVisible(true)
-        }
+        makeActorsVisible()
         pauseGame(false)
     }
 
@@ -104,38 +98,16 @@ class GameScreen(game: LGCGame,
         stage.act(delta)
         stage.draw()
 
-        val isTutorialPassed = (level as? FirstLevel)?.passed == true
-
         if (screenEnterTime < ANIMATION_DURATION) {
             screenEnterTime += delta
             renderBlackScreen(screenEnterTime, ANIMATION_DURATION, true)
-        } else if ((blackScreenTime < ANIMATION_DURATION_LONG && startGame)
-                || screenOut
-                || (blackScreenTime < ANIMATION_DURATION_LONG && isTutorialPassed)) {
-            blackScreenTime += delta
-            renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
-        } else if (isTutorialPassed && blackScreenTime >= ANIMATION_DURATION) {
-            renderBlackScreen(blackScreenTime, ANIMATION_DURATION, false)
-            player.resetPosition()
-            level = getNextLevel()
-            resetStage()
-            resumeGame()
-            lastKnownCameraPosition = Gdx.graphics.height / 2f
-            camera.position.y = player.y
-            blackScreenTime = 0f
-            screenEnterTime = 0f
         } else if (startGame && blackScreenTime >= ANIMATION_DURATION_LONG) {
             renderBlackScreen(blackScreenTime, ANIMATION_DURATION_LONG, false)
             startGame = false
             blackScreenTime = 0f
             screenEnterTime = 0f
-            makeActorsVisible(true)
+            makeActorsVisible()
         }
-    }
-
-    private fun getNextLevel(): Level {
-        return CommonLevel(player,
-                worldMap.addLevel(0, 0, (player.x / tileSize).toInt(), Config(LGCGame.LEVEL_WIDTH, CommonLevel.LEVEL_HEIGHT)))
     }
 
     private var bottleWasUpdated = false
@@ -247,11 +219,6 @@ class GameScreen(game: LGCGame,
         for (i in 0 until level.foresters.size) {
             stage.addActor(level.foresters[i])
         }
-
-        (level as? FirstLevel)?.guards?.forEach {
-            stage.addActor(it)
-            stage.addActor(it.label)
-        }
     }
 
     private fun updateStage() {
@@ -275,13 +242,6 @@ class GameScreen(game: LGCGame,
         for (i in 0 until level.foresters.size) {
             if (level.foresters[i].stage != this.stage) {
                 stage.addActor(level.foresters[i])
-            }
-        }
-
-        (level as? FirstLevel)?.let { it ->
-            it.guards?.forEach {
-                stage.addActor(it)
-                stage.addActor(it.label)
             }
         }
 
@@ -418,7 +378,6 @@ class GameScreen(game: LGCGame,
                 addActor(Overlay(camera, 40 * Gdx.graphics.density, lutController,
                         getRegion(SETTINGS_BACKGROUND)))
                 addActor(SettingButton(camera, lutController, game, 0))
-//                addActor(SettingButton(camera, lutController, game, 1))
                 addAction(Actions.moveTo(0F, 0F, ANIMATION_DURATION))
 
                 val closeStoreButton = SquareButton(
@@ -555,25 +514,21 @@ class GameScreen(game: LGCGame,
 
     internal fun handleKeyDown(keycode: Int): Boolean {
         var handled = true
-        val x = player.x
-        val y = player.y
+        val x = player.toX
+        val y = player.toY
 
         when (keycode) {
             Input.Keys.LEFT -> {
                 startMovingTo(x - tileSize, y, keycode)
-//                Gdx.app.log("kifio", "direction left; move to: ${x - tileSize}; $y)")
             }
             Input.Keys.RIGHT -> {
                 startMovingTo(x + tileSize, y, keycode)
-//                Gdx.app.log("kifio", "direction right; move to: ${x + tileSize}; $y)")
             }
             Input.Keys.UP -> {
                 startMovingTo(x, y + tileSize, keycode)
-//                Gdx.app.log("kifio", "direction up; move to: $x; ${y + tileSize}")
             }
             Input.Keys.DOWN -> {
                 startMovingTo(x, y - tileSize, keycode)
-//                Gdx.app.log("kifio", "direction down; move to: $x; ${y + tileSize}")
             }
             Input.Keys.BACK -> {
                 removeSettings()
@@ -586,7 +541,7 @@ class GameScreen(game: LGCGame,
                     removeSettings()
                 } else if (restartGameButton != null && resumeGameButton != null) {
                     pressResume()
-                } else if (!paused) {
+                } else if (!paused && !gameOver) {
                     pauseButton?.remove()
                     pauseGame(true)
                 }
@@ -614,9 +569,11 @@ class GameScreen(game: LGCGame,
             return
         }
 
-        level.movePlayerTo(x, y, player) {
+        level.movePlayerTo(x, y, camera.position.y - (Gdx.graphics.height / 2f), player) {
             if (this.movementDirections.isNotEmpty()) {
-                handleKeyDown(movementDirections.last())
+                val keyCode = movementDirections.last()
+                Gdx.app.log("kifio", "handleKeyDown: $keyCode")
+                handleKeyDown(keyCode)
             }
         }
 
@@ -670,9 +627,9 @@ class GameScreen(game: LGCGame,
     private fun Int.mapYToScreen(): Float = Gdx.graphics.height - 1f - this;
     private fun Int.mapYToLevel(): Float = camera.position.y - Gdx.graphics.height / 2f + mapYToScreen()
 
-    private fun makeActorsVisible(isVisible: Boolean) {
+    private fun makeActorsVisible() {
         stage.actors.forEach {
-            if (it is MovableActor) it.isVisible = isVisible
+            if (it is MovableActor) it.isVisible = true
         }
     }
 

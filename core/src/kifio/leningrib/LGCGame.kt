@@ -9,24 +9,16 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
-import com.sun.org.apache.xpath.internal.operations.Bool
 import generator.Config
 import kifio.leningrib.levels.CommonLevel
-import kifio.leningrib.levels.FirstLevel
 import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager
 import kifio.leningrib.model.actors.game.Player
-import kifio.leningrib.platform.PlayGamesClientInterface
-import kifio.leningrib.platform.StoreInterface
 import kifio.leningrib.screens.BaseScreen
 import kifio.leningrib.screens.GameScreen
 import kifio.leningrib.screens.LaunchScreen
 import model.LevelMap
 import model.WorldMap
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
 
 class LGCGame() : Game() {

@@ -138,7 +138,6 @@ public class MushroomsManager extends ObjectsManager<Mushroom> {
     }
 
     private SequenceAction getSpeechAction(float duration, final int speechIndex) {
-        Gdx.app.log("kifio", "Mushroom speech duration: " + duration);
         SequenceAction seq = new SequenceAction();
         seq.addAction(Actions.delay(duration));
         seq.addAction(Actions.run(new Runnable() {

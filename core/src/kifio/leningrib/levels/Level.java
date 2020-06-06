@@ -180,13 +180,17 @@ public abstract class Level {
         return mushroomsManager.gameObjects;
     }
 
-    public void movePlayerTo(float x, float y, Player player, @Nullable Runnable onFinish) {
+    public void movePlayerTo(float x,
+                             float y,
+                             float bottomThreshold,
+                             Player player,
+                             @Nullable Runnable onFinish) {
         if (player.isDexterous()) {
-            player.resetPlayerPath(x, y, dexterityForestGraph, onFinish);
+            player.resetPlayerPath(x, y, bottomThreshold, dexterityForestGraph, onFinish);
         } else if (player.isStrong()) {
-            player.resetPlayerPath(x, y, strengthForestGraph, onFinish);
+            player.resetPlayerPath(x, y, bottomThreshold, strengthForestGraph, onFinish);
         } else {
-            player.resetPlayerPath(x, y, forestGraph, onFinish);
+            player.resetPlayerPath(x, y, bottomThreshold, forestGraph, onFinish);
         }
     }
 

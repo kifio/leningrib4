@@ -180,7 +180,7 @@ public class Player extends MovableActor {
 
     @Override
     protected float getDelayTime() {
-        return 0.0f;
+        return 0.1f;
     }
 
     @Override
@@ -202,17 +202,18 @@ public class Player extends MovableActor {
         return RUNING + "_" + m.getEffectName();
     }
 
-    public void resetPlayerPath(float x, float y, ForestGraph forestGraph, @Nullable Runnable callback) {
-        float fromX = getX();
-        float fromY = getY();
+    public float toX = Utils.mapCoordinate(getX());
+    public float toY = Utils.mapCoordinate(getY());
 
-        if (!forestGraph.isNodeExists(x, y)) {
-            return;
-        }
+    public void resetPlayerPath(float x,
+                                float y,
+                                float bottomThreshold,
+                                ForestGraph forestGraph, @Nullable Runnable callback) {
 
-        if (MathUtils.isEqual(fromX, x) && MathUtils.isEqual(fromY, y)) {
-            return;
-        }
+        float fromX = toX;
+        float fromY = toY;
+        float toX = Utils.mapCoordinate(x);
+        float toY = Utils.mapCoordinate(y);
 
         if (current == null) {
             return;
@@ -230,21 +231,14 @@ public class Player extends MovableActor {
             }));
         }
 
-//        if (forestGraph.isNodeExists(
-//                Utils.mapCoordinate(x),
-//                Utils.mapCoordinate(y)
-//        )) {
-//            Gdx.app.log("kifio", "node exists, move to: x: " + x + "; y: " + y);
-//            action.addAction(getMoveAction(fromX, fromY, x, y));
-//        } else {
-//            Gdx.app.log("kifio", "node does not exists, move to: x: " + x + "; y: " + y);
-//            action.addAction(getMoveAction(
-//                    Utils.mapCoordinate(fromX),
-//                    Utils.mapCoordinate(fromY),
-//                    Utils.mapCoordinate(fromX),
-//                    Utils.mapCoordinate(fromY)));
-//        }
-        action.addAction(getMoveAction(fromX, fromY, x, y));
+        if (forestGraph.isNodeExists(toX, toY) && toY > bottomThreshold) {
+            this.toX = toX;
+            this.toY = toY;
+            action.addAction(getMoveAction(fromX, fromY, toX, toY));
+        } else {
+            // TODO: Try to handle next pressed key
+            action.addAction(Actions.delay(getDelayTime()));
+        }
 
         action.addAction(Actions.run(new Runnable() {
             @Override
@@ -252,7 +246,10 @@ public class Player extends MovableActor {
                 current = UIState.obtainUIState(getIdlingState(), Player.this);
             }
         }));
-        if (callback != null) action.addAction(Actions.run(callback));
+
+        if (callback != null) {
+            action.addAction(Actions.run(callback));
+        }
         addAction(action);
     }
 
@@ -289,10 +286,6 @@ public class Player extends MovableActor {
             }
         }));
         return seq;
-    }
-
-    public void resetPosition() {
-        setY(GameScreen.tileSize + 1);
     }
 
     public void updateLabel(int lutIndex) {
