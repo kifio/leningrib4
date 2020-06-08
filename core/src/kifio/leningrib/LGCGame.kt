@@ -36,7 +36,7 @@ class LGCGame() : Game() {
         const val MUSIC = 0
         const val SOUNDS = 1
 
-        fun getLevelAndPlayer(worldMap: WorldMap): Pair<Player, Level> {
+        fun getLevelAndPlayer(worldMap: WorldMap): Pair<Player, CommonLevel> {
             val levelMap: LevelMap
             val level: Level
             val player: Player

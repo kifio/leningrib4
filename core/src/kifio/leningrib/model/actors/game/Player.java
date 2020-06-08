@@ -1,9 +1,11 @@
 package kifio.leningrib.model.actors.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -11,7 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import kifio.leningrib.LGCGame;
 import kifio.leningrib.Utils;
@@ -31,13 +39,15 @@ public class Player extends MovableActor {
     private float velocity = GameScreen.tileSize * 6 + (getMushroomsCount() / VELOCITY_DELIMETER);
     private int mushroomsCount = 0;
     private float effectTime = 0L;
-    private Mushroom mushroom;
     private float speechTime = 0f;
-
     private boolean shouldCheckStuckUnderTrees = false;
-    public boolean isUnderTrees = false;
     private int bottlesCount = INITIAL_BOTTLES_COUNT;
     private long score = 0;
+    private Mushroom mushroom;
+    private ArrayList<Integer> movementDirections = new ArrayList<>();
+
+    public float bottomThreshold = 0f;
+    public boolean isUnderTrees = false;
 
     public Label label;
 
@@ -164,15 +174,50 @@ public class Player extends MovableActor {
         }
     }
 
-    public void clearEffect() {
-        if (mushroom == null) return;
-        clearEffectTexture();
-        mushroom = null;
+    public void addMovementDirection(Integer movementDirection) {
+        if (!movementDirections.contains(movementDirection)) {
+            movementDirections.add(movementDirection);
+            switch (movementDirection) {
+                case Input.Keys.LEFT:
+                    Gdx.app.log("kifio", "run left");
+                    break;
+                case Input.Keys.RIGHT:
+                    Gdx.app.log("kifio", "run right");
+                    break;
+                case Input.Keys.UP:
+                    Gdx.app.log("kifio", "run up");
+                    break;
+                case Input.Keys.DOWN:
+                    Gdx.app.log("kifio", "run down");
+                    break;
+            }
+            if (current != null && !current.getPackFile().equals(getRunningState())) {
+                current = UIState.obtainUIState(getRunningState(), Player.this);
+            }
+        }
     }
 
-//    public int getPassedLevelsCount() {
-//        return passedLevelsCount;
-//    }
+    public void removeMovementDirection(Integer movementDirection) {
+        movementDirections.remove(movementDirection);
+        switch (movementDirection) {
+            case Input.Keys.LEFT:
+                Gdx.app.log("kifio", "stop run left");
+                break;
+            case Input.Keys.RIGHT:
+                Gdx.app.log("kifio", "stop run right");
+                break;
+            case Input.Keys.UP:
+                Gdx.app.log("kifio", "stop run up");
+                break;
+            case Input.Keys.DOWN:
+                Gdx.app.log("kifio", "stop run down");
+                break;
+        }
+
+        if (current != null && movementDirections.isEmpty()) {
+            current = UIState.obtainUIState(getIdlingState(), Player.this);
+        }
+    }
 
     public int getMushroomsCount() {
         return mushroomsCount;
@@ -202,54 +247,63 @@ public class Player extends MovableActor {
         return RUNING + "_" + m.getEffectName();
     }
 
-    public float toX = Utils.mapCoordinate(getX());
-    public float toY = Utils.mapCoordinate(getY());
+    public void resetPlayerPath(ForestGraph forestGraph) {
 
-    public void resetPlayerPath(float x,
-                                float y,
-                                float bottomThreshold,
-                                ForestGraph forestGraph, @Nullable Runnable callback) {
+        float x = getX();
+        float y = getY();
 
-        float fromX = toX;
-        float fromY = toY;
-        float toX = Utils.mapCoordinate(x);
-        float toY = Utils.mapCoordinate(y);
+        for (int i = movementDirections.size() - 1; i >= 0; i--) {
+            int direction = movementDirections.get(i);
+            switch (direction) {
+                case Input.Keys.LEFT:
+                    x = x - GameScreen.tileSize;
+                    break;
+                case Input.Keys.RIGHT:
+                    x = x + GameScreen.tileSize;
+                    break;
+                case Input.Keys.UP:
+                    y = y + GameScreen.tileSize;
+                    break;
+                case Input.Keys.DOWN:
+                    y = y - GameScreen.tileSize;
+                    break;
+            }
 
+            if (forestGraph.isNodeExists(x, y) && y > bottomThreshold) {
+                Vector2 destination = new Vector2(x, y);
+                if (!path.nodes.contains(destination, false)) {
+                    Vector2 origin = new Vector2();
+                    int count = path.getCount();
+                    if (count == 0) {
+                        origin.x = Utils.mapCoordinate(x);
+                        origin.y = Utils.mapCoordinate(y);
+                    } else {
+                        Vector2 vec = path.get(count - 1);
+                        origin.x = vec.x;
+                        origin.y = vec.y;
+                    }
+
+                    path.add(destination);
+                    addMoveActionsSequence(origin, destination);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void addMoveActionsSequence(final Vector2 from, final Vector2  to) {
         if (current == null) {
             return;
         }
 
-        stop();
-
         SequenceAction action = new SequenceAction();
-        if (!current.getPackFile().equals(getRunningState())) {
-            action.addAction(Actions.run(new Runnable() {
-                @Override
-                public void run() {
-                    current = UIState.obtainUIState(getRunningState(), Player.this);
-                }
-            }));
-        }
-
-        if (forestGraph.isNodeExists(toX, toY) && toY > bottomThreshold) {
-            this.toX = toX;
-            this.toY = toY;
-            action.addAction(getMoveAction(fromX, fromY, toX, toY));
-        } else {
-            // TODO: Try to handle next pressed key
-            action.addAction(Actions.delay(getDelayTime()));
-        }
-
+        action.addAction(getMoveAction(from.x, from.y, to.x, to.y));
         action.addAction(Actions.run(new Runnable() {
             @Override
             public void run() {
-                current = UIState.obtainUIState(getIdlingState(), Player.this);
+                path.nodes.removeValue(to, true);
             }
         }));
-
-        if (callback != null) {
-            action.addAction(Actions.run(callback));
-        }
         addAction(action);
     }
 

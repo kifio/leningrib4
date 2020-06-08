@@ -78,6 +78,7 @@ public abstract class MovableActor extends Actor {
 
 	protected Action getMoveAction(float fromX, float fromY, float targetX, float targetY) {
 		float calculatedDuration = GameScreen.tileSize / getVelocity();
+
 		return Actions.moveTo(targetX, targetY, calculatedDuration);
 	}
 

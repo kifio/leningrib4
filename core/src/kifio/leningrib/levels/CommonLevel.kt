@@ -19,6 +19,7 @@ import kifio.leningrib.model.actors.ui.Dialog
 import kifio.leningrib.model.pathfinding.ForestGraph
 import kifio.leningrib.screens.GameScreen
 import model.LevelMap
+import sun.audio.AudioPlayer.player
 import java.util.concurrent.ThreadLocalRandom
 
 class CommonLevel() : Level() {

@@ -2,6 +2,7 @@ package kifio.leningrib.model
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 
@@ -15,12 +16,14 @@ class TreePart(private val treeTexture: TextureRegion,
 
     @JvmField
 	var position: Vector2 = Vector2(x, y)
+    val bounds: Rectangle
 
     init {
         setX(x)
         setY(y)
-        setWidth(size.toFloat())
-        setHeight(size.toFloat())
+        width = size.toFloat()
+        height = size.toFloat()
+        bounds = Rectangle(x ,y, width, height)
     }
 
     override fun draw(batch: Batch, alpha: Float) {

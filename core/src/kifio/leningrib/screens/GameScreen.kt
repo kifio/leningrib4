@@ -17,7 +17,6 @@ import kifio.leningrib.LGCGame.Companion.ANIMATION_DURATION_LONG
 import kifio.leningrib.LUTController
 import kifio.leningrib.Utils
 import kifio.leningrib.levels.CommonLevel
-import kifio.leningrib.levels.Level
 import kifio.leningrib.model.ResourcesManager.*
 import kifio.leningrib.model.actors.fixed.Bottle
 import kifio.leningrib.model.actors.game.MovableActor
@@ -28,15 +27,13 @@ import kifio.leningrib.screens.input.LInputListener
 import model.WorldMap
 
 class GameScreen(game: LGCGame,
-                 private var level: Level,
+                 private var level: CommonLevel,
                  @JvmField var player: Player,
                  private var worldMap: WorldMap    // Уровень конструируется с координатами 0,0. Карта уровня долго генерируется первый раз, передаем ее снаружи.
 ) : BaseScreen(game) {
 
-    private var movementDirections = mutableListOf<Int>()
     private val gestureListener: LInputListener? = LInputListener(this)
     private val gestureDetector: LGestureDetector? = LGestureDetector(gestureListener, this)
-    private var bottomCameraThreshold = Gdx.graphics.height / 2f
     private var blackScreenTime = 0f
     private var screenEnterTime = 0f
     private var screenOut = false
@@ -124,6 +121,9 @@ class GameScreen(game: LGCGame,
         if (player.mushroomsCount > 0) {
             player.updateLabel(lutController.updateLut(delta, player.mushroomsCount))
         }
+
+        player.bottomThreshold = camera.position.y - (Gdx.graphics.height / 2f);
+        level.updatePlayerPath(player)
 
         level.mushroomsSpeeches?.let { addSpeechesToStage(it) }
         level.forestersSpeeches?.let { addSpeechesToStage(it) }
@@ -505,30 +505,17 @@ class GameScreen(game: LGCGame,
             Input.Keys.RIGHT,
             Input.Keys.DOWN,
             Input.Keys.UP -> {
-                if (movementDirections.contains(keycode)) {
-                    movementDirections.remove(keycode)
-                }
+                player.removeMovementDirection(keycode)
             }
         }
     }
 
     internal fun handleKeyDown(keycode: Int): Boolean {
         var handled = true
-        val x = player.toX
-        val y = player.toY
 
         when (keycode) {
-            Input.Keys.LEFT -> {
-                startMovingTo(x - tileSize, y, keycode)
-            }
-            Input.Keys.RIGHT -> {
-                startMovingTo(x + tileSize, y, keycode)
-            }
-            Input.Keys.UP -> {
-                startMovingTo(x, y + tileSize, keycode)
-            }
-            Input.Keys.DOWN -> {
-                startMovingTo(x, y - tileSize, keycode)
+            Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.UP, Input.Keys.DOWN -> {
+                player.addMovementDirection(keycode)
             }
             Input.Keys.BACK -> {
                 removeSettings()
@@ -561,26 +548,6 @@ class GameScreen(game: LGCGame,
         }
 
         return handled
-    }
-
-    private fun startMovingTo(x: Float, y: Float, movementDirection: Int) {
-        if (gameOver) {
-            this.movementDirections.clear()
-            return
-        }
-
-        level.movePlayerTo(x, y, camera.position.y - (Gdx.graphics.height / 2f), player) {
-            if (this.movementDirections.isNotEmpty()) {
-                val keyCode = movementDirections.last()
-                Gdx.app.log("kifio", "handleKeyDown: $keyCode")
-                handleKeyDown(keyCode)
-            }
-        }
-
-        if (!movementDirections.contains(movementDirection)) {
-            this.movementDirections.add(movementDirection)
-        }
-
     }
 
     private fun removeSettings() {
