@@ -177,20 +177,6 @@ public class Player extends MovableActor {
     public void addMovementDirection(Integer movementDirection) {
         if (!movementDirections.contains(movementDirection)) {
             movementDirections.add(movementDirection);
-            switch (movementDirection) {
-                case Input.Keys.LEFT:
-                    Gdx.app.log("kifio", "run left");
-                    break;
-                case Input.Keys.RIGHT:
-                    Gdx.app.log("kifio", "run right");
-                    break;
-                case Input.Keys.UP:
-                    Gdx.app.log("kifio", "run up");
-                    break;
-                case Input.Keys.DOWN:
-                    Gdx.app.log("kifio", "run down");
-                    break;
-            }
             if (current != null && !current.getPackFile().equals(getRunningState())) {
                 current = UIState.obtainUIState(getRunningState(), Player.this);
             }
@@ -199,21 +185,6 @@ public class Player extends MovableActor {
 
     public void removeMovementDirection(Integer movementDirection) {
         movementDirections.remove(movementDirection);
-        switch (movementDirection) {
-            case Input.Keys.LEFT:
-                Gdx.app.log("kifio", "stop run left");
-                break;
-            case Input.Keys.RIGHT:
-                Gdx.app.log("kifio", "stop run right");
-                break;
-            case Input.Keys.UP:
-                Gdx.app.log("kifio", "stop run up");
-                break;
-            case Input.Keys.DOWN:
-                Gdx.app.log("kifio", "stop run down");
-                break;
-        }
-
         if (current != null && movementDirections.isEmpty()) {
             current = UIState.obtainUIState(getIdlingState(), Player.this);
         }

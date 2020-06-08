@@ -1,6 +1,5 @@
 package kifio.leningrib.model;
 
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.audio.Music;
@@ -15,11 +14,8 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import generator.SegmentType;
-import kifio.leningrib.LGCGame;
 
 public class ResourcesManager {
-
-    public static final int LUTS_COUNT = 30;
 
     public static final String GRASS_2 = "grass_2.png";
     public static final String GRASS_0 = "grass_0.png";
@@ -33,8 +29,6 @@ public class ResourcesManager {
     public static final String PAUSE_PRESSED = "pause_pressed.png";
     public static final String SETTINGS = "settings_unpressed.png";
     public static final String SETTINGS_PRESSED = "settings_pressed.png";
-    public static final String STORE = "store_hud.png";
-    public static final String STORE_PRESSED = "store_hud_pressed.png";
     public static final String HUD_BACKGROUND = "background_hud.png";
     public static final String LENIN_GRIB = "lenin_grib.png";
     public static final String LAUNCH_TREES = "launch_trees.png";
@@ -58,13 +52,11 @@ public class ResourcesManager {
     public static final String TRACK_2 = "sounds/track_2.ogg";
     public static final String CLICK = "sounds/click.ogg";
     public static final String GAMEOVER = "sounds/gameover.wav";
-    public static final String STORE_TOP = "store_top.png";
     public static final String VODKA_1 = "vodka_1.png";
     public static final String VODKA_2 = "vodka_2.png";
     public static final String GUM_1 = "gum_1.png";
     public static final String GUM_2 = "gum_2.png";
     public static final String GUM_1_PRESSED = "gum_1_pressed.png";
-    public static final String STORE_ITEM_BG = "store_item_bg.png";
     public static final String CLOSE_STORE = "close_store.png";
     public static final String CLOSE_STORE_PRESSED = "close_store_pressed.png";
     public static final String LEADERBOARD = "leaderboard_bg.png";
@@ -173,10 +165,6 @@ public class ResourcesManager {
         am.load(RESTART_BUTTON_PRESSED, Texture.class, param);
         am.load(GAME_OVER, Texture.class, param);
         am.load(RESULT_MUSHROOM, Texture.class, param);
-        am.load(STORE_TOP, Texture.class, param);
-        am.load(STORE, Texture.class, param);
-        am.load(STORE_PRESSED, Texture.class, param);
-        am.load(STORE_ITEM_BG, Texture.class, param);
         am.load(GAME_OVER_RESULTS_OVERLAY, Texture.class, param);
         am.load(TRACK_1, Music.class);
         am.load(TRACK_2, Music.class);
@@ -196,7 +184,6 @@ public class ResourcesManager {
         am.load(GUM_1, Texture.class, param);
         am.load(GUM_2, Texture.class, param);
         am.load(GUM_1_PRESSED, Texture.class, param);
-        am.load(STORE_ITEM_BG, Texture.class, param);
         am.load(LEADERBOARD, Texture.class, param);
         am.load(LEADERBOARD_PRESSED, Texture.class, param);
 
@@ -241,12 +228,9 @@ public class ResourcesManager {
         putTexture(LEADERBOARD);
         putTexture(LEADERBOARD_PRESSED);
         putTexture(GAME_OVER_RESULTS_OVERLAY);
-        putTexture(STORE);
         putTexture(GUM_1);
         putTexture(GUM_1_PRESSED);
         putTexture(GUM_2);
-        putTexture(STORE);
-        putTexture(STORE_PRESSED);
         putTexture(PAUSE_PRESSED);
         putTexture(HUD_BACKGROUND);
         putTexture(SETTING);
@@ -357,10 +341,6 @@ public class ResourcesManager {
     }
 
     private static @Nullable Sound getSound(String name) {
-//        if (preferences != null && preferences.getBoolean(LGCGame.SOUNDS)) {
-            return am.get(name, Sound.class);
-//        } else {
-//            return null;
-//        }
+        return am.get(name, Sound.class);
     }
 }
